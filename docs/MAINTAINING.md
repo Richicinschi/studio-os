@@ -51,4 +51,22 @@ Semver. A new or changed item is a minor version. A removed item or a changed ad
 
 ## History
 
-This repository stays private. If the kit ever goes public, push the clean tree to a separate public repository; never flip this one, because its history holds every earlier version.
+The kit has two histories that never meet. The development history lives in a private repository, the `dev` remote; it holds every earlier version, private terms included, so it is never made public. The public repository, the `origin` remote, began on 2026-11-02 with one signed commit holding the v2.0.1 tree, and each later release adds one commit on top. Never push `main` to `origin`: the two histories share no commit, and the only way through would be a force-push.
+
+## Publishing a release
+
+Day-to-day work and every release commit go to `dev` (`git push dev main`). After a release has passed every gate (`--release` runs gitleaks and the lint), publish its tree as one commit on the local branch `public`, which tracks `origin/main`. Use a worktree for it, so `main` and its gitignored local files stay where they are:
+
+```bash
+git fetch origin
+git worktree add ../studio-os-public public        # the first time: git worktree add -b public ../studio-os-public origin/main
+cd ../studio-os-public
+git rm -r -q .                                      # empty the index and the folder of tracked files
+git checkout <release commit> -- .                  # the release tree, every file
+git commit -S -m "Studio OS vX.Y.Z"                 # message: the version; the story is in CHANGELOG.md
+test "$(git rev-parse HEAD^{tree})" = "$(git rev-parse <release commit>^{tree})" && echo "same tree"
+node <your kit checkout>/tools/export/history-check.mjs public -1
+git push origin public:main
+```
+
+Expected: `same tree`, then `history-check: 1 commit(s) checked ...; 0 carry at least one`, then a plain push with no force. `history-check.mjs` reads the local files of the checkout it lives in, the one that holds them; worktrees share their branches, so it sees `public` from there. It checks the commit's whole tree, its file names and its message against the owner's name, the deny list and the private item and source names, and prints term numbers only. Any term found stops the publish: fix it in the kit, release again, and start over. Without `-1` it checks every commit on `public`, the whole public history.

@@ -2,6 +2,12 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v2.0.2 (2026-11-02)
+
+- The README is restructured and shorter: what the kit is, why, who it is for, the five phases in one table, a quick start, and what is inside; it opens with a banner (`docs/banner.png`).
+
+No catalog changes.
+
 ## v2.0.1 (2026-11-02)
 
 - The kit is now public under the MIT licence (`LICENSE`), so you can clone it without an invite or a GitHub account; the third-party skills in `catalog/skills/` keep their own licences, listed in `docs/THIRD_PARTY_NOTICES.md`.

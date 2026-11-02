@@ -1,0 +1,7 @@
+# The local files (privacy deny list, owner name) never enter git: committing them would leak what they protect.
+tools/export/*.local.txt
+tools/export/*.local.json
+# A never-share list beside the hook templates is someone's own list of terms, never the kit's.
+templates/git-hooks/never-share.local.txt
+node_modules/
+.DS_Store

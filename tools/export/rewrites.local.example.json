@@ -1,0 +1,4 @@
+[
+  { "file": "catalog/skills/zorblat-diagrams/SKILL.md", "phrase": "diagram the Quenlin app", "replacement": "diagram this app", "why": "a studio product by name", "gone": "quenlin" },
+  { "file": "catalog/agents/zorblat-seat.md", "pattern": "Quenlin (?:game|app) review\\n", "replacement": "", "why": "a studio product by name", "gone": "quenlin" }
+]

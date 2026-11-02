@@ -1,0 +1,10 @@
+# Copy to privacy.local.txt (gitignored) and replace these fake entries with the real ones.
+# One term per line, matched as a whole word in any case. Lines starting with # are comments.
+# The owner's first name (also in owner.local.txt)
+Zorblat
+# People (anyone who is not a public author)
+Jane Example
+# Clients and employers
+Example Corp
+# Personal identifiers: emails, key ids, registration numbers
+someone@example.invalid

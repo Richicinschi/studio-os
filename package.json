@@ -1,0 +1,14 @@
+{
+  "name": "studio-os",
+  "version": "2.0.1",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Studio OS: adopt a solo studio's way of working with Claude, piece by piece.",
+  "scripts": {
+    "test": "node --test \"tools/export/test/*.test.mjs\"",
+    "lint": "node tools/export/lint-content.mjs",
+    "export": "node tools/export/export.mjs"
+  },
+  "engines": { "node": ">=22" }
+}

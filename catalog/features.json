@@ -1,0 +1,1186 @@
+{
+  "kit": "studio-os",
+  "version": "2.0.0",
+  "heavyTokens": 1000,
+  "modules": [
+    {
+      "id": "01-continuity",
+      "title": "Continuity",
+      "items": [
+        {
+          "id": "front-door",
+          "kind": "practice",
+          "title": "The front-door instruction file",
+          "importance": "recommended",
+          "why": "Without one file every session reads first, each session guesses who you are, what the rules are and what to load.",
+          "loads": "every-session",
+          "everySessionTokens": 358,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/front-door.md",
+          "files": [
+            "templates/AGENTS.md"
+          ]
+        },
+        {
+          "id": "handoff",
+          "kind": "skill",
+          "importance": "recommended",
+          "why": "A new day starts from zero; the handoff note, and the skill that writes it, let the next session start where you stopped.",
+          "loads": "every-session",
+          "everySessionTokens": 127,
+          "onDemandTokens": 1816,
+          "heavy": false,
+          "card": "cards/handoff.md"
+        },
+        {
+          "id": "memory-index",
+          "kind": "practice",
+          "title": "The memory folder with its index",
+          "importance": "recommended",
+          "why": "Chat history is not memory; one fact per file and a one-line index let the next session find what was learned.",
+          "loads": "every-session",
+          "everySessionTokens": 55,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/memory-index.md",
+          "files": [
+            "templates/memory/MEMORY.md"
+          ]
+        },
+        {
+          "id": "session-end-check",
+          "kind": "practice",
+          "title": "A check before a session ends",
+          "importance": "recommended",
+          "why": "Work left uncommitted or unpushed at the end of a session is found days later, or never; this names it before you stop.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/session-end-check.md",
+          "files": [
+            "templates/hooks/session-end-check.mjs"
+          ]
+        },
+        {
+          "id": "vault",
+          "kind": "practice",
+          "title": "The memory vault",
+          "importance": "recommended",
+          "why": "Shortening memory to make room loses it; the vault keeps the full text word for word and leaves a pointer behind.",
+          "loads": "on-demand",
+          "everySessionTokens": 0,
+          "onDemandTokens": 53,
+          "heavy": false,
+          "card": "cards/vault.md",
+          "files": [
+            "templates/memory/vault/MEMORY-VAULT.md"
+          ]
+        },
+        {
+          "id": "claude-md-curator",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Only once your front door passes about 30,000 characters: it moves old entries to an archive, never deletes them.",
+          "loads": "every-session",
+          "everySessionTokens": 179,
+          "onDemandTokens": 1563,
+          "heavy": false,
+          "card": "cards/claude-md-curator.md"
+        },
+        {
+          "id": "decision-log",
+          "kind": "practice",
+          "title": "A decision log",
+          "importance": "optional",
+          "why": "A decision whose reason was never written gets argued again months later; one dated entry per decision keeps the why.",
+          "loads": "every-session",
+          "everySessionTokens": 51,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/decision-log.md",
+          "files": [
+            "templates/decisions/DECISIONS.md"
+          ]
+        },
+        {
+          "id": "session-start-status",
+          "kind": "practice",
+          "title": "A status line at the start of a session",
+          "importance": "optional",
+          "why": "Unpushed work, stale branches and an outdated front door show up at the start, in at most ten lines.",
+          "loads": "every-session",
+          "everySessionTokens": 200,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/session-start-status.md",
+          "files": [
+            "templates/hooks/session-start-status.mjs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "02-context-and-models",
+      "title": "Context and models",
+      "items": [
+        {
+          "id": "context-habits",
+          "kind": "practice",
+          "title": "Context habits",
+          "importance": "recommended",
+          "why": "Long threads get heavy and forgetful; a fresh session per day or task, and bulk reading in subagents, keep each one light.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/context-habits.md",
+          "files": [
+            "cards/context-habits.md"
+          ]
+        },
+        {
+          "id": "rules-on-demand",
+          "kind": "practice",
+          "title": "Rules loaded only when needed",
+          "importance": "recommended",
+          "why": "Every rule in the front door costs tokens on every turn; a short table says which file to read before which task.",
+          "loads": "every-session",
+          "everySessionTokens": 89,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/rules-on-demand.md",
+          "files": [
+            "cards/rules-on-demand.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "03-planning",
+      "title": "Planning",
+      "items": [
+        {
+          "id": "brainstorming",
+          "kind": "skill",
+          "importance": "recommended",
+          "why": "Building starts before anyone says what \"done\" means; this turns an idea into a design you approve first.",
+          "loads": "every-session",
+          "everySessionTokens": 54,
+          "onDemandTokens": 3331,
+          "heavy": false,
+          "card": "cards/brainstorming.md"
+        },
+        {
+          "id": "setup-check",
+          "kind": "practice",
+          "title": "Check my setup",
+          "importance": "recommended",
+          "why": "Adopted items drift: a hook switched off, a tool uninstalled; one command re-runs every check from your adoption plan.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/setup-check.md",
+          "files": [
+            "cards/setup-check.md"
+          ]
+        },
+        {
+          "id": "writing-plans",
+          "kind": "skill",
+          "importance": "recommended",
+          "why": "An approved design becomes small tasks, each with its own check, so progress can be seen and resumed.",
+          "loads": "every-session",
+          "everySessionTokens": 21,
+          "onDemandTokens": 2539,
+          "heavy": false,
+          "card": "cards/writing-plans.md"
+        },
+        {
+          "id": "coding-guidelines",
+          "kind": "external",
+          "title": "The coding guidelines",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Agents overbuild, guess silently and change more than asked; four short rules keep code simple and changes surgical.",
+          "loads": "every-session",
+          "everySessionTokens": 631,
+          "onDemandTokens": null,
+          "heavy": false,
+          "card": "cards/coding-guidelines.md"
+        },
+        {
+          "id": "drill-to-plan",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "For a vague, big ask: it interviews you one question at a time until the spec leaves no decision open.",
+          "loads": "every-session",
+          "everySessionTokens": 166,
+          "onDemandTokens": 1801,
+          "heavy": false,
+          "card": "cards/drill-to-plan.md"
+        },
+        {
+          "id": "executing-plans",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Claude carries out a written plan task by task in one session, with a ledger that survives forgetting and one review at the end.",
+          "loads": "every-session",
+          "everySessionTokens": 43,
+          "onDemandTokens": 4360,
+          "heavy": false,
+          "card": "cards/executing-plans.md"
+        },
+        {
+          "id": "frontend-design",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended"
+          },
+          "why": "For software work with a user interface: deliberate visual choices instead of templated defaults.",
+          "loads": "every-session",
+          "everySessionTokens": 51,
+          "onDemandTokens": 2276,
+          "heavy": false,
+          "card": "cards/frontend-design.md"
+        },
+        {
+          "id": "superpowers",
+          "kind": "external",
+          "title": "superpowers, the upstream plugin",
+          "importance": "optional",
+          "why": "The upstream plugin, if you prefer it to the kit's adapted copy of its skills. Heavy: about 1,465 tokens at start-up.",
+          "loads": "every-session",
+          "everySessionTokens": 1465,
+          "onDemandTokens": null,
+          "heavy": true,
+          "card": "cards/superpowers.md"
+        },
+        {
+          "id": "verification-before-completion",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A passing check is often a broken check; nothing is called done until the command that proves it has run.",
+          "loads": "every-session",
+          "everySessionTokens": 57,
+          "onDemandTokens": 841,
+          "heavy": false,
+          "card": "cards/verification-before-completion.md"
+        },
+        {
+          "id": "verify-before-push",
+          "kind": "practice",
+          "title": "One local check before every push",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A push that breaks the build is found by someone else; one script that runs every test and lint first finds it on your machine.",
+          "loads": "every-session",
+          "everySessionTokens": 32,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/verify-before-push.md",
+          "files": [
+            "cards/verify-before-push.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "04-delegation",
+      "title": "Delegation",
+      "items": [
+        {
+          "id": "dispatching-parallel-agents",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "When work splits into independent parts, they run at the same time instead of one after another.",
+          "loads": "every-session",
+          "everySessionTokens": 27,
+          "onDemandTokens": 1479,
+          "heavy": false,
+          "card": "cards/dispatching-parallel-agents.md"
+        },
+        {
+          "id": "improve",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Reads a whole codebase and writes ranked, self-contained plans for other sessions to carry out; it changes nothing itself.",
+          "loads": "every-session",
+          "everySessionTokens": 127,
+          "onDemandTokens": 3640,
+          "heavy": false,
+          "card": "cards/improve.md"
+        },
+        {
+          "id": "long-jobs-in-containers",
+          "kind": "practice",
+          "title": "Long jobs in named containers",
+          "importance": {
+            "default": "optional",
+            "ml": "recommended"
+          },
+          "why": "A long job in a background shell dies unseen; a named container survives, can be watched, and keeps heavy work off your main machine.",
+          "loads": "every-session",
+          "everySessionTokens": 77,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/long-jobs-in-containers.md",
+          "files": [
+            "cards/long-jobs-in-containers.md"
+          ]
+        },
+        {
+          "id": "subagent-driven-development",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Runs a plan's independent tasks through subagents, with one review at the end, while the main thread keeps deciding.",
+          "loads": "every-session",
+          "everySessionTokens": 22,
+          "onDemandTokens": 4953,
+          "heavy": false,
+          "card": "cards/subagent-driven-development.md"
+        }
+      ]
+    },
+    {
+      "id": "05-skills",
+      "title": "Skills",
+      "items": [
+        {
+          "id": "skillspector",
+          "kind": "external",
+          "title": "SkillSpector with the scan-first rule",
+          "importance": "core",
+          "why": "A copied skill can carry a prompt injection or send data out; every later item is scanned with it before it is installed.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": null,
+          "heavy": false,
+          "card": "cards/skillspector.md"
+        },
+        {
+          "id": "writing-great-skills",
+          "kind": "skill",
+          "importance": "recommended",
+          "why": "Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable.",
+          "loads": "every-session",
+          "everySessionTokens": 114,
+          "onDemandTokens": 2361,
+          "heavy": false,
+          "card": "cards/writing-great-skills.md"
+        },
+        {
+          "id": "using-agent-skills",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Once you lose track of your skills: one router that names each skill and when to reach for it.",
+          "loads": "every-session",
+          "everySessionTokens": 86,
+          "onDemandTokens": 1000,
+          "heavy": false,
+          "card": "cards/using-agent-skills.md"
+        }
+      ]
+    },
+    {
+      "id": "06-git-and-guardrails",
+      "title": "Git and guardrails",
+      "items": [
+        {
+          "id": "git-guardrails",
+          "kind": "skill",
+          "importance": "recommended",
+          "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
+          "loads": "every-session",
+          "everySessionTokens": 118,
+          "onDemandTokens": 954,
+          "heavy": false,
+          "card": "cards/git-guardrails.md"
+        },
+        {
+          "id": "git-hooks",
+          "kind": "practice",
+          "title": "The git hook templates",
+          "importance": "recommended",
+          "why": "Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/git-hooks.md",
+          "files": [
+            "templates/git-hooks"
+          ]
+        },
+        {
+          "id": "commit-and-pr-writing",
+          "kind": "practice",
+          "title": "Commit messages and PR bodies that say why",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does.",
+          "loads": "every-session",
+          "everySessionTokens": 69,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/commit-and-pr-writing.md",
+          "files": [
+            "cards/commit-and-pr-writing.md"
+          ]
+        },
+        {
+          "id": "finishing-a-development-branch",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own.",
+          "loads": "every-session",
+          "everySessionTokens": 26,
+          "onDemandTokens": 2185,
+          "heavy": false,
+          "card": "cards/finishing-a-development-branch.md"
+        },
+        {
+          "id": "git-cleanup",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any.",
+          "loads": "every-session",
+          "everySessionTokens": 39,
+          "onDemandTokens": 3079,
+          "heavy": false,
+          "card": "cards/git-cleanup.md"
+        },
+        {
+          "id": "git-identity-per-folder",
+          "kind": "practice",
+          "title": "One git identity per folder",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Company work committed under a personal address, or the reverse, is hard to undo; each folder picks its own address.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/git-identity-per-folder.md",
+          "files": [
+            "cards/git-identity-per-folder.md"
+          ]
+        },
+        {
+          "id": "grant-ledger",
+          "kind": "practice",
+          "title": "The grant ledger for risky acts",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "One recorded yes per force-push, merge, tag or hook skip, so a vague \"clean up\" never covers an act you did not name.",
+          "loads": "every-session",
+          "everySessionTokens": 101,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/grant-ledger.md",
+          "files": [
+            "cards/grant-ledger.md"
+          ]
+        },
+        {
+          "id": "merge-commit-only",
+          "kind": "practice",
+          "title": "Merge commits only",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A squash folds a branch into one commit and a rebase rewrites every one; a merge commit keeps the full history.",
+          "loads": "every-session",
+          "everySessionTokens": 78,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/merge-commit-only.md",
+          "files": [
+            "cards/merge-commit-only.md"
+          ]
+        },
+        {
+          "id": "never-share-list",
+          "kind": "practice",
+          "title": "A never-share list",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Client names and internal terms leak through commits and posts; a private list the pre-commit checks refuses them first.",
+          "loads": "every-session",
+          "everySessionTokens": 61,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/never-share-list.md",
+          "files": [
+            "templates/git-hooks/check-staged.mjs"
+          ]
+        },
+        {
+          "id": "rules-audit",
+          "kind": "practice",
+          "title": "The periodic rules audit",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Rules drift from what enforces them; a read-only session every few months finds contradictions and gaps.",
+          "loads": "on-demand",
+          "everySessionTokens": 0,
+          "onDemandTokens": 379,
+          "heavy": false,
+          "card": "cards/rules-audit.md",
+          "files": [
+            "templates/audit/rules-audit-brief.md"
+          ]
+        },
+        {
+          "id": "signed-commits",
+          "kind": "practice",
+          "title": "Signed commits",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A signature proves a commit came from you; some companies require it, and a server shows signed commits as verified.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/signed-commits.md",
+          "files": [
+            "cards/signed-commits.md"
+          ]
+        },
+        {
+          "id": "using-git-worktrees",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Sets up a separate worktree for a branch, so parallel work never switches branches under another session.",
+          "loads": "every-session",
+          "everySessionTokens": 49,
+          "onDemandTokens": 1926,
+          "heavy": false,
+          "card": "cards/using-git-worktrees.md"
+        },
+        {
+          "id": "worktrees",
+          "kind": "practice",
+          "title": "One worktree per parallel session",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Two sessions in one checkout switch branches under each other; a worktree each keeps their work apart.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/worktrees.md",
+          "files": [
+            "cards/worktrees.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "07-identity-and-contract",
+      "title": "Identity and contract",
+      "items": [
+        {
+          "id": "identity-relationship",
+          "kind": "practice",
+          "title": "RELATIONSHIP.md: what needs your OK",
+          "importance": "recommended",
+          "why": "Without a written contract Claude asks about the obvious and skips the risky; the yes-list and the never-list settle it.",
+          "loads": "every-session",
+          "everySessionTokens": 91,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/identity-relationship.md",
+          "files": [
+            "templates/identity/RELATIONSHIP.md"
+          ]
+        },
+        {
+          "id": "identity-user",
+          "kind": "practice",
+          "title": "USER.md: who you are",
+          "importance": "recommended",
+          "why": "Every session guesses who you are and what you know; a short page you wrote ends the guessing.",
+          "loads": "every-session",
+          "everySessionTokens": 79,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/identity-user.md",
+          "files": [
+            "templates/identity/USER.md"
+          ]
+        },
+        {
+          "id": "identity-soul",
+          "kind": "practice",
+          "title": "SOUL.md: the values Claude works by",
+          "importance": "optional",
+          "why": "For those who want stated values, such as measure before claiming; most setups do without it.",
+          "loads": "every-session",
+          "everySessionTokens": 75,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/identity-soul.md",
+          "files": [
+            "templates/identity/SOUL.md"
+          ]
+        },
+        {
+          "id": "identity-style",
+          "kind": "practice",
+          "title": "STYLE.md: how to write for you",
+          "importance": "optional",
+          "why": "Corrections to tone and format vanish by the next morning; recommended when output habits already annoy you.",
+          "loads": "every-session",
+          "everySessionTokens": 58,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/identity-style.md",
+          "files": [
+            "templates/identity/STYLE.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "08-agents-and-council",
+      "title": "Agents and the council",
+      "items": [
+        {
+          "id": "atlas-operator",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A council seat for ship discipline: what ships next, what is blocked, what to cut.",
+          "loads": "every-session",
+          "everySessionTokens": 69,
+          "onDemandTokens": 389,
+          "heavy": false,
+          "card": "cards/atlas-operator.md"
+        },
+        {
+          "id": "bob-builder",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "Builds a planned feature test-first in its own worktree, so the main thread keeps planning.",
+          "loads": "every-session",
+          "everySessionTokens": 55,
+          "onDemandTokens": 302,
+          "heavy": false,
+          "card": "cards/bob-builder.md"
+        },
+        {
+          "id": "council",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "One model gives one view of a big decision; the council asks several seats that disagree and returns one brief.",
+          "loads": "every-session",
+          "everySessionTokens": 154,
+          "onDemandTokens": 1260,
+          "heavy": false,
+          "card": "cards/council.md"
+        },
+        {
+          "id": "fred-advocate",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A council seat for the person at the other end: do they care, understand and benefit?",
+          "loads": "every-session",
+          "everySessionTokens": 58,
+          "onDemandTokens": 277,
+          "heavy": false,
+          "card": "cards/fred-advocate.md"
+        },
+        {
+          "id": "jony-designer",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A council seat for design and polish: does it look and feel considered?",
+          "loads": "every-session",
+          "everySessionTokens": 60,
+          "onDemandTokens": 311,
+          "heavy": false,
+          "card": "cards/jony-designer.md"
+        },
+        {
+          "id": "karen-skeptic",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A board that nods along is worthless: this seat's whole job is to find what is wrong with a plan before you commit.",
+          "loads": "every-session",
+          "everySessionTokens": 57,
+          "onDemandTokens": 276,
+          "heavy": false,
+          "card": "cards/karen-skeptic.md"
+        },
+        {
+          "id": "linus-reviewer",
+          "kind": "agent",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line.",
+          "loads": "every-session",
+          "everySessionTokens": 51,
+          "onDemandTokens": 327,
+          "heavy": false,
+          "card": "cards/linus-reviewer.md"
+        },
+        {
+          "id": "lorn-founder",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A council seat that asks whether a thing deserves your time at all, before how to build it.",
+          "loads": "every-session",
+          "everySessionTokens": 69,
+          "onDemandTokens": 325,
+          "heavy": false,
+          "card": "cards/lorn-founder.md"
+        },
+        {
+          "id": "marie-architect",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A council seat that asks whether this is the simplest thing that works, and fights over-engineering.",
+          "loads": "every-session",
+          "everySessionTokens": 64,
+          "onDemandTokens": 289,
+          "heavy": false,
+          "card": "cards/marie-architect.md"
+        },
+        {
+          "id": "midas-treasurer",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "A council seat for money: does it pay, and soon? The simplest paid test first.",
+          "loads": "every-session",
+          "everySessionTokens": 59,
+          "onDemandTokens": 281,
+          "heavy": false,
+          "card": "cards/midas-treasurer.md"
+        },
+        {
+          "id": "receiving-code-review",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Review feedback taken on trust, or argued away, both go wrong; this checks each point before acting on it.",
+          "loads": "every-session",
+          "everySessionTokens": 59,
+          "onDemandTokens": 1480,
+          "heavy": false,
+          "card": "cards/receiving-code-review.md"
+        },
+        {
+          "id": "requesting-code-review",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges.",
+          "loads": "every-session",
+          "everySessionTokens": 27,
+          "onDemandTokens": 754,
+          "heavy": false,
+          "card": "cards/requesting-code-review.md"
+        },
+        {
+          "id": "saul-counsel",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "An on-call council seat for legal, privacy and policy questions; it cites the rule and is cautious.",
+          "loads": "every-session",
+          "everySessionTokens": 57,
+          "onDemandTokens": 315,
+          "heavy": false,
+          "card": "cards/saul-counsel.md"
+        },
+        {
+          "id": "sherlock-researcher",
+          "kind": "agent",
+          "importance": "optional",
+          "why": "Deep research across many sources, with every claim cited, for questions one search will not settle.",
+          "loads": "every-session",
+          "everySessionTokens": 57,
+          "onDemandTokens": 344,
+          "heavy": false,
+          "card": "cards/sherlock-researcher.md"
+        }
+      ]
+    },
+    {
+      "id": "09-data-work",
+      "title": "Data work",
+      "items": [
+        {
+          "id": "anthropic-document-skills",
+          "kind": "external",
+          "title": "Anthropic's document skills in claude.ai",
+          "importance": {
+            "default": "optional",
+            "data": "recommended"
+          },
+          "why": "Excel, Word, PowerPoint and PDF files made and read in claude.ai; built in, switched on in settings.",
+          "loads": "on-demand",
+          "everySessionTokens": 0,
+          "onDemandTokens": null,
+          "heavy": false,
+          "card": "cards/anthropic-document-skills.md"
+        },
+        {
+          "id": "building-pydantic-ai-agents",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "For agents built in Python with Pydantic AI: tools, structured output, streaming and testing.",
+          "loads": "every-session",
+          "everySessionTokens": 90,
+          "onDemandTokens": 2973,
+          "heavy": false,
+          "card": "cards/building-pydantic-ai-agents.md"
+        },
+        {
+          "id": "claim-auditor",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "data": "recommended",
+            "ml": "recommended"
+          },
+          "why": "A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships.",
+          "loads": "every-session",
+          "everySessionTokens": 140,
+          "onDemandTokens": 1057,
+          "heavy": false,
+          "card": "cards/claim-auditor.md"
+        },
+        {
+          "id": "codebase-design",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended"
+          },
+          "why": "Shared words for designing modules with small interfaces, so code stays testable as it grows.",
+          "loads": "every-session",
+          "everySessionTokens": 75,
+          "onDemandTokens": 1545,
+          "heavy": false,
+          "card": "cards/codebase-design.md"
+        },
+        {
+          "id": "diagnosing-bugs",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "For a hard bug or a slowdown: it builds a feedback loop that can fail before it guesses at a cause.",
+          "loads": "every-session",
+          "everySessionTokens": 60,
+          "onDemandTokens": 2762,
+          "heavy": false,
+          "card": "cards/diagnosing-bugs.md"
+        },
+        {
+          "id": "drawio-diagrams",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Turns a system or data flow into an editable diagram file, kept on your machine.",
+          "loads": "every-session",
+          "everySessionTokens": 181,
+          "onDemandTokens": 1992,
+          "heavy": false,
+          "card": "cards/drawio-diagrams.md"
+        },
+        {
+          "id": "modern-python",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "Sets up Python projects with uv and ruff, for new projects or a move off pip, Poetry or black.",
+          "loads": "every-session",
+          "everySessionTokens": 40,
+          "onDemandTokens": 2454,
+          "heavy": false,
+          "card": "cards/modern-python.md"
+        },
+        {
+          "id": "production-fastapi",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "For a FastAPI service: logging, health checks, shutdown, error handling and security patterns.",
+          "loads": "every-session",
+          "everySessionTokens": 139,
+          "onDemandTokens": 6081,
+          "heavy": false,
+          "card": "cards/production-fastapi.md"
+        },
+        {
+          "id": "supply-chain-risk-auditor",
+          "kind": "skill",
+          "importance": "optional",
+          "why": "A package installed because a snippet needed it: this checks who maintains your dependencies and how risky each is.",
+          "loads": "every-session",
+          "everySessionTokens": 70,
+          "onDemandTokens": 1373,
+          "heavy": false,
+          "card": "cards/supply-chain-risk-auditor.md"
+        },
+        {
+          "id": "tdd",
+          "kind": "skill",
+          "importance": {
+            "default": "optional",
+            "software": "recommended",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "Agent tool calls that were never tested fail in front of users; this builds features test-first, red then green.",
+          "loads": "every-session",
+          "everySessionTokens": 61,
+          "onDemandTokens": 1953,
+          "heavy": false,
+          "card": "cards/tdd.md"
+        }
+      ]
+    },
+    {
+      "id": "10-tools-and-mcp",
+      "title": "Tools and MCP servers",
+      "items": [
+        {
+          "id": "mcp-least-access",
+          "kind": "practice",
+          "title": "MCP servers with the least access",
+          "importance": "optional",
+          "why": "Whatever a connected server can read, a session can read; recommended as soon as you have or want one.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/mcp-least-access.md",
+          "files": [
+            "cards/mcp-least-access.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "11-workspace-layout",
+      "title": "Workspace layout and restructuring",
+      "items": [
+        {
+          "id": "claude-ai-project",
+          "kind": "practice",
+          "title": "The claude.ai Project instructions",
+          "importance": "recommended",
+          "why": "A new claude.ai chat knows nothing; Project instructions and a handoff note in its knowledge carry your work across chats.",
+          "loads": "every-session",
+          "everySessionTokens": 194,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/claude-ai-project.md",
+          "files": [
+            "templates/claude-ai/PROJECT-INSTRUCTIONS.md"
+          ]
+        },
+        {
+          "id": "project-registry",
+          "kind": "practice",
+          "title": "A project registry",
+          "importance": "optional",
+          "why": "With more than three repositories a session loses track of what exists where; one index row each says where to start.",
+          "loads": "on-demand",
+          "everySessionTokens": 0,
+          "onDemandTokens": 108,
+          "heavy": false,
+          "card": "cards/project-registry.md",
+          "files": [
+            "templates/registry/PROJECTS.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "12-experiments-and-evaluation",
+      "title": "Experiments and evaluation",
+      "items": [
+        {
+          "id": "baseline-before-claim",
+          "kind": "practice",
+          "title": "A baseline before any claim",
+          "importance": {
+            "default": "optional",
+            "ml": "recommended",
+            "data": "recommended"
+          },
+          "why": "A number with nothing to compare against proves nothing; a passing check can be a broken one.",
+          "loads": "every-session",
+          "everySessionTokens": 96,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/baseline-before-claim.md",
+          "files": [
+            "cards/baseline-before-claim.md"
+          ]
+        },
+        {
+          "id": "negative-results",
+          "kind": "practice",
+          "title": "Negative results recorded as results",
+          "importance": {
+            "default": "optional",
+            "ml": "recommended"
+          },
+          "why": "A failed idea that is not written down gets tried again; a recorded \"no\" saves the next run and keeps the record honest.",
+          "loads": "every-session",
+          "everySessionTokens": 86,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/negative-results.md",
+          "files": [
+            "cards/negative-results.md"
+          ]
+        },
+        {
+          "id": "real-data-seed",
+          "kind": "practice",
+          "title": "A small real-data seed",
+          "importance": {
+            "default": "optional",
+            "ml": "recommended"
+          },
+          "why": "A pipeline tested only on made-up data breaks on the first real file; a small real slice, inside your data rules, finds that first.",
+          "loads": "every-session",
+          "everySessionTokens": 51,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/real-data-seed.md",
+          "files": [
+            "cards/real-data-seed.md"
+          ]
+        },
+        {
+          "id": "sealed-holdout",
+          "kind": "practice",
+          "title": "A sealed holdout",
+          "importance": {
+            "default": "optional",
+            "ml": "recommended"
+          },
+          "why": "Every look at test data while tuning leaks it into the model; a holdout opened once, at the end, tells the truth.",
+          "loads": "every-session",
+          "everySessionTokens": 75,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/sealed-holdout.md",
+          "files": [
+            "cards/sealed-holdout.md"
+          ]
+        },
+        {
+          "id": "success-criteria-first",
+          "kind": "practice",
+          "title": "Success criteria before the run",
+          "importance": {
+            "default": "optional",
+            "ml": "recommended"
+          },
+          "why": "Criteria chosen after the results always fit them; writing them first is what lets a run fail.",
+          "loads": "every-session",
+          "everySessionTokens": 89,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/success-criteria-first.md",
+          "files": [
+            "cards/success-criteria-first.md"
+          ]
+        }
+      ]
+    }
+  ],
+  "later": [
+    {
+      "id": "wiki-graph",
+      "title": "The knowledge wiki graph",
+      "why": "A generator, a graph tool and upkeep after every session; worth it only once memory and handoff are a habit."
+    },
+    {
+      "id": "session-archive",
+      "title": "The session archive",
+      "why": "Keeps every transcript, so it needs its own privacy rules first."
+    }
+  ]
+}

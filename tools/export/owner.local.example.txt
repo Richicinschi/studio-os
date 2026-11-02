@@ -1,0 +1,5 @@
+# Copy to owner.local.txt (gitignored) and replace the invented name below with the owner's first name.
+# The export rewrites that name, and its possessive, to "the owner" in every generated file.
+# Put the same name in privacy.local.txt too, so any copy the rewrite misses fails the privacy gate.
+# The first line that is not a comment is the name.
+Zorblat

@@ -1,0 +1,1703 @@
+{
+  "kit": "studio-os",
+  "version": "2.0.0",
+  "items": [
+    {
+      "id": "ab-testing",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "ad-creative",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "ai-seo",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "analytics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "anthropic-document-skills",
+      "kind": "external",
+      "status": "link-only",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "upstream": "https://github.com/anthropics/skills",
+      "licence": "Source-available under Anthropic's terms, not open source (skills/docx/LICENSE.txt and its siblings)",
+      "install": "Built into claude.ai for Excel, Word, PowerPoint and PDF once code execution and file creation is on; see docs/facts.md, 'claude.ai: custom skills and the built-in document skills'.",
+      "importance": {
+        "default": "optional",
+        "data": "recommended"
+      },
+      "why": "Excel, Word, PowerPoint and PDF files made and read in claude.ai; built in, switched on in settings.",
+      "title": "Anthropic's document skills in claude.ai",
+      "loads": "on-demand"
+    },
+    {
+      "id": "aso",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "astro-dev",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "atlas-operator",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A council seat for ship discipline: what ships next, what is blocked, what to cut."
+    },
+    {
+      "id": "bob-builder",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "Builds a planned feature test-first in its own worktree, so the main thread keeps planning."
+    },
+    {
+      "id": "brainstorming",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "importance": "recommended",
+      "why": "Building starts before anyone says what \"done\" means; this turns an idea into a design you approve first.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "brand",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "browser-testing-with-devtools",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "build-local-site",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "building-pydantic-ai-agents",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone building agents that call tools; a reference for tool contracts.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "For agents built in Python with Pydantic AI: tools, structured output, streaming and testing."
+    },
+    {
+      "id": "churn-prevention",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "claim-auditor",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone shipping numbers, charts or dashboards that must trace back to a source.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": {
+        "default": "optional",
+        "data": "recommended",
+        "ml": "recommended"
+      },
+      "why": "A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships."
+    },
+    {
+      "id": "claude-md-curator",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "suits": "Anyone whose instruction file keeps growing until it costs context.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "Only once your front door passes about 30,000 characters: it moves old entries to an archive, never deletes them."
+    },
+    {
+      "id": "codebase-design",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone structuring code that will grow.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": {
+        "default": "optional",
+        "software": "recommended"
+      },
+      "why": "Shared words for designing modules with small interfaces, so code stays testable as it grows."
+    },
+    {
+      "id": "cold-email",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "community-marketing",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "competitor-profiling",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "competitors",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "content-strategy",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "copy-editing",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "copywriting",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "council",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "Anyone facing a real decision who wants opposing views first.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "One model gives one view of a big decision; the council asks several seats that disagree and returns one brief."
+    },
+    {
+      "id": "cro",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "customer-research",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "dataviz",
+      "kind": "external",
+      "status": "catalog-only",
+      "pack": "catalog",
+      "module": "09-data-work",
+      "upstream": "not published",
+      "licence": "none published",
+      "install": "Not documented by Anthropic, so the kit cannot say how to get it; see docs/facts.md, 'claude.ai: custom skills and the built-in document skills'.",
+      "note": "Checked 2026-11-02: not documented as an Anthropic built-in in claude.ai or Claude Code, and in neither anthropics/skills nor anthropics/claude-plugins-official. Some Claude Code builds offer it with no file on disk; an adopter cannot be told how to get it, so it is catalog-only."
+    },
+    {
+      "id": "diagnosing-bugs",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone debugging a failure or a slowdown.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "For a hard bug or a slowdown: it builds a feedback loop that can fail before it guesses at a cause."
+    },
+    {
+      "id": "dispatching-parallel-agents",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "04-delegation",
+      "importance": "optional",
+      "why": "When work splits into independent parts, they run at the same time instead of one after another.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "drawio-diagrams",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone who documents systems or data flows.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "Turns a system or data flow into an editable diagram file, kept on your machine."
+    },
+    {
+      "id": "drill-to-plan",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "suits": "Anyone starting work whose design is still vague.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "For a vague, big ask: it interviews you one question at a time until the spec leaves no decision open."
+    },
+    {
+      "id": "emails",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "executing-plans",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "importance": "optional",
+      "why": "Claude carries out a written plan task by task in one session, with a ledger that survives forgetting and one review at the end.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "finishing-a-development-branch",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "firebase-apk-scanner",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-auth-basics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-basics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-crashlytics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-firestore",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-hosting-basics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-remote-config-basics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "firebase-security-rules-auditor",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-add-integration-test",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-add-widget-preview",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-add-widget-test",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-apply-architecture-best-practices",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-build-responsive-layout",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-fix-layout-issues",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-implement-json-serialization",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-setup-declarative-routing",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-setup-localization",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "flutter-use-http-package",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "fred-advocate",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A council seat for the person at the other end: do they care, understand and benefit?"
+    },
+    {
+      "id": "frontend-design",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "importance": {
+        "default": "optional",
+        "software": "recommended"
+      },
+      "why": "For software work with a user interface: deliberate visual choices instead of templated defaults.",
+      "changes": "Vendored from Anthropic's official plugin text of 2026-09-01; the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "git-cleanup",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "suits": "Anyone whose repos collect stale branches and worktrees.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any."
+    },
+    {
+      "id": "git-guardrails",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "suits": "Anyone letting Claude run git commands.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "recommended",
+      "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run."
+    },
+    {
+      "id": "godot-audit",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "godot-camera-systems",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "godot-export-builds",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "godot-particles",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "godot-shaders-basics",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "godot-tweening",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "gsap-core",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "gsap-scrolltrigger",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "gsap-timeline",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "handoff",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "suits": "Anyone who ends a session and wants the next one to start where this one stopped.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "recommended",
+      "why": "A new day starts from zero; the handoff note, and the skill that writes it, let the next session start where you stopped."
+    },
+    {
+      "id": "improve",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "04-delegation",
+      "suits": "Anyone who wants an audit turned into small plans a cheaper model can execute.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "Reads a whole codebase and writes ranked, self-contained plans for other sessions to carry out; it changes nothing itself."
+    },
+    {
+      "id": "iso-figures",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "jony-designer",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A council seat for design and polish: does it look and feel considered?"
+    },
+    {
+      "id": "karen-skeptic",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A board that nods along is worthless: this seat's whole job is to find what is wrong with a plan before you commit."
+    },
+    {
+      "id": "launch",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "lead-magnets",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-analytics-consent",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-apple-gate",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-cross-store",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-data-surface-scan",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-doc-draft",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-flow-grader",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-gdpr-audit",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-guardrails",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-health-claims",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-play-gate",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-privacy-review",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-reg-monitor",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-signoff-orchestrator",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-terms-review-nl",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "legal-withdrawal-check",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "linus-reviewer",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line."
+    },
+    {
+      "id": "lorn-founder",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A council seat that asks whether a thing deserves your time at all, before how to build it."
+    },
+    {
+      "id": "marie-architect",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A council seat that asks whether this is the simplest thing that works, and fights over-engineering."
+    },
+    {
+      "id": "marketing-ideas",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "marketing-plan",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "marketing-psychology",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "midas-treasurer",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "A council seat for money: does it pay, and soon? The simplest paid test first."
+    },
+    {
+      "id": "modern-python",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Python work: uv, ruff, ty.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "Sets up Python projects with uv and ruff, for new projects or a move off pip, Poetry or black."
+    },
+    {
+      "id": "motion-design",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "motion-dev-animations",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "offers",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "onboarding",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "paywalls",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "performance-optimization",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "ponytail-audit",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "pricing",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "product-marketing",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "production-docker",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "production-fastapi",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone building or calling HTTP services in Python.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "For a FastAPI service: logging, health checks, shutdown, error handling and security patterns."
+    },
+    {
+      "id": "programmatic-seo",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "public-relations",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "receiving-code-review",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Review feedback taken on trust, or argued away, both go wrong; this checks each point before acting on it.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "referrals",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "requesting-code-review",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "review-animations",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "saul-counsel",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "An on-call council seat for legal, privacy and policy questions; it cites the rule and is cautious."
+    },
+    {
+      "id": "save-session",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "schema",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "seo-audit",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "sherlock-researcher",
+      "kind": "agent",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "08-agents-and-council",
+      "suits": "A council seat; run alone or through /council.",
+      "changes": "Written in the studio; studio-specific steps are marked in the module page.",
+      "importance": "optional",
+      "why": "Deep research across many sources, with every claim cited, for questions one search will not settle."
+    },
+    {
+      "id": "signup",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "site-architecture",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "skillspector",
+      "kind": "external",
+      "status": "link-only",
+      "pack": "foundation",
+      "module": "05-skills",
+      "upstream": "https://github.com/NVIDIA/SkillSpector",
+      "licence": "Apache-2.0",
+      "install": "uv tool install --python 3.13 git+https://github.com/NVIDIA/SkillSpector.git",
+      "importance": "core",
+      "why": "A copied skill can carry a prompt injection or send data out; every later item is scanned with it before it is installed.",
+      "title": "SkillSpector with the scan-first rule",
+      "loads": "none"
+    },
+    {
+      "id": "social",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "start-project",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "subagent-driven-development",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "04-delegation",
+      "importance": "optional",
+      "why": "Runs a plan's independent tasks through subagents, with one review at the end, while the main thread keeps deciding.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "superpowers",
+      "kind": "external",
+      "status": "link-only",
+      "pack": "foundation",
+      "module": "03-planning",
+      "upstream": "https://github.com/obra/superpowers",
+      "licence": "MIT",
+      "install": "A Claude Code plugin pinned to 7.0.1 through the repository's own marketplace at tag v7.0.1 (commit 2ce8aa15), scanned with SkillSpector before it is installed; see docs/facts.md, 'Installing superpowers'.",
+      "importance": "optional",
+      "why": "The upstream plugin, if you prefer it to the kit's adapted copy of its skills. Heavy: about 1,465 tokens at start-up.",
+      "title": "superpowers, the upstream plugin",
+      "loads": "every-session",
+      "everySessionTokens": 1465,
+      "tokensNote": "Measured on 7.0.1 (commit 2ce8aa15), 2026-11-02: the start-up text its hook injects (about 800) plus 15 skill descriptions (about 667); bytes / 4."
+    },
+    {
+      "id": "supply-chain-risk-auditor",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone installing Python or npm packages at work.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "A package installed because a snippet needed it: this checks who maintains your dependencies and how risky each is."
+    },
+    {
+      "id": "tdd",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "09-data-work",
+      "suits": "Anyone writing code that must keep working.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Agent tool calls that were never tested fail in front of users; this builds features test-first, red then green."
+    },
+    {
+      "id": "teach",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "ui-ux-pro-max",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "update-wiki-graph",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "using-agent-skills",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "05-skills",
+      "suits": "Anyone with more than a handful of skills who needs routing between them.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "optional",
+      "why": "Once you lose track of your skills: one router that names each skill and when to reach for it."
+    },
+    {
+      "id": "using-firebase",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "using-git-worktrees",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Sets up a separate worktree for a branch, so parallel work never switches branches under another session.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "verification-before-completion",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A passing check is often a broken check; nothing is called done until the command that proves it has run.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "vet-external-skill",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog",
+      "note": "Folded into the kit-only vet-and-adopt skill."
+    },
+    {
+      "id": "web-perf",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "workers-best-practices",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "wrangler",
+      "kind": "skill",
+      "status": "catalog-only",
+      "pack": "catalog"
+    },
+    {
+      "id": "writing-great-skills",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "foundation",
+      "module": "05-skills",
+      "suits": "Anyone who writes or reviews a skill.",
+      "changes": "Adapted from upstream to the studio conventions (frontmatter, voice, examples). Compare with upstream before adopting.",
+      "importance": "recommended",
+      "why": "Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable."
+    },
+    {
+      "id": "writing-plans",
+      "kind": "skill",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "importance": "recommended",
+      "why": "An approved design becomes small tasks, each with its own check, so progress can be seen and resumed.",
+      "changes": "Vendored from superpowers 7.0.1 (commit 2ce8aa15); the studio's changes are listed in VENDORED.md beside SKILL.md."
+    },
+    {
+      "id": "claude-ai-project",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "11-workspace-layout",
+      "title": "The claude.ai Project instructions",
+      "importance": "recommended",
+      "why": "A new claude.ai chat knows nothing; Project instructions and a handoff note in its knowledge carry your work across chats.",
+      "loads": "every-session",
+      "files": [
+        "templates/claude-ai/PROJECT-INSTRUCTIONS.md"
+      ]
+    },
+    {
+      "id": "context-habits",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "02-context-and-models",
+      "title": "Context habits",
+      "importance": "recommended",
+      "why": "Long threads get heavy and forgetful; a fresh session per day or task, and bulk reading in subagents, keep each one light.",
+      "loads": "none",
+      "files": [
+        "cards/context-habits.md"
+      ]
+    },
+    {
+      "id": "front-door",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "title": "The front-door instruction file",
+      "importance": "recommended",
+      "why": "Without one file every session reads first, each session guesses who you are, what the rules are and what to load.",
+      "loads": "every-session",
+      "files": [
+        "templates/AGENTS.md"
+      ]
+    },
+    {
+      "id": "git-hooks",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "The git hook templates",
+      "importance": "recommended",
+      "why": "Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands.",
+      "loads": "none",
+      "files": [
+        "templates/git-hooks"
+      ]
+    },
+    {
+      "id": "git-identity-per-folder",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "One git identity per folder",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Company work committed under a personal address, or the reverse, is hard to undo; each folder picks its own address.",
+      "loads": "none",
+      "files": [
+        "cards/git-identity-per-folder.md"
+      ]
+    },
+    {
+      "id": "grant-ledger",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "The grant ledger for risky acts",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "One recorded yes per force-push, merge, tag or hook skip, so a vague \"clean up\" never covers an act you did not name.",
+      "loads": "every-session",
+      "files": [
+        "cards/grant-ledger.md"
+      ],
+      "everySessionTokens": 101,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "mcp-least-access",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "10-tools-and-mcp",
+      "title": "MCP servers with the least access",
+      "importance": "optional",
+      "why": "Whatever a connected server can read, a session can read; recommended as soon as you have or want one.",
+      "loads": "none",
+      "files": [
+        "cards/mcp-least-access.md"
+      ]
+    },
+    {
+      "id": "memory-index",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "title": "The memory folder with its index",
+      "importance": "recommended",
+      "why": "Chat history is not memory; one fact per file and a one-line index let the next session find what was learned.",
+      "loads": "every-session",
+      "files": [
+        "templates/memory/MEMORY.md"
+      ]
+    },
+    {
+      "id": "rules-audit",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "The periodic rules audit",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Rules drift from what enforces them; a read-only session every few months finds contradictions and gaps.",
+      "loads": "on-demand",
+      "files": [
+        "templates/audit/rules-audit-brief.md"
+      ]
+    },
+    {
+      "id": "signed-commits",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "Signed commits",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A signature proves a commit came from you; some companies require it, and a server shows signed commits as verified.",
+      "loads": "none",
+      "files": [
+        "cards/signed-commits.md"
+      ]
+    },
+    {
+      "id": "vault",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "title": "The memory vault",
+      "importance": "recommended",
+      "why": "Shortening memory to make room loses it; the vault keeps the full text word for word and leaves a pointer behind.",
+      "loads": "on-demand",
+      "files": [
+        "templates/memory/vault/MEMORY-VAULT.md"
+      ]
+    },
+    {
+      "id": "worktrees",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "One worktree per parallel session",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Two sessions in one checkout switch branches under each other; a worktree each keeps their work apart.",
+      "loads": "none",
+      "files": [
+        "cards/worktrees.md"
+      ]
+    },
+    {
+      "id": "identity-user",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "07-identity-and-contract",
+      "title": "USER.md: who you are",
+      "importance": "recommended",
+      "why": "Every session guesses who you are and what you know; a short page you wrote ends the guessing.",
+      "loads": "every-session",
+      "files": [
+        "templates/identity/USER.md"
+      ]
+    },
+    {
+      "id": "identity-relationship",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "07-identity-and-contract",
+      "title": "RELATIONSHIP.md: what needs your OK",
+      "importance": "recommended",
+      "why": "Without a written contract Claude asks about the obvious and skips the risky; the yes-list and the never-list settle it.",
+      "loads": "every-session",
+      "files": [
+        "templates/identity/RELATIONSHIP.md"
+      ]
+    },
+    {
+      "id": "identity-style",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "07-identity-and-contract",
+      "title": "STYLE.md: how to write for you",
+      "importance": "optional",
+      "why": "Corrections to tone and format vanish by the next morning; recommended when output habits already annoy you.",
+      "loads": "every-session",
+      "files": [
+        "templates/identity/STYLE.md"
+      ]
+    },
+    {
+      "id": "identity-soul",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "07-identity-and-contract",
+      "title": "SOUL.md: the values Claude works by",
+      "importance": "optional",
+      "why": "For those who want stated values, such as measure before claiming; most setups do without it.",
+      "loads": "every-session",
+      "files": [
+        "templates/identity/SOUL.md"
+      ]
+    },
+    {
+      "id": "session-end-check",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "title": "A check before a session ends",
+      "importance": "recommended",
+      "why": "Work left uncommitted or unpushed at the end of a session is found days later, or never; this names it before you stop.",
+      "loads": "none",
+      "files": [
+        "templates/hooks/session-end-check.mjs"
+      ]
+    },
+    {
+      "id": "session-start-status",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "title": "A status line at the start of a session",
+      "importance": "optional",
+      "why": "Unpushed work, stale branches and an outdated front door show up at the start, in at most ten lines.",
+      "loads": "every-session",
+      "files": [
+        "templates/hooks/session-start-status.mjs"
+      ],
+      "everySessionTokens": 200
+    },
+    {
+      "id": "decision-log",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "01-continuity",
+      "title": "A decision log",
+      "importance": "optional",
+      "why": "A decision whose reason was never written gets argued again months later; one dated entry per decision keeps the why.",
+      "loads": "every-session",
+      "files": [
+        "templates/decisions/DECISIONS.md"
+      ],
+      "everySessionTokens": 51,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "rules-on-demand",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "02-context-and-models",
+      "title": "Rules loaded only when needed",
+      "importance": "recommended",
+      "why": "Every rule in the front door costs tokens on every turn; a short table says which file to read before which task.",
+      "loads": "every-session",
+      "files": [
+        "cards/rules-on-demand.md"
+      ],
+      "everySessionTokens": 89,
+      "tokensNote": "A four-row table measured at 356 bytes, bytes / 4; the card gives light 63 and full 114."
+    },
+    {
+      "id": "verify-before-push",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "title": "One local check before every push",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A push that breaks the build is found by someone else; one script that runs every test and lint first finds it on your machine.",
+      "loads": "every-session",
+      "files": [
+        "cards/verify-before-push.md"
+      ],
+      "everySessionTokens": 32,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "setup-check",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "title": "Check my setup",
+      "importance": "recommended",
+      "why": "Adopted items drift: a hook switched off, a tool uninstalled; one command re-runs every check from your adoption plan.",
+      "loads": "none",
+      "files": [
+        "cards/setup-check.md"
+      ]
+    },
+    {
+      "id": "long-jobs-in-containers",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "04-delegation",
+      "title": "Long jobs in named containers",
+      "importance": {
+        "default": "optional",
+        "ml": "recommended"
+      },
+      "why": "A long job in a background shell dies unseen; a named container survives, can be watched, and keeps heavy work off your main machine.",
+      "loads": "every-session",
+      "files": [
+        "cards/long-jobs-in-containers.md"
+      ],
+      "everySessionTokens": 77,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "merge-commit-only",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "Merge commits only",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A squash folds a branch into one commit and a rebase rewrites every one; a merge commit keeps the full history.",
+      "loads": "every-session",
+      "files": [
+        "cards/merge-commit-only.md"
+      ],
+      "everySessionTokens": 78,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "never-share-list",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "A never-share list",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Client names and internal terms leak through commits and posts; a private list the pre-commit checks refuses them first.",
+      "loads": "every-session",
+      "files": [
+        "templates/git-hooks/check-staged.mjs"
+      ],
+      "everySessionTokens": 61,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "project-registry",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "11-workspace-layout",
+      "title": "A project registry",
+      "importance": "optional",
+      "why": "With more than three repositories a session loses track of what exists where; one index row each says where to start.",
+      "loads": "on-demand",
+      "files": [
+        "templates/registry/PROJECTS.md"
+      ]
+    },
+    {
+      "id": "commit-and-pr-writing",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "Commit messages and PR bodies that say why",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does.",
+      "loads": "every-session",
+      "files": [
+        "cards/commit-and-pr-writing.md"
+      ],
+      "everySessionTokens": 69,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "success-criteria-first",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "12-experiments-and-evaluation",
+      "title": "Success criteria before the run",
+      "importance": {
+        "default": "optional",
+        "ml": "recommended"
+      },
+      "why": "Criteria chosen after the results always fit them; writing them first is what lets a run fail.",
+      "loads": "every-session",
+      "files": [
+        "cards/success-criteria-first.md"
+      ],
+      "everySessionTokens": 89,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "sealed-holdout",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "12-experiments-and-evaluation",
+      "title": "A sealed holdout",
+      "importance": {
+        "default": "optional",
+        "ml": "recommended"
+      },
+      "why": "Every look at test data while tuning leaks it into the model; a holdout opened once, at the end, tells the truth.",
+      "loads": "every-session",
+      "files": [
+        "cards/sealed-holdout.md"
+      ],
+      "everySessionTokens": 75,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "baseline-before-claim",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "12-experiments-and-evaluation",
+      "title": "A baseline before any claim",
+      "importance": {
+        "default": "optional",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "A number with nothing to compare against proves nothing; a passing check can be a broken one.",
+      "loads": "every-session",
+      "files": [
+        "cards/baseline-before-claim.md"
+      ],
+      "everySessionTokens": 96,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "real-data-seed",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "12-experiments-and-evaluation",
+      "title": "A small real-data seed",
+      "importance": {
+        "default": "optional",
+        "ml": "recommended"
+      },
+      "why": "A pipeline tested only on made-up data breaks on the first real file; a small real slice, inside your data rules, finds that first.",
+      "loads": "every-session",
+      "files": [
+        "cards/real-data-seed.md"
+      ],
+      "everySessionTokens": 51,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "negative-results",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "data-work",
+      "module": "12-experiments-and-evaluation",
+      "title": "Negative results recorded as results",
+      "importance": {
+        "default": "optional",
+        "ml": "recommended"
+      },
+      "why": "A failed idea that is not written down gets tried again; a recorded \"no\" saves the next run and keeps the record honest.",
+      "loads": "every-session",
+      "files": [
+        "cards/negative-results.md"
+      ],
+      "everySessionTokens": 86,
+      "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "coding-guidelines",
+      "kind": "external",
+      "status": "link-only",
+      "pack": "way-of-working",
+      "module": "03-planning",
+      "title": "The coding guidelines",
+      "importance": {
+        "default": "optional",
+        "software": "recommended",
+        "ml": "recommended",
+        "data": "recommended"
+      },
+      "why": "Agents overbuild, guess silently and change more than asked; four short rules keep code simple and changes surgical.",
+      "loads": "every-session",
+      "everySessionTokens": 631,
+      "tokensNote": "Measured 2026-11-02: the guidelines text (2,340 bytes) plus its source line and a which-wins line, 2,523 bytes, bytes / 4; the card gives light 131 and standard 418.",
+      "upstream": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "licence": "MIT",
+      "install": "Copied into your front door from the upstream CLAUDE.md after vet-and-adopt; see cards/coding-guidelines.md."
+    }
+  ],
+  "later": [
+    {
+      "id": "wiki-graph",
+      "title": "The knowledge wiki graph",
+      "why": "A generator, a graph tool and upkeep after every session; worth it only once memory and handoff are a habit."
+    },
+    {
+      "id": "session-archive",
+      "title": "The session archive",
+      "why": "Keeps every transcript, so it needs its own privacy rules first."
+    }
+  ]
+}

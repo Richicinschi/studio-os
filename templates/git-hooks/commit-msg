@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refuse an attribution trailer that names a tool or a second author (adapt to your own rules).
+exec node "$(dirname "$0")/check-message.mjs" "$1"

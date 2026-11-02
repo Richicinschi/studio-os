@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1860" height="650" viewBox="0 0 1860 650" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1860" height="650" fill="#ffffff"/>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#444444"/></marker></defs>
+<text x="40" y="40" font-size="20" font-weight="700" fill="#222222">Adopting Studio OS v2: Prepare, then five phases, then update runs; nothing installed before you decide</text>
+<text x="40" y="69" font-size="13" fill="#555555">Yellow: you act. Blue: Claude acts. Grey: later. Every phase writes its result into adoption/ in your own setup, so a run can stop and resume at any phase.</text>
+<rect x="40" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#d6b656" stroke-width="1.5"/>
+<path d="M48,110 H252 Q260,110 260,118 V164 H40 V118 Q40,110 48,110 Z" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+<text x="150" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">BEFORE · PREPARE</text>
+<text x="150" y="152" font-size="11" text-anchor="middle" fill="#333333">you · about 10 minutes (estimate)</text>
+<text x="52" y="190" font-size="12" fill="#222222" xml:space="preserve">• Install Claude Code and Git</text>
+<text x="52" y="207" font-size="12" fill="#222222" xml:space="preserve">• Clone the kit and open</text>
+<text x="52" y="224" font-size="12" fill="#222222" xml:space="preserve">  its folder in Claude Code,</text>
+<text x="52" y="241" font-size="12" fill="#222222" xml:space="preserve">  your setup folder added</text>
+<text x="52" y="258" font-size="12" fill="#222222" xml:space="preserve">• Say &quot;start the adoption&quot;</text>
+<text x="52" y="292" font-size="12" fill="#222222" xml:space="preserve">Nothing in your own setup</text>
+<text x="52" y="309" font-size="12" fill="#222222" xml:space="preserve">is read or touched yet.</text>
+<text x="52" y="343" font-size="12" fill="#222222" xml:space="preserve">claude.ai only: paste the</text>
+<text x="52" y="360" font-size="12" fill="#222222" xml:space="preserve">kit's Project instructions</text>
+<text x="52" y="377" font-size="12" fill="#222222" xml:space="preserve">instead, and follow the</text>
+<text x="52" y="394" font-size="12" fill="#222222" xml:space="preserve">same phases by hand.</text>
+<path d="M54,480 H234 L246,492 V526 H54 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="150" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">nothing written yet</text>
+<line x1="260" y1="139" x2="298" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="300" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5"/>
+<path d="M308,110 H512 Q520,110 520,118 V164 H300 V118 Q300,110 308,110 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="410" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">1 · AUDIT</text>
+<text x="410" y="152" font-size="11" text-anchor="middle" fill="#333333">Claude · read-only · about 5 min</text>
+<text x="312" y="190" font-size="12" fill="#222222" xml:space="preserve">• Asks first: may I look?</text>
+<text x="312" y="207" font-size="12" fill="#222222" xml:space="preserve">• Reads your setup the way</text>
+<text x="312" y="224" font-size="12" fill="#222222" xml:space="preserve">  /init reads a project:</text>
+<text x="312" y="241" font-size="12" fill="#222222" xml:space="preserve">  stack, instruction files,</text>
+<text x="312" y="258" font-size="12" fill="#222222" xml:space="preserve">  skills, hooks, MCP servers,</text>
+<text x="312" y="275" font-size="12" fill="#222222" xml:space="preserve">  git remotes</text>
+<text x="312" y="292" font-size="12" fill="#222222" xml:space="preserve">• Never opens secrets or</text>
+<text x="312" y="309" font-size="12" fill="#222222" xml:space="preserve">  data files</text>
+<text x="312" y="326" font-size="12" fill="#222222" xml:space="preserve">• Estimates what loads into</text>
+<text x="312" y="343" font-size="12" fill="#222222" xml:space="preserve">  every session today (tokens)</text>
+<text x="312" y="360" font-size="12" fill="#222222" xml:space="preserve">• Lists what the kit covers,</text>
+<text x="312" y="377" font-size="12" fill="#222222" xml:space="preserve">  partly covers, or misses</text>
+<path d="M314,480 H494 L506,492 V526 H314 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="410" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">adoption/inventory.md</text>
+<line x1="520" y1="139" x2="558" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="560" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#d6b656" stroke-width="1.5"/>
+<path d="M568,110 H772 Q780,110 780,118 V164 H560 V118 Q560,110 568,110 Z" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+<text x="670" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">2 · DECIDE</text>
+<text x="670" y="152" font-size="11" text-anchor="middle" fill="#333333">you answer · one question at a time</text>
+<text x="572" y="190" font-size="12" fill="#222222" xml:space="preserve">• Confirm your profile and</text>
+<text x="572" y="207" font-size="12" fill="#222222" xml:space="preserve">  your data rules, before</text>
+<text x="572" y="224" font-size="12" fill="#222222" xml:space="preserve">  anything that stores</text>
+<text x="572" y="241" font-size="12" fill="#222222" xml:space="preserve">• The feature menu: tick</text>
+<text x="572" y="258" font-size="12" fill="#222222" xml:space="preserve">  modules, then the items</text>
+<text x="572" y="275" font-size="12" fill="#222222" xml:space="preserve">  inside; take single skills</text>
+<text x="572" y="292" font-size="12" fill="#222222" xml:space="preserve">  from any other module</text>
+<text x="572" y="309" font-size="12" fill="#222222" xml:space="preserve">• Each item is flagged:</text>
+<text x="572" y="326" font-size="12" fill="#222222" xml:space="preserve">  importance + context cost</text>
+<text x="572" y="343" font-size="12" fill="#222222" xml:space="preserve">• Total: &quot;your choice adds</text>
+<text x="572" y="360" font-size="12" fill="#222222" xml:space="preserve">  ~N tokens per session&quot;</text>
+<text x="572" y="377" font-size="12" fill="#222222" xml:space="preserve">• Tailoring, ticked items only</text>
+<text x="572" y="394" font-size="12" fill="#222222" xml:space="preserve">• Each gap: vet one, write</text>
+<text x="572" y="411" font-size="12" fill="#222222" xml:space="preserve">  one, or skip</text>
+<text x="572" y="428" font-size="12" fill="#222222" xml:space="preserve">• &quot;Not sure&quot; takes the</text>
+<text x="572" y="445" font-size="12" fill="#222222" xml:space="preserve">  recommended option</text>
+<path d="M574,480 H754 L766,492 V526 H574 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="670" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">adoption/features.md</text>
+<line x1="780" y1="139" x2="818" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="820" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5"/>
+<path d="M828,110 H1032 Q1040,110 1040,118 V164 H820 V118 Q820,110 828,110 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="930" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">3 · SPEC AND PLAN</text>
+<text x="930" y="152" font-size="11" text-anchor="middle" fill="#333333">Claude writes · you approve</text>
+<text x="832" y="190" font-size="12" fill="#222222" xml:space="preserve">• spec.md: what you chose,</text>
+<text x="832" y="207" font-size="12" fill="#222222" xml:space="preserve">  how it is tailored, what</text>
+<text x="832" y="224" font-size="12" fill="#222222" xml:space="preserve">  was ruled out and why</text>
+<text x="832" y="241" font-size="12" fill="#222222" xml:space="preserve">• Nothing goes on without</text>
+<text x="832" y="258" font-size="12" fill="#222222" xml:space="preserve">  your yes</text>
+<text x="832" y="275" font-size="12" fill="#222222" xml:space="preserve">• plan.md: one row per item,</text>
+<text x="832" y="292" font-size="12" fill="#222222" xml:space="preserve">  in waves; wave 1 is the</text>
+<text x="832" y="309" font-size="12" fill="#222222" xml:space="preserve">  first sitting, at most</text>
+<text x="832" y="326" font-size="12" fill="#222222" xml:space="preserve">  about 8 rows, the scanner</text>
+<text x="832" y="343" font-size="12" fill="#222222" xml:space="preserve">  first; the rest wait</text>
+<path d="M834,480 H1014 L1026,492 V526 H834 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="930" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">adoption/spec.md + plan.md</text>
+<line x1="1040" y1="139" x2="1078" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="1080" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5"/>
+<path d="M1088,110 H1292 Q1300,110 1300,118 V164 H1080 V118 Q1080,110 1088,110 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="1190" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">4 · INSTALL</text>
+<text x="1190" y="152" font-size="11" text-anchor="middle" fill="#333333">wave 1, row by row · on your yes</text>
+<text x="1092" y="190" font-size="12" fill="#222222" xml:space="preserve">• Row 1 is always the</text>
+<text x="1092" y="207" font-size="12" fill="#222222" xml:space="preserve">  scanner: SkillSpector and</text>
+<text x="1092" y="224" font-size="12" fill="#222222" xml:space="preserve">  the scan-first rule</text>
+<text x="1092" y="241" font-size="12" fill="#222222" xml:space="preserve">• Empty folder: row 2 builds</text>
+<text x="1092" y="258" font-size="12" fill="#222222" xml:space="preserve">  it (setup-workspace)</text>
+<text x="1092" y="275" font-size="12" fill="#222222" xml:space="preserve">• Each item: scan, triage,</text>
+<text x="1092" y="292" font-size="12" fill="#222222" xml:space="preserve">  then skip, fold, adapt or</text>
+<text x="1092" y="309" font-size="12" fill="#222222" xml:space="preserve">  adopt; you decide</text>
+<text x="1092" y="326" font-size="12" fill="#222222" xml:space="preserve">• Steps only you can do:</text>
+<text x="1092" y="343" font-size="12" fill="#222222" xml:space="preserve">  ! lines; sign-ins in a</text>
+<text x="1092" y="360" font-size="12" fill="#222222" xml:space="preserve">  separate terminal</text>
+<path d="M1094,480 H1274 L1286,492 V526 H1094 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="1190" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">adoption/decisions.md</text>
+<line x1="1300" y1="139" x2="1338" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="1340" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.5"/>
+<path d="M1348,110 H1552 Q1560,110 1560,118 V164 H1340 V118 Q1340,110 1348,110 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="1450" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">5 · VERIFY</text>
+<text x="1450" y="152" font-size="11" text-anchor="middle" fill="#333333">end of wave 1 · same sitting</text>
+<text x="1352" y="190" font-size="12" fill="#222222" xml:space="preserve">• Every adopted item shown</text>
+<text x="1352" y="207" font-size="12" fill="#222222" xml:space="preserve">  working: hooks canary,</text>
+<text x="1352" y="224" font-size="12" fill="#222222" xml:space="preserve">  a memory written + found</text>
+<text x="1352" y="241" font-size="12" fill="#222222" xml:space="preserve">• Resume test in a fresh</text>
+<text x="1352" y="258" font-size="12" fill="#222222" xml:space="preserve">  session in your setup</text>
+<text x="1352" y="275" font-size="12" fill="#222222" xml:space="preserve">• Context estimated again</text>
+<text x="1352" y="292" font-size="12" fill="#222222" xml:space="preserve">  against the first total</text>
+<text x="1352" y="309" font-size="12" fill="#222222" xml:space="preserve">• One page: what you have</text>
+<text x="1352" y="326" font-size="12" fill="#222222" xml:space="preserve">  now, how to resume</text>
+<text x="1352" y="343" font-size="12" fill="#222222" xml:space="preserve">  tomorrow</text>
+<path d="M1354,480 H1534 L1546,492 V526 H1354 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="1450" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">adoption/handover.md</text>
+<line x1="1560" y1="139" x2="1598" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="1600" y="110" width="220" height="430" rx="8" fill="#ffffff" stroke="#666666" stroke-width="1.5"/>
+<path d="M1608,110 H1812 Q1820,110 1820,118 V164 H1600 V118 Q1600,110 1608,110 Z" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+<text x="1710" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">LATER · UPDATE RUNS</text>
+<text x="1710" y="152" font-size="11" text-anchor="middle" fill="#333333">once per kit version</text>
+<text x="1612" y="190" font-size="12" fill="#222222" xml:space="preserve">• Reads CHANGELOG.md and</text>
+<text x="1612" y="207" font-size="12" fill="#222222" xml:space="preserve">  your decisions.md</text>
+<text x="1612" y="224" font-size="12" fill="#222222" xml:space="preserve">• Asks only about new or</text>
+<text x="1612" y="241" font-size="12" fill="#222222" xml:space="preserve">  changed items</text>
+<text x="1612" y="258" font-size="12" fill="#222222" xml:space="preserve">• Nothing decided is</text>
+<text x="1612" y="275" font-size="12" fill="#222222" xml:space="preserve">  asked again</text>
+<path d="M1614,480 H1794 L1806,492 V526 H1614 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="1710" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">decisions.md (appended)</text>
+<path d="M1710,540 V590 H670 V542" fill="none" stroke="#666666" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arr)"/>
+<text x="1190" y="582" font-size="12" text-anchor="middle" fill="#444444">update mode: new or changed items only</text>
+</svg>

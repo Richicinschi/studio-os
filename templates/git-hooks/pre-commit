@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refuse a commit that adds a conflict marker, a real private address outside test files, or a secret.
+exec node "$(dirname "$0")/check-staged.mjs"

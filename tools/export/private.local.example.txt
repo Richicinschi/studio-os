@@ -1,0 +1,8 @@
+# Copy to private.local.txt (gitignored, never committed). What no committed kit file may name.
+# kind:id lines: hub skills and agents that are never exported; the export treats each as a private
+# item, so the hub stays fully classified while the committed manifest never names them.
+skill:zorblat-diary
+agent:quenlin-coach
+# source lines: a hub source a kit page summarizes but may not list in its front matter. Staleness and
+# the release's clean-hub check follow it like any other source.
+source modules/12-experiments-and-evaluation/README.md .studio/memory/zorblat-research.md

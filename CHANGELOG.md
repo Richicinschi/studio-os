@@ -2,6 +2,17 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v2.0.3 (2026-11-03)
+
+- Tests now run on GitHub for every push and pull request, on Windows, macOS and Linux with Node 22, and the README shows their badge.
+- `SECURITY.md` says how to report a vulnerability privately, and lists which protections the kit enforces in code and which are instructions Claude follows, with their known gaps.
+- `CONTRIBUTING.md` and two issue forms (a bug, and a step that confused you) say how a change reaches the kit: issues first, and a pull request as a proposal that ships in the next release.
+- `docs/trials.md` records how the adoption was tested, by agents playing adopters: what broke, what was fixed, and what that does not prove.
+- The quick start says its commands work in bash, zsh and PowerShell, not in cmd.exe.
+- Maintainers: a test workflow in `.github/workflows/test.yml` (read-only permissions, actions pinned to commit SHAs), issue forms in `.github/ISSUE_TEMPLATE/`, the export gates accept `.github/`, `SECURITY.md` and `CONTRIBUTING.md`, and `docs/MAINTAINING.md` asks every release to name maintainer-facing changes like these.
+
+No catalog changes.
+
 ## v2.0.2 (2026-11-02)
 
 - The README is restructured and shorter: what the kit is, why, who it is for, the five phases in one table, a quick start, and what is inside; it opens with a banner (`docs/banner.png`).

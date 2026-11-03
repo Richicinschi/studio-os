@@ -1,0 +1,61 @@
+name: Bug
+description: Something in the kit does not work as written
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste secrets, keys, company data or personal details. Describe them in words instead.
+  - type: textarea
+    id: what-you-did
+    attributes:
+      label: What you did
+      description: The steps, in order.
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: what-you-expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: kit-version
+    attributes:
+      label: Kit version
+      description: From `package.json`, or the top of `CHANGELOG.md`.
+      placeholder: "2.0.3"
+    validations:
+      required: true
+  - type: dropdown
+    id: system
+    attributes:
+      label: Your system
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: false
+  - type: dropdown
+    id: claude-product
+    attributes:
+      label: Claude product
+      options:
+        - Claude Code
+        - claude.ai
+    validations:
+      required: false
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else
+    validations:
+      required: false

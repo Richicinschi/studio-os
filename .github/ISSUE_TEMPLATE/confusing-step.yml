@@ -1,0 +1,44 @@
+name: A step confused me
+description: A phase, card or page was unclear, or Claude said something unexpected
+title: "[Confusing step]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste secrets, keys, company data or personal details. Describe them in words instead.
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Which phase
+      options:
+        - Prepare
+        - 1 Audit
+        - 2 Decide
+        - 3 Spec and plan
+        - 4 Install
+        - 5 Verify
+        - Update
+        - Not in the adoption
+    validations:
+      required: true
+  - type: textarea
+    id: what-claude-said
+    attributes:
+      label: What Claude said
+      description: Quote it.
+    validations:
+      required: true
+  - type: textarea
+    id: what-you-expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: page-or-card
+    attributes:
+      label: The page or card involved
+      description: Optional.
+    validations:
+      required: false

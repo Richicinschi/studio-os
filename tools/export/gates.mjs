@@ -17,7 +17,7 @@ const EXEMPT = new Set(['tools/export/rules.mjs']);
 // The local files (deny list, owner name) never leave this machine and are never scanned or staged.
 export const isLocalOnly = (rel) => /^tools\/export\/[^/]+\.local\.(?:txt|json)$/.test(rel);
 
-export const HAND_WRITTEN = ['LICENSE', 'START-HERE.md', 'ADOPT.md', 'README.md', 'PRINCIPLES.md', 'AGENTS.md', 'CLAUDE.md', 'CHANGELOG.md', 'package.json', '.gitignore', '.gitattributes', 'export.manifest.json',
+export const HAND_WRITTEN = ['LICENSE', 'SECURITY.md', 'CONTRIBUTING.md', '.github/', 'START-HERE.md', 'ADOPT.md', 'README.md', 'PRINCIPLES.md', 'AGENTS.md', 'CLAUDE.md', 'CHANGELOG.md', 'package.json', '.gitignore', '.gitattributes', 'export.manifest.json',
   '.claude/', 'modules/', 'templates/', 'examples/', 'docs/', 'tools/', 'cards/'];
 
 export function walkFiles(root, rel = '') {

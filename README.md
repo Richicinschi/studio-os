@@ -9,6 +9,10 @@
   &nbsp;·&nbsp; <a href="modules/">Modules</a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/Richicinschi/studio-os/actions/workflows/test.yml"><img src="https://github.com/Richicinschi/studio-os/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+</p>
+
 <br>
 
 **Studio OS** is how one solo studio works with Claude, written down so you can take the parts that fit your own work.
@@ -55,6 +59,8 @@ cd "$HOME/studio-os"
 claude --add-dir "$HOME/claude-setup"
 ```
 
+These lines work in bash, zsh and PowerShell, not in Windows' `cmd.exe`.
+
 Then say **"Start the adoption."** Installing Claude Code and git, and where your setup can live: [START-HERE.md](START-HERE.md).
 
 ## What is inside
@@ -69,6 +75,11 @@ Then say **"Start the adoption."** Installing Claude Code and git, and where you
 | [examples/](examples/) | Stories from the studio, with the names taken out |
 | [templates/](templates/) | Blank files to start from |
 | [ADOPT.md](ADOPT.md) | The protocol your Claude follows during the adoption |
+| [docs/trials.md](docs/trials.md) | How the adoption was tested, by agents playing adopters, and what that does not prove |
+
+## Problems and changes
+
+A bug or a step that confused you: open an issue ([CONTRIBUTING.md](CONTRIBUTING.md)). A security problem: report it privately ([SECURITY.md](SECURITY.md)).
 
 ## Licence
 

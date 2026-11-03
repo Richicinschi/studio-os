@@ -1,7 +1,7 @@
 {
-  "version": "2.0.2",
-  "date": "2026-11-02",
-  "hubCommit": "03676d928efff16c7448e7e88947d8eb7cf902fc",
+  "version": "2.0.3",
+  "date": "2026-11-03",
+  "hubCommit": "7ce60c49835ed3e98d0ed72aa028299795e40caa",
   "items": {
     "agent:atlas-operator": "82e7ad74549e2f99",
     "agent:bob-builder": "54f3dcc2d5803c8d",

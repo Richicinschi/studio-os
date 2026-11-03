@@ -17,7 +17,7 @@ For whoever exports the kit from the studio. Adopters never need this page.
 
 1. **Dry run:** `node tools/export/export.mjs --hub <path to the studio hub>`. It builds the catalog in a staging copy, runs every gate there, and changes the kit only when all of them pass.
 2. **Scan:** `node tools/export/scan.mjs` runs SkillSpector over every shipped and kit-only skill and records the verdicts in `tools/export/scans.json`; the next export writes them into each `SOURCE.md`.
-3. **Release**, from a clean checkout of the hub, because a release refuses a hub with uncommitted changes in what the export reads: `node tools/export/export.mjs --hub <clean hub checkout> --release X.Y.Z --note "What this release is about."` A release also runs the content lint, then writes the `CHANGELOG.md` section and `tools/export/state.json`.
+3. **Release**, from a clean checkout of the hub, because a release refuses a hub with uncommitted changes in what the export reads: `node tools/export/export.mjs --hub <clean hub checkout> --release X.Y.Z --note "What this release is about."` A release also runs the content lint, then writes the `CHANGELOG.md` section and `tools/export/state.json`. The changelog is the full account of what a release ships: when maintainer-facing files changed since the last release (`tools/`, `docs/MAINTAINING.md`, the tests), add one more note that starts with "Maintainers:" and says what changed, even when adopters see no difference. `git log --stat <last release>..HEAD -- tools docs/MAINTAINING.md` lists them.
 
 Exit codes: 0, done; 1, a gate failed and the kit is unchanged; 2, refused before building (a missing local file, a `--note` carrying a denied term, path or secret, a dirty hub, or `--no-gitleaks` on a release).
 

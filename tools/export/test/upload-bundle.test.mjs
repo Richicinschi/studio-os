@@ -18,7 +18,17 @@ function makePacks() {
   w('some-domain-here/stubs/one/SKILL.md', 'stub\n');
   return root;
 }
-const tarCmd = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe') : 'tar';
+// Windows and macOS ship bsdtar, which reads a zip. GNU tar on Linux cannot, so there unzip does.
+const bsdtar = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe') : 'tar';
+const useTar = process.platform === 'win32' || process.platform === 'darwin';
+function zipRun(cmd, args) {
+  const r = spawnSync(cmd, args, { encoding: 'utf8' });
+  if (r.error) throw new Error(`no zip reader: ${cmd} did not run (${r.error.code}). Install ${useTar ? 'bsdtar' : 'unzip'} to run these tests.`);
+  assert.equal(r.status, 0, r.stderr);
+  return r.stdout;
+}
+const listZip = (zip) => zipRun(...(useTar ? [bsdtar, ['-tf', zip]] : ['unzip', ['-Z1', zip]])).split(/\r?\n/).filter(Boolean).sort();
+const extractZip = (zip, dir) => zipRun(...(useTar ? [bsdtar, ['-xf', zip, '-C', dir]] : ['unzip', ['-q', zip, '-d', dir]]));
 const WANT = ['some-domain-here/SKILL.md', 'some-domain-here/skills/one.md', 'some-domain-here/skills/two/helper.md'];
 const tmp = (p) => mkdtempSync(path.join(os.tmpdir(), p));
 
@@ -29,20 +39,18 @@ test('bundle holds the entry and skills only', () => {
   } finally { rmSync(packs, { recursive: true, force: true }); }
 });
 
-test('tar lists the zip', () => {
+test('the zip lists with the platform zip reader', () => {
   const packs = makePacks();
   const out = tmp('kit-zip-');
   try {
     assert.equal(main(['some-domain-here', '--out', out, '--packs', packs]), 0);
     const zip = path.join(out, 'some-domain-here.zip');
     assert.ok(existsSync(zip));
-    const r = spawnSync(tarCmd, ['-tf', zip], { encoding: 'utf8' });
-    assert.equal(r.status, 0, r.stderr);
-    assert.deepEqual(r.stdout.split(/\r?\n/).filter(Boolean).sort(), WANT);
+    assert.deepEqual(listZip(zip), WANT);
   } finally { rmSync(packs, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
 });
 
-test('the same input gives the same bytes, and tar extracts the content', () => {
+test('the same input gives the same bytes, and the zip reader extracts the content', () => {
   const packs = makePacks();
   const a = tmp('kit-zip-');
   const b = tmp('kit-zip-');
@@ -51,8 +59,7 @@ test('the same input gives the same bytes, and tar extracts the content', () => 
     main(['some-domain-here', '--out', a, '--packs', packs]);
     main(['some-domain-here', '--out', b, '--packs', packs]);
     assert.ok(readFileSync(path.join(a, 'some-domain-here.zip')).equals(readFileSync(path.join(b, 'some-domain-here.zip'))));
-    const r = spawnSync(tarCmd, ['-xf', path.join(a, 'some-domain-here.zip'), '-C', c], { encoding: 'utf8' });
-    assert.equal(r.status, 0, r.stderr);
+    extractZip(path.join(a, 'some-domain-here.zip'), c);
     assert.equal(readFileSync(path.join(c, 'some-domain-here/skills/two/helper.md'), 'utf8'), 'Nested file\n');
   } finally { for (const d of [packs, a, b, c]) rmSync(d, { recursive: true, force: true }); }
 });

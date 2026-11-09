@@ -2,6 +2,13 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.0.1 (2026-11-09)
+
+- The claude.ai bundle tests now check the zip with unzip on Linux, where tar cannot read zips.
+- Maintainers: tools/export/test/upload-bundle.test.mjs lists and extracts the bundle zips with unzip on Linux and with bsdtar on Windows and macOS; a missing reader fails with a message.
+
+No catalog changes.
+
 ## v3.0.0 (2026-11-09)
 
 - The core plus domains: the studio's own skills, organised by job, installed only when you adopt a domain.

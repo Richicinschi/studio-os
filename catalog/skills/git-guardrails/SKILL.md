@@ -1,121 +1,105 @@
 ---
 name: git-guardrails
 description: >-
-  Set up a Claude Code PreToolUse hook that blocks DESTRUCTIVE git commands (force-pushes and
-  remote deletes, history rewrites, reset --hard, clean -f, branch -D, checkout ./restore .,
-  skipped hooks) before they execute, for a repo or agent no stricter guard covers. Use when the user wants to enforce the studio's
-  no-force-push / no-history-rewrite rules at the tool layer outside the hub, add git safety
-  hooks, or harden a project/agent against destructive git.
+  Install a PreToolUse hook that vetoes destructive git: no-verify, branch -D, clean -f, reset --hard, history rewrite, force-push. Meant for any repo or agent that the hub guard misses. Use it to protect a project from destructive git, or to enforce no-force-push outside the hub, at the tool layer.
 metadata:
   category: engineering
-  author: Richicinschi (adapted by Claude from mattpocock/skills)
+  author: Richicinschi
   version: 1.2.0
   domain: git safety hook for Claude Code
-  sources:
-    - mattpocock/skills · misc/git-guardrails-claude-code (MIT) — blocklist retuned to studio policy; see ./LICENSE
 ---
+# Git guardrails
 
-# Setup Git Guardrails
+A hook that checks every shell command before it runs and refuses the destructive git ones.
+It enforces, at the tool layer, the studio rule that an agent never force-pushes, rewrites
+history or discards work with `reset --hard` unless the owner explicitly asked. Use it for any project or agent that the hub's own
+guard does not watch.
 
-Sets up a PreToolUse hook that intercepts and blocks destructive git commands before Claude
-executes them — a tool-layer backstop for the studio's hard rules (never force-push, rewrite
-history, or `reset --hard` without an explicit ask). Complements any stricter guard you already run; this is the reusable installer for any project or agent.
+## Why and where
 
-> **Studio policy note:** unlike the upstream default, this does **not** block plain `git push`
-> — Claude pushes at checkpoints by policy (see AGENTS.md). Only force-push and destructive ops
-> are blocked.
->
-> **Where it belongs:** only where a stricter guard of your own does
-> not run, e.g. a session started inside a project or another agent. Never install it
-> beside a guard that lets a force-push or history rewrite through once the owner's grant row is in
-> your grants ledger (the rule that each risky act needs a recorded yes), and this script has no grant path, so it would block
-> the granted act. It reads the command with `jq`; without `jq` it matches the raw hook input
-> instead, so it still blocks.
+- Use it where the hub guard (G6, under `.studio/guardrails/`) does not run: a session opened
+  inside a project, or a different agent.
+- Never put it in the hub, and never beside G6. Hard rule 11 lets a forced push or a
+  history rewrite proceed once the owner has written a grant row for it in your grants ledger;
+  G6 honours that row. This script has no idea what a grant is, so it would veto the granted act.
+- The script extracts the command with `jq`. With no `jq` installed it matches against the whole
+  hook payload, so nothing slips past.
 
-## What Gets Blocked
+## Policy on plain push
 
-- force-pushes and remote deletes: `push --force` / `-f` / `--force-with-lease`, a `+` refspec (`push origin +main`), `--mirror`, `--delete` / `-d`, `push origin :branch`
-- history rewrites: `reset --hard`, any `rebase` (finishing one with `--continue`, `--abort`, `--skip` or `--quit` is allowed), `commit --amend`, `branch -f`, `checkout -B` / `switch -C`, `commit-tree`, `filter-branch`, `filter-repo`, `update-ref -d`
-- destructive working-tree ops: `clean` with an `f` in its flags (`-f`, `-fd`, `-xdf`), `branch -D`, `checkout -f`, `checkout .` / `checkout -- .` / `restore .`, `worktree remove --force`
-- the way back: `stash drop`, `stash clear`, `reflog expire`, `gc --prune`
-- skipped hooks: `--no-verify`, `commit -n`, `-c core.hooksPath=`
+A plain `git push` passes. The studio pushes at checkpoints (see AGENTS.md). Only forced and
+destructive pushes are stopped.
 
-(Plain `git push`, `push -n`, `branch -d`, `switch -c`, `stash` / `stash pop`, plain `gc` and `worktree remove` are allowed.) When blocked, Claude sees a message
-telling it that it does not have authority to run these commands. The studio tests these cases against its own copy; Check step 1 tests yours.
+## What is blocked
 
-## Steps
+| Command | Refused forms |
+|---|---|
+| `push` | `--mirror`, `--delete`, `-d`, `-f`, `--force`, `--force-with-lease`, a `+ref` such as `origin +main`, an empty-source `origin :branch` |
+| `reset` | `--hard` |
+| `rebase` | every use, except `--continue`, `--quit`, `--skip` and `--abort` on one already running |
+| `commit` | `--amend`, `-n`, `--no-verify` |
+| `branch` | `-D`, `-f` |
+| `checkout` | `-f`, `-B`, `.`, `-- .` |
+| `switch` | `-C` |
+| `restore` | `.` |
+| `clean` | any flag group containing `f`, such as `-f`, `-fd`, `-xdf` |
+| `worktree remove` | `--force` |
+| `stash` | `drop`, `clear` |
+| `reflog` | `expire` |
+| `gc` | `--prune` |
+| `update-ref` | `-d` |
+| `commit-tree`, `filter-repo`, `filter-branch` | all uses |
+| any git call | `-c core.hooksPath=` |
 
-### 1. Ask scope
+## Still allowed
 
-Ask the user: install for **this project only** (`.claude/settings.json`) or **all projects** (`~/.claude/settings.json`)?
+Unforced `git push` (and `push -n`), lowercase `branch -d`, lowercase `switch -c`, `stash`
+with `stash pop`, `gc` without `--prune`, and `worktree remove` without force.
 
-### 2. Copy the hook script
+A refused command prints a `BLOCKED` message on stderr that says the agent has no authority to
+run it, and the script exits with code 2.
 
-The bundled script is at: [scripts/block-dangerous-git.sh](scripts/block-dangerous-git.sh)
+## Install
 
-Copy it to the target location based on scope:
+1. **Pick the scope.** Ask which applies: the current project alone (its own
+   `.claude/settings.json`), or every project (`~/.claude/settings.json`).
+2. **Copy the script.** The script ships beside this file, in the scripts folder. Put a copy at
+   `.claude/hooks/` inside the project, or `~/.claude/hooks/` for global scope, and `chmod +x`
+   it.
+3. **Register it.** Add a PreToolUse entry to the chosen settings file. If the file already has
+   `hooks.PreToolUse`, append to that array; never replace the file.
 
-- **Project**: `.claude/hooks/block-dangerous-git.sh`
-- **Global**: `~/.claude/hooks/block-dangerous-git.sh`
+   Project:
 
-Make it executable with `chmod +x`.
+   ```json
+   {
+     "hooks": {
+       "PreToolUse": [
+         {
+           "matcher": "Bash|PowerShell",
+           "hooks": [
+             {
+               "type": "command",
+               "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-dangerous-git.sh"
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
 
-### 3. Add hook to settings
+   Global: the same entry, but its command points at the copy under your home folder.
+4. **Tune.** Ask whether any pattern should be added or dropped, and edit the copied script to
+   match.
+5. **Check it works.** Pipe a forced push into it:
 
-Add to the appropriate settings file:
+   ```bash
+   echo '{"tool_input":{"command":"git push --force origin main"}}' | <path-to-script>
+   ```
 
-**Project** (`.claude/settings.json`):
+   Expect exit code 2 and a `BLOCKED` line on stderr. A plain `git push` in the same form must
+   exit 0.
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash|PowerShell",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-dangerous-git.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-**Global** (`~/.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash|PowerShell",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/block-dangerous-git.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-If the settings file already exists, merge the hook into existing `hooks.PreToolUse` array — don't overwrite other settings.
-
-### 4. Ask about customization
-
-Ask if user wants to add or remove any patterns from the blocked list. Edit the copied script accordingly.
-
-### 5. Verify
-
-Run a quick test:
-
-```bash
-echo '{"tool_input":{"command":"git push --force origin main"}}' | <path-to-script>
-```
-
-Should exit with code 2 and print a BLOCKED message to stderr.
+The hub keeps the full case table in its guardrails test folder (the file named
+`git-guardrails-skill.test.mjs`).

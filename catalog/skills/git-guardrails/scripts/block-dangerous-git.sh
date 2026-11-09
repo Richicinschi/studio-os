@@ -1,52 +1,57 @@
 #!/bin/bash
+# PreToolUse hook: reads the hook JSON on stdin, exits 2 to veto a destructive git command.
+# Studio policy: a plain `git push` passes. Force-pushes, history rewrites, working-tree
+# destruction and skipped hooks do not.
 
-INPUT=$(cat)
-# Without jq, match against the raw hook input instead of letting everything through.
-if command -v jq >/dev/null 2>&1; then
-  COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command')
+payload=$(cat)
+
+# Without jq, fall back to scanning the raw payload.
+if type -P jq >/dev/null; then
+  cmd=$(jq -r '.tool_input.command' <<<"$payload")
 else
-  COMMAND="$INPUT"
+  cmd="$payload"
 fi
 
-# Studio policy: plain `git push` is ALLOWED (Claude pushes at checkpoints).
-# Blocked: force-pushes and remote deletes, history rewrites, destructive working-tree ops,
-# and skipped hooks. G = git and its options, up to the subcommand, within one shell command.
-# E = the end of an argument; the quote covers the raw-input fallback.
-G='git[^;&|]*'
-E='( |$|")'
-DANGEROUS_PATTERNS=(
-  "$G push[^;&|]*( --force| -f$E| \+[^ ;&|]| --mirror| --delete| -d$E| :[^ ;&|\"]+)"
-  "$G reset[^;&|]* --hard"
-  "$G clean[^;&|]* (-[a-zA-Z]*f|--force)"
-  "$G branch[^;&|]* (-D|-f|--force)$E"
-  "$G (checkout|switch)[^;&|]* (-B|-C|--force-create)$E"
-  "$G commit-tree"
-  "$G checkout[^;&|]* (-f|--force)$E"
-  "$G (checkout|restore)( --)? +\.$E"
-  "$G stash +(drop|clear)"
-  "$G reflog +expire"
-  "$G gc[^;&|]* --prune"
-  "$G worktree +remove[^;&|]* (-f|--force)$E"
-  "$G commit[^;&|]* --amend"
-  "$G (filter-branch|filter-repo)"
-  "$G update-ref[^;&|]* -d$E"
-  "$G --no-verify"
-  "$G commit[^;&|]* -[a-zA-Z]*n[a-zA-Z]*$E"
-  "git[^;&|]* -c +core\.hooksPath"
+# GIT matches "git" plus any options before the subcommand, never crossing a
+# shell separator. END marks the close of one argument (the quote is for raw JSON).
+GIT='git[^;&|]*'
+ARGS='[^;&|]*'
+END='( |$|")'
+
+rules=(
+  "$GIT push${ARGS}( --mirror| --delete| --force| -d$END| -f$END)"
+  "$GIT push${ARGS}( :[^ ;&|\"]+| \+[^ ;&|])"
+  "$GIT reset${ARGS} --hard"
+  "$GIT clean${ARGS} (--force|-[[:alpha:]]*f)"
+  "$GIT branch${ARGS} (--force|-D|-f)$END"
+  "$GIT (checkout|switch)${ARGS} (--force-create|-B|-C)$END"
+  "$GIT checkout${ARGS} (-f|--force)$END"
+  "$GIT (restore|checkout)(  *--)? +\.$END"
+  "$GIT commit-tree"
+  "$GIT filter-(repo|branch)"
+  "$GIT update-ref${ARGS} -d$END"
+  "$GIT stash +(drop|clear)"
+  "$GIT reflog +expire"
+  "$GIT gc${ARGS} --prune"
+  "$GIT worktree +remove${ARGS} (-f|--force)$END"
+  "$GIT commit${ARGS} --amend"
+  "$GIT --no-verify"
+  "$GIT commit${ARGS} -[[:alpha:]]*n[[:alpha:]]*$END"
+  "git${ARGS} -c +core\.hooksPath"
 )
 
-block() {
-  echo "BLOCKED: '$COMMAND' matches dangerous pattern '$1'. The user has prevented you from doing this." >&2
+refuse() {
+  echo "BLOCKED: '$cmd' hit the rule '$1'. You are not authorised to run this; ask the user." >&2
   exit 2
 }
 
-for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-  if echo "$COMMAND" | grep -qE "$pattern"; then block "$pattern"; fi
+for rule in "${rules[@]}"; do
+  grep -qE "$rule" <<<"$cmd" && refuse "$rule"
 done
 
-# A rebase rewrites history; finishing or abandoning one that is already running does not.
-if echo "$COMMAND" | grep -qE "$G rebase( |$)" && ! echo "$COMMAND" | grep -qE "$G rebase +--(abort|continue|skip|quit)"; then
-  block "git rebase"
+# Any rebase rewrites history, except steering one already under way.
+if grep -qE "$GIT rebase( |$)" <<<"$cmd"; then
+  grep -qE "$GIT rebase +--(continue|quit|skip|abort)" <<<"$cmd" || refuse "git rebase"
 fi
 
 exit 0

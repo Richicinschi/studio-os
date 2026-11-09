@@ -2,6 +2,9 @@
 id: context-habits
 module: 02-context-and-models
 checked: 2026-11-02
+other_figures:
+  - 74
+  - 1000
 ---
 
 # Context habits

@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../data/business';
+import { serviceTypes } from '../data/serviceTypes';
+import { serviceAreas } from '../data/serviceAreas';
+
+// Shared look for text inputs, selects and the textarea.
+const fieldBase =
+  'mt-1.5 w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm text-stone-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none';
+const fieldText = `${fieldBase} placeholder-stone-400`;
+const fieldSelect = `${fieldBase} bg-white`;
+const labelClass = 'block text-sm font-medium text-stone-700';
+const iconBox = 'flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-50';
+const infoLink = 'text-sm text-brand-700 transition-colors hover:text-brand-900';
+---
+
+<BaseLayout
+  title={`Contact ${business.name}`}
+  description={`Ask ${business.name} for a free estimate. Call ${business.phone} or send the form below. We cover ${business.serviceRadius}.`}
+>
+  <Breadcrumbs crumbs={[{ label: 'Contact' }]} />
+
+  <section class="py-12 lg:py-16">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="max-w-3xl animate-fade-up">
+        <h1 class="font-display text-4xl text-brand-900 sm:text-5xl">Contact {business.name}</h1>
+        <p class="mt-4 text-lg leading-relaxed text-stone-600">
+          Call, email or use the form. Routine requests get an answer within one business day.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 lg:pb-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid gap-12 lg:grid-cols-5 lg:gap-16">
+        <!-- Form column -->
+        <div class="lg:col-span-3">
+          <div class="rounded-xl border border-stone-200 bg-white p-6 sm:p-8">
+            <h2 class="font-display text-2xl text-brand-900">Send a message</h2>
+            <p class="mt-2 text-sm text-stone-500">Tell us what you need and we will reply soon.</p>
+
+            <!-- The form posts nowhere yet: point `action` at a real endpoint before launch. -->
+            <form action="#" method="POST" class="mt-8 space-y-6">
+              <div class="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label for="name" class={labelClass}>Full name <span class="text-red-500">*</span></label>
+                  <input type="text" id="name" name="name" required placeholder="Your name" class={fieldText} />
+                </div>
+                <div>
+                  <label for="email" class={labelClass}>Email <span class="text-red-500">*</span></label>
+                  <input type="email" id="email" name="email" required placeholder="you@example.com" class={fieldText} />
+                </div>
+              </div>
+
+              <div>
+                <label for="phone" class={labelClass}>Phone number</label>
+                <input type="tel" id="phone" name="phone" placeholder="(555) 555-0147" class={fieldText} />
+              </div>
+
+              <div class="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label for="service" class={labelClass}>What do you need?</label>
+                  <select id="service" name="service" class={fieldSelect}>
+                    <option value="">Pick a service</option>
+                    {serviceTypes.map((s) => <option value={s.slug}>{s.name}</option>)}
+                    <option value="other">Other or not sure</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="area" class={labelClass}>Where are you?</label>
+                  <select id="area" name="area" class={fieldSelect}>
+                    <option value="">Pick your town</option>
+                    {serviceAreas.map((a) => <option value={a.slug}>{a.name}, {a.county}</option>)}
+                    <option value="other">Somewhere else</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="message" class={labelClass}>Message <span class="text-red-500">*</span></label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows="5"
+                  placeholder="Describe the problem or the job..."
+                  class={fieldText}
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md sm:w-auto"
+              >
+                <Icon name="lucide:send" class="size-4" />
+                Send message
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Details column -->
+        <div class="lg:col-span-2">
+          <div class="rounded-xl border border-stone-200 bg-white p-6 sm:p-8">
+            <h2 class="font-display text-2xl text-brand-900">Reach us directly</h2>
+
+            <ul class="mt-6 space-y-5">
+              <li class="flex items-start gap-3">
+                <div class={iconBox}><Icon name="lucide:phone" class="size-5 text-brand-700" /></div>
+                <div>
+                  <p class="text-sm font-medium text-stone-700">Phone</p>
+                  <a href={business.phoneHref} class={infoLink}>{business.phone}</a>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class={iconBox}><Icon name="lucide:mail" class="size-5 text-brand-700" /></div>
+                <div>
+                  <p class="text-sm font-medium text-stone-700">Email</p>
+                  <a href={`mailto:${business.email}`} class={infoLink}>{business.email}</a>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class={iconBox}><Icon name="lucide:map-pin" class="size-5 text-brand-700" /></div>
+                <div>
+                  <p class="text-sm font-medium text-stone-700">Location</p>
+                  <p class="text-sm text-stone-600">
+                    {business.address.city}, {business.address.state} {business.address.zip}
+                  </p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class={iconBox}><Icon name="lucide:clock" class="size-5 text-brand-700" /></div>
+                <div>
+                  <p class="text-sm font-medium text-stone-700">Opening hours</p>
+                  <div class="mt-1 space-y-0.5 text-sm text-stone-600">
+                    {business.hours.map((row) => (
+                      <p><span class="font-medium">{row.days}:</span> {row.hours}</p>
+                    ))}
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Edit or delete this box if the business has no after-hours service. -->
+            <div class="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <div class="flex items-start gap-3">
+                <Icon name="lucide:alert-triangle" class="mt-0.5 size-5 shrink-0 text-amber-600" />
+                <div>
+                  <p class="text-sm font-semibold text-amber-800">Urgent problem?</p>
+                  <p class="mt-1 text-sm text-amber-700">
+                    Burst pipe, gas smell or a sewer backing up: phone
+                    <a href={business.phoneHref} class="font-semibold underline">{business.phone}</a>
+                    now. Someone answers around the clock.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

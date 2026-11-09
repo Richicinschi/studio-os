@@ -1,318 +1,316 @@
 #!/usr/bin/env python3
-"""Deterministic structural linter for .drawio files.
+# -*- coding: utf-8 -*-
+"""Check a .drawio file for structural mistakes without opening draw.io.
 
-Catches the class of mistakes a vision self-check is slow and unreliable at:
-dangling edge endpoints, duplicate or reserved ids, broken parent references,
-and (as warnings) off-grid geometry, overlapping sibling nodes, and edge
-routing defects. Runs without launching draw.io, so it is a fast pre-check
-before the visual review step.
+Command line: validate.py FILE, with optional --strict.
 
-  uv run python validate.py diagram.drawio
+Errors (they make the exit code 1):
+  - two cells with the same id
+  - a parent, source or target id that no cell has
+  - a vertex or edge that uses the reserved ids 0 or 1
+  - a vertex with no usable width and height
+  - a file that cannot be parsed, or a page with no model
 
-Edge routing checks (warnings): an edge segment crossing a non-incident leaf
-vertex ("routes through vertex"), and two edges crossing each other ("edges X
-and Y cross") — the two defects the SKILL.md step-5 self-check looks for
-("Edge-shape overlap", "Stacked edges"), but caught here deterministically.
+Warnings (exit code 1 only with --strict):
+  - a vertex with zero or negative size, or a negative position
+  - two leaf vertices of the same parent that overlap
+  - an edge route that runs through a vertex it does not connect
+  - two edge routes that cross
 
-Routing is only knowable from the XML when an edge carries explicit waypoints
-(``<Array as="points">``) — exactly the hand-routed case the SKILL.md tells
-authors to use to route around shapes. Edges with no waypoints are auto-routed
-by draw.io at render time (the path is not stored), so they are NOT geometry-
-checked here, keeping these warnings free of false positives. Endpoints honour
-``exitX/exitY``/``entryX/entryY`` when present, else the node centre, and
-absolute positions are resolved through parent containers.
+Edge routes are only known when an edge stores waypoints (an <Array
+as="points"> inside its geometry). Without waypoints draw.io chooses the path at
+render time, so such edges are left out of the two route checks; that keeps the
+route warnings free of guesses. A route starts and ends where the style pins the
+exit and entry points, or at the centre of the vertex, and uses absolute
+coordinates, so containers are accounted for.
 
-Exit status is non-zero when any error (or, with --strict, any warning) is
-found, so it can gate a workflow. Compressed (non-XML) diagram pages are
-skipped with a warning — this skill always writes uncompressed XML.
-
-Usage: uv run python validate.py <file.drawio> [--strict]
+A compressed (non-XML) page cannot be read: it is skipped with a warning.
+Output lines: "warning: ...", "error: ...", then "N error(s), M warning(s)".
 """
 import argparse
+import math
 import sys
 import xml.etree.ElementTree as ET
 
-RESERVED = {"0", "1"}
+ROOT_IDS = ("0", "1")
+GEOMETRY_FIELDS = (("x", "0"), ("y", "0"), ("width", "nan"), ("height", "nan"))
 
 
-def rect(cell):
-    """Return (x, y, w, h) floats for a cell's geometry, or None if absent/bad.
+class Cell:
+    """One mxCell of a page, with the questions the checks ask of it."""
 
-    x/y default to 0 when omitted: draw.io treats a missing position as the
-    origin, and container-managed children (table rows, swimlane/UML-class
-    lines under tableLayout) legitimately omit x/y while keeping width/height.
-    Only width/height are required to be present and numeric.
-    """
-    g = cell.find("mxGeometry")
-    if g is None:
+    def __init__(self, node):
+        self.node = node
+        self.id = node.get("id")
+        self.parent = node.get("parent")
+        self.is_vertex = node.get("vertex") in ("1",)
+        self.is_edge = node.get("edge") in ("1",)
+        self.style = node.get("style") or ""
+        self.geometry = node.find("mxGeometry")
+
+    def box(self):
+        """(x, y, width, height); None without geometry or with unreadable numbers."""
+        if self.geometry is None:
+            return None
+        try:
+            return tuple(float(self.geometry.get(key, dflt)) for key, dflt in GEOMETRY_FIELDS)
+        except ValueError:
+            return None
+
+    def has_size(self):
+        found = self.box()
+        return found is not None and not any(math.isnan(n) for n in found)
+
+    def is_label(self):
+        """Edge labels and relatively placed cells have no width/height of their own."""
+        relative = self.geometry is not None and self.geometry.get("relative") in ("1",)
+        return relative or "edgeLabel" in self.style
+
+    def style_number(self, key):
+        wanted = key + "="
+        for piece in self.style.split(";"):
+            if piece.startswith(wanted):
+                try:
+                    return float(piece[len(wanted):])
+                except ValueError:
+                    return None
         return None
-    try:
-        return (float(g.get("x", "0")), float(g.get("y", "0")),
-                float(g.get("width", "nan")), float(g.get("height", "nan")))
-    except ValueError:
-        return None
 
-
-def is_edge_label(cell):
-    """True for a draw.io edge label / relative-positioned child vertex.
-
-    These legitimately omit width/height: their position is given relative to a
-    parent edge (style ``edgeLabel``) or via ``relative="1"`` geometry. Treating
-    them as normal vertices wrongly flags them as missing/invalid geometry.
-    """
-    if "edgeLabel" in (cell.get("style") or ""):
-        return True
-    g = cell.find("mxGeometry")
-    return g is not None and g.get("relative") == "1"
-
-
-def overlap(a, b):
-    ax, ay, aw, ah = a
-    bx, by, bw, bh = b
-    return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
-
-
-# --- Edge routing geometry -------------------------------------------------
-#
-# These helpers reason about edge paths. They only apply to edges with explicit
-# waypoints (the route is otherwise computed by draw.io at render time and not
-# stored in the XML), so the checks never guess an auto-routed path.
-
-def style_num(style, key):
-    """Return float value of ``key=`` in a draw.io style string, or None."""
-    for part in (style or "").split(";"):
-        if part.startswith(key + "="):
+    def waypoints(self):
+        if self.geometry is None:
+            return []
+        holder = self.geometry.find("Array")
+        if holder is None:
+            return []
+        found = []
+        for point in holder.findall("mxPoint"):
             try:
-                return float(part.split("=", 1)[1])
-            except ValueError:
-                return None
-    return None
+                found.append((float(point.get("x")), float(point.get("y"))))
+            except (TypeError, ValueError):
+                continue
+        return found
 
 
-def abs_rect(cell, by_id):
-    """Absolute (x, y, w, h) of a vertex, summing parent-container offsets.
+class Page:
+    def __init__(self, cells):
+        self.cells = [Cell(node) for node in cells]
+        self.by_id = {}
+        self.duplicates = []
+        for cell in self.cells:
+            if cell.id in self.by_id:
+                self.duplicates.append(cell.id)
+            self.by_id[cell.id] = cell
+        self.parent_ids = {cell.parent for cell in self.cells}
 
-    Children of a container use coordinates relative to the container origin, so
-    an edge spanning containers needs absolute positions to be compared.
+    def page_box(self, cell):
+        """Box in page coordinates: adds the offsets of every vertex ancestor."""
+        if not cell.has_size():
+            return None
+        left, top, width, height = cell.box()
+        visited = set()
+        above = cell.parent
+        while above and above in self.by_id and above not in visited:
+            visited.add(above)
+            holder = self.by_id[above]
+            if holder.is_vertex and holder.has_size():
+                outer = holder.box()
+                left, top = left + outer[0], top + outer[1]
+            above = holder.parent
+        return (left, top, width, height)
+
+    def anchor(self, edge, end):
+        """Page position where an edge touches its source or target vertex."""
+        other = self.by_id.get(edge.node.get(end))
+        if other is None:
+            return None
+        box = self.page_box(other)
+        if box is None:
+            return None
+        side = "exit" if end == "source" else "entry"
+        fx = edge.style_number(side + "X")
+        fy = edge.style_number(side + "Y")
+        fx = 0.5 if fx is None else fx
+        fy = 0.5 if fy is None else fy
+        return (box[0] + fx * box[2], box[1] + fy * box[3])
+
+    def route(self, edge):
+        """Polyline of a waypointed edge, or None when it cannot be known."""
+        middle = edge.waypoints()
+        if not middle:
+            return None
+        start, end = self.anchor(edge, "source"), self.anchor(edge, "target")
+        if start is None or end is None:
+            return None
+        return [start] + middle + [end]
+
+
+# Geometry helpers
+
+def overlaps(a, b):
+    return not (a[0] + a[2] <= b[0] or b[0] + b[2] <= a[0]
+                or a[1] + a[3] <= b[1] or b[1] + b[3] <= a[1])
+
+
+def turn(a, b, c):
+    """1 for a left turn a -> b -> c, -1 for a right turn, 0 when in line."""
+    ab_x, ab_y = b[0] - a[0], b[1] - a[1]
+    ac_x, ac_y = c[0] - a[0], c[1] - a[1]
+    area = ab_x * ac_y - ab_y * ac_x
+    if abs(area) < 1e-9:
+        return 0
+    return 1 if area > 0 else -1
+
+
+def properly_cross(a1, a2, b1, b2):
+    """Do segment a1-a2 and segment b1-b2 cross at a point interior to both?
+
+    Meeting at an end point, or lying along one another, is not a crossing.
     """
-    r = rect(cell)
-    if r is None or any(v != v for v in r):
-        return None
-    x, y, w, h = r
-    parent, seen = cell.get("parent"), set()
-    while parent and parent in by_id and parent not in seen:
-        seen.add(parent)
-        p = by_id[parent]
-        if p.get("vertex") == "1":
-            pr = rect(p)
-            if pr and not any(v != v for v in pr):
-                x += pr[0]
-                y += pr[1]
-        parent = p.get("parent")
-    return (x, y, w, h)
+    first = (turn(a1, a2, b1), turn(a1, a2, b2))
+    second = (turn(b1, b2, a1), turn(b1, b2, a2))
+    if 0 in first or 0 in second:
+        return False
+    return first[0] != first[1] and second[0] != second[1]
 
 
-def endpoint(edge, end, by_id):
-    """Absolute (x, y) where ``edge`` meets its source/target vertex.
-
-    Honours exitX/exitY (source) and entryX/entryY (target) if the style pins
-    them; otherwise the vertex centre. Returns None if the vertex is unresolved.
-    """
-    vid = edge.get(end)
-    if not vid or vid not in by_id:
-        return None
-    box = abs_rect(by_id[vid], by_id)
-    if box is None:
-        return None
-    x, y, w, h = box
-    style = edge.get("style") or ""
-    fx = style_num(style, "exitX" if end == "source" else "entryX")
-    fy = style_num(style, "exitY" if end == "source" else "entryY")
-    return (x + (fx if fx is not None else 0.5) * w,
-            y + (fy if fy is not None else 0.5) * h)
+def inside(point, box, eps=1e-6):
+    left, top = box[0] + eps, box[1] + eps
+    right, bottom = box[0] + box[2] - eps, box[1] + box[3] - eps
+    return left < point[0] < right and top < point[1] < bottom
 
 
-def edge_waypoints(edge):
-    """Explicit <Array as="points"> waypoints of an edge as [(x, y), ...]."""
-    g = edge.find("mxGeometry")
-    if g is None:
-        return []
-    arr = g.find("Array")
-    if arr is None:
-        return []
-    pts = []
-    for pt in arr.findall("mxPoint"):
-        px, py = pt.get("x"), pt.get("y")
-        if px is not None and py is not None:
-            try:
-                pts.append((float(px), float(py)))
-            except ValueError:
-                pass
-    return pts
-
-
-def edge_route(edge, by_id):
-    """Absolute polyline [(x, y), ...] for a waypointed edge, or None.
-
-    Returns None when the edge has no explicit waypoints (auto-routed; path
-    unknown) or an endpoint cannot be resolved.
-    """
-    waypoints = edge_waypoints(edge)
-    if not waypoints:
-        return None
-    s, t = endpoint(edge, "source", by_id), endpoint(edge, "target", by_id)
-    if s is None or t is None:
-        return None
-    return [s] + waypoints + [t]
-
-
-def _orient(a, b, c):
-    v = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
-    return 0 if abs(v) < 1e-9 else (1 if v > 0 else -1)
-
-
-def segments_cross(p1, p2, p3, p4):
-    """True if segments p1p2 and p3p4 properly cross (interior intersection).
-
-    Proper crossing only: collinear overlap and shared-endpoint touches return
-    False, so edges meeting at a common node or grazing a corner are not flagged.
-    """
-    o1, o2 = _orient(p1, p2, p3), _orient(p1, p2, p4)
-    o3, o4 = _orient(p3, p4, p1), _orient(p3, p4, p2)
-    return o1 != o2 and o3 != o4 and 0 not in (o1, o2, o3, o4)
-
-
-def _point_in_rect(p, box, eps=1e-6):
-    x, y, w, h = box
-    return x + eps < p[0] < x + w - eps and y + eps < p[1] < y + h - eps
-
-
-def route_hits_rect(points, box):
-    """True if a polyline enters a rectangle's interior or crosses a border."""
-    x, y, w, h = box
-    corners = [(x, y), (x + w, y), (x + w, y + h), (x, y + h)]
-    borders = list(zip(corners, corners[1:] + corners[:1]))
-    for a, b in zip(points, points[1:]):
-        if _point_in_rect(a, box) or _point_in_rect(b, box):
+def touches_box(line, box):
+    """Does a polyline enter the box, or cross any of its four sides?"""
+    west, north = box[0], box[1]
+    east, south = west + box[2], north + box[3]
+    ring = [(west, north), (east, north), (east, south), (west, south)]
+    sides = [(ring[k], ring[(k + 1) % 4]) for k in range(4)]
+    for start, stop in zip(line, line[1:]):
+        if inside(start, box) or inside(stop, box):
             return True
-        if any(segments_cross(a, b, c, d) for c, d in borders):
-            return True
-    return False
-
-
-def routes_cross(pa, pb):
-    """True if any segment of polyline pa properly crosses any of pb."""
-    for a1, a2 in zip(pa, pa[1:]):
-        for b1, b2 in zip(pb, pb[1:]):
-            if segments_cross(a1, a2, b1, b2):
+        for c, d in sides:
+            if properly_cross(start, stop, c, d):
                 return True
     return False
 
 
-def geometry_warnings(cells, ids, parents):
-    """Edge-through-vertex and edge-crossing warnings for waypointed edges."""
-    warns = []
-    routed = []          # (edge_id, polyline, {source, target})
-    for c in cells:
-        if c.get("edge") == "1":
-            pts = edge_route(c, ids)
-            if pts:
-                routed.append((c.get("id"), pts,
-                               {c.get("source"), c.get("target")}))
-    # Edge routes through an unrelated leaf vertex (containers wrap children, so
-    # an edge legitimately traverses them — restrict to leaves, as overlap does).
-    leaves = [(c.get("id"), abs_rect(c, ids)) for c in cells
-              if c.get("vertex") == "1" and c.get("id") not in parents
-              and not is_edge_label(c)]
-    leaves = [(vid, box) for vid, box in leaves if box]
-    for eid, pts, ends in routed:
-        for vid, box in leaves:
-            if vid not in ends and route_hits_rect(pts, box):
-                warns.append(f"edge {eid!r} routes through vertex {vid!r}")
-    # Edge-edge crossings (both routes known).
-    for i in range(len(routed)):
-        for j in range(i + 1, len(routed)):
-            (ia, pa, _), (ib, pb, _) = routed[i], routed[j]
-            if routes_cross(pa, pb):
-                warns.append(f"edges {ia!r} and {ib!r} cross")
-    return warns
+def lines_cross(first, second):
+    for a, b in zip(first, first[1:]):
+        for c, d in zip(second, second[1:]):
+            if properly_cross(a, b, c, d):
+                return True
+    return False
+
+
+# The checks
+
+def route_notes(page):
+    notes = []
+    routed = []
+    for cell in page.cells:
+        if cell.is_edge:
+            line = page.route(cell)
+            if line:
+                ends = {cell.node.get("source"), cell.node.get("target")}
+                routed.append((cell.id, line, ends))
+
+    # Containers are meant to be crossed, so only leaf vertices count as obstacles.
+    obstacles = []
+    for cell in page.cells:
+        if cell.is_vertex and cell.id not in page.parent_ids and not cell.is_label():
+            box = page.page_box(cell)
+            if box:
+                obstacles.append((cell.id, box))
+
+    for edge_id, line, ends in routed:
+        for vertex_id, box in obstacles:
+            if vertex_id not in ends and touches_box(line, box):
+                notes.append("edge %r routes through vertex %r" % (edge_id, vertex_id))
+
+    for i, (first_id, first_line, _) in enumerate(routed):
+        for second_id, second_line, _ in routed[i + 1:]:
+            if lines_cross(first_line, second_line):
+                notes.append("edges %r and %r cross" % (first_id, second_id))
+    return notes
 
 
 def check_page(diagram):
-    """Return (errors, warnings) for one <diagram> page."""
-    name = diagram.get("name", "?")
-    model = diagram.find("mxGraphModel")
+    """Lint one page. Returns the list of errors and the list of warnings."""
+    models = diagram.findall("mxGraphModel")
+    model = models[0] if models else None
     if model is None:
-        if (diagram.text or "").strip():
-            return [], [f"page {name!r}: compressed, skipped (cannot lint)"]
-        return [f"page {name!r}: no <mxGraphModel>"], []
-    root = model.find("root")
-    cells = root.findall("mxCell") if root is not None else []
-    errors, warns = [], []
-    ids = {}
-    for c in cells:
-        cid = c.get("id")
-        if cid in ids:
-            errors.append(f"duplicate id {cid!r}")
-        ids[cid] = c
-    parents = {c.get("parent") for c in cells}            # ids that have children
-    for c in cells:
-        cid, parent = c.get("id"), c.get("parent")
-        is_v, is_e = c.get("vertex") == "1", c.get("edge") == "1"
-        if parent is not None and parent not in ids:
-            errors.append(f"cell {cid!r} parent {parent!r} does not exist")
-        for end in ("source", "target"):
-            ref = c.get(end)
-            if ref and ref not in ids:
-                errors.append(f"edge {cid!r} {end} {ref!r} does not exist")
-        if (is_v or is_e) and cid in RESERVED:
-            errors.append(f"cell {cid!r} reuses reserved id 0/1")
-        if is_v and not is_edge_label(c):
-            r = rect(c)
-            if r is None or any(v != v for v in r):       # None or NaN
-                errors.append(f"vertex {cid!r} has missing/invalid geometry")
-            else:
-                x, y, w, h = r
-                if w <= 0 or h <= 0:
-                    warns.append(f"vertex {cid!r} non-positive size {w:g}x{h:g}")
-                if x < 0 or y < 0:
-                    warns.append(f"vertex {cid!r} negative position ({x:g},{y:g})")
-    # Sibling overlap: only leaf vertices (containers legitimately wrap children).
-    boxes = [(c.get("id"), c.get("parent"), rect(c)) for c in cells
-             if c.get("vertex") == "1" and c.get("id") not in parents and rect(c)
-             and not any(v != v for v in rect(c))]
-    for i in range(len(boxes)):
-        for j in range(i + 1, len(boxes)):
-            (ia, pa, ra), (ib, pb, rb) = boxes[i], boxes[j]
-            if pa == pb and overlap(ra, rb):
-                warns.append(f"vertices {ia!r} and {ib!r} overlap")
-    warns += geometry_warnings(cells, ids, parents)
-    return errors, warns
+        label = diagram.attrib.get("name", "?")
+        packed = bool(diagram.text and diagram.text.strip())
+        if packed:
+            return [], ["page %r: compressed, skipped (cannot lint)" % label]
+        return ["page %r: no <mxGraphModel>" % label], []
+
+    nodes = []
+    for root in model.findall("root"):
+        nodes = root.findall("mxCell")
+        break
+    page = Page(nodes)
+    problems = ["duplicate id %r" % dup for dup in page.duplicates]
+    cautions = []
+
+    for cell in page.cells:
+        if cell.parent is not None and cell.parent not in page.by_id:
+            problems.append("cell %r parent %r does not exist" % (cell.id, cell.parent))
+        for end, target in (("source", cell.node.get("source")),
+                            ("target", cell.node.get("target"))):
+            if target and target not in page.by_id:
+                problems.append("edge %r %s %r does not exist" % (cell.id, end, target))
+        if (cell.is_vertex or cell.is_edge) and cell.id in ROOT_IDS:
+            problems.append("cell %r reuses reserved id 0/1" % cell.id)
+        if cell.is_vertex and not cell.is_label():
+            if not cell.has_size():
+                problems.append("vertex %r has missing/invalid geometry" % cell.id)
+                continue
+            x, y, w, h = cell.box()
+            if w <= 0 or h <= 0:
+                cautions.append("vertex %r non-positive size %gx%g" % (cell.id, w, h))
+            if x < 0 or y < 0:
+                cautions.append("vertex %r negative position (%g,%g)" % (cell.id, x, y))
+
+    leaves = [c for c in page.cells
+              if c.is_vertex and c.id not in page.parent_ids and c.has_size()]
+    for i, left in enumerate(leaves):
+        for right in leaves[i + 1:]:
+            if left.parent == right.parent and overlaps(left.box(), right.box()):
+                cautions.append("vertices %r and %r overlap" % (left.id, right.id))
+
+    return problems, cautions + route_notes(page)
+
+
+def load_root(path):
+    """Parse the file, or stop with an error message."""
+    try:
+        return ET.parse(path).getroot()
+    except (OSError, ET.ParseError) as exc:
+        sys.exit("error: cannot parse %s: %s" % (path, exc))
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Lint a .drawio file for structural errors.")
-    ap.add_argument("file")
-    ap.add_argument("--strict", action="store_true", help="treat warnings as failure too")
-    args = ap.parse_args()
-    try:
-        tree = ET.parse(args.file)
-    except (ET.ParseError, OSError) as exc:
-        sys.exit(f"error: cannot parse {args.file}: {exc}")
-    pages = tree.getroot().findall("diagram") or [tree.getroot()]
-    errors, warns = [], []
-    for page in pages:
-        e, w = check_page(page)
-        errors += e
-        warns += w
-    for w in warns:
-        print(f"warning: {w}")
-    for e in errors:
-        print(f"error: {e}")
-    print(f"{len(errors)} error(s), {len(warns)} warning(s)")
-    if errors or (args.strict and warns):
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Check a .drawio file for structural mistakes.")
+    parser.add_argument("file")
+    parser.add_argument("--strict", help="exit 1 on warnings as well as errors",
+                        action="store_true")
+    args = parser.parse_args()
+    top = load_root(args.file)
+    errors, warnings = [], []
+    for page in top.findall("diagram") or [top]:
+        found_errors, found_warnings = check_page(page)
+        errors += found_errors
+        warnings += found_warnings
+
+    for text in warnings:
+        print("warning: " + text)
+    for text in errors:
+        print("error: " + text)
+    print("%d error(s), %d warning(s)" % (len(errors), len(warnings)))
+    failed = bool(errors) or (args.strict and bool(warnings))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

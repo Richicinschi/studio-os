@@ -1,102 +1,93 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: Use after completing tasks, after implementing major features, or before merging, to verify the work meets its requirements. Hands a fresh linus-reviewer agent a focused brief and a commit range.
 metadata:
   category: quality
-  author: Richicinschi (adapted by Claude from obra/superpowers)
+  author: Richicinschi
   version: 1.0.0
-  domain: dispatching a code review with a crafted brief
-  sources:
-    - obra/superpowers · skills/requesting-code-review (MIT) @ v7.0.1 2ce8aa15; see ./LICENSE and ./VENDORED.md
+  domain: asking a reviewer agent to check finished work
 ---
+# Requesting a code review
 
-# Requesting Code Review
+A second pair of eyes finds problems before the next task builds on them. Give the reviewer a written brief and the commit range. Never give it your session history: it should judge the work, not your reasoning.
 
-Dispatch a code reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history.
+Rule: review early, and review often.
 
-**Core principle:** Review early, review often.
+## When to ask
 
-## When to Request Review
+Always:
+- once a task finishes, if subagent-driven-development turned review on for it; and at the end of every plan
+- after a large feature
+- before merging to main
 
-**Mandatory:**
-- After a task whose task review is switched on in subagent-driven development, and at the end of every plan
-- After completing major feature
-- Before merge to main
+Worth it:
+- when you are stuck and want a fresh view
+- before a refactor, to get a baseline
+- after a hard bug fix
 
-**Optional but valuable:**
-- When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
+## How to ask
 
-## How to Request
+1. Pick the commit range.
 
-**1. Get git SHAs:**
 ```bash
-BASE_SHA=$(git rev-parse HEAD~1)  # or: git merge-base origin/main HEAD
+BASE_SHA=$(git rev-parse HEAD~1)   # whole branch instead: git merge-base origin/main HEAD
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
-**2. Dispatch code reviewer subagent:**
+2. Dispatch the `linus-reviewer` agent (set as `subagent_type`). Its brief is [code-reviewer.md](code-reviewer.md) with the four values below filled in. Leave the model out, so it runs on the session's own model (`.claude/agents/AGENTS.md`).
 
-Dispatch the studio's reviewer, the `linus-reviewer` agent (as `subagent_type`), with the template at [code-reviewer.md](code-reviewer.md) filled in as its brief. Omit the model: it runs on the session's own (`.claude/agents/AGENTS.md`).
+   - `[DESCRIPTION]`: one short paragraph on what you built
+   - `[PLAN_OR_REQUIREMENTS]`: what the work had to do
+   - `[BASE_SHA]`: the commit before your work
+   - `[HEAD_SHA]`: your last commit
 
-**Placeholders:**
-- `{DESCRIPTION}` - Brief summary of what you built
-- `{PLAN_OR_REQUIREMENTS}` - What it should do
-- `{BASE_SHA}` - Starting commit
-- `{HEAD_SHA}` - Ending commit
+3. Handle what comes back.
+   - Critical: fix now.
+   - Important: fix before you go on.
+   - Minor: write it down for later.
+   - Think the reviewer is wrong? Say so, give your reasoning, and show the code or test that proves it.
 
-**3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
-
-## Example
+## Sample session
 
 ```
-[Just completed Task 2: Add verification function]
+[Task 5 done: add the retry queue]
 
-You: Let me request code review before proceeding.
+You: Reviewing before Task 6.
 
-BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | cut -d' ' -f1)
+BASE_SHA=$(git log --oneline | grep "Task 4" | head -1 | cut -d' ' -f1)
 HEAD_SHA=$(git rev-parse HEAD)
 
-[Dispatch code reviewer subagent]
-  DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/superpowers/plans/deployment-plan.md
-  BASE_SHA: a7981ec
-  HEAD_SHA: 3df7661
+[Dispatch linus-reviewer]
+  DESCRIPTION: Retry queue with backoff and a dead-job list
+  PLAN_OR_REQUIREMENTS: Task 5 in docs/plans/queue-plan.md
+  BASE_SHA: 9be04c1
+  HEAD_SHA: 71d2a58
 
-[Subagent returns]:
-  Strengths: Clean architecture, real tests
+[Reviewer replies]:
+  Strengths: small API, tests hit real timeouts
   Issues:
-    Important: Missing progress indicators
-    Minor: Magic number (100) for reporting interval
-  Assessment: Ready to proceed
+    Important: no cap on retry count
+    Minor: log lines lack the job id
+  Verdict: With fixes
 
-You: [Fix progress indicators]
-[Continue to Task 3]
+You: [add max_attempts, rerun the tests]
+[Go on to Task 6]
 ```
 
-## Common Rationalizations
+## Excuses that do not hold
 
-| Excuse | Reality |
-|--------|---------|
-| "I'll just review the diff myself instead of dispatching a reviewer" | You're the coordinator — reviewing the diff inline burns the context window you need to keep driving the work. Dispatch a reviewer subagent: the diff and the evaluation live in its context, and only the findings come back to you. |
-| "The reviewer needs my whole session history to understand the change" | Hand it precisely crafted context, never your session's history. That keeps the reviewer on the work product, not your thought process. |
+| Excuse | Why it fails |
+|--------|--------------|
+| "I will read the diff myself, it is quicker" | You run the work. A long diff read inline fills the context you need to keep going. A reviewer holds the diff in its own context and returns only findings. |
+| "The reviewer needs the full history to follow the change" | A good brief is enough. History drags in your assumptions and bends the verdict. |
 
-## Red Flags
+## Never
 
-**Never:**
-- Skip review because "it's simple"
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
+- Skip a review because the change is small.
+- Wave off a Critical finding.
+- Carry on with an Important finding unfixed.
+- Fight feedback that is correct.
 
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
+When the reviewer is wrong, answer with reasoning and with code or tests that show it, or ask it to clarify.
 
-See template at: [code-reviewer.md](code-reviewer.md)
+The brief lives in [code-reviewer.md](code-reviewer.md).

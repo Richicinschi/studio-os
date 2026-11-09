@@ -1,7 +1,10 @@
 ---
 id: executing-plans
 module: 03-planning
-checked: 2026-11-02
+checked: 2026-11-09
+tokens:
+  description: 53
+  body: 4127
 ---
 
 # Executing a plan inline, with a ledger
@@ -18,13 +21,12 @@ checked: 2026-11-02
 Read-only: names, descriptions, versions and counts. No skill body is opened, and nothing uses the network.
 
 - A skill of the same name: `test -f .claude/skills/executing-plans/SKILL.md && echo project` in each repository in `adoption/inventory.md`, and `test -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/executing-plans/SKILL.md" && echo user`.
-- The upstream plugin, which carries it as `superpowers:executing-plans`: `claude plugin list`, reading only a `superpowers@...` entry and its `Version`.
 - Another skill doing the same job: the front matter only (the lines between the first two `---`) of every `SKILL.md` at both levels, looking for a description about executing or implementing a plan.
 - What it relies on, at both levels, folder names only (`test -d <level>/<name>`): `subagent-driven-development` (whose `scripts/` it calls), `requesting-code-review` (whose `code-reviewer.md` briefs the final review), `tdd`, `diagnosing-bugs`, `verification-before-completion`, `using-git-worktrees`, `finishing-a-development-branch`.
 - A reviewer agent: `ls .claude/agents/ "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents/" 2>/dev/null`, file names only, looking for `linus-reviewer.md` or your own reviewer.
 - bash, for its scripts: `bash --version | head -1`.
 
-The menu marks the item **have** when an `executing-plans` skill exists at either level or the superpowers plugin is installed, **partly** when the skill is there but `subagent-driven-development/scripts/` is not beside it, or when another skill does the job, and **not yet** otherwise.
+The menu marks the item **have** when an `executing-plans` skill exists at either level, **partly** when the skill is there but `subagent-driven-development/scripts/` is not beside it, or when another skill does the job, and **not yet** otherwise.
 
 ## Ask
 
@@ -60,21 +62,20 @@ The menu marks the item **have** when an `executing-plans` skill exists at eithe
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/executing-plans/`: scans it with SkillSpector (`skillspector scan catalog/skills/executing-plans --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows), triages each finding with you, and reads `scripts/task-start` and `scripts/task-done` itself. They run git and your test command, write into the plan's workspace inside your repository, and send nothing out. The studio rescanned its adapted copies of superpowers 7.0.1 the same way and found no new real finding; `VENDORED.md` lists every change it made. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
-2. **Claude:** on your yes, writes the copy into the scope you chose, keeps the upstream `LICENSE` (MIT), and changes:
+1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/executing-plans/`: scans it with SkillSpector (`skillspector scan catalog/skills/executing-plans --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows), triages each finding with you, and reads `scripts/task-start` and `scripts/task-done` itself. They run git and your test command, write into the plan's workspace inside your repository, and send nothing out. The maintainers' latest scan result is in the skill's `SOURCE.md` ("Last scan"); your own scan is the one that decides. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
+2. **Claude:** on your yes, writes the copy into the scope you chose and rewrites for your setup:
    - the author line in the front matter, which names the studio, to yours;
    - "Final Review": the copy dispatches `linus-reviewer` with no model named, so it runs on the session's model unless `CLAUDE_CODE_SUBAGENT_MODEL` is set ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), citing the studio's agent rules file (`.claude/agents/AGENTS.md`). Claude puts your answer to question 2 there, and your own model rule in one line, or none;
    - the skills it calls (`tdd`, `diagnosing-bugs`, `verification-before-completion`, `using-git-worktrees`, `finishing-a-development-branch`, `requesting-code-review`): each kept, renamed to yours, or removed with the line that calls it;
    - the pointer to `../using-agent-skills/references/claude-code-tools.md`: dropped unless you have that file;
-   - when you do not take subagent-driven-development: its three helper scripts copied into this skill's `scripts/` folder, with the paths in `task-start`, `task-done` and `SKILL.md` changed to match;
-   - the studio's `VENDORED.md`, replaced by a short note of your own: the upstream, version 7.0.1, and what you changed.
+   - when you do not take subagent-driven-development: its three helper scripts copied into this skill's `scripts/` folder, with the paths in `task-start`, `task-done` and `SKILL.md` changed to match.
 
    Claude shows the result before it saves it.
 3. **Claude:** records the decision, the scope and the undo in `adoption/decisions.md`.
 
 ## Check
 
-1. **Claude:** inside one of your repositories, writes a one-task test plan to a temporary file outside it (a heading `### Task 1: check` and one line under it), then runs `bash <scope>/executing-plans/scripts/task-start <that file> 1`. Expected, two lines: `brief: <repo>/.superpowers/sdd/<plan name>/task-1-brief.md` and `base: <the commit id of HEAD>`. `git status` shows nothing new, because the workspace ignores itself. Then Claude deletes the test plan and that workspace folder.
+1. **Claude:** inside one of your repositories, writes a one-task test plan to a temporary file outside it (a heading `### Task 1: check` and one line under it), then runs `bash <scope>/executing-plans/scripts/task-start <that file> 1`. Expected, two lines: `brief: <repo>/.studio-work/sdd/<plan name>/task-1-brief.md` and `base: <the commit id of HEAD>`. `git status` shows nothing new, because the workspace ignores itself. Then Claude deletes the test plan and that workspace folder.
 2. **you:** in a new session, say "execute the plan at <path> inline". Before Task 1, Claude creates `progress.md` in that plan's workspace, whose first line is `# SDD ledger — plan: <path>`.
 
 If either check fails, the item is not done: the plan row stays unticked. An error naming `subagent-driven-development/scripts` means the scripts are not where `task-start` looks for them.
@@ -82,7 +83,7 @@ If either check fails, the item is not done: the plan row stays unticked. An err
 ## Undo
 
 - **Claude:** deletes the `executing-plans` folder from the scope it went into, with any scripts step 2 copied in.
-- **Claude:** on your yes, deletes the `.superpowers/sdd/` workspaces of finished plans; they are git-ignored scratch, and the commits stay in your history.
+- **Claude:** on your yes, deletes the `.studio-work/sdd/` workspaces of finished plans; they are git-ignored scratch, and the commits stay in your history.
 - **Claude:** adds a row to `adoption/decisions.md` saying the item was removed.
 
 ## Watch out
@@ -93,4 +94,4 @@ If either check fails, the item is not done: the plan row stays unticked. An err
 - **The workspace is git-ignored,** ledger included, so a command that deletes ignored files deletes it too. `git clean -fdx` is meant to be one (its `-x`); what each `git clean` flag removes is not in docs/facts.md as of 2026-11-02, so read `git clean -h` before you run one. Recover the state from `git log`.
 - **Long plans:** the last tasks run on a compacted context. The skill itself prefers [subagent-driven-development](subagent-driven-development.md) when a plan is long, or when you want a review after each task.
 - **Start it in a fresh session** when you want a clean context: it runs in whichever session invokes it.
-- **Cost:** its name and description load into every session, about 47 tokens (an estimate, bytes divided by 4); the full skill, about 4,500 tokens (estimate), loads only when it is used.
+- **Cost:** its name and description load into every session, about 53 tokens (an estimate, bytes divided by 4); the full skill, about 4,500 tokens (estimate), loads only when it is used.

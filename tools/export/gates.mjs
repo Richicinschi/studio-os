@@ -128,12 +128,14 @@ export function gateLinks(root) {
 // gate; it passes only if it decodes to exactly the gated .drawio beside it.
 // Every menu item has its hand-written adoption card, and every card belongs to a menu item.
 export function gateCards(root, manifest) {
-  const menu = manifest.items.filter(isMenuItem);
+  // Menu items have a card named for the item; a shipped pack has `pack-<id>`.
+  const wanted = [...manifest.items.filter(isMenuItem).map((it) => ({ file: it.id, label: `${it.kind}:${it.id}` })),
+    ...manifest.items.filter((it) => it.kind === 'pack' && it.status === 'shipped').map((it) => ({ file: `pack-${it.id}`, label: `pack:${it.id}` }))];
   const dir = path.join(root, 'cards');
   const cards = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => f.slice(0, -3)) : [];
-  const ids = new Set(menu.map((it) => it.id));
+  const ids = new Set(wanted.map((w) => w.file));
   return [
-    ...menu.filter((it) => !cards.includes(it.id)).map((it) => `cards/${it.id}.md: missing, the adoption card for ${it.kind}:${it.id}`),
+    ...wanted.filter((w) => !cards.includes(w.file)).map((w) => `cards/${w.file}.md: missing, the adoption card for ${w.label}`),
     ...cards.filter((c) => !ids.has(c)).sort().map((c) => `cards/${c}.md: a card for no menu item`),
   ];
 }

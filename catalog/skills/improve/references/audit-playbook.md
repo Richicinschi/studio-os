@@ -1,130 +1,221 @@
 # Audit Playbook
 
-What to look for, per category. Each subagent (or direct audit pass) gets the relevant section plus the **Finding format** at the bottom. Adapt depth to repo size — a 2K-line CLI gets a lighter pass than a 500K-line monorepo.
+A checklist per category. Hand each subagent (or each direct pass) its category section plus the
+**Finding format** at the end. Scale the effort to the repo: for a 2K-line CLI a lighter pass is right,
+and for a 500K-line monorepo a heavier one.
 
-A finding is only a finding with evidence. "Probably has N+1 queries somewhere" is not a finding; `orders/api.ts:142 issues one query per order item inside a loop` is.
+Evidence makes a finding. "Somewhere there are probably slow queries" is a hunch.
+`billing/export.py:88 runs one SELECT for every invoice line inside a for-loop` is a finding.
 
 ---
 
 ## 1. Correctness / Bugs
 
-The highest-trust category — real bugs found by reading, not speculation.
+The category you can trust most: defects located by reading code, not guessed.
 
-- Error handling: swallowed exceptions, empty catch blocks, `catch (e) { console.log(e) }` on critical paths, missing error states in UI code.
-- Async hazards: unawaited promises, race conditions on shared state, missing cancellation/cleanup (stale closures in React effects, listeners never removed).
-- Null/undefined flows: non-null assertions (`!`) on values that can be null, optional chaining hiding a value that must exist, unchecked array indexing.
-- Boundary conditions: off-by-one, empty-collection handling, timezone/locale assumptions, integer overflow in counters/IDs.
-- State machines: impossible-state combinations representable in types, status enums with unhandled branches (look for `default:` that silently no-ops).
-- Concurrency: check-then-act on shared resources, missing transactions around multi-write operations, idempotency of retried operations (webhooks, queues).
-- Type escape hatches: `any` / `as` casts / `@ts-ignore` clusters — each one is a place the compiler was overruled.
-- Resource leaks: unclosed handles, connections, subscriptions; missing `finally`.
+- Error handling: exceptions swallowed, empty `catch`/`except` blocks, an error only printed on a
+  critical path, UI code with no failure state.
+- Async hazards: promises or tasks nobody awaits, races on shared state, work never cancelled or
+  cleaned up (stale closures in React effects, listeners that are never removed).
+- Null flows: non-null assertions (`!`) on values that may be missing, optional chaining that
+  hides a value which must exist, array access with no bounds check.
+- Edges: off-by-one errors, empty inputs, assumptions about time zone or locale, counters or IDs
+  that can overflow.
+- State machines: states the types allow but the domain forbids; enums with an unhandled case,
+  especially a `default:` branch that does nothing.
+- Concurrency: check-then-act on a shared resource, several writes with no transaction around
+  them, retried operations (webhooks, queue jobs) that are not idempotent.
+- Type escapes: clusters of `any`, `as` casts or `@ts-ignore`. Each is a spot where the compiler
+  was overruled.
+- Leaks: files, connections or subscriptions left open; a missing `finally`.
 
 ## 2. Security
 
-Review only what is directly supported by code evidence. Keep findings framed as defensive maintenance: identify the code pattern, explain the production impact, and describe the remediation. Keep plans at the level of code changes, configuration changes, and tests; do not include runnable demonstration strings or step-by-step misuse details.
+Report only what the code itself supports. Frame each finding as defensive maintenance: name the
+code pattern, state the production impact, describe the remedy. Plans stay at the level of code
+changes, configuration changes and tests. Leave out working attack strings and step-by-step
+misuse.
 
-**Handling rule:** never copy a secret value into a finding or plan — those files get committed. Reference the `file:line` and credential type only ("Stripe live key at `config.ts:12`"), and the fix sketch always includes rotation, not just removal (a committed secret is burned even after deletion).
+**Secrets rule:** a secret value never goes into a finding or a plan, because those files get
+committed. Give `file:line` and the kind of credential ("payment-provider live key at
+`settings.py:31`"). The fix always includes rotation as well as removal, since a committed
+secret is compromised even after deletion.
 
-**By-design is not a finding:** standard platform conventions are intentional behavior — honoring `https_proxy`/`NO_PROXY`, reading `~/.netrc`, an explicitly local dev tool shelling out to configured package managers. A tradeoff explicitly recorded in an ADR or decision doc is likewise settled, not a finding. Flag these only when the *implementation* adds risk beyond the convention or the documented decision itself — and note that a **stale ADR is itself a finding**: if the code has drifted from what the decision doc says, report the decision drift (the doc or the code is wrong; either way the team should know), don't use the doc to suppress it.
+**By design is not a finding.** Ordinary platform conventions are intended: honouring
+`https_proxy` and `NO_PROXY`, reading `~/.netrc`, a plainly local developer tool that runs the
+configured package manager. A tradeoff written down in an ADR or decision document is settled
+too. Raise such a case only if the implementation adds risk beyond the convention or the
+recorded decision. Note also that **a stale ADR is a finding in itself**: when the code no longer
+does what the decision says, report the drift (either the document or the code is wrong). Do not
+let the document silence it.
 
-- Credential hygiene: hardcoded keys/tokens/passwords, credentials in committed `.env` files, credentials logged or persisted in event/history stores. Findings should name only the credential type and location, then recommend removal, rotation, and a safer configuration path.
-- Data crossing into interpreters or privileged APIs: SQL or shell operations assembled from request data (SQL/command injection), HTML sinks fed by user-controlled content (XSS), dynamic execution APIs used with runtime input, or filesystem paths derived from request data (path traversal). Describe the safer API or validation boundary; do not provide runnable examples.
-- Access control: endpoints/server actions that lack server-side identity checks, authorization enforced only in the client, object access by ID without ownership or tenant checks (IDOR), or missing request authenticity checks (CSRF) on state-changing routes.
-- Input contracts: API boundaries that trust request bodies without schema validation, file upload handling without clear type/size/storage constraints, or broad object assignment from request data into persistence models (mass assignment).
-- Dependency posture: run the ecosystem's audit command (`npm audit`, `pip-audit`, `cargo audit`) in read-only mode. Report only critical/high advisories that affect reachable runtime code or build/distribution paths; avoid low-signal audit noise.
-- Production configuration: overly broad CORS where credentials are allowed, missing response-hardening headers (e.g. CSP) where sensitive browser surfaces exist, cookies missing appropriate `HttpOnly`/`Secure`/`SameSite` attributes, or debug/verbose behavior enabled in production configuration.
-- Data minimization: PII or sensitive operational data in logs, stack traces returned to clients, or internal error details exposed through API responses.
+- Credentials: hardcoded keys, tokens or passwords; secrets in committed `.env` files; secrets
+  written to logs or stored in event or history tables. Name only the type and place, then
+  advise removal, rotation and a safer way to supply them.
+- Untrusted data reaching interpreters or privileged APIs: SQL or shell strings built from
+  request data (injection), HTML sinks fed user content (XSS), dynamic-execution APIs given
+  runtime input, and file paths built from request data (path traversal). Say which safer API
+  or validation boundary would close the gap. Never include a working exploit.
+- Access control: endpoints or server actions with no server-side identity check, permissions
+  enforced only in the client, records fetched by ID with no owner or tenant check (IDOR), and
+  state-changing routes with no request-authenticity check (CSRF).
+- Input contracts: request bodies accepted without a schema, file uploads with no type, size or
+  storage limits, whole request objects assigned into persistence models (mass assignment).
+- Dependencies: run the ecosystem's audit command read-only (`npm audit`, `pip-audit`,
+  `cargo audit`). Report only critical or high advisories that reach runtime code or the
+  build and distribution path. Skip low-signal noise.
+- Production config: overly broad CORS where credentials are allowed, no hardening headers
+  (such as CSP) where a browser surface holds sensitive data, cookies without `HttpOnly`,
+  `Secure` or `SameSite`, debug or verbose modes enabled in production settings.
+- Data minimisation: PII or sensitive operational data in logs, stack traces sent to clients,
+  internal error detail shown in API responses.
 
 ## 3. Performance
 
-Look for the algorithmic and architectural wins, not micro-optimizations.
+Hunt for algorithmic and structural wins, not micro-tuning.
 
-- N+1 patterns: query/fetch per item inside loops or per list-row rendering; missing batching or dataloader.
-- Wrong complexity: nested scans over the same collection, repeated `find`/`filter` inside hot loops where a Map keyed lookup belongs.
-- Caching gaps: identical expensive computations or fetches repeated per request/render; missing memoization at clear function boundaries; no HTTP/data-layer caching on stable data.
-- Payload size: over-fetching (select *, full objects where IDs suffice), missing pagination on unbounded lists, large JSON shipped to clients.
-- Frontend (if applicable): bundle composition (heavyweight deps for trivial use), missing code-splitting on rarely-hit routes, unoptimized images/fonts, client-side fetching for data available at render time, render waterfalls. For React/Next.js, defer to the repo's framework conventions and any installed best-practices guidelines.
-- Backend: synchronous work that belongs in a queue, missing indexes implied by query patterns (flag for verification — don't claim without schema evidence), connection-per-request patterns where pooling exists.
-- Build/CI: slow CI from missing caching, redundant pipeline steps, test suites that could parallelize.
+- N+1: a query or fetch for each item in a loop or each rendered list row, with no batching or
+  dataloader.
+- Wrong complexity: nested scans of one collection; `find` or `filter` repeated inside a hot
+  loop where a keyed map belongs.
+- Missing caches: the same costly computation or fetch redone for every request or render; no
+  memoisation at obvious function boundaries; no HTTP or data-layer cache on stable data.
+- Payload weight: over-fetching (`select *`, whole objects where IDs suffice), unbounded lists
+  with no pagination, big JSON sent to clients.
+- Frontend, where relevant: bundle makeup (a heavy dependency for a trivial job), no code
+  splitting on rarely visited routes, raw images and fonts, client-side fetching of data that
+  was available at render time, request waterfalls. For React or Next.js, defer to the repo's
+  own framework conventions and any best-practice guidance installed.
+- Backend: work done in the request that belongs on a queue; indexes that query patterns imply
+  but may be missing (mark for verification; do not assert without schema evidence); a new
+  connection per request where a pool exists.
+- Build and CI: slow pipelines from missing caches, repeated steps, test suites that could run
+  in parallel.
 
 ## 4. Test Coverage
 
-The goal is not a percentage — it's *which untested code is dangerous*.
+The aim is not a percentage. It is to learn which untested code is dangerous.
 
-- Map the critical paths (money, auth, data mutation, the feature the repo exists for) and check which have zero or trivial coverage.
-- Modules with high churn (git log) + no tests = top refactor risk; flag as "characterization tests first" candidates.
-- Existing test quality: tests that assert nothing meaningful, heavy mocking that tests the mocks, snapshot tests nobody reads, flaky patterns (real timers, real network, order dependence).
-- Missing test layers: unit-only suites with zero integration coverage on API boundaries, or the inverse (slow E2E for what a unit test would catch).
-- Verification infrastructure: is there a one-command way to know the codebase works? If not, that's finding #1 and a prerequisite plan for any risky change.
+- Map the critical paths (payments, auth, data writes, the feature the repo exists for) and see
+  which have no tests or trivial ones.
+- High-churn modules with no tests are the largest refactoring risk. Mark them as candidates for
+  "characterization tests first".
+- Quality of current tests: assertions that prove nothing, mocks so heavy the test checks the
+  mock, snapshots no one reviews, flaky habits (real clocks, live network, dependence on order).
+- Missing layers: only unit tests and nothing at API boundaries, or the reverse, a slow
+  end-to-end test for what a unit test would catch.
+- Verification set-up: is there one command that says whether the code works? If not, that is
+  finding one, and a prerequisite plan for every risky change.
 
 ## 5. Tech Debt & Architecture
 
-- Duplication: the same logic re-implemented in 3+ places (search for near-identical functions/components); divergent copies that have drifted.
-- Layering violations: UI importing from data layer internals, circular dependencies, "utils" modules that became a junk drawer with high fan-in.
-- Dead code: unexported-and-unused modules, feature flags fully rolled out but still branching, commented-out blocks with no explanation, deps in the manifest no longer imported.
-- God objects/modules: files an order of magnitude larger than the repo median that everything touches; functions with double-digit parameters or deep conditional nesting.
-- Inconsistent patterns: three ways of doing data fetching / error handling / styling in the same repo — pick the winner (the one the team converged on most recently) and plan the consolidation.
-- Abstraction mismatches: premature abstractions with a single implementation, or missing abstractions where the same change always requires touching N files in lockstep.
+- Duplication: one piece of logic written out in three or more places; copies that have
+  drifted apart.
+- Layer breaks: UI reaching into data-layer internals, import cycles, a "utils" module that
+  became a junk drawer everything imports.
+- Dead code: unexported and unused modules, fully launched feature flags that still branch,
+  commented-out blocks with no note, manifest entries no longer imported.
+- Oversized units: a file that everything touches and that is an order of magnitude
+  larger than the repo median; functions with double-digit parameter lists or deeply nested conditions.
+- Mixed patterns: three ways of fetching data, handling errors or styling in one repo. Choose
+  the winner (the style the team moved to most recently) and plan the merge.
+- Wrong abstraction level: a premature abstraction with exactly one implementation (test seams
+  and ports are legitimate, so leave those), or no abstraction where every change must touch N
+  files together.
 
 ## 6. Dependencies & Migrations
 
-- Major-version lag on core framework/runtime (not every minor bump — the ones with real cost to staying behind: EOL, security-fix cutoffs, ecosystem incompatibility).
-- Deprecated APIs in use that have announced removal timelines.
-- Abandoned dependencies (no release in years, archived repos) on critical paths.
-- Duplicate dependencies solving the same problem (two date libs, two HTTP clients).
-- Lockfile/manifest drift, version pinning inconsistencies across a monorepo.
-- For each migration candidate, estimate blast radius (files touched) — that drives effort and whether to recommend it at all.
+- Core framework or runtime far behind by major version. Ignore routine minor bumps; flag only
+  the cases where staying behind costs something real (end of life, security fixes stopping,
+  ecosystem incompatibility).
+- Deprecated APIs in use whose removal date has been announced.
+- Abandoned packages (no release for years, archived repos) on critical paths.
+- Two packages for the same job (two date libraries, two HTTP clients).
+- Lockfile and manifest out of step; version pins that differ across a monorepo.
+- For every migration candidate, estimate the blast radius in files touched. It sets the effort
+  and decides whether to recommend the migration at all.
 
 ## 7. DX & Tooling
 
-- Missing or broken: typecheck script, lint config, formatter, pre-commit hooks, editorconfig.
-- Slow feedback loops: dev-server or test startup measured in minutes, no watch mode, CI without caching.
-- Onboarding friction: README setup steps that are wrong/incomplete, undocumented required env vars, no `.env.example`.
-- Missing `CLAUDE.md`/`AGENTS.md` — for repos where agents will execute the plans, this is high-leverage: recommend one and include its outline as a plan.
-- Error messages/logging: unstructured logs on services, missing request IDs/correlation, debugging requiring code changes.
+- Missing or broken pieces: typecheck script, lint config, formatter, pre-commit hooks,
+  editorconfig.
+- Slow feedback: a dev server or test start that takes minutes, no watch mode, CI with no
+  cache.
+- Onboarding friction: README steps that are wrong or incomplete, required env vars nobody
+  documented, no `.env.example`.
+- No `CLAUDE.md` or `AGENTS.md`. Where agents will carry out the plans this is a high-leverage
+  fix; recommend one and put its outline in a plan.
+- Logging and errors: unstructured service logs, no request or correlation IDs, debugging that
+  needs a code change.
 
 ## 8. Docs
 
-Lowest default priority — only flag where absence has a concrete cost:
+Lowest priority by default. Raise something only when its absence has a concrete cost.
 
-- Public API surface (published packages) without reference docs.
-- Architectural decisions nobody can reconstruct (why X over Y) for actively-contested areas.
-- Stale docs that are actively wrong (worse than missing) — setup instructions, API examples that no longer compile.
+- A published package whose public API has no reference docs.
+- Architectural choices no one can reconstruct (why X rather than Y) in an area under active
+  dispute.
+- Docs that are wrong, which is worse than missing: setup steps or API samples that no longer
+  compile.
 
-## 9. Direction — features & where to take this next
+## 9. Direction: what to build next
 
-Forward-looking: not what's broken, but what this codebase wants to become. **Grounding rule:** every suggestion must cite evidence from the repo itself — a suggestion that could apply to any project in the category ("add dark mode", "add AI") is noise, not a finding. Sources of grounded direction signal:
+Here you look ahead. The question is not what is broken but what the project is becoming.
+**Grounding rule:** every idea must point at evidence in this repo. If an idea would suit any
+project of the same type ("add dark mode", "add AI"), it is filler. Real signals come from:
 
-- **Unfinished intent**: TODO/FIXME clusters around one theme, feature flags never rolled out, stubbed or half-built modules, commented-out feature code, abandoned mid-feature work visible in git history.
-- **Stated-but-undelivered**: README/docs/roadmap promises with no corresponding code, CLI flags or config options that are no-ops, issue templates for features that don't exist. A PRD or `PRODUCT.md` that names users, use cases, or a direction the code hasn't caught up to is the strongest grounding signal there is — prefer it over inferred intent, and never propose something a decision doc already rejected (note the contradiction instead).
-- **Surface asymmetries**: one-directional pairs (export without import, create without bulk-create, webhooks out but not in), entities with CRUD minus one, a public API that internal code clearly needed and hand-rolled around.
-- **The adjacent possible**: capabilities the existing architecture makes disproportionately cheap — a plugin system one interface away, a public API one route file from the existing service layer, an integration the data model already supports.
-- **Friction worth productizing**: things users of this project evidently do by hand around it (visible in docs, examples, issues) that the project could absorb.
+- **Intent left unfinished**: TODO or FIXME notes piling up around one theme, flags that never
+  shipped, stubs and half-built modules, feature code commented out, work dropped midway as
+  git history shows.
+- **Promises with nothing behind them**: README, docs or roadmap entries lacking code; CLI
+  flags or settings that do nothing; issue templates for features that are absent. The best
+  anchor of all is a PRD or `PRODUCT.md` naming users, use cases, or a direction that the code
+  has yet to reach. Trust it over guessed intent. Never propose what a decision document
+  already turned down; report the conflict instead.
+- **Lopsided surfaces**: operations that only run one way (export but no import, single create
+  but no bulk, webhooks sent but never received), entities missing one of create, read, update
+  and delete, a public API the internal code obviously needed and hand-rolled around.
+- **The cheap next move**: whatever the architecture makes unusually easy, such as a plugin
+  hook one interface away, a public endpoint one route file from an existing service layer, an
+  integration the data model already supports.
+- **Chores worth absorbing**: manual work users plainly do around the project (docs, examples
+  and issues show it) that the project could do for them.
 
-Direction findings use the standard format with two adaptations: **Impact** is product/user value (who wants this and why now), and **Confidence** reflects how grounded the evidence is — not certainty that it's the right call. Strategy belongs to the maintainer; the advisor's job is grounded options with honest trade-offs. Effort estimates here are coarser; say so. Plans for selected direction findings are usually a *design/spike plan* (investigate, prototype, define the API, list open questions) rather than a build-everything plan — scope them that way.
+Direction findings use the normal format with two shifts. **Impact** is product value: who
+wants the thing and why now. **Confidence** measures how solid the evidence is, not whether the
+idea is wise. Strategy is the maintainer's call; your job is grounded options with honest
+trade-offs. Effort estimates are coarser here, and you should say so. A plan for a chosen
+direction finding is usually a design or spike plan (research, prototype, define the API, list
+open questions), not a plan to build the whole thing. Scope it that way.
 
 ---
 
 ## Finding format
 
-Every finding, from every category and every subagent, comes back in this shape:
+Every finding returns in this form, whichever category or subagent produced it:
 
 ```markdown
 ### [CATEGORY-NN] Short imperative title
 
-- **Evidence**: `path/file.ts:123` — one-sentence description of what's there. (Repeat per location; 2–5 strongest locations, note "and ~N similar sites" if widespread.)
-- **Impact**: What goes wrong / what's being paid because of this. Concrete: "every order-list render issues 1+N queries", not "suboptimal".
-- **Effort**: S (hours) / M (a day-ish) / L (multi-day) — for the *fix*, including tests.
-- **Risk**: What the fix could break; LOW/MED/HIGH plus one line why.
-- **Confidence**: HIGH (read the code, certain) / MED (strong signal, needs verification) / LOW (smell, needs investigation). LOW-confidence findings may be reported but get an "investigate" plan, not a "fix" plan.
-- **Fix sketch**: 1–3 sentences. Not the plan — just enough to judge effort honestly.
+- **Evidence**: `path/file.py:123`, then a sentence on what sits there. (One bullet per
+  location; keep the 2-5 best, and write "and ~N similar sites" if it is widespread.)
+- **Impact**: The harm or cost, concretely: "each invoice export fires 1+N queries", never
+  "inefficient".
+- **Effort**: S (hours) / M (about a day) / L (several days) to *fix it*, tests included.
+- **Risk**: What the fix could break: LOW, MED or HIGH, with one line of reason.
+- **Confidence**: HIGH (read the code, certain) / MED (strong signal, still to confirm) / LOW
+  (a smell to investigate). A LOW finding can be reported, but it gets an "investigate" plan,
+  not a "fix" plan.
+- **Fix sketch**: one to three sentences. It is not the plan, only enough to size the work.
 ```
 
 ## Prioritization rubric
 
-Order findings by **leverage = impact ÷ effort, discounted by confidence and fix-risk**. Tiebreakers:
+Order findings by **leverage: impact over effort, reduced for doubt and for risky fixes**. When
+two are close, apply these tie-breakers:
 
-1. Anything that unblocks other findings (verification baseline, characterization tests) floats up.
-2. Security findings with HIGH confidence float above equivalent-leverage non-security findings.
-3. Prefer findings whose fix has a clean verification story — executor models succeed at those.
-4. "Not worth doing" is a valid verdict; record it with one line of reasoning so the user knows it was considered.
+1. If a finding unblocks others (a verification baseline, characterization tests), it goes up.
+2. A HIGH-confidence security finding beats a non-security one with equal leverage.
+3. Prefer a finding whose fix is simple to verify, since executor models do well on those.
+4. A "not worth doing" verdict is valid. Write it with a line of reasoning so the user sees the
+   idea was weighed.

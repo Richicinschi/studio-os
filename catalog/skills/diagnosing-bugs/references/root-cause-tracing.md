@@ -1,171 +1,156 @@
-> Source: obra/superpowers `skills/systematic-debugging/root-cause-tracing.md` (MIT, Copyright (c) 2025 Jesse Vincent) @ v7.0.1 2ce8aa15, folded into diagnosing-bugs; licence in `../LICENSE`.
+# Tracing a failure back to its cause
 
-# Root Cause Tracing
+## The problem
 
-## Overview
+Failures often surface far from where they began: a file appears in the wrong folder, a database opens at the wrong path, a command runs in the wrong directory. The natural move is to patch the spot where it blew up. That patch treats a symptom.
 
-Bugs often manifest deep in the call stack (git init in wrong directory, file created in wrong location, database opened with wrong path). Your instinct is to fix where the error appears, but that's treating a symptom.
+Rule: walk backwards up the call chain until you reach where the bad value was first produced, and fix it there.
 
-**Core principle:** Trace backward through the call chain until you find the original trigger, then fix at the source.
-
-## When to Use
+## When it applies
 
 ```dot
-digraph when_to_use {
-    "Bug appears deep in stack?" [shape=diamond];
-    "Can trace backwards?" [shape=diamond];
-    "Fix at symptom point" [shape=box];
-    "Trace to original trigger" [shape=box];
-    "BETTER: Also add defense-in-depth" [shape=box];
+digraph trace_or_patch {
+    "Failure shows up deep in the stack" [shape=box];
+    "Can you walk it backwards?" [shape=diamond];
+    "Walk back to the origin" [shape=box];
+    "Fix at the symptom" [shape=box];
+    "Then add checks at each layer" [shape=box];
 
-    "Bug appears deep in stack?" -> "Can trace backwards?" [label="yes"];
-    "Can trace backwards?" -> "Trace to original trigger" [label="yes"];
-    "Can trace backwards?" -> "Fix at symptom point" [label="no - dead end"];
-    "Trace to original trigger" -> "BETTER: Also add defense-in-depth";
+    "Failure shows up deep in the stack" -> "Can you walk it backwards?";
+    "Can you walk it backwards?" -> "Walk back to the origin" [label="yes"];
+    "Can you walk it backwards?" -> "Fix at the symptom" [label="no, dead end"];
+    "Walk back to the origin" -> "Then add checks at each layer";
 }
 ```
 
-**Use when:**
-- Error happens deep in execution (not at entry point)
-- Stack trace shows long call chain
-- Unclear where invalid data originated
-- Need to find which test/code triggers the problem
+Use it when:
+- the error happens well inside execution, not at the entry point
+- the stack trace is long
+- you cannot tell where the bad value came from
+- you need to learn which test or caller sets it off
 
-## The Tracing Process
+## Steps
 
-### 1. Observe the Symptom
+### 1. Write down the symptom
 ```
-Error: git init failed in ~/project/packages/core
+Stray file after the suite: services/api/manifest.json (not in git, not created by hand)
 ```
 
-### 2. Find Immediate Cause
-**What code directly causes this?**
+### 2. Find the line that directly causes it
 ```typescript
-await execFileAsync('git', ['init'], { cwd: projectDir });
+await execFileAsync('tar', ['-xf', archive], { cwd: unpackDir });
 ```
 
-### 3. Ask: What Called This?
+### 3. Ask who called it
 ```typescript
-WorktreeManager.createSessionWorktree(projectDir, sessionId)
-  → called by Session.initializeWorkspace()
-  → called by Session.create()
-  → called by test at Project.create()
+Importer.unpack(archive, unpackDir)
+  -> called by Importer.open()
+  -> called by Importer.openLatest()
+  -> called by the integration test, inside makeImporter()
 ```
 
-### 4. Keep Tracing Up
-**What value was passed?**
-- `projectDir = ''` (empty string!)
-- Empty string as `cwd` resolves to `process.cwd()`
-- That's the source code directory!
+### 4. Keep climbing and inspect each value
+- `unpackDir` was `''`
+- `execFile` ignores an empty `cwd`, so the child process started in the current directory
+- the current directory was `services/api/`
 
-### 5. Find Original Trigger
-**Where did empty string come from?**
+### 5. Locate the first bad value
 ```typescript
-const context = setupCoreTest(); // Returns { tempDir: '' }
-Project.create('name', context.tempDir); // Accessed before beforeEach!
+const env = makeTestEnv(); // returns { unpackDir: '' } until setup hooks run
+makeImporter('nightly', env.unpackDir); // read at module load, before setup
 ```
 
-## Adding Stack Traces
+## When you cannot climb by reading
 
-When you can't trace manually, add instrumentation:
+Add a probe just before the risky call:
 
 ```typescript
-// Before the problematic operation
-async function gitInit(directory: string) {
-  const stack = new Error().stack;
-  console.error('DEBUG git init:', {
-    directory,
+async function unpack(archive: string, dir: string) {
+  console.error('DEBUG unpack:', {
+    archive,
+    dir,
     cwd: process.cwd(),
-    nodeEnv: process.env.NODE_ENV,
-    stack,
+    mode: process.env.NODE_ENV,
+    trace: new Error().stack,
   });
-
-  await execFileAsync('git', ['init'], { cwd: directory });
+  await execFileAsync('tar', ['-xf', archive], { cwd: dir });
 }
 ```
 
-**Critical:** Use `console.error()` in tests (not logger - may not show)
+Use `console.error()` in tests. A logger may be muted there.
 
-**Run and capture:**
+Capture the output:
 ```bash
-npm test 2>&1 | grep 'DEBUG git init'
+npm test 2>&1 | grep 'DEBUG unpack'
 ```
 
-**Analyze stack traces:**
-- Look for test file names
-- Find the line number triggering the call
-- Identify the pattern (same test? same parameter?)
+Then read it:
+- look for test file names in the trace
+- note the line that triggers the call
+- see whether one test or one argument keeps repeating
 
-## Finding Which Test Causes Pollution
+## Finding the test that leaves things behind
 
-If something appears during tests but you don't know which test:
-
-Use the bisection script `find-polluter.sh` in this directory:
+If a stray file appears during a test run and you do not know which test makes it, use `find-polluter.sh` from this folder. It runs the test files one at a time and stops at the first one after which the file exists.
 
 ```bash
-bash ./find-polluter.sh '.git' 'src/**/*.test.ts'
+bash ./find-polluter.sh 'manifest.json' 'src/**/*.spec.ts'
 ```
 
-Runs tests one-by-one, stops at first polluter. See script for usage.
+## Worked case
 
-## Real Example: Empty projectDir
+Symptom: a stray `manifest.json` appeared in `services/api/` after the test run.
 
-**Symptom:** `.git` created in `packages/core/` (source code)
+Chain, from the symptom upward:
+1. `tar` ran in `process.cwd()` because `execFile` ignores an empty `cwd`.
+2. `Importer.unpack` got an empty `unpackDir`.
+3. `Importer.open` forwarded the empty string it was given.
+4. The test read `env.unpackDir` at module load, before any setup hook.
+5. `makeTestEnv()` returns `{ unpackDir: '' }` until the hooks run.
 
-**Trace chain:**
-1. `git init` runs in `process.cwd()` ← empty cwd parameter
-2. WorktreeManager called with empty projectDir
-3. Session.create() passed empty string
-4. Test accessed `context.tempDir` before beforeEach
-5. setupCoreTest() returns `{ tempDir: '' }` initially
+Root cause: a top-level read of a value that is not filled in yet.
 
-**Root cause:** Top-level variable initialization accessing empty value
+Fix: make `unpackDir` a getter that throws when read before setup.
 
-**Fix:** Made tempDir a getter that throws if accessed before beforeEach
+Extra safety added (the same incident is told in `defense-in-depth.md`):
+- `Importer.open` validates its directory
+- `ScratchManager` refuses an empty base path
+- a test-mode guard refuses to unpack outside the temp folder
+- a stack trace is logged before every unpack
 
-**Also added defense-in-depth:**
-- Layer 1: Project.create() validates directory
-- Layer 2: WorkspaceManager validates not empty
-- Layer 3: NODE_ENV guard refuses git init outside tmpdir
-- Layer 4: Stack trace logging before git init
-
-## Key Principle
+## The loop to follow
 
 ```dot
-digraph principle {
-    "Found immediate cause" [shape=ellipse];
-    "Can trace one level up?" [shape=diamond];
-    "Trace backwards" [shape=box];
-    "Is this the source?" [shape=diamond];
-    "Fix at source" [shape=box];
-    "Add validation at each layer" [shape=box];
-    "Bug impossible" [shape=doublecircle];
+digraph climb {
+    "Found direct cause" [shape=ellipse];
+    "Is there a caller to inspect?" [shape=diamond];
+    "Go up one level" [shape=box];
+    "Is this where the bad value began?" [shape=diamond];
+    "Fix here" [shape=box];
+    "Add checks on each layer" [shape=box];
+    "Done" [shape=doublecircle];
     "NEVER fix just the symptom" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
 
-    "Found immediate cause" -> "Can trace one level up?";
-    "Can trace one level up?" -> "Trace backwards" [label="yes"];
-    "Can trace one level up?" -> "NEVER fix just the symptom" [label="no"];
-    "Trace backwards" -> "Is this the source?";
-    "Is this the source?" -> "Trace backwards" [label="no - keeps going"];
-    "Is this the source?" -> "Fix at source" [label="yes"];
-    "Fix at source" -> "Add validation at each layer";
-    "Add validation at each layer" -> "Bug impossible";
+    "Found direct cause" -> "Is there a caller to inspect?";
+    "Is there a caller to inspect?" -> "Go up one level" [label="yes"];
+    "Is there a caller to inspect?" -> "NEVER fix just the symptom" [label="no"];
+    "Go up one level" -> "Is this where the bad value began?";
+    "Is this where the bad value began?" -> "Go up one level" [label="no"];
+    "Is this where the bad value began?" -> "Fix here" [label="yes"];
+    "Fix here" -> "Add checks on each layer";
+    "Add checks on each layer" -> "Done";
 }
 ```
 
-**NEVER fix just where the error appears.** Trace back to find the original trigger.
+NEVER fix just where the error appears.
 
-## Stack Trace Tips
+## Probe tips
 
-**In tests:** Use `console.error()` not logger - logger may be suppressed
-**Before operation:** Log before the dangerous operation, not after it fails
-**Include context:** Directory, cwd, environment variables, timestamps
-**Capture stack:** `new Error().stack` shows complete call chain
+- In tests, print with `console.error()`, not the logger.
+- Log before the risky operation, not after it fails.
+- Record directory, cwd, environment variables and time.
+- `new Error().stack` gives the full chain.
 
-## Real-World Impact
+## Result of this approach
 
-From debugging session (2025-10-03):
-- Found root cause through 5-level trace
-- Fixed at source (getter validation)
-- Added 4 layers of defense
-- 1847 tests passed, zero pollution
+A 5-step trace found the real origin, a getter fixed it at the source, four defensive checks went in, and the full suite ran clean with nothing stray left behind.

@@ -1,48 +1,45 @@
-# Final Review and Finish
+# Final review and finish
 
-Part of subagent-driven-development. Every task in the plan is
-complete.
+Companion to subagent-driven-development. Read this when the last task is complete.
 
-The final whole-branch review gets a package too: run
-`bash scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
-branch started from, e.g. `git merge-base main HEAD`) and include the
-printed path in the final review dispatch, so the final reviewer reads
-one file instead of re-deriving the branch diff with git commands. Dispatch
-the `linus-reviewer` agent, model omitted (see SKILL.md's Model Selection),
-with requesting-code-review's
-[code-reviewer.md](../../requesting-code-review/code-reviewer.md) as its
-brief. Point it at the ledger's deferred-minor and parked lines so it can
-triage which must be fixed before merge. For tasks that had no task review,
-this is the only review they get: name them, and the plan's riskiest ones.
+## Review the whole branch
 
-If the final whole-branch review returns findings, dispatch ONE fix subagent
-(`bob-builder`) with the complete findings list — not one fixer per finding.
-Per-finding fixers each rebuild context and re-run suites; a real
-session's final-review fix wave cost more than all its tasks combined.
-Then run exactly one scoped re-review of the fix wave
-(`bash scripts/review-package PLAN_FILE FIX_BASE HEAD` over the fix range,
-[re-review-prompt.md](../re-review-prompt.md)).
-Adjudicate any residual findings as in the fix loop's breaker
-(references/fix-loop.md): park with rulings, or rule on the load-bearing
-ones and ledger what you decided. Only the four things that stop a running
-plan (top of SKILL.md) stop you here. There is no second fix wave —
-residual load-bearing findings surface to your human partner when
-finishing-a-development-branch presents the options.
+1. Build a package that covers everything the branch changed. MERGE_BASE is the commit where the branch began, for instance the output of `git merge-base main HEAD`:
 
-### Finish
+```
+bash scripts/review-package PLAN_FILE MERGE_BASE HEAD
+```
 
-Before you delete anything, collect every ledger line containing `Ruling:` —
-preflight rulings, parked findings, breaker adjudications, all of them — into
-your final message under "Rulings I made", in the order you made them, each
-with what it costs if wrong. The list is exhaustive: if the ledger holds a
-ruling, the list holds it. That list is the only place the decisions you
-took on your human partner's behalf reach them — they read it and rework
-whatever you got wrong. A ruling that dies with the workspace was a decision
-made in secret.
+The reviewer then opens a single file and does not have to reconstruct the diff with git commands.
 
-When the final whole-branch review is clean and its fixes are merged,
-delete this plan's workspace (`rm -rf <workspace>`) — the git history is
-the record now. Sibling directories belong to other plans; leave them
-alone.
+2. Dispatch `linus-reviewer` with the model omitted (Model Selection in SKILL.md). Its brief is the one that requesting-code-review keeps: [the code-reviewer brief](../../requesting-code-review/code-reviewer.md). Pass the printed package path.
+3. Point the reviewer to the deferred-minor and parked lines of the ledger, so it can say which of them need a fix before merge.
+4. List the tasks that got no task review, because this is the only review those tasks receive. Add the plan's riskiest tasks to the list.
 
-Use finishing-a-development-branch.
+## One fix wave
+
+When findings come back, send ONE fixer (`bob-builder`) the entire list. A fixer per finding means every one rebuilds context and re-runs the suites. In a real session, the wave after the final review cost more than all the tasks combined.
+
+Afterwards run a single scoped re-review of that wave, and no more than one. Package the fix range:
+
+```
+bash scripts/review-package PLAN_FILE FIX_BASE HEAD
+```
+
+and dispatch the [re-review template](../re-review-prompt.md).
+
+Findings still open after that get the breaker treatment from the fix loop (see fix-loop.md in this folder): park them with rulings, or, for load-bearing ones, rule and write down what you chose. Only the four stops listed in SKILL.md can halt you now. A second fix wave does not exist. Any load-bearing finding left over reaches your human partner through the options that finishing-a-development-branch presents.
+
+## Finish
+
+Gather first, delete second. Pull out every ledger line containing `Ruling:`: pre-flight rulings, parked findings, breaker decisions, with none left behind. Put them in your closing message under the heading "Rulings I made". Keep the order in which you decided them, and add to each one the price of being wrong. The list is complete or it is worthless: any ruling in the ledger must appear in it. It is the sole channel through which the calls you made for your human partner reach them, and they use it to redo whatever you got wrong. A ruling that vanishes with the workspace was taken in secret.
+
+When the branch review is clean and its fixes are merged (committed to the branch), remove this plan's workspace:
+
+```
+rm -rf <workspace>
+```
+
+Git history is the record from then on. The folders beside it belong to other plans, so do not touch them.
+
+Hand over to finishing-a-development-branch.

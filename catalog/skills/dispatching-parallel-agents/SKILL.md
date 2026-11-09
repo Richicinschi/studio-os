@@ -1,174 +1,148 @@
 ---
 name: dispatching-parallel-agents
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: Use when facing 2+ independent tasks, each one worked on without shared state or sequential dependencies. Each gets its own subagent and self-contained brief, runs side by side, then you check the results together.
 metadata:
   category: workflow
-  author: Richicinschi (adapted by Claude from obra/superpowers)
+  author: Richicinschi
   version: 1.0.0
   domain: parallel subagent dispatch for independent tasks
-  sources:
-    - obra/superpowers · skills/dispatching-parallel-agents (MIT) @ v7.0.1 2ce8aa15; see ./LICENSE and ./VENDORED.md
 ---
-
 # Dispatching Parallel Agents
 
-## Overview
+Split independent work across subagents so it runs at the same time. One agent takes one problem area. You keep your own context free for coordinating.
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+Never pass your session's context or history to a subagent. Give it only what its brief holds, and decide exactly what each one needs. This keeps each agent on its task.
 
-When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
+The case that comes up most: several things are broken in unrelated places (different test files, different modules, different bugs). Chasing them one after another wastes time, because none of them needs the others.
 
-**Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
-
-## When to Use
+## When to split
 
 ```dot
-digraph when_to_use {
-    "Multiple failures?" [shape=diamond];
-    "Are they independent?" [shape=diamond];
-    "Single agent investigates all" [shape=box];
-    "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
-    "Sequential agents" [shape=box];
-    "Parallel dispatch" [shape=box];
+digraph split {
+    rankdir=LR;
+    "Several problems" [shape=ellipse];
+    "Does one fix touch another?" [shape=diamond];
+    "Same files or resources?" [shape=diamond];
+    "One agent, all of it" [shape=box];
+    "Agents in turn" [shape=box];
+    "Agents side by side" [shape=box];
 
-    "Multiple failures?" -> "Are they independent?" [label="yes"];
-    "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
+    "Several problems" -> "Does one fix touch another?";
+    "Does one fix touch another?" -> "One agent, all of it" [label="yes"];
+    "Does one fix touch another?" -> "Same files or resources?" [label="no"];
+    "Same files or resources?" -> "Agents in turn" [label="yes"];
+    "Same files or resources?" -> "Agents side by side" [label="no"];
 }
 ```
 
-**Use when:**
-- 3+ test files failing with different root causes
-- Multiple subsystems broken independently
-- Each problem can be understood without context from others
-- No shared state between investigations
+Split when:
+- Three or more test files fail, each for its own reason.
+- Several modules are broken independently.
+- You can explain each problem without mentioning the others.
+- The investigations touch no common state.
 
-**Don't use when:**
-- Failures are related (fix one might fix others)
-- Need to understand full system state
-- Agents would interfere with each other
+Keep it in one hand when:
+- The failures look related, so one fix may clear several. Look at them together first.
+- You need a picture of the whole system to understand any of them.
+- You do not yet know what is broken. Explore first, split later.
+- Agents could interfere with each other in any way: one agent's output would change another's input, or the result depends on the order they finish. Typical cases are editing the same files or using the same resource (a port, a database, a build folder). Run those one at a time.
 
-## The Pattern
+## Steps
 
-### 1. Identify Independent Domains
+### 1. Sort the problems into areas
 
-Group failures by what's broken:
-- File A tests: Tool approval flow
-- File B tests: Batch completion behavior
-- File C tests: Abort functionality
+Group by what is broken, not by who noticed it. Test the grouping: a fix in one area must not change the outcome in another.
 
-Each domain is independent - fixing tool approval doesn't affect abort tests.
+### 2. Give each area one task
 
-### 2. Create Focused Agent Tasks
+Every task states four things:
+- **Scope.** One file or one module.
+- **Goal.** The observable result, such as "these tests pass".
+- **Limits.** What the agent must leave alone. Default: unless the brief says otherwise, the agent changes nothing outside its scope.
+- **Return format.** What it reports back.
 
-Each agent gets:
-- **Specific scope:** One test file or subsystem
-- **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+### 3. Dispatch together
 
-### 3. Dispatch in Parallel
-
-Issue all three subagent dispatches in the same response — they run in parallel:
+Put every dispatch call in a single response. Calls issued in the same response run concurrently. Calls spread over several responses run one after another.
 
 ```text
-Subagent (general-purpose): "Fix agent-tool-abort.test.ts failures"
-Subagent (general-purpose): "Fix batch-completion-behavior.test.ts failures"
-Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
-# All three run concurrently.
+Subagent (general-purpose): "Fix invoice-export.test.ts failures"
+Subagent (general-purpose): "Fix csv-import.test.ts failures"
+Subagent (general-purpose): "Fix session-expiry.test.ts failures"
+# All three start at once.
 ```
 
-Multiple dispatch calls in one response = parallel execution. One per response = sequential.
+### 4. Collect and combine
 
-### 4. Review and Integrate
+When the agents report:
+1. Read each summary.
+2. Check that no two agents changed the same code.
+3. Run the whole test suite.
+4. Merge the changes.
 
-When agents return:
-- Read each summary
-- Verify fixes don't conflict
-- Run full test suite
-- Integrate all changes
+## Write each brief
 
-## Agent Prompt Structure
+A brief must be:
+1. **Focused.** One problem area only.
+2. **Self-contained.** Include the error text, test names and file paths. The agent cannot ask you.
+3. **Explicit about output.** Say what to send back.
 
-Good agent prompts are:
-1. **Focused** - One clear problem domain
-2. **Self-contained** - All context needed to understand the problem
-3. **Specific about output** - What should the agent return?
+Template, filled in with a made-up case:
 
 ```markdown
-Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
+Fix the 2 failing tests in src/billing/csv-import.test.ts:
 
-1. "should abort tool with partial output capture" - expects 'interrupted at' in message
-2. "should handle mixed completed and aborted tools" - fast tool aborted instead of completed
-3. "should properly track pendingToolCount" - expects 3 results but gets 0
+1. "skips blank trailing rows" - expects 41 records, receives 42
+2. "keeps quoted commas in the memo column" - memo is cut at the first comma
 
-These are timing/race condition issues. Your task:
+Both started after the parser was moved to a streaming reader. This looks like a chunk-boundary and state-handling problem, not a data problem. Your task:
 
-1. Read the test file and understand what each test verifies
-2. Identify root cause - timing issues or actual bugs?
-3. Fix by:
-   - Replacing arbitrary timeouts with event-based waiting
-   - Fixing bugs in abort implementation if found
-   - Adjusting test expectations if testing changed behavior
+1. Read the test file and note what each test checks.
+2. Decide whether the parser is wrong or the test assumes the old behaviour.
+3. Fix it:
+   - Handle end-of-stream correctly in the reader
+   - Respect quote state across chunk boundaries
+   - Change a test only if its expectation is outdated, and say why
 
-Do NOT just increase timeouts - find the real issue.
+Do NOT touch src/billing/export/ or any file outside src/billing/.
+Do NOT just add retries or longer waits to make a test pass. Find the real cause.
 
-Return: Summary of what you found and what you fixed.
+Return: the root cause of each failure and the list of files you changed.
 ```
 
-## Common Mistakes
+## Common mistakes
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
+| Weak brief | Better brief |
+|---|---|
+| "Fix all the tests": the agent wanders | "Fix csv-import.test.ts": one clear scope |
+| "Fix the flaky bug": no starting point | Paste the failing assertions and test names |
+| No limits: the agent refactors half the tree | "Tests only" or "Do not change src/billing/export/" |
+| "Sort it out": you cannot tell what changed | "Return the root cause and the files changed" |
 
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+## Worked example
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
+**Situation.** A dependency upgrade leaves five failures in three test files.
 
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+| File | Failures | Symptom |
+|---|---|---|
+| invoice-export.test.ts | 2 | PDF totals off by one cent |
+| csv-import.test.ts | 2 | quoted commas split a field |
+| session-expiry.test.ts | 1 | token still valid after the timeout |
 
-## When NOT to Use
+**Decision.** Rounding, parsing and session logic share no code, so these are three areas.
 
-**Related failures:** Fixing one might fix others - investigate together first
-**Need full context:** Understanding requires seeing entire system
-**Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
+**Dispatch.** Three agents in one response, one file each.
 
-## Real Example from Session
+**Reports.**
+- Export agent: the new library rounds half to even; set the rounding mode explicitly.
+- Import agent: quote state was reset at each chunk; carry it across chunks.
+- Session agent: the test used real time; switch it to a fake clock.
 
-**Scenario:** 6 test failures across 3 files after major refactoring
+**Combine.** No overlapping edits, and the whole suite passes.
 
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
+## After they return
 
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
-
-**Dispatch:**
-```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
-```
-
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
-
-**Integration:** All fixes independent, no conflicts, full suite green
-
-## Verification
-
-After agents return:
-1. **Review each summary** - Understand what changed
-2. **Check for conflicts** - Did agents edit same code?
-3. **Run full suite** - Verify all fixes work together
-4. **Spot check** - Agents can make systematic errors
+1. **Read every summary.** Know what each agent changed and why.
+2. **Look for overlap.** Did two agents touch the same code?
+3. **Run the whole suite.** Separate fixes can still clash when combined.
+4. **Spot check.** Agents can repeat the same mistake across a task, such as silencing a test instead of fixing the cause.

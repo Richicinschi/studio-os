@@ -2,6 +2,9 @@
 id: git-cleanup
 module: 06-git-and-guardrails
 checked: 2026-11-02
+tokens:
+  description: 46
+  body: 2344
 ---
 
 # Cleaning up stale branches
@@ -80,4 +83,4 @@ If it deletes anything before your answer, or starts when you did not type its n
 - **Bash only, as shipped.** On Windows without Git for Windows, Claude has PowerShell, and the commands do not run as written.
 - **One yes covers the list it was given.** It asks twice, the second time with the exact commands; read that list, since your yes covers what is on it ([module 06](../modules/06-git-and-guardrails/README.md#the-mechanism)).
 - **Licence:** it is under Creative Commons Attribution-ShareAlike 4.0, as the `LICENSE` file in its kit folder states; that licence is not checked in docs/facts.md as of 2026-11-02. Keep the licence and the credit to its upstream with any copy, and read the licence before you share an adapted one.
-- **Token cost:** none in a session where you do not run it: with `disable-model-invocation: true`, its description is not in context ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). Its body, about 3,100 tokens (estimate, bytes divided by 4), loads each time you run it.
+- **Token cost:** none in a session where you do not run it: with `disable-model-invocation: true`, its description is not in context ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). Its body, about 2,344 tokens (estimate, bytes divided by 4), loads each time you run it.

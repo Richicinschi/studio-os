@@ -1,72 +1,74 @@
 ---
 name: using-agent-skills
 description: >-
-  Router for the studio's OWN skill catalog — given a task, find the right skill. Use when
-  starting a task and unsure which skill applies, when you want to discover what skills exist,
-  or when chaining skills across a piece of work. Points only at skills that actually exist in
-  this workspace (.claude/skills/) plus the built-in slash commands.
+  Maps a task to the studio skill or pack that fits it. Use when starting a task, if unsure which skill applies; also to discover what exists. Points to core skills, standalone commands and packs, plus built-in slash commands.
 metadata:
   category: studio
-  author: Richicinschi (Claude-authored; routing structure inspired by addyosmani/agent-skills; session primer from obra/superpowers)
+  author: Richicinschi
   version: 1.1.0
   domain: skill discovery / routing over the studio catalog
-  sources:
-    - addyosmani/agent-skills · using-agent-skills (MIT) — routing-tree STRUCTURE only; the map is fully rewritten to our catalog, his collection refs + the Karpathy-duplicate "core behaviors" dropped (those live in AGENTS.md). See ./LICENSE.
-    - obra/superpowers · skills/using-superpowers (MIT) @ v7.0.1 2ce8aa15 — folded in (audit W7, 2026-11-02) — its rules in studio wording as session-start.md (injected at session start), and references/claude-code-tools.md; see ./LICENSE and ../vendored.json
 ---
-
 # using-agent-skills
 
-Find the right studio skill for the task in front of you. This routes ONLY to skills that
-exist here (`.claude/skills/`, grouped by category in `.claude/skills/README.md`) and the
-built-in slash commands. The global operating rules — the hard rules in
-your rules file and the Karpathy coding guidelines in
-your coding guidelines, both loaded through the front door `AGENTS.md` — always
-apply and are not repeated here.
+Name the task, find the row, open the skill. This page lists the skills this kit ships in `.claude/skills/`, the skills inside any domain you installed, and Claude Code's built-in slash commands.
 
-## Task → skill
+A name followed by "pack X" lives inside the domain X you installed. Read `.claude/skills/X/SKILL.md`, find the skill in its table, open the file it names and follow it.
 
-```
-Vague idea / unsure what you want?             → drill-to-plan        (interrogate → design spec)
-  …a lighter design conversation?              → brainstorming
-Have a spec, need an ordered plan?             → writing-plans
-Have a plan, run it?                           → executing-plans (inline) · subagent-driven-development (bob-builder per task)
-Independent tasks at once?                     → dispatching-parallel-agents
-Need an isolated workspace?                    → using-git-worktrees  (outside the repo, off origin/main)
-Designing a module interface / where a seam goes? → codebase-design
-Whole-codebase architecture friction?          → improve
-New UI with a distinct look of its own?        → frontend-design
-A diagram (architecture / flow / ERD / UML)?   → drawio-diagrams
+The hard rules (your rules file) and coding guidelines (your coding guidelines) are loaded through `AGENTS.md`. They always apply and are not repeated below.
 
-Building a feature / fixing a bug, test-first? → tdd                  (your stack's test runner)
-Something broke / slow / throwing?             → diagnosing-bugs
-Performance / Core Web Vitals?                 → performance-optimization
+## Which skill for which task
 
-Reviewing a change?                            → /code-review         (add `ultra` for cloud multi-agent)
-  …by the studio's reviewer seat?              → requesting-code-review (dispatches linus-reviewer)
-  …review feedback came back?                  → receiving-code-review
-  …security angle?                             → /security-review
-  …too complex, simplify?                      → /simplify
-Confirm it actually works?                     → verification-before-completion · /verify   ·   launch the app → /run
-Work done, branch green?                       → finishing-a-development-branch (PR; the owner merges)
+### Shaping the work
 
-Privacy Policy / Terms / store legal?          → legal-signoff-orchestrator  (entry to the legal-* suite)
+| Situation | Go to |
+|---|---|
+| Idea is vague, you cannot yet say what you want | `drill-to-plan` (questions one at a time, ends in a design spec) |
+| A lighter talk about a design | `brainstorming` |
+| A spec exists and needs ordered steps | `writing-plans` |
+| A plan exists and must be run | `executing-plans` (in this session) or `subagent-driven-development` (one `bob-builder` per task) |
+| Several tasks that share no state | `dispatching-parallel-agents` |
+| Work needs its own checkout | `using-git-worktrees` (outside the repo, off origin/main) |
+| Where should a module boundary or seam go | `codebase-design` (pack engineering-testing-performance-code-design) |
+| The architecture of a whole codebase feels wrong | `improve` |
+| A finished deliverable whose claims need tracing | `claim-auditor` |
+| A diagram: architecture, flow, ER, UML | `drawio-diagrams` |
 
-Authoring or editing a skill?                  → writing-great-skills
-Installing, updating or adopting an outside
-  skill, plugin, MCP server or hook?           → vet-external-skill   (SkillSpector gate → egress check → decision; the scan-first rule)
-Enforce no-force-push at the tool layer?       → git-guardrails
-Learning a topic over multiple sessions?       → /teach
+### Building and fixing
 
-New app or game?                               → start-project
-End of session / archive it?                   → save-session
-AGENTS.md getting long?                        → claude-md-curator
-```
+| Situation | Go to |
+|---|---|
+| New behaviour or a bug fix, test first | `tdd` (flutter test, or GUT for Godot) |
+| Something is broken, slow or throwing | `diagnosing-bugs` |
+| Page speed or Core Web Vitals | `performance-optimization` (pack engineering-testing-performance-code-design) |
+| A new interface with its own distinct look | `frontend-design` (pack design-ui-logos-slides-posters) |
+| Godot game code or a project audit | `godot-audit` (pack godot-camera-shaders-particles-export) |
+| Privacy policy, terms or store legal | `legal-signoff-orchestrator` (entry to the `legal-*` suite) |
 
-## Rules
+### Checking and finishing
 
-- Check for a matching skill before starting non-trivial work — skills encode process that prevents repeat mistakes. Every session starts with the same rule set, [`session-start.md`](session-start.md), which a start-up hook of your own (the studio's is not in this kit) injects on startup, clear and compaction (superpowers' using-superpowers, in studio wording).
-- Claude Code specifics (running a whole plan one layer down, when the owner asks): [`references/claude-code-tools.md`](references/claude-code-tools.md).
-- Skills compose. Common chains: `drill-to-plan` → `writing-plans` → `tdd` → `/code-review`; `diagnosing-bugs` → `tdd` (regression test) → `/code-review`; `vet-external-skill` → `writing-great-skills` (adapt the survivor).
-- The full catalog lives in `.claude/skills/README.md`, which holds the one category list. When unsure, read it.
-- This router reflects what exists today — add a line when a new skill lands, then re-sync (`node tools/sync-skills.mjs`).
+| Situation | Go to |
+|---|---|
+| Review a change | `/code-review` (the `ultra` level runs a multi-agent review in the cloud) |
+| Review by the studio's own reviewer seat | `requesting-code-review` (sends it to `linus-reviewer`) |
+| Review comments have come back | `receiving-code-review` |
+| Security angle on a change | `/security-review` |
+| Change is too complicated | `/simplify` |
+| Prove that it works | `verification-before-completion` or `/verify`; to start the app, `/run` |
+| Branch is green and ready | `finishing-a-development-branch` (opens the PR; the owner merges) |
+| Merged branches and worktrees to clear | `git-cleanup` |
+| Session is ending | `handoff`; to archive the session, `save-session` |
+
+### Skills, tools and housekeeping
+
+| Situation | Go to |
+|---|---|
+| Writing or changing a skill | `writing-great-skills` |
+| Block force-push at the tool layer in a repo the hub guard does not cover | `git-guardrails` |
+| Learning a subject across several sessions | `/teach` |
+
+## Using the map
+
+- Look for a matching skill before any non-trivial work. They hold process that stops old mistakes coming back. Every session begins with the same short rule set in [`session-start.md`](session-start.md); a start-up hook of your own (the studio's is not in this kit) injects it on startup, clear and compaction.
+- Cheaper coordination of a full plan, on the owner's request only: see [`references/claude-code-tools.md`](references/claude-code-tools.md).
+- Skills chain. Typical runs: `drill-to-plan`, `writing-plans`, `tdd`, `/code-review`. For a bug: `diagnosing-bugs`, then `tdd` for the regression test, then `/code-review`. For an outside skill: `vet-and-adopt`, then `writing-great-skills` to adapt whatever survives.
+- When no row fits, list `.claude/skills/` and read the descriptions.

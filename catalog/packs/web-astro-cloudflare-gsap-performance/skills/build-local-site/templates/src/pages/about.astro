@@ -1,0 +1,205 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness } from '../data/business';
+import { serviceAreas } from '../data/serviceAreas';
+import { areaUrl, contactUrl } from '../lib/urls';
+
+const years = yearsInBusiness();
+
+const trustItems = [
+  {
+    icon: 'lucide:badge-check',
+    title: 'Licensed',
+    detail: business.license,
+  },
+  {
+    icon: 'lucide:shield',
+    title: 'Fully Insured',
+    detail: "Every job is covered by liability insurance and workers' compensation.",
+  },
+  {
+    icon: 'lucide:award',
+    // Sample badge: delete unless the business really holds this rating.
+    title: 'BBB A+ Rating',
+    detail: 'The Better Business Bureau gives us its top A+ grade for fair dealing.',
+  },
+  {
+    icon: 'lucide:calendar',
+    title: `${years}+ Years in Business`,
+    detail: `Working across ${business.serviceRadius} since ${business.yearEstablished}.`,
+  },
+];
+---
+
+<BaseLayout
+  title={`About ${business.name} | Fairmont TX Plumber`}
+  description={`Learn about ${business.name}, founded by ${business.owner} in ${business.yearEstablished}. ${years}+ years serving ${business.serviceRadius} with licensed, insured plumbing services.`}
+>
+  <Breadcrumbs crumbs={[{ label: 'About' }]} />
+
+  <!-- ===== Page header ===== -->
+  <section class="py-12 lg:py-16">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="max-w-3xl animate-fade-up">
+        <h1 class="font-display text-4xl text-brand-900 sm:text-5xl">
+          About {business.name}
+        </h1>
+        <p class="mt-4 text-lg leading-relaxed text-stone-600">
+          A local, licensed and insured company. Since {business.yearEstablished} we have
+          been fixing plumbing across the Fairmont region.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Story ===== -->
+  <section class="pb-16 lg:pb-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div class="prose-editorial">
+          <h2>Our Story</h2>
+          <p>
+            In {business.yearEstablished}, {business.owner} started {business.name} with one
+            aim: give the people of {business.serviceRadius} plumbing work that is fair and
+            well made.
+          </p>
+          <p>
+            The company began with a single plumber and now has more than {years} years
+            behind it. {business.owner} is a licensed Master Plumber and checks each
+            project personally so it meets his own bar.
+          </p>
+          <p>
+            Our approach is simple: get it right the first time, price it fairly, and treat
+            each house as if it were ours. The result is an A+ from the Better Business
+            Bureau and many customers who call us again.
+          </p>
+          <p>
+            An emergency at midnight or a planned kitchen remodel gets the same response. We
+            arrive on time, explain what is going on and start work. No upselling, no
+            surprises, just dependable plumbing.
+          </p>
+        </div>
+
+        <!-- Owner card -->
+        <div>
+          <div class="rounded-xl border border-stone-200 bg-white p-8">
+            <div class="flex items-center gap-4">
+              <div class="flex size-16 items-center justify-center rounded-full bg-brand-100">
+                <Icon name="lucide:user" class="size-8 text-brand-700" />
+              </div>
+              <div>
+                <h3 class="font-display text-xl text-brand-900">{business.owner}</h3>
+                <p class="text-sm text-stone-500">Owner & Master Plumber</p>
+              </div>
+            </div>
+            <div class="mt-6 space-y-3 text-sm leading-relaxed text-stone-600">
+              <p>
+                {business.owner} has spent over {years} years in the plumbing trade. After
+                earning a Master Plumber license he opened {business.name} to give
+                Fairmont and nearby towns the personal attention bigger firms rarely offer.
+              </p>
+              <p>
+                He works on every job himself, from the first estimate through the final
+                inspection. Call {business.name} and you may well find him on the other end
+                of the line.
+              </p>
+            </div>
+            <div class="mt-6 border-t border-stone-100 pt-6">
+              <p class="text-xs font-medium uppercase tracking-wider text-stone-400">Credentials</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">
+                  <Icon name="lucide:badge-check" class="size-3.5" />
+                  {business.license}
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">
+                  <Icon name="lucide:shield-check" class="size-3.5" />
+                  BBB A+ Rated
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Trust ===== -->
+  <section class="bg-stone-100 py-16 lg:py-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 class="text-center font-display text-3xl text-brand-900">
+        Why People Trust Us
+      </h2>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {trustItems.map((item, i) => (
+          <div class={`animate-fade-up rounded-xl border border-stone-200 bg-white p-6 stagger-${i + 1}`}>
+            <div class="flex size-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
+              <Icon name={item.icon} class="size-6" />
+            </div>
+            <h3 class="mt-4 font-display text-lg text-brand-900">{item.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-stone-600">{item.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Communities ===== -->
+  <section class="py-16 lg:py-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 class="text-center font-display text-3xl text-brand-900">
+        Towns We Cover
+      </h2>
+      <p class="mx-auto mt-4 max-w-2xl text-center text-stone-600">
+        Our plumbers work throughout {business.serviceRadius}. These are the towns where
+        you will see us most.
+      </p>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {serviceAreas.map((area) => (
+          <a
+            href={areaUrl(area.slug)}
+            class="card-hover flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-5 py-4 transition-colors"
+          >
+            <Icon name="lucide:map-pin" class="size-5 shrink-0 text-brand-600" />
+            <div>
+              <span class="font-medium text-brand-900">{area.name}</span>
+              <span class="block text-xs text-stone-500">{area.county}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Call to action ===== -->
+  <section class="bg-brand-900">
+    <div class="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-16">
+      <div class="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div>
+          <h2 class="font-display text-3xl text-white">Let Us Help You</h2>
+          <p class="mt-2 text-brand-200">
+            Phone for a free estimate or write to us online. We would be glad to earn your business.
+          </p>
+        </div>
+        <div class="flex shrink-0 flex-wrap gap-4">
+          <a
+            href={business.phoneHref}
+            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-6 py-3 text-sm font-semibold text-brand-950 shadow-lg transition-all hover:bg-amber-400"
+          >
+            <Icon name="lucide:phone" class="size-5" />
+            {business.phone}
+          </a>
+          <a
+            href={contactUrl()}
+            class="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-white/20"
+          >
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

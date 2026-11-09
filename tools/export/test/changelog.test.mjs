@@ -105,3 +105,22 @@ test('staleness and the clean-hub check also follow private sources a page may n
     assert.deepEqual(pageSources(root, extra), ['.studio/memory/a.md', '.studio/memory/private-one.md']);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+// ---- v3: removed items are listed with what replaces them
+test('removed items are listed with their replacement', () => {
+  const removed = [
+    { kind: 'skill', id: 'council', was: 'shipped', replacedBy: 'a-shipped-domain', in: '3.0.0' },
+    { kind: 'skill', id: 'ab-testing', was: 'catalog-only', replacedBy: 'a-waiting-domain', in: '3.0.0' },
+    { kind: 'skill', id: 'cro', was: 'catalog-only', replacedBy: 'a-waiting-domain', in: '3.0.0' },
+    { kind: 'external', id: 'old-link', was: 'link-only', note: 'the core skills this kit ships', in: '3.0.0' },
+    { kind: 'skill', id: 'gone', was: 'catalog-only', in: '3.0.0' },
+    { kind: 'skill', id: 'earlier', was: 'shipped', replacedBy: 'a-shipped-domain', in: '2.5.0' },
+  ];
+  const text = changelogSection('3.0.0', '2026-12-01', { added: [], removed: [], changed: [] }, [], { removed, shippedPacks: ['a-shipped-domain'] });
+  assert.match(text, /\*\*Removed in this version, with what replaces each:\*\*/);
+  assert.match(text, /- `skill:council` → the domain `a-shipped-domain`/);
+  assert.match(text, /- `skill:ab-testing`, `skill:cro` → none in this version; its domain `a-waiting-domain` is not shipped yet/);
+  assert.match(text, /- `external:old-link` → the core skills this kit ships/);
+  assert.match(text, /- `skill:gone` → no longer part of the kit/);
+  assert.ok(!text.includes('earlier'), 'a removal from another version is not listed');
+});

@@ -241,3 +241,15 @@ test('a rebuild removes catalog files no longer produced', () => {
     assert.equal(existsSync(path.join(out, 'catalog/skills/old')), false);
   } finally { done(); }
 });
+
+test('outside data named in a NOTICE file inside a skill is listed in the third-party notices', () => {
+  const { hub, out, done } = setup();
+  try {
+    mkdirSync(path.join(hub, '.claude/skills/alpha/data'), { recursive: true });
+    writeFileSync(path.join(hub, '.claude/skills/alpha/data/INDEX-NOTICE.md'), '# Where the index comes from\n\nIt is published at <https://example.invalid/data-project> and released under the Apache License 2.0, which applies to this data.\n');
+    const r = buildKit({ hub, out, manifest, owner });
+    const e = r.notices.find((n) => n.id === 'alpha');
+    assert.deepEqual(e, { id: 'alpha', upstream: 'https://example.invalid/data-project', licenceFile: 'data/INDEX-NOTICE.md', licenceLine: 'Apache License 2.0 (data; see the notice file)' });
+    assert.match(readFileSync(path.join(out, 'docs/THIRD_PARTY_NOTICES.md'), 'utf8'), /\| alpha \| https:\/\/example\.invalid\/data-project \| Apache License 2\.0 \(data/);
+  } finally { done(); }
+});

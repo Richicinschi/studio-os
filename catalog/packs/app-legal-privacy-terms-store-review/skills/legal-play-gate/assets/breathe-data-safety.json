@@ -1,0 +1,15 @@
+{
+  "_comment": "Single source of truth for Breathe's Google Play Data Safety declaration. Consumed by scripts/emit_play_csv.mjs via --answers. Reconcile 1:1 with Privacy §3/§6, the Apple App Privacy label, store-privacy-declarations.md, and the legal-data-surface-scan android output before every submit. NOT 'Health & fitness' (over-declaration trap). SHARED=false on every row: Google/Firebase, RevenueCat and the stores act as PROCESSORS on our documented instructions, which Play's Data Safety guidance explicitly excludes from 'sharing' (transfer to a third party for their own purposes). This matches store-privacy-declarations.md 'Shared: No' and Privacy §6.",
+  "app": "Breathe",
+  "security": { "encryptedInTransit": true, "userCanRequestDeletion": true },
+  "data": [
+    { "category": "Personal info", "type": "Email address", "collected": true, "shared": false, "ephemeral": false, "optional": true, "purposes": ["Account management", "App functionality"], "recipient": "Google/Firebase (processor)" },
+    { "category": "Personal info", "type": "User IDs", "collected": true, "shared": false, "ephemeral": false, "optional": false, "purposes": ["Account management", "App functionality", "Analytics"], "recipient": "Google/Firebase, RevenueCat (processors)" },
+    { "category": "Personal info", "type": "Name", "collected": true, "shared": false, "ephemeral": false, "optional": true, "purposes": ["Account management"], "recipient": "Google/Firebase (processor)" },
+    { "category": "Financial info", "type": "Purchase history", "collected": true, "shared": false, "ephemeral": false, "optional": false, "purposes": ["App functionality", "Account management"], "recipient": "RevenueCat (processor); Google Play (merchant of record)" },
+    { "category": "App activity", "type": "App interactions", "collected": true, "shared": false, "ephemeral": false, "optional": true, "purposes": ["Analytics", "App functionality"], "recipient": "Google (Firebase Analytics, processor)" },
+    { "category": "App info and performance", "type": "Crash logs", "collected": true, "shared": false, "ephemeral": false, "optional": true, "purposes": ["Fraud prevention, security, and compliance", "App functionality"], "recipient": "Google (Crashlytics, processor)" },
+    { "category": "App info and performance", "type": "Diagnostics", "collected": true, "shared": false, "ephemeral": false, "optional": true, "purposes": ["App functionality"], "recipient": "Google (Crashlytics, processor)" }
+  ],
+  "notCollected": ["Location", "Health & fitness", "Messages", "Photos & videos", "Audio", "Files & docs", "Calendar", "Contacts", "Web browsing history", "Advertising ID"]
+}

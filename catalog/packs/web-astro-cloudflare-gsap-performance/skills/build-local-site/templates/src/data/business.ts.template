@@ -1,0 +1,199 @@
+// ============================================================
+// Business data
+// ============================================================
+// One object feeds the header, footer, meta tags, JSON-LD, the
+// contact page and the about page. Replace each __TOKEN__ with
+// the real value. Field names are what the page templates read,
+// so rename nothing here without renaming it in src/pages too.
+// ============================================================
+
+export interface BusinessHours {
+  /** Day label, e.g. "Monday - Friday" or "Saturday" */
+  days: string;
+  /** Opening times, e.g. "7:00 AM - 6:00 PM", or "Closed" */
+  hours: string;
+  /** schema.org DayOfWeek names this row covers, e.g. ["Monday", "Tuesday"]. Leave empty for a closed day. */
+  dayOfWeek: string[];
+  /** 24-hour opening time, "08:00". Leave '' when closed. */
+  opens: string;
+  /** 24-hour closing time, "17:00". Leave '' when closed. */
+  closes: string;
+}
+
+export interface Address {
+  street: string;
+  city: string;
+  /** Full state name, e.g. "Texas" */
+  state: string;
+  /** Two-letter code, e.g. "TX" */
+  stateCode: string;
+  zip: string;
+  country: string;
+}
+
+export interface Coordinates {
+  /** e.g. 40.0821 */
+  lat: number;
+  /** e.g. -83.0113 */
+  lng: number;
+}
+
+export interface Business {
+  // Identity
+  name: string;
+  /** Registered name, used in schema.org `legalName` */
+  legalName: string;
+  /** Short form for tight spots such as the mobile header */
+  shortName: string;
+  /** Owner or founder, shown on the about page and in schema */
+  owner: string;
+  /** One line under the logo or in the hero */
+  tagline: string;
+  /** One or two sentences, reused in meta tags and schema */
+  description: string;
+  /** schema.org type from the industry table in the guide, e.g. "Plumber" */
+  schemaType: string;
+
+  // Contact
+  /** Shown to visitors, e.g. "(555) 555-0182" */
+  phone: string;
+  /** Link form, e.g. "tel:+15555550182" */
+  phoneHref: string;
+  /** Out-of-hours number; '' when there is none */
+  phoneSecondary: string;
+  email: string;
+
+  // Place
+  address: Address;
+  coordinates: Coordinates;
+  /** Human wording for the territory, e.g. "Harlan and Mercer Counties" */
+  serviceRadius: string;
+
+  // Online
+  /** Live URL, https, no trailing slash */
+  website: string;
+  googleBusinessUrl: string;
+  /** Use '' for any network the business is not on */
+  socialMedia: {
+    facebook: string;
+    instagram: string;
+    twitter: string;
+    youtube: string;
+    linkedin: string;
+    nextdoor: string;
+    yelp: string;
+  };
+
+  // Credentials
+  /** Licence or registration number printed in footer and about page */
+  license: string;
+  yearEstablished: number;
+  certifications: string[];
+
+  // Operations
+  hours: BusinessHours[];
+  emergencyService: boolean;
+  /** e.g. "Emergency callouts, day or night" */
+  emergencyCta: string;
+
+  // Branding files, relative to /public
+  logo: string;
+  logoWhite: string;
+  /** 1200x630 */
+  ogImage: string;
+}
+
+export const business: Business = {
+  // Identity
+  name: '__BUSINESS_NAME__',
+  legalName: '__BUSINESS_LEGAL_NAME__',
+  shortName: '__BUSINESS_SHORT_NAME__',
+  owner: '__OWNER_NAME__',
+  tagline: '__BUSINESS_TAGLINE__',
+  description: '__BUSINESS_DESCRIPTION__',
+  schemaType: '__SCHEMA_TYPE__',
+
+  // Contact
+  phone: '__PHONE_DISPLAY__',
+  phoneHref: 'tel:__PHONE_TEL__',
+  phoneSecondary: '__PHONE_SECONDARY__', // '' if none
+  email: '__EMAIL__',
+
+  // Place
+  address: {
+    street: '__STREET_ADDRESS__',
+    city: '__CITY__',
+    state: '__STATE__',
+    stateCode: '__STATE_CODE__',
+    zip: '__ZIP_CODE__',
+    country: 'United States',
+  },
+  coordinates: {
+    lat: 0, // __LATITUDE__ as a number
+    lng: 0, // __LONGITUDE__ as a number
+  },
+  serviceRadius: '__SERVICE_RADIUS__',
+
+  // Online
+  website: '__SITE_URL__',
+  googleBusinessUrl: '__GOOGLE_BUSINESS_URL__',
+  socialMedia: {
+    facebook: '__FACEBOOK_URL__', // full URL or ''
+    instagram: '__INSTAGRAM_URL__',
+    twitter: '__TWITTER_URL__',
+    youtube: '__YOUTUBE_URL__',
+    linkedin: '__LINKEDIN_URL__',
+    nextdoor: '__NEXTDOOR_URL__',
+    yelp: '__YELP_URL__',
+  },
+
+  // Credentials
+  license: '__LICENSE_NUMBER__',
+  yearEstablished: 2000, // __FOUNDED_YEAR__ as a number
+  certifications: [
+    // '__CERTIFICATION_1__',
+    // '__CERTIFICATION_2__',
+  ],
+
+  // Operations
+  hours: [
+    {
+      days: 'Monday - Friday',
+      hours: '__WEEKDAY_HOURS__',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '__WEEKDAY_OPENS__',
+      closes: '__WEEKDAY_CLOSES__',
+    },
+    { days: 'Saturday', hours: '__SATURDAY_HOURS__', dayOfWeek: ['Saturday'], opens: '__SATURDAY_OPENS__', closes: '__SATURDAY_CLOSES__' },
+    { days: 'Sunday', hours: '__SUNDAY_HOURS__', dayOfWeek: [], opens: '', closes: '' },
+  ],
+  emergencyService: false, // __EMERGENCY_SERVICE__ as true or false
+  emergencyCta: '__EMERGENCY_CTA__',
+
+  // Branding
+  logo: '/images/logo.svg',
+  logoWhite: '/images/logo-white.svg',
+  ogImage: '/images/og-image.jpg',
+};
+
+/**
+ * schema.org OpeningHoursSpecification entries built from `business.hours`.
+ * Rows without days or without a valid HH:MM open and close time are skipped,
+ * so unfilled tokens and closed days never reach the markup.
+ */
+export function openingHoursSchema() {
+  const time = /^\d{2}:\d{2}$/;
+  return business.hours
+    .filter((h) => h.dayOfWeek.length > 0 && time.test(h.opens) && time.test(h.closes))
+    .map((h) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: h.dayOfWeek.map((d) => `https://schema.org/${d}`),
+      opens: h.opens,
+      closes: h.closes,
+    }));
+}
+
+/** Whole years since the business started, for "X years of experience" copy. */
+export function yearsInBusiness(): number {
+  return new Date().getFullYear() - business.yearEstablished;
+}

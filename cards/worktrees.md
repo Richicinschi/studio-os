@@ -1,7 +1,9 @@
 ---
 id: worktrees
 module: 06-git-and-guardrails
-checked: 2026-11-02
+checked: 2026-11-09
+other_figures:
+  - 75
 ---
 
 # One worktree per parallel session
@@ -10,7 +12,7 @@ checked: 2026-11-02
 
 - **The problem:** two Claude sessions in one checkout share one branch and one set of files. When one switches branches, stashes (puts changes aside) or cleans, the other's files change under it, and its next commit lands on the wrong branch.
 - **The reason:** a git worktree is a second working folder of the same repository, on a branch of its own. When each parallel session works in its own worktree, no session can move another's branch, and the rule "never switch branches, stash or clean where another session may be live" holds because of where each session works, not because anyone remembers it.
-- **The cost of skipping it:** commits on the wrong branch, and changes that have to be found and moved by hand while the other session keeps working. The kit has no full story of it; the studio's one recorded case, a single line in its copy of the `using-git-worktrees` skill, is under Watch out.
+- **The cost of skipping it:** commits on the wrong branch, and changes that have to be found and moved by hand while the other session keeps working. The kit has no full story of it; the studio's one recorded case, a single line in the studio's `using-git-worktrees` skill, is under Watch out.
 - **The principle:** [one task, one branch, one PR, full history](../PRINCIPLES.md#one-task-one-branch-one-pr-full-history). Each piece of work keeps its own branch only if each session keeps its own folder.
 
 ## Detect
@@ -20,7 +22,7 @@ Read-only. Counts and set / not set only.
 - For each repository in `adoption/inventory.md`, how many worktrees it has: `git -C <repo> worktree list | wc -l` (`1` means the main checkout only).
 - Whether a worktree folder inside a repository is kept out of git, when one exists: `git -C <repo> check-ignore -q .worktrees && echo ignored || echo "not ignored"`, and the same for `worktrees`.
 - Whether your instruction files carry a worktree rule, a count per file: `grep -ci worktree CLAUDE.md AGENTS.md 2>/dev/null` in your setup and in each repository.
-- Whether the full routine is there: a skill folder named `using-git-worktrees` in `.claude/skills/` or in `~/.claude/skills/` (or under `$CLAUDE_CONFIG_DIR` when that is set), or the superpowers plugin in `claude plugin list`.
+- Whether the full routine is there: a skill folder named `using-git-worktrees` in `.claude/skills/` or in `~/.claude/skills/` (or under `$CLAUDE_CONFIG_DIR` when that is set).
 
 The menu marks the item **have** when an instruction file carries a worktree rule and every worktree folder inside a repository is ignored; **partly** when the skill is there but no instruction says when to use it, or when the rule is there but a worktree folder inside a repository is not ignored; and **not yet** otherwise.
 

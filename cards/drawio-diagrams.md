@@ -2,6 +2,9 @@
 id: drawio-diagrams
 module: 09-data-work
 checked: 2026-11-02
+tokens:
+  description: 74
+  body: 2113
 ---
 
 # draw.io diagrams

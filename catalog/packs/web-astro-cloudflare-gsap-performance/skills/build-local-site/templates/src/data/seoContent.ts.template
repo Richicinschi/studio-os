@@ -1,0 +1,132 @@
+// ============================================================
+// SEO content: FAQs and reviews
+// ============================================================
+// Builds the question lists and review picks that area pages,
+// combo pages and the homepage show and mark up as schema.
+//
+// Tokens to replace:
+//   __BUSINESS_NAME__  brand name
+//   __PHONE__          display phone, e.g. "(555) 555-0182"
+//   __LICENSE__        licence number
+//   __CITY__           main city
+//   __STATE__          state name
+//   __TRADE_NOUN__     the trade in plain words, e.g. "plumbing" (see TRADE_NOUN below)
+//
+// The answers below are starting points. Edit every claim (estimates, emergency
+// hours, payment) to match what this business truly offers.
+//
+// The components call generateFaqs(area, service?) with objects and
+// getReviewsForPage(areaSlug?, serviceSlug?, count?) with slugs.
+// ============================================================
+
+import type { ServiceArea } from './serviceAreas';
+import type { ServiceType } from './serviceTypes';
+import { getPriceSpan } from './serviceTypes';
+
+// What to call the work when a page covers no single service, e.g. "plumbing", "HVAC work", "dental care".
+const TRADE_NOUN = '__TRADE_NOUN__';
+
+export interface FaqItem {
+  question: string;
+  /** Plain text. It also goes into FAQPage JSON-LD, so avoid HTML. */
+  answer: string;
+}
+
+export interface Review {
+  author: string;
+  /** 1 to 5 */
+  rating: number;
+  text: string;
+  /** ISO date, "2025-06-03" */
+  date: string;
+  /** Service slug this review is about */
+  service?: string;
+  /** Area slug this review is about */
+  area?: string;
+  /** Where it was left, e.g. "Google" */
+  source?: string;
+}
+
+/**
+ * Five FAQs for a page. Rules baked in below: every answer is two or three
+ * sentences, at least two name the business, at least two give the phone
+ * number, and one mentions the licence.
+ */
+export function generateFaqs(area: ServiceArea, service?: ServiceType): FaqItem[] {
+  const what = service ? service.name.toLowerCase() : TRADE_NOUN;
+  const span = service ? getPriceSpan(service) : null;
+
+  const cost = span && span.max > 0
+    ? `Jobs usually fall between $${span.min} and $${span.max}, depending on size and parts. __BUSINESS_NAME__ offers free on-site estimates for most jobs. Call __PHONE__ to book one.`
+    : `The price depends on the job. __BUSINESS_NAME__ offers free on-site estimates for most jobs. Call __PHONE__ to book one.`;
+
+  return [
+    {
+      question: `How much does ${what} cost in ${area.name}?`,
+      answer: cost,
+    },
+    {
+      question: `How soon can you reach ${area.name} for ${what}?`,
+      answer: `We normally arrive in ${area.name} within ${area.responseTime}. Phone __PHONE__ and we will give you a time.`,
+    },
+    {
+      question: `Is your ${what} team licensed in ${area.name}?`,
+      answer: `Yes. __BUSINESS_NAME__ holds licence __LICENSE__ and carries full insurance in __STATE__. Every job in ${area.name} is covered.`,
+    },
+    {
+      question: `Do you handle urgent ${what} in ${area.name} outside office hours?`,
+      answer: `__BUSINESS_NAME__ offers 24/7 emergency service. Ring __PHONE__ at any hour and a technician is sent to ${area.name}.`,
+    },
+    {
+      question: `Which other towns near ${area.name} do you serve?`,
+      answer: `Besides ${area.name}, the crew covers ${area.county} and neighbouring towns from __CITY__. Browse the service areas page for the full list.`,
+    },
+  ];
+}
+
+// PLACEHOLDER: replace with real customer reviews. Never invent them.
+// Example entry:
+//
+// {
+//   author: 'Sam Ortiz',
+//   rating: 5,
+//   text: 'Quick, fairly priced, and the plumber explained everything.',
+//   date: '2025-06-03',
+//   service: 'drain-cleaning',
+//   area: 'east-fairmont',
+//   source: 'Google',
+// },
+export const reviews: Review[] = [];
+
+/**
+ * Up to `count` reviews for a page, best matches first. An area match and a
+ * service match are each worth two points; ties keep the higher rating first.
+ */
+export function getReviewsForPage(
+  areaSlug?: string,
+  serviceSlug?: string,
+  count: number = 3,
+): Review[] {
+  const score = (r: Review) =>
+    (areaSlug && r.area === areaSlug ? 2 : 0) + (serviceSlug && r.service === serviceSlug ? 2 : 0);
+
+  return [...reviews]
+    .sort((a, b) => score(b) - score(a) || b.rating - a.rating)
+    .slice(0, count);
+}
+
+/** Numbers for a JSON-LD AggregateRating built from every review. */
+export function getAggregateRating(): {
+  ratingValue: string;
+  reviewCount: number;
+  bestRating: number;
+  worstRating: number;
+} {
+  const total = reviews.reduce((sum, r) => sum + r.rating, 0);
+  return {
+    ratingValue: reviews.length ? (total / reviews.length).toFixed(1) : '0',
+    reviewCount: reviews.length,
+    bestRating: 5,
+    worstRating: 1,
+  };
+}

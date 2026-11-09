@@ -51,7 +51,7 @@ Your Claude takes you through these steps during the adoption ([START-HERE](../.
 5. When something passes the four tests, have Claude write one memory file and one index line, in the format of `memory/README.md`.
 6. Adopt [handoff](../../catalog/skills/handoff/SOURCE.md) as ADAPT. Keep its floor, the part every version of it keeps: the memory sweep, the state refreshed, everything committed, and a last message naming what was left undone. (studio-specific: the kit copy also calls studio tools you do not have, such as a health check, an end-of-session gate, a log and a transcript archiver; [its card](../../cards/handoff.md) says what replaces each, or drops it.)
 7. At the end of a day, or whenever you stop mid-task, say "write a handoff note". It goes into `handoffs/` in your setup, named `YYYY-MM-DD-<topic>.md`, with five fields: done, decided, open, the first step for next time, and a resume prompt. Next time, start a new session instead of resuming the old one: start Claude Code where you start it each day, or type `/clear` in the open one, which starts a new conversation with empty context ([docs/facts.md](../../docs/facts.md), "Claude Code: context commands, subagents, extra folders"). Then paste the note's resume prompt as your first message.
-8. Adopt [claude-md-curator](../../catalog/skills/claude-md-curator/SOURCE.md) when your front door passes about 30,000 characters. (studio-specific: the archive in the studio's wiki, its registry budget and its budget hook; archive to a file of your own, such as `handoffs/archive.md`.)
+8. When your front door passes about 30,000 characters, move its old entries to an archive file of your own, such as `handoffs/archive.md`, instead of deleting them.
 
 ## Apply it in claude.ai
 
@@ -62,4 +62,4 @@ Your Claude takes you through these steps during the adoption ([START-HERE](../.
 5. Keep old handoff notes in the knowledge: that is your vault. Never replace one with a shorter summary.
 6. Check the memory feature. It is on by default on Free, Pro, Max and Ultra, and off on Team and Enterprise until each member turns it on (`docs/facts.md`, "claude.ai: memory and past chats"). The files in the Project stay the record you control.
 
-Catalog items used: [handoff](../../catalog/skills/handoff/SOURCE.md), [claude-md-curator](../../catalog/skills/claude-md-curator/SOURCE.md). `save-session` is named in the catalog, but its files are not in the kit, so it cannot be adopted from here.
+Catalog items used: [handoff](../../catalog/skills/handoff/SOURCE.md). `save-session` is named in the catalog, but its files are not in the kit, so it cannot be adopted from here.

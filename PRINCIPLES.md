@@ -35,7 +35,7 @@ When memory, an instruction file or a log grows too big, move the old text, word
 
 - **Why:** a summary keeps what seemed important on the day it was written, and loses the line that turns out to matter later. A vault entry can always be brought back; a deleted one cannot.
 - **What it cost when ignored:** [vault before you shorten](examples/vault-before-shortening.md).
-- **Carried by:** [the vault](cards/vault.md), [claude-md-curator](cards/claude-md-curator.md), [negative results recorded as results](cards/negative-results.md).
+- **Carried by:** [the vault](cards/vault.md), [negative results recorded as results](cards/negative-results.md).
 
 ## Hard stops for the irreversible, judgement for the rest
 
@@ -59,7 +59,7 @@ A skill, plugin, MCP server (a program that connects Claude to an outside system
 
 - **Why:** whatever runs in a session can read what the session reads. A scanner is a gate, not a judge: its findings need reading, and it can miss a real call home.
 - **What it cost when ignored:** a framework scored 100/100 critical on false positives, while its telemetry, on by default, produced no finding at all ([the outside-framework review](examples/outside-framework-review.md)).
-- **Carried by:** [SkillSpector with the scan-first rule](cards/skillspector.md), [supply-chain-risk-auditor](cards/supply-chain-risk-auditor.md), the kit's [`vet-and-adopt`](.claude/skills/vet-and-adopt/SKILL.md).
+- **Carried by:** [SkillSpector with the scan-first rule](cards/skillspector.md), the kit's [`vet-and-adopt`](.claude/skills/vet-and-adopt/SKILL.md).
 
 ## One task, one branch, one PR, full history
 
@@ -75,7 +75,7 @@ Write the least code that solves the problem, change only what the task needs, a
 
 - **Why:** an unrequested feature, abstraction or clean-up is a change someone has to read, test and live with. A diff where every line traces to the request is a diff you can review.
 - **What it cost when ignored:** [module 03, The problem](modules/03-planning/README.md#the-problem): work that answers a question nobody asked.
-- **Carried by:** [codebase-design](cards/codebase-design.md), [improve](cards/improve.md), the [marie-architect](cards/marie-architect.md) seat (one of the kit's reviewer agents, each with one point of view), [the coding guidelines](cards/coding-guidelines.md).
+- **Carried by:** [improve](cards/improve.md), the [marie-architect](cards/pack-advisor-council-for-big-decisions.md) seat (one of the kit's reviewer agents, each with one point of view), [the coding guidelines](cards/coding-guidelines.md).
 
 ## Delegate the mechanical, keep the decisions
 
@@ -91,7 +91,7 @@ What loads into every session costs you on every turn; load the index, open the 
 
 - **Why:** instruction files, the memory index and every skill's description load before your first message. The studio estimated its own start at about 30,000 tokens: its own estimate, made on 2026-11-02 from the files' sizes in bytes divided by 4, not a count by Claude Code. The [feature menu](catalog/FEATURES.md) shows each item's estimate, so you can choose with the cost in view.
 - **What it cost when ignored:** [module 02, The problem](modules/02-context-and-models/README.md#the-problem): long threads wear out and get forgetful.
-- **Carried by:** [the memory index](cards/memory-index.md), [claude-md-curator](cards/claude-md-curator.md), [using-agent-skills](cards/using-agent-skills.md), [rules on demand](cards/rules-on-demand.md), [a start status that prints nothing when all is in order](cards/session-start-status.md).
+- **Carried by:** [the memory index](cards/memory-index.md), [using-agent-skills](cards/using-agent-skills.md), [rules on demand](cards/rules-on-demand.md), [a start status that prints nothing when all is in order](cards/session-start-status.md).
 
 ## Fit, not copy
 
@@ -107,4 +107,4 @@ When a plan looks wrong, say so once, with the evidence and the cost, recommend 
 
 - **Why:** agreement that costs nothing is worth nothing, and re-arguing a settled decision is noise. A concern stated once, clearly, is worth hearing.
 - **What it cost when ignored:** a board that nods along gives one view of a big decision ([module 08, The problem](modules/08-agents-and-council/README.md#the-problem)).
-- **Carried by:** [RELATIONSHIP.md, how disagreement works](cards/identity-relationship.md), [council](cards/council.md), the [karen-skeptic](cards/karen-skeptic.md) seat.
+- **Carried by:** [RELATIONSHIP.md, how disagreement works](cards/identity-relationship.md), [council](cards/pack-advisor-council-for-big-decisions.md), the [karen-skeptic](cards/pack-advisor-council-for-big-decisions.md) seat.

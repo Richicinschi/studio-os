@@ -1,124 +1,118 @@
-> Source: obra/superpowers `skills/systematic-debugging/defense-in-depth.md` (MIT, Copyright (c) 2025 Jesse Vincent) @ v7.0.1 2ce8aa15, folded into diagnosing-bugs; licence in `../LICENSE`.
+# Checks at every layer
 
-# Defense-in-Depth Validation
+## The idea
 
-## Overview
+After you fix a bug caused by bad data, one new check at one spot feels like enough. It is not. Another caller can skip that spot, a refactor can move it, and a test double can hide it.
 
-When you fix a bug caused by invalid data, adding validation at one place feels sufficient. But that single check can be bypassed by different code paths, refactoring, or mocks.
+Principle: check the value at every layer it passes through. Then the bug cannot return by a side door.
 
-**Core principle:** Validate at EVERY layer data passes through. Make the bug structurally impossible.
+One check says "this case is fixed". Several checks say "this case cannot happen".
 
-## Why Multiple Layers
+## Why layers
 
-Single validation: "We fixed the bug"
-Multiple layers: "We made the bug impossible"
+Each layer catches what the others miss:
+- The entry check stops most bad input.
+- The logic check catches combinations that look valid at the edge.
+- An environment guard blocks actions that are only dangerous in some contexts, such as tests.
+- Diagnostic logging helps when everything else was bypassed.
 
-Different layers catch different cases:
-- Entry validation catches most bugs
-- Business logic catches edge cases
-- Environment guards prevent context-specific dangers
-- Debug logging helps when other layers fail
+## The four layers
 
-## The Four Layers
+### 1. Entry check
 
-### Layer 1: Entry Point Validation
-**Purpose:** Reject obviously invalid input at API boundary
+Purpose: turn away plainly invalid input at the boundary.
 
 ```typescript
-function createProject(name: string, workingDirectory: string) {
-  if (!workingDirectory || workingDirectory.trim() === '') {
-    throw new Error('workingDirectory cannot be empty');
+function openImporter(label: string, targetDir: string) {
+  if (!targetDir || targetDir.trim() === '') {
+    throw new Error('targetDir must not be blank');
   }
-  if (!existsSync(workingDirectory)) {
-    throw new Error(`workingDirectory does not exist: ${workingDirectory}`);
+  if (!existsSync(targetDir)) {
+    throw new Error(`targetDir is missing: ${targetDir}`);
   }
-  if (!statSync(workingDirectory).isDirectory()) {
-    throw new Error(`workingDirectory is not a directory: ${workingDirectory}`);
+  if (!statSync(targetDir).isDirectory()) {
+    throw new Error(`targetDir is a file, not a folder: ${targetDir}`);
   }
-  // ... proceed
+  // carry on
 }
 ```
 
-### Layer 2: Business Logic Validation
-**Purpose:** Ensure data makes sense for this operation
+### 2. Logic check
+
+Purpose: confirm the value makes sense for this specific operation.
 
 ```typescript
-function initializeWorkspace(projectDir: string, sessionId: string) {
-  if (!projectDir) {
-    throw new Error('projectDir required for workspace initialization');
+function prepareScratch(baseDir: string, runId: string) {
+  if (!baseDir) {
+    throw new Error('prepareScratch needs a baseDir');
   }
-  // ... proceed
+  // carry on
 }
 ```
 
-### Layer 3: Environment Guards
-**Purpose:** Prevent dangerous operations in specific contexts
+### 3. Environment guard
+
+Purpose: block risky actions in a particular context.
 
 ```typescript
-async function gitInit(directory: string) {
-  // In tests, refuse git init outside temp directories
+async function unpackArchive(archive: string, dir: string) {
+  // Under test, only ever extract inside the OS temp folder.
   if (process.env.NODE_ENV === 'test') {
-    const normalized = normalize(resolve(directory));
-    const tmpDir = normalize(resolve(tmpdir()));
-
-    if (!normalized.startsWith(tmpDir)) {
-      throw new Error(
-        `Refusing git init outside temp dir during tests: ${directory}`
-      );
+    const target = normalize(resolve(dir));
+    const allowed = normalize(resolve(tmpdir()));
+    if (!target.startsWith(allowed)) {
+      throw new Error(`Test run tried to unpack outside temp: ${dir}`);
     }
   }
-  // ... proceed
+  // carry on
 }
 ```
 
-### Layer 4: Debug Instrumentation
-**Purpose:** Capture context for forensics
+### 4. Forensic logging
+
+Purpose: leave evidence for the next investigation.
 
 ```typescript
-async function gitInit(directory: string) {
-  const stack = new Error().stack;
-  logger.debug('About to git init', {
-    directory,
+async function unpackArchive(archive: string, dir: string) {
+  logger.debug('about to unpack', {
+    archive,
+    dir,
     cwd: process.cwd(),
-    stack,
+    trace: new Error().stack,
   });
-  // ... proceed
+  // carry on
 }
 ```
 
-## Applying the Pattern
+## Using it
 
-When you find a bug:
+After finding a root cause:
 
-1. **Trace the data flow** - Where does bad value originate? Where used?
-2. **Map all checkpoints** - List every point data passes through
-3. **Add validation at each layer** - Entry, business, environment, debug
-4. **Test each layer** - Try to bypass layer 1, verify layer 2 catches it
+1. Follow the data: where does the bad value start, and where is it used?
+2. List every point it crosses.
+3. Add a check at each of the four layers.
+4. Test each one on its own: slip past layer 1 and confirm layer 2 stops it.
 
-## Example from Session
+## Worked case
 
-Bug: Empty `projectDir` caused `git init` in source code
+Bug: a blank `unpackDir` made `execFile('tar', ['-xf', archive], { cwd: '' })` run in the current directory (an empty `cwd` is ignored), so a stray `manifest.json` landed in `services/api/`.
 
-**Data flow:**
-1. Test setup → empty string
-2. `Project.create(name, '')`
-3. `WorkspaceManager.createWorkspace('')`
-4. `git init` runs in `process.cwd()`
+Path of the value:
+1. A test fixture handed over an empty string.
+2. `Importer.open(label, '')` accepted it.
+3. `ScratchManager.prepare('')` accepted it.
+4. The extraction ran in `process.cwd()`.
 
-**Four layers added:**
-- Layer 1: `Project.create()` validates not empty/exists/writable
-- Layer 2: `WorkspaceManager` validates projectDir not empty
-- Layer 3: `WorktreeManager` refuses git init outside tmpdir in tests
-- Layer 4: Stack trace logging before git init
+Layers added:
+- Layer 1: `Importer.open()` rejects blank, missing and non-folder paths.
+- Layer 2: `ScratchManager` rejects an empty base path.
+- Layer 3: the extraction refuses to run outside the temp folder when `NODE_ENV` is `test`.
+- Layer 4: the call logs its arguments and a stack trace first.
 
-**Result:** All 1847 tests passed, bug impossible to reproduce
+Outcome: the whole suite stayed green and no stray file ever appeared again.
 
-## Key Insight
+## Why all four
 
-All four layers were necessary. During testing, each layer caught bugs the others missed:
-- Different code paths bypassed entry validation
-- Mocks bypassed business logic checks
-- Edge cases on different platforms needed environment guards
-- Debug logging identified structural misuse
+In practice each one earned its place. Some callers skipped the entry check. Test doubles skipped the logic check. Odd platforms needed the environment guard. The logging exposed a misuse nobody had predicted.
 
-**Don't stop at one validation point.** Add checks at every layer.
+Do not stop at one check.

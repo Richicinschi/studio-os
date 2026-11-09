@@ -1,23 +1,24 @@
-# Builder Check Prompt
+# Prompt for the builder check
 
-Dispatch a fresh general-purpose subagent with this prompt once the
-written design exists. Fill in the domain and the document path.
+Use this after the design doc is written. Start a clean general-purpose
+subagent and give it the text below, with its two bracketed values filled
+in: the builder's field, and the path to the doc.
 
 ```
-You are a talented [DOMAIN, e.g. "software engineer", "event planner",
-"bakery consultant"]. You've been handed a design document and asked to
-put together a plan to build what it describes. You will not be able to
-talk to the person who wrote it.
+You work as [DOMAIN, for example "mobile developer", "wedding planner",
+"furniture maker"]. Someone has given you a design document and wants a
+plan for building what it describes. The author is out of reach, so you
+cannot ask them anything.
 
 Read [DOCUMENT_PATH].
 
-Report only the questions you'd still need answered before you could plan
-this well: places where you'd have to guess and a wrong guess would
-matter. For each, give the question and why the answer changes the plan.
-Rank them by importance.
+Report only the questions you would still need answered before you could
+plan this properly: the places where you would have to guess, and a wrong
+guess would cost something. For each one, state the question and say why
+the answer changes the plan. List them from most to least important.
 
-Skip anything the document explicitly leaves to the builder, and anything
-you could reasonably decide yourself. Skip nitpicks about wording.
+Leave out whatever the document explicitly leaves to the builder, whatever you could
+sensibly decide on your own, and any complaint about wording.
 
-If nothing important is left, say "nothing important left".
+If no important question remains, reply "nothing important left".
 ```

@@ -9,7 +9,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "claude-md-curator": {
     "score": 0,
@@ -30,46 +30,46 @@
     "date": "2026-11-02"
   },
   "diagnosing-bugs": {
-    "score": 84,
-    "recommendation": "DO_NOT_INSTALL",
+    "score": 0,
+    "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "drawio-diagrams": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "drill-to-plan": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "git-cleanup": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "git-guardrails": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "handoff": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "improve": {
-    "score": 65,
+    "score": 60,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "modern-python": {
     "score": 100,
@@ -90,64 +90,64 @@
     "date": "2026-11-02"
   },
   "tdd": {
-    "score": 5,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
-  },
-  "using-agent-skills": {
     "score": 25,
     "recommendation": "CAUTION",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
+  },
+  "using-agent-skills": {
+    "score": 35,
+    "recommendation": "CAUTION",
+    "version": "v2.2.3",
+    "date": "2026-11-09"
   },
   "writing-great-skills": {
-    "score": 100,
-    "recommendation": "DO_NOT_INSTALL",
+    "score": 0,
+    "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "drill-to-adopt": {
     "score": 10,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "setup-workspace": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "vet-and-adopt": {
     "score": 20,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "brainstorming": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "dispatching-parallel-agents": {
-    "score": 5,
+    "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "executing-plans": {
-    "score": 50,
+    "score": 25,
     "recommendation": "CAUTION",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "finishing-a-development-branch": {
-    "score": 30,
+    "score": 25,
     "recommendation": "CAUTION",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "frontend-design": {
     "score": 20,
@@ -156,39 +156,39 @@
     "date": "2026-11-02"
   },
   "receiving-code-review": {
-    "score": 5,
+    "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "requesting-code-review": {
-    "score": 15,
+    "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "subagent-driven-development": {
-    "score": 30,
+    "score": 25,
     "recommendation": "CAUTION",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "using-git-worktrees": {
-    "score": 35,
-    "recommendation": "CAUTION",
+    "score": 10,
+    "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "verification-before-completion": {
-    "score": 15,
+    "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   },
   "writing-plans": {
-    "score": 5,
+    "score": 0,
     "recommendation": "SAFE",
     "version": "v2.2.3",
-    "date": "2026-11-02"
+    "date": "2026-11-09"
   }
 }

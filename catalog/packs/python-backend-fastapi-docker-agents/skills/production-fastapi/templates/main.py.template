@@ -1,0 +1,293 @@
+"""A complete production-shaped FastAPI app in one file.
+
+How to use it: copy to your project as main.py and edit. It combines every pattern from
+the production-fastapi skill: settings that fail fast, structured logging, pure ASGI
+middleware, problem-details errors, health probes, lifespan-managed resources, CORS and
+docs switched off in production. When the file grows, split each section into the module
+of the same name under templates/.
+"""
+
+import asyncio
+import logging
+import time
+import uuid
+from contextlib import asynccontextmanager
+from datetime import UTC, datetime
+
+import httpx
+import structlog
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
+
+
+# --- Settings: a missing required value stops the process at import ---------------------
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+    )
+
+    app_name: str = "orders-api"
+    app_version: str = "0.1.0"
+    environment: str = "development"
+    debug: bool = False
+
+    database_url: str  # required
+    db_pool_size: int = 10
+    db_max_overflow: int = 5
+
+    redis_url: str = "redis://localhost:6379/0"
+    cors_origins: list[str] = ["http://localhost:3000"]
+    log_level: str = "INFO"
+
+
+settings = Settings()
+
+
+# --- Logging ----------------------------------------------------------------------------
+
+def configure_logging() -> None:
+    steps = [
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.format_exc_info,
+    ]
+    renderer = (
+        structlog.processors.JSONRenderer()
+        if settings.environment == "production"
+        else structlog.dev.ConsoleRenderer()
+    )
+    structlog.configure(
+        processors=[*steps, structlog.stdlib.ProcessorFormatter.wrap_for_formatter],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        structlog.stdlib.ProcessorFormatter(
+            processors=[structlog.stdlib.ProcessorFormatter.remove_processors_meta, renderer]
+        )
+    )
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(handler)
+    root.setLevel(settings.log_level.upper())
+    for noisy in ("uvicorn.access", "httpx"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
+
+
+log = structlog.get_logger()
+
+
+# --- Middleware: plain ASGI classes, never BaseHTTPMiddleware ---------------------------
+
+QUIET_PATHS = {"/health", "/health/live", "/health/ready", "/health/startup"}
+
+
+class RequestIDMiddleware:
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] not in ("http", "websocket"):
+            await self.app(scope, receive, send)
+            return
+        rid = str(uuid.uuid4())
+        scope.setdefault("state", {})["request_id"] = rid
+        structlog.contextvars.clear_contextvars()
+        structlog.contextvars.bind_contextvars(request_id=rid)
+
+        async def tag(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                message["headers"] = [*message.get("headers", []), (b"x-request-id", rid.encode())]
+            await send(message)
+
+        await self.app(scope, receive, tag)
+
+
+class LoggingMiddleware:
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or scope.get("path") in QUIET_PATHS:
+            await self.app(scope, receive, send)
+            return
+        began = time.perf_counter()
+        status = {"code": 500}  # stays 500 if the app raises before responding
+
+        async def watch(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                status["code"] = message["status"]
+            await send(message)
+
+        try:
+            await self.app(scope, receive, watch)
+        finally:
+            log.info(
+                "http_request",
+                method=scope["method"],
+                path=scope["path"],
+                status_code=status["code"],
+                duration_ms=round((time.perf_counter() - began) * 1000, 2),
+            )
+
+
+class SecurityHeadersMiddleware:
+    HEADERS = [
+        (b"strict-transport-security", b"max-age=63072000; includeSubDomains"),
+        (b"x-content-type-options", b"nosniff"),
+        (b"x-frame-options", b"DENY"),
+        (b"x-xss-protection", b"0"),
+        (b"referrer-policy", b"strict-origin-when-cross-origin"),
+        (b"permissions-policy", b"camera=(), microphone=(), geolocation=()"),
+    ]
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        async def add(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                message["headers"] = [*message.get("headers", []), *self.HEADERS]
+            await send(message)
+
+        await self.app(scope, receive, add)
+
+
+# --- Errors: RFC 9457 problem details ---------------------------------------------------
+
+class AppError(Exception):
+    def __init__(self, detail: str, status_code: int = 500, error_type: str = "internal_error"):
+        super().__init__(detail)
+        self.detail = detail
+        self.status_code = status_code
+        self.error_type = error_type
+
+
+def problem(request: Request, status: int, kind: str, detail: str) -> JSONResponse:
+    return JSONResponse(
+        status_code=status,
+        content={
+            "type": f"/errors/{kind}",
+            "title": kind.replace("_", " ").title(),
+            "status": status,
+            "detail": detail,
+            "instance": str(request.url),
+            "request_id": getattr(request.state, "request_id", None),
+        },
+    )
+
+
+async def on_app_error(request: Request, exc: AppError) -> JSONResponse:
+    log.warning("app_error_returned", error_type=exc.error_type, detail=exc.detail)
+    return problem(request, exc.status_code, exc.error_type, exc.detail)
+
+
+async def on_crash(request: Request, exc: Exception) -> JSONResponse:
+    log.exception("request_crashed")
+    return problem(request, 500, "internal_error", "An unexpected error occurred.")
+
+
+# --- Health -----------------------------------------------------------------------------
+
+health_router = APIRouter(tags=["health"])
+
+
+@health_router.get("/health/live")
+async def liveness() -> dict:
+    return {"status": "alive", "timestamp": datetime.now(UTC).isoformat()}
+
+
+@health_router.get("/health/ready")
+async def readiness(request: Request) -> JSONResponse:
+    checks: dict[str, dict] = {}
+    try:
+        async with asyncio.timeout(2.0):
+            async with request.app.state.db_engine.connect() as conn:
+                await conn.execute(text("SELECT 1"))
+        checks["database"] = {"status": "healthy"}
+    except Exception as exc:
+        checks["database"] = {"status": "unhealthy", "error": str(exc)}
+
+    ok = all(c["status"] == "healthy" for c in checks.values())
+    return JSONResponse(
+        status_code=200 if ok else 503,
+        content={
+            "status": "ready" if ok else "not_ready",
+            "checks": checks,
+            "timestamp": datetime.now(UTC).isoformat(),
+        },
+    )
+
+
+# --- Lifespan ---------------------------------------------------------------------------
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    configure_logging()
+    app.state.db_engine = create_async_engine(
+        settings.database_url,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+    )
+    app.state.http_client = httpx.AsyncClient(
+        timeout=httpx.Timeout(10.0, connect=5.0),
+        limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
+    )
+    log.info("startup_done", version=settings.app_version, environment=settings.environment)
+
+    yield
+
+    await app.state.http_client.aclose()
+    await app.state.db_engine.dispose()
+    log.info("shutdown_done")
+
+
+# --- The app ----------------------------------------------------------------------------
+
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+    lifespan=lifespan,
+    docs_url=None if settings.environment == "production" else "/docs",
+    redoc_url=None,
+)
+
+# Starlette makes the LAST middleware added the OUTERMOST, so add innermost first.
+# Resulting order for a request: CORS, security headers, request id, logging.
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(RequestIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+)
+
+app.add_exception_handler(AppError, on_app_error)
+app.add_exception_handler(Exception, on_crash)
+
+app.include_router(health_router)
+
+
+# Example route. Delete it.
+@app.get("/")
+async def root() -> dict:
+    return {"service": settings.app_name, "version": settings.app_version}

@@ -2,6 +2,9 @@
 id: claim-auditor
 module: 09-data-work
 checked: 2026-11-02
+tokens:
+  description: 74
+  body: 1069
 ---
 
 # Claim auditor
@@ -71,7 +74,7 @@ If the wrong figure comes back GREEN or AMBER, or the GREEN one has no command b
 
 ## Watch out
 
-- **Context cost:** its description loads every session, about 140 tokens; the body, about 1,060 tokens, loads only when it runs. Both are estimates (bytes divided by 4).
+- **Context cost:** its description loads every session, about 74 tokens; the body, about 1,060 tokens, loads only when it runs. Both are estimates (bytes divided by 4).
 - **It re-runs your queries.** A figure from a warehouse means a query against that warehouse, with your access. Give Claude read-only access where you can; it runs nothing you have not allowed. In claude.ai, Claude can re-run only what it can execute there, such as an uploaded file with code execution on; a warehouse query you run yourself ([module 09, Apply it in claude.ai](../modules/09-data-work/README.md#apply-it-in-claudeai)).
 - **A report full of RED is the point.** The skill's one firm rule is never to soften a finding: not by downgrading a grade, not by leaving out a claim it could not source, not by rewording a number until it needs no support. If you rewrite the skill, keep that rule.
 - **"It was in the previous draft" is not a source.** Nor is a figure quoted in a commit message, a chat or Claude's own earlier summary; the skill follows each one back to the original or grades it RED.

@@ -6,6 +6,8 @@ tokens:
   light: 166
   standard: 358
   full: 405
+other_figures:
+  - 1000
 ---
 
 # The front door
@@ -87,7 +89,7 @@ If step 1 prints `0`, or step 2 gets an answer that is not yours, the item is no
 ## Watch out
 
 - **A `CLAUDE.md` without the import hides `AGENTS.md`.** Since v2.1.277, Claude Code reads `AGENTS.md` only when no `CLAUDE.md`, `.claude/CLAUDE.md` or `CLAUDE.local.md` exists in the working folder or above it. A stray `CLAUDE.md` in a parent folder, or a new `CLAUDE.local.md`, turns your front door off without a sound. The line `@AGENTS.md` keeps it on ([docs/facts.md](../docs/facts.md)).
-- **Every line costs every session.** The blank template is 1,430 bytes, about 358 tokens (estimate, bytes divided by 4); the light size keeps 662 bytes of it, about 166 tokens, and the full size's empty table adds 188 bytes, about 47 (estimates). It grows with what you write. Files it imports with `@` load at launch with it, up to four imports deep. The studio keeps each front door under about 30,000 characters and moves old entries to an archive, never deleting them ([claude-md-curator](claude-md-curator.md)).
+- **Every line costs every session.** The blank template is 1,430 bytes, about 358 tokens (estimate, bytes divided by 4); the light size keeps 662 bytes of it, about 166 tokens, and the full size's empty table adds 188 bytes, about 47 (estimates). It grows with what you write. Files it imports with `@` load at launch with it, up to four imports deep. The studio keeps each front door under about 30,000 characters and moves old entries to an archive, never deleting them.
 - **Rules said only in chat do not last.** After a compaction (Claude Code summarizing a long conversation to free room), the project-root `CLAUDE.md` is read again from disk, and instructions given only in the conversation can be lost. A rule you want kept belongs in the front door.
 - **A repository beside the setup does not see it.** A session started inside a repository next to your setup folder does not read the setup's front door. Start in the setup folder and add the repository with `--add-dir`; Claude Code does not discover most `.claude/` configuration from an added folder.
 - **Company repositories get no front door by default.** Ask before any instruction file goes into one. Git does not ignore a `CLAUDE.local.md` until you add it to `.gitignore`.

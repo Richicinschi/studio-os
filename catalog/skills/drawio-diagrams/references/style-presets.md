@@ -1,110 +1,136 @@
-# Style Presets — Learn, Apply, Manage
+# Style presets
 
-A **style preset** is a named JSON file capturing a user's visual preferences — palette, shape vocabulary, fonts, edge style. When a preset is active, it fully replaces the built-in conventions in SKILL.md's color/shape/edge tables.
+A preset is a small JSON file that remembers how a person likes their diagrams to look: the
+colours, the shape vocabulary, the fonts and the edge style. While one is active it takes the
+place of the default colour, shape and edge tables in `SKILL.md`.
 
-Read this file when:
-- The user asks to "learn", "save", "remember", or "extract" a style from a file
-- The user wants to manage existing presets (list, set default, delete, rename)
-- You've resolved an active preset in Step 0 and need the application rules
-- You need to validate a preset file before loading it
+Read this file if any of these is true:
+- someone wants a style learned, saved, remembered or extracted from a file;
+- someone wants to list, show, delete, rename or default a preset;
+- step 0 of the working order found a preset and you need the rules for using it;
+- a preset file must be checked before it is used.
 
-## Locations and lookup order
+## Finding presets
 
-1. `~/.drawio-skill/styles/<name>.json` — user presets (survive `git pull`).
-2. `<this-skill-dir>/styles/built-in/<name>.json` — built-ins shipped with the skill (`default`, `corporate`, `handdrawn`).
+There are two places, searched in this order.
 
-A user preset shadows a built-in of the same name.
+1. `~/.drawio-skill/styles/<name>.json` holds the user's own presets.
+2. `<skill-dir>/styles/built-in/<name>.json` holds the three that ship with the skill: `default`,
+   `corporate` and `handdrawn`.
 
-Only user presets can have `"default": true`. When the user says *"make `<built-in-name>` my default"*, copy the built-in JSON to `~/.drawio-skill/styles/<name>.json` first, then set `default: true` on the copy — leave the shipped built-in untouched.
+A user file hides a built-in of the same name. `styles/schema.json` describes the format.
 
-**Name normalisation:** always lowercase the user-provided name before writing or looking up files (the preset schema enforces lowercase; uppercase names will fail validation).
+Three rules about names and defaults:
+- Lowercase every name before you create or look up a file. The schema insists on lowercase.
+- Only a user preset may carry `"default": true`.
+- To make a built-in the default, copy it into the user folder first and flag the copy. Leave
+  the shipped file alone.
 
-## Applying a preset
+## Using a preset
 
-When SKILL.md's Step 0 identified a preset, it fully replaces the built-in palette, shape keywords, edge defaults, and font for this diagram — do not mix values from the built-in color table.
+The preset wins over everything in the default tables. Do not blend the two.
 
-**Color lookup.** For each role a shape plays (service / database / queue / gateway / error / external / security), resolve `preset.roles[role]` to a slot name, then `preset.palette[<slot>]` to the `(fillColor, strokeColor)` pair. If `roles[role]` is unset or the resolved slot is `null`, follow this fallback ladder:
+**Colour.** Work out the role of each shape: service, database, queue, gateway, error, external
+or security. `roles` in the preset maps a role to a slot name, and `palette` maps the slot to a
+fill and stroke. When the role is missing, or its slot is `null`, go down this ladder:
 
-1. Try the role's canonical slot (`service→primary`, `database→success`, `queue→warning`, `gateway→accent`, `error→danger`, `external→neutral`, `security→secondary`).
-2. If that slot is also empty, pick the most-populated non-null slot in the preset.
-3. Never reach into the built-in color table — the preset is authoritative.
+1. Try the role's home slot. Home slots: primary is for services, success for databases, warning
+   for queues, accent for gateways, danger for errors, neutral for external systems, secondary
+   for security.
+2. Failing that, take the slot with the most content.
+3. Stay inside the preset. Never borrow from the default table.
 
-**Decision and container shapes** are not in `preset.roles` — they have shape vocabulary (`preset.shapes.decision`, `preset.shapes.container`) but no role-to-slot mapping. Pick their colors as follows:
-- **Decision** (rhombus) → use `preset.palette.warning` (the canonical yellow slot in the built-in conventions). If `warning` is empty, apply the slot-fallback ladder above starting from `warning`.
-- **Container** (swimlane) → use the palette slot matching the tier/grouping the container represents (e.g. a "Services" tier container uses `primary`; a "Data" tier uses `success`). If no tier signal is available, default to `primary`.
+Decisions and containers are not in `roles`:
+- A rhombus decision takes `palette.warning`, or the ladder starting from `warning` if that is empty.
+- A swimlane container takes the slot of the tier it represents (services get `primary`, data
+  gets `success`), or `primary` when nothing hints at a tier.
 
-**Shape keywords.** Use `preset.shapes[role]` as the **prefix** of the vertex style string (before `whiteSpace=wrap;html=1;...`). Example: for a database role, if `preset.shapes.database = "shape=cylinder3"`, the vertex style starts `shape=cylinder3;whiteSpace=wrap;html=1;fillColor=...`. The six named shape keys are `service`, `database`, `queue`, `decision`, `external`, `container`. Roles `gateway`, `error`, and `security` reuse `preset.shapes.service` unless the preset explicitly populates a key with their name.
+**Shapes.** The text in `shapes[role]` opens the vertex style, ahead of `whiteSpace=wrap;html=1;`
+and the colours. A database in a preset whose `shapes.database` is `shape=cylinder3` therefore
+begins `shape=cylinder3;`. Six keys exist: `service`, `database`, `queue`, `decision`,
+`external`, `container`. Gateway, error and security borrow `shapes.service` unless the preset
+names them.
 
-**Edges.** Use `preset.edges.style` as the base edge style string. Append `preset.edges.arrow`. Per-edge routing keys (`exitX/exitY/entryX/entryY/...`) are still added by the usual routing rules in SKILL.md. If the flow between two shapes matches a token from `preset.edges.dashedFor` (either because the user's prompt used that word, or because one end of the edge plays a role whose typical relation is "optional"), append `;dashed=1` to the edge style.
+**Edges.** Begin with `edges.style` and add `edges.arrow`. Position keys such as `exitX` and
+`entryY` still come from the normal routing rules. If a link fits one of the words in
+`edges.dashedFor` (the user used the word, or one end plays a role that is usually optional),
+add `;dashed=1`.
 
-**Fonts.** Append `fontFamily=<preset.font.fontFamily>;fontSize=<preset.font.fontSize>` to every vertex style. Container headers and swimlane titles additionally get `fontSize=<preset.font.titleFontSize>;fontStyle=1` when `preset.font.titleBold` is `true`.
+**Fonts.** Every vertex gets `fontFamily` and `fontSize` from the preset. When `titleBold` is on,
+container headers and swimlane titles also get `fontSize=<titleFontSize>;fontStyle=1`.
 
 **Extras.**
-- `preset.extras.sketch === true` → append `sketch=1` to every vertex style and every edge style.
-- `preset.extras.globalStrokeWidth !== 1` (any value other than the drawio default of 1, including `0.5`) → append `strokeWidth=<n>` to every vertex style and every edge style.
+- `sketch` true: add `sketch=1` to all vertex and edge styles.
+- `globalStrokeWidth` other than 1 (0.5 included): add `strokeWidth=<n>` to all of them.
 
-**Interaction with diagram-type presets** (ERD / UML / Sequence / ML / Flowchart). Diagram-type presets set structural style keywords that the user preset must preserve (e.g. ERD tables rely on `shape=table;startSize=30;container=1;childLayout=tableLayout;...`). The rule: keep the diagram-type preset's structural keywords, then layer the user preset's color / font / edge / extras on top. When a diagram-type preset hardcodes a color (`fillColor=#dae8fc`, etc.) that conflicts with the user preset, the user preset's color wins. Exception: `fillColor=none` is structural — do not replace it with a palette color.
+**Together with a diagram type.** The type keeps its structural keywords (an ERD still needs its
+table-layout keys). The preset supplies colours, fonts, edge style and extras on top. If the type
+hard-codes a colour, the preset's colour replaces it, except `fillColor=none`, which is structure.
 
-## Learn flow
+## Learning a style from a file
 
-**Triggers:** "learn my style from `<path>` as `<name>`", "save this as `<name>` style", "remember this style as `<name>`".
+Examples of the request: "remember this style as `<name>`", "save this as `<name>` style",
+"learn my style from `<path>` as `<name>`".
 
-**Dispatch by file extension:**
-- `.drawio`, `.xml` → XML path
-- `.png`, `.jpg`, `.jpeg`, `.svg` (rasterized flat image) → image path
+The file type picks the route: `.drawio` and `.xml` go the XML way; `.png`, `.jpg`, `.jpeg` and
+`.svg` (as a flat picture) go the image way. Then:
 
-**Steps:**
+1. Read `style-extraction.md`.
+2. Extract the candidate with the route's procedure.
+3. Lowercase the name. Write the candidate to `drawio-preset-<name>.json` in the scratch
+   directory. Do not touch `~/.drawio-skill/styles/` yet.
+4. Draw the sample diagram from `style-extraction.md` with the candidate, export it to
+   `./preset-<name>-sample.png`, and repair the PNG with `repair_png.py`.
+5. Show the user a summary table (palette values, shape per role, font, edge style, extras), the
+   sample's path (embedded if the environment allows), and a provenance line giving the source
+   type, source path, extraction date and confidence.
+6. Act on the answer.
+   - "save" or "looks good": create `~/.drawio-skill/styles/` if needed, write the candidate there
+     as `<name>.json`, then delete the scratch file and the sample PNG.
+   - "change `<field>` to `<value>`": edit the candidate, draw again, ask again.
+   - "cancel", "abort" or "no": delete the scratch file and sample; save nothing.
 
-1. **Load the extraction reference.** Read `references/style-extraction.md` into context.
-2. **Extract** following the XML path or image path procedure in the reference.
-3. **Normalize and build candidate.** Convert the user-provided preset name to lowercase. Use this normalized name for ALL file paths in this flow. Build the candidate preset JSON and write it to `/tmp/drawio-preset-<name>.json` (where `<name>` is the already-normalized name). Do **not** save to `~/.drawio-skill/styles/<name>.json` yet.
-4. **Render a sample** using the sample-diagram skeleton in `references/style-extraction.md`, parameterized by the candidate preset. Export PNG to `./preset-<name>-sample.png` using the same `drawio -x -f png -e -s 2 -o ./preset-<name>-sample.png /tmp/drawio-preset-<name>.drawio` command the main workflow uses, then run `repair_png.py` on it (see the Rendering the sample steps in `style-extraction.md`).
-5. **Show the user:**
-   - Preset summary table (palette hex values, shapes per role, font, edge style, extras).
-   - The sample PNG path (and embed the image if the environment supports it).
-   - Provenance line: `source.type`, `source.path`, `extracted_at`, `confidence`.
-6. **Wait for approval:**
-   - "save" / "looks good" → write candidate to `~/.drawio-skill/styles/<name>.json`. Create `~/.drawio-skill/styles/` if it doesn't exist. Delete tempfile and sample PNG.
-   - "change `<field>` to `<value>`" → edit the in-memory candidate, re-render, re-ask.
-   - "cancel" / "abort" / "no" → delete tempfile and sample PNG; nothing saved.
+What to do when things go wrong:
 
-**Error behavior:**
-
-| Failure | Behavior |
+| Situation | Response |
 |---|---|
-| Source path does not exist | Stop; report path not found. |
-| XML parse fails | Stop; report the parse error; suggest opening the file in drawio desktop to repair. |
-| Image vision unavailable | Stop; tell user to re-run on a vision-capable model or provide the `.drawio` file. |
-| Extraction yields 0 vertices / shapes | Stop; refuse to save. |
-| Extraction yields <3 distinct color pairs | Continue; mark `confidence: "low"` (image) or `"medium"` (XML); warn in summary. |
-| Preset name collides with existing user preset | Ask: overwrite, or pick a new name. |
-| Preset name collides with a built-in preset | Save to user dir (shadows the built-in); warn once. |
-| Sample render fails | Still show summary; note "could not render sample — saving on your OK anyway". Do not block. |
+| The source path does not exist | Stop; say the path was not found. |
+| The XML does not parse | Stop; quote the parse error and suggest repairing the file in the desktop app. |
+| An image is given but no vision is available | Stop; ask for a vision-capable model or the `.drawio` file. |
+| The file yields no shapes | Stop; refuse to save. |
+| Under 3 distinct colour pairs | Carry on, with `confidence` `"low"` (image) or `"medium"` (XML), and warn. |
+| The name is taken by a user preset | Ask whether to overwrite or rename. |
+| The name is taken by a built-in | Save into the user folder, which hides the built-in; warn once. |
+| The sample cannot be drawn | Show the summary anyway, note that the sample failed, and offer to save on the user's OK. Never block. |
 
-## Management operations
+## Looking after presets
 
-All operations are natural language — no slash commands.
+Everything is asked in plain language. Lowercase the names first.
 
-*Apply name normalisation (lowercase) to all `<name>`, `<a>`, `<b>` arguments before any file operation.*
+- **List.** For "list my styles", "what styles do I have" or "show me my style presets", read both
+  folders and print name, location (user or built-in), `source.type`, `confidence` and the default
+  flag. Mark any built-in that a user preset hides.
+- **Show.** For "show my `<name>` style" or "what's in `<name>`", print the JSON with indentation
+  and one line on source, confidence and default status.
+- **Set default.** For "make `<name>` the default": on a user preset, set the flag, clear it from
+  any other user preset, save both files. On a built-in, copy it to the user folder, then flag the
+  copy.
+- **Clear default.** For "remove default" or "unset default", clear the flag from whichever user
+  preset holds it.
+- **Delete.** Ask first, then remove `~/.drawio-skill/styles/<name>.json`. Never delete anything
+  in `styles/built-in/`; suggest a same-named user preset to hide it.
+- **Rename.** Move `<a>.json` to `<b>.json` in the user folder and change the `name` field inside.
+  A built-in cannot be renamed; offer to copy it and rename the copy.
+- **Learn.** "learn my style from `<path>` as `<name>`" starts the section above.
 
-| User says | Agent does |
-|---|---|
-| "list my styles", "what styles do I have", "show me my style presets" | Read `~/.drawio-skill/styles/` and `<this-skill-dir>/styles/built-in/`. Print a table: `name`, `location` (user/built-in), `source.type`, `confidence`, `default` flag. Built-ins shadowed by a user preset are marked so. |
-| "show my `<name>` style", "what's in `<name>`" | Print the preset JSON (pretty-printed) + a one-line summary (source, confidence, is-default). |
-| "make `<name>` the default", "set `<name>` as default" | If `<name>` is a user preset: set `default: true` on it; clear `default` on any other user preset that had it; save both files. If `<name>` is a built-in: copy `<this-skill-dir>/styles/built-in/<name>.json` → `~/.drawio-skill/styles/<name>.json` first, then set `default: true` on the copy. Never mutate the shipped built-in. |
-| "remove default", "unset default" | Clear `default: true` from whichever user preset has it. |
-| "delete `<name>`", "remove `<name>`" | Confirm first. Then `rm ~/.drawio-skill/styles/<name>.json`. Refuse to delete files under `<this-skill-dir>/styles/built-in/` — suggest shadowing with a user preset of the same name. |
-| "rename `<a>` to `<b>`" | `mv ~/.drawio-skill/styles/<a>.json ~/.drawio-skill/styles/<b>.json`, then update the `name` field inside. Fails if `<a>` is a built-in (offer to copy-then-rename instead). |
-| "learn my style from `<path>` as `<name>`" | Dispatch to the Learn flow above. |
+## Checking a preset
 
-## Preset file validation
+Run this light check whenever a preset is loaded, for drawing or for management:
+- `name`, `version`, `palette`, `roles`, `shapes`, `font` and `edges` exist;
+- `version` equals 1;
+- every filled palette slot has `fillColor` and `strokeColor` in `#RRGGBB` form;
+- `confidence`, if present, is `"low"`, `"medium"` or `"high"`.
 
-When loading any preset (for generation or management), do a lightweight structural check:
-- Required top-level fields present (`name`, `version`, `palette`, `roles`, `shapes`, `font`, `edges`).
-- `version === 1`.
-- Every populated palette slot has both `fillColor` and `strokeColor` as `#RRGGBB`.
-- `confidence` ∈ {`"low"`, `"medium"`, `"high"`} if present.
-
-On validation failure:
-- **During generation:** warn the user, fall back to built-in conventions for this one diagram, do not mutate the file.
-- **During learn:** refuse to save the candidate; report which field failed.
+A failed check while drawing: warn, fall back to the default conventions for this diagram only,
+and leave the file unchanged. A failed check while learning: refuse to save and name the
+offending field.

@@ -1,120 +1,97 @@
 #!/usr/bin/env bash
-# Stop the brainstorm server and clean up
-# Usage: stop-server.sh <session_dir>
+# Stops a brainstorm companion server and tidies up. Prints one line of JSON.
 #
-# Kills the server process. Only deletes session directory if it's
-# under /tmp (ephemeral). Persistent directories (.superpowers/) are
-# kept so mockups can be reviewed later.
+#   stop-server.sh <session_dir>
+#
+# Output is a "status" of stopped, not_running or stale_pid. If the process will not die the status is "failed",
+# with an "error" text, and the exit code is 1.
+# A session under /tmp is deleted once its server has stopped. A session under <project>/.studio-work/ stays, so
+# the mockups can be looked at later.
 
-SESSION_DIR="$1"
+session_dir=$1
 
-if [[ -z "$SESSION_DIR" ]]; then
-  echo '{"error": "Usage: stop-server.sh <session_dir>"}'
+say_status() {
+  printf '{"status": "%s"}\n' "$1"
+}
+
+if [[ -z $session_dir ]]; then
+  printf '{"error": "%s"}\n' 'Usage: stop-server.sh <session_dir>'
   exit 1
 fi
 
-STATE_DIR="${SESSION_DIR}/state"
-PID_FILE="${STATE_DIR}/server.pid"
-SERVER_ID_FILE="${STATE_DIR}/server-instance-id"
+state=$session_dir/state
 
-mark_stopped() {
-  local reason="$1"
-  rm -f "${STATE_DIR}/server-info"
-  printf '{"reason":"%s","timestamp":%s}\n' "$reason" "$(date +%s)" > "${STATE_DIR}/server-stopped"
+alive() {
+  kill -s 0 "$1" 2>/dev/null
 }
 
-read_expected_server_id() {
-  [[ -f "$SERVER_ID_FILE" ]] || return 1
-  local id
-  id="$(tr -d '\r\n' < "$SERVER_ID_FILE" 2>/dev/null || true)"
-  [[ "$id" =~ ^[A-Za-z0-9_-]{32,64}$ ]] || return 1
-  printf '%s\n' "$id"
+# Leave a marker so the agent, and the paused page, can tell the server is down.
+mark_down() {
+  rm -f "$state/server-info"
+  echo "{\"reason\":\"$1\",\"timestamp\":$(date +%s)}" > "$state/server-stopped"
 }
 
-command_line_for_pid() {
-  local pid="$1"
-  if [[ -r "/proc/$pid/cmdline" ]]; then
-    tr '\0' '\n' < "/proc/$pid/cmdline" 2>/dev/null || true
-    return 0
+# Does process $1 carry the argument --brainstorm-server-id=$2?
+has_instance_arg() {
+  local pid=$1 want="--brainstorm-server-id=$2" cmd
+  if [[ -r /proc/$pid/cmdline ]]; then
+    tr '\0' '\n' < "/proc/$pid/cmdline" | grep -qxF -- "$want"
+    return
   fi
-  ps -ww -p "$pid" -o command= 2>/dev/null || ps -f -p "$pid" 2>/dev/null | sed '1d' || true
+  cmd="$({ ps -o command= -p "$pid"; } 2>/dev/null)"
+  [[ -n $cmd ]] || cmd="$({ ps -f -p "$pid" | tail -n +2; } 2>/dev/null)"
+  [[ " $cmd " == *" $want "* ]]
 }
 
-command_has_server_id() {
-  local pid="$1"
-  local expected="$2"
-  local expected_arg="--brainstorm-server-id=$expected"
-  if [[ -r "/proc/$pid/cmdline" ]]; then
-    local arg
-    while IFS= read -r -d '' arg || [[ -n "$arg" ]]; do
-      [[ "$arg" == "$expected_arg" ]] && return 0
-    done < "/proc/$pid/cmdline"
-    return 1
-  fi
-  local command_line
-  command_line="$(command_line_for_pid "$pid")"
-  [[ -n "$command_line" ]] || return 1
-  case " $command_line " in
-    *" $expected_arg "*) return 0 ;;
-    *) return 1 ;;
-  esac
+# A pid file proves nothing after a reboot or a pid wrap-around. Signal only a live process that carries this
+# session's instance id; if the id is missing or unreadable, the process is not ours.
+is_ours() {
+  local pid=$1 id
+  alive "$pid" || return 1
+  [[ -f $state/server-instance-id ]] || return 1
+  read -r id < "$state/server-instance-id"
+  id=${id%$'\r'}
+  [[ $id =~ ^[-_a-zA-Z0-9]{32,64}$ ]] && has_instance_arg "$pid" "$id"
 }
 
-# Confirm a PID has this session's per-start instance id, not just a familiar
-# process name. Ambiguous or legacy metadata fails closed as stale_pid.
-is_brainstorm_server() {
-  kill -0 "$1" 2>/dev/null || return 1
-  local expected_id
-  expected_id="$(read_expected_server_id)" || return 1
-  command_has_server_id "$1" "$expected_id" || return 1
-  return 0
-}
-
-if [[ -f "$PID_FILE" ]]; then
-  pid=$(cat "$PID_FILE")
-
-  # Refuse to signal a PID we can't prove is our server. A stale pid file may
-  # point at an unrelated process after a reboot/PID wraparound.
-  if ! is_brainstorm_server "$pid"; then
-    rm -f "$PID_FILE" "$SERVER_ID_FILE"
-    mark_stopped "stale_pid"
-    echo '{"status": "stale_pid"}'
-    exit 0
-  fi
-
-  # Try to stop gracefully, fallback to force if still alive
-  kill "$pid" 2>/dev/null || true
-
-  # Wait for graceful shutdown (up to ~2s)
-  for _ in {1..20}; do
-    if ! kill -0 "$pid" 2>/dev/null; then
-      break
-    fi
-    sleep 0.1
-  done
-
-  # If still running, escalate to SIGKILL
-  if kill -0 "$pid" 2>/dev/null; then
-    kill -9 "$pid" 2>/dev/null || true
-
-    # Give SIGKILL a moment to take effect
-    sleep 0.1
-  fi
-
-  if kill -0 "$pid" 2>/dev/null; then
-    echo '{"status": "failed", "error": "process still running"}'
-    exit 1
-  fi
-
-  rm -f "$PID_FILE" "$SERVER_ID_FILE" "${STATE_DIR}/server.log"
-  mark_stopped "stop-server.sh"
-
-  # Only delete ephemeral /tmp directories
-  if [[ "$SESSION_DIR" == /tmp/* ]]; then
-    rm -rf "$SESSION_DIR"
-  fi
-
-  echo '{"status": "stopped"}'
-else
-  echo '{"status": "not_running"}'
+if [[ ! -f $state/server.pid ]]; then
+  say_status not_running
+  exit 0
 fi
+
+pid="$(cat "$state/server.pid")"
+
+if ! is_ours "$pid"; then
+  rm -f "$state/server.pid" "$state/server-instance-id"
+  mark_down stale_pid
+  say_status stale_pid
+  exit 0
+fi
+
+# Ask first and give it about 2 seconds, then force it.
+kill "$pid" 2>/dev/null
+for (( waited = 0; waited < 20; waited++ )); do
+  alive "$pid" || break
+  sleep 0.1
+done
+if alive "$pid"; then
+  kill -KILL "$pid" 2>/dev/null
+  sleep 0.1
+fi
+
+if alive "$pid"; then
+  printf '{"status": "%s", "error": "%s"}\n' failed "process still running"
+  exit 1
+fi
+
+rm -f "$state/server.pid" "$state/server-instance-id" "$state/server.log"
+mark_down stop-server.sh
+
+# Only a throwaway session that start-server.sh made (/tmp/brainstorm-<id>) is deleted, and never a path
+# holding "..", which could climb out of /tmp.
+case $session_dir in
+  *..*) ;;
+  /tmp/brainstorm-*) rm -rf "$session_dir" ;;
+esac
+
+say_status stopped

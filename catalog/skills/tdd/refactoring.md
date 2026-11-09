@@ -1,10 +1,12 @@
-# Refactor Candidates
+# What to look for when refactoring
 
-After TDD cycle, look for:
+With the tests green, scan for these smells:
 
-- **Duplication** → Extract function/class
-- **Long methods** → Break into private helpers (keep tests on public interface)
-- **Shallow modules** → Combine or deepen
-- **Feature envy** → Move logic to where data lives
-- **Primitive obsession** → Introduce value objects
-- **Existing code** the new code reveals as problematic
+- **Repeated code**: pull it into a shared function or class.
+- **A very long method**: split it into private helpers. Leave the tests on the public interface.
+- **Thin, shallow modules**: merge them, or give them more to do behind a smaller surface.
+- **Feature envy**: move the logic next to the data it uses.
+- **Primitive obsession**: wrap loose strings and numbers in small value types.
+- **Older code that the new code shows up as awkward**.
+
+Change one thing, run the tests, then change the next.

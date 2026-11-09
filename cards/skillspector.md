@@ -1,7 +1,9 @@
 ---
 id: skillspector
 module: 05-skills
-checked: 2026-11-02
+checked: 2026-11-09
+other_figures:
+  - 60
 ---
 
 # SkillSpector with the scan-first rule
@@ -10,7 +12,7 @@ checked: 2026-11-02
 
 - **The problem:** a skill, plugin, MCP server or hook from outside runs inside your session, and most are copied without being read. One can carry a prompt injection (text written to steer Claude against you), a script that sends data out, or a licence that never allowed the copy.
 - **The reason:** SkillSpector is a static scanner: it reads an item's files before anything runs, with no API key and no cost. One line in your front door makes every later session scan first, for updates, servers and hooks as well, not only during this adoption.
-- **The cost of skipping it:** the studio ran a plugin for months without a scan, because its rule named only the skills it adapted; when the plugin was finally scanned, its one call home turned up only in a read of the code ([module 10, Evidence](../modules/10-tools-and-mcp/README.md#evidence)). A scan alone is not enough either: an outside framework scored 100/100, critical, on false positives, while its telemetry produced no finding ([module 05, Evidence](../modules/05-skills/README.md#evidence)).
+- **The cost of skipping it:** the studio ran a plugin for months without a scan, because its rule named only the skills it took in; when the plugin was finally scanned, its one call home turned up only in a read of the code ([module 10, Evidence](../modules/10-tools-and-mcp/README.md#evidence)). A scan alone is not enough either: an outside framework scored 100/100, critical, on false positives, while its telemetry produced no finding ([module 05, Evidence](../modules/05-skills/README.md#evidence)).
 - **The principle:** [scan before anything runs in a session](../PRINCIPLES.md#scan-before-anything-runs-in-a-session). This item is the scanner, and the rule that sends every later item through it.
 
 ## Detect
@@ -75,10 +77,10 @@ If no version prints, the scan prints an error instead of a verdict, or the line
 
 ## Watch out
 
-- **The scan is a gate, not a judge.** Scores are noisy both ways. On 2026-11-02 the static scan rated the superpowers plugin 100/100, `DO_NOT_INSTALL`; the studio's triage found 47 of the 52 findings in loaded files to be false positives, and the one call that leaves your machine produced no finding at all ([docs/facts.md](../docs/facts.md), "Installing superpowers"). Read the findings in what a session loads, then read the code for outgoing calls.
+- **The scan is a gate, not a judge.** Scores are noisy both ways. An outside workflow plugin the studio once ran was rated 100/100, `DO_NOT_INSTALL`; the studio's triage found most findings in the files a session loads to be false positives, and the one call that leaves your machine produced no finding at all ([the plugin scan the studio ran](../examples/outside-plugin-scan.md)). Read the findings in what a session loads, then read the code for outgoing calls.
 - **Windows needs UTF-8 mode** for every scan (`PYTHONUTF8=1`); macOS and Linux terminals are UTF-8 already.
 - **Versions move.** The install line names no version, so you get what the repository's main branch holds on the day you install. The kit's numbers come from a build of main from before July 2026 that reports itself as 2.2.3, a number no release carries; the newest release on 2026-11-02 was v2.13.3. A fresh install gets a newer version, so your scores and finding counts can differ from the ones the kit quotes ([docs/facts.md](../docs/facts.md), "Installing SkillSpector").
 - **Keep `--no-llm`.** The static scan needs no API key and costs nothing; the LLM pass is paid, and Claude leaves it off unless you choose it.
-- **Name updates and all four kinds in the line.** The studio's own gap was a rule that covered the skills it adapted, not a plugin it already ran.
+- **Name updates and all four kinds in the line.** The studio's own gap was a rule that covered the skills it took in, not a plugin it already ran.
 - **A work machine** may need your IT department's approval for a tool installed from GitHub; ask before step 2. An install that asks for an administrator password goes in a separate terminal, not through `!`: whether a `!` command can take typed input is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: the ! prefix, /init and local files").
 - **Token cost:** SkillSpector loads nothing into a session. The rule line costs about 60 tokens every session (estimate, bytes divided by 4).

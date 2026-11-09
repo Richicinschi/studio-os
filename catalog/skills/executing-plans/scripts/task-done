@@ -1,52 +1,62 @@
 #!/usr/bin/env bash
-# Close one task of an inline plan execution in a single call: run the task's
-# test command, keep its full output in the workspace, print the tail, and —
-# only if the command succeeded — append the completion line to the ledger.
-# A failing command records nothing: the task is not complete.
+# task-done PLAN_FILE TASK_NUMBER BASE -- TEST_COMMAND [ARGS...]
 #
-# Usage: task-done PLAN_FILE TASK_NUMBER BASE -- TEST_COMMAND [ARGS...]
-#   BASE is the SHA task-start printed; the completion line records BASE..HEAD.
-# Exit: the test command's exit status.
+# Closes a task in one call. It runs the test command, saves the whole
+# output in the plan's workspace, shows the last lines, and writes the
+# completion line to the ledger only when the command succeeded. A failing
+# command leaves the ledger alone: the task is not complete.
+#
+# BASE is the SHA task-start printed. The ledger line covers BASE..HEAD.
+# Exit codes: 2 for bad usage or an unknown BASE; otherwise the test
+# command's own exit status.
 set -euo pipefail
 
-if [ $# -lt 5 ] || [ "$4" != "--" ]; then
+if [ "$#" -lt 5 ] || [ "$4" != "--" ]; then
   echo "usage: task-done PLAN_FILE TASK_NUMBER BASE -- TEST_COMMAND [ARGS...]" >&2
   exit 2
 fi
 
-plan=$1
-n=$2
-base=$3
+plan_file=$1
+task_no=$2
+base_ref=$3
 shift 4
-sdd="$(cd "$(dirname "$0")/../../subagent-driven-development/scripts" && pwd)"
 
-git rev-parse --verify --quiet "$base" >/dev/null || { echo "bad BASE: $base" >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+sdd_scripts=$(cd "$here/../../subagent-driven-development/scripts" && pwd)
 
-dir=$("$sdd/sdd-workspace" "$plan")
-log="$dir/task-${n}-tests.log"
-ledger="$dir/progress.md"
-
-# Render the command the way a person would type it, for the ledger line.
-cmd=""
-for a in "$@"; do
-  case "$a" in
-    *[[:space:]\"\;\|\&]*) cmd="$cmd '$a'" ;;
-    *) cmd="$cmd $a" ;;
-  esac
-done
-cmd=${cmd# }
-
-rc=0
-"$@" > "$log" 2>&1 || rc=$?
-
-tail -n 5 "$log"
-if [ "$rc" -ne 0 ]; then
-  echo "task-done: test command exited $rc; Task $n NOT recorded (full output: $log)" >&2
-  exit "$rc"
+if ! git rev-parse --verify --quiet "$base_ref" > /dev/null; then
+  echo "bad BASE: $base_ref" >&2
+  exit 2
 fi
 
-last=$(grep -v '^[[:space:]]*$' "$log" | tail -n 1) || last="(no output)"
-[ -f "$ledger" ] || printf '# SDD ledger — plan: %s\n' "$plan" > "$ledger"
-line="Task $n: complete (commits $(git rev-parse --short=7 "$base")..$(git rev-parse --short=7 HEAD), tests: $cmd → $last)"
-printf '%s\n' "$line" >> "$ledger"
-echo "ledger: $line"
+workspace=$("$sdd_scripts/sdd-workspace" "$plan_file")
+test_log="$workspace/task-${task_no}-tests.log"
+ledger_file="$workspace/progress.md"
+
+# Rebuild the command as it would be typed, quoting any word that needs it.
+shown=
+for word in "$@"; do
+  case "$word" in
+    *[[:space:]\"\;\|\&]*) shown="${shown:+$shown }'$word'" ;;
+    *) shown="${shown:+$shown }$word" ;;
+  esac
+done
+
+status=0
+"$@" > "$test_log" 2>&1 || status=$?
+
+tail -n 5 "$test_log"
+if [ "$status" -ne 0 ]; then
+  echo "task-done: test command exited $status; Task $task_no NOT recorded (full output: $test_log)" >&2
+  exit "$status"
+fi
+
+result=$(grep -v '^[[:space:]]*$' "$test_log" | tail -n 1) || result="(no output)"
+if [ ! -f "$ledger_file" ]; then
+  printf '# SDD ledger — plan: %s\n' "$plan_file" > "$ledger_file"
+fi
+short_base=$(git rev-parse --short=7 "$base_ref")
+short_head=$(git rev-parse --short=7 HEAD)
+entry="Task $task_no: complete (commits $short_base..$short_head, tests: $shown → $result)"
+printf '%s\n' "$entry" >> "$ledger_file"
+echo "ledger: $entry"

@@ -23,13 +23,13 @@ One model gives one view, shaped by how you framed the question. Asking the same
 ## The mechanism
 
 - **Persona agents: one seat, one question each.** A Claude Code agent is a Markdown file with a name, a description and its instructions (where they load from: [docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). Each studio seat carries one lens:
-  - the skeptic ([`karen-skeptic`](../../catalog/agents/karen-skeptic.md)) asks what breaks. It returns the three likeliest ways a plan fails, each with its trigger, then the one assumption that sinks everything if it is wrong;
-  - the architect ([`marie-architect`](../../catalog/agents/marie-architect.md)) asks whether this is the simplest thing that works;
+  - the skeptic ([`karen-skeptic`](../../cards/pack-advisor-council-for-big-decisions.md)) asks what breaks. It returns the three likeliest ways a plan fails, each with its trigger, then the one assumption that sinks everything if it is wrong;
+  - the architect ([`marie-architect`](../../cards/pack-advisor-council-for-big-decisions.md)) asks whether this is the simplest thing that works;
   - the reviewer ([`linus-reviewer`](../../catalog/agents/linus-reviewer.md)) asks whether the diff is right, with findings by file and line and a verdict;
   - the researcher ([`sherlock-researcher`](../../catalog/agents/sherlock-researcher.md)) asks what the sources say, and returns a cited report.
 
   The studio has eleven seats: a board that advises and a crew that does the work.
-- **Tools follow the role.** A subagent's `tools:` line is an allowlist ([docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). The seven advisors get no Write, Edit or Bash, so "read-only" is enforced by what they lack, not by a promise. Two seats are exceptions: the operator ([`atlas-operator`](../../catalog/agents/atlas-operator.md)) advises but also writes plans, so it carries Write, Edit and Bash; the reviewer keeps Bash for git and tests, and Bash can change files, so its read-only is a rule it follows, not a limit. The crew gets the writes its work needs. No seat sets a model, so each runs on the session's, unless `CLAUDE_CODE_SUBAGENT_MODEL` is set.
+- **Tools follow the role.** A subagent's `tools:` line is an allowlist ([docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). The seven advisors get no Write, Edit or Bash, so "read-only" is enforced by what they lack, not by a promise. Two seats are exceptions: the operator ([`atlas-operator`](../../cards/pack-advisor-council-for-big-decisions.md)) advises but also writes plans, so it carries Write, Edit and Bash; the reviewer keeps Bash for git and tests, and Bash can change files, so its read-only is a rule it follows, not a limit. The crew gets the writes its work needs. No seat sets a model, so each runs on the session's, unless `CLAUDE_CODE_SUBAGENT_MODEL` is set.
 - **Solo for one view.** "Have the reviewer look at this branch."
 - **`/council` for a real fork.** The `council` skill:
   1. selects three to five relevant seats, never all of them by reflex, and says who it left out;
@@ -68,4 +68,4 @@ Whether the claude.ai chat app has subagents is not documented ([docs/facts.md](
 3. **For a debate,** paste each seat's answer into the other's chat and ask it to rebut, concede, then hold or update.
 4. **Close it yourself:** where they disagree, and what you decide.
 
-Catalog items used here: [council](../../catalog/skills/council/SOURCE.md) · [karen-skeptic](../../catalog/agents/karen-skeptic.md) · [marie-architect](../../catalog/agents/marie-architect.md) · [linus-reviewer](../../catalog/agents/linus-reviewer.md) · [sherlock-researcher](../../catalog/agents/sherlock-researcher.md).
+Catalog items used here: [council](../../cards/pack-advisor-council-for-big-decisions.md) · [karen-skeptic](../../cards/pack-advisor-council-for-big-decisions.md) · [marie-architect](../../cards/pack-advisor-council-for-big-decisions.md) · [linus-reviewer](../../catalog/agents/linus-reviewer.md) · [sherlock-researcher](../../catalog/agents/sherlock-researcher.md).

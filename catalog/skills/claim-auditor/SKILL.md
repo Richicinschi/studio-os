@@ -1,12 +1,7 @@
 ---
 name: claim-auditor
 description: >-
-  Trace every factual claim in a deliverable back to its source before it ships. Extracts each
-  number, percentage, chart, date and named-entity assertion, finds its grounding, RE-RUNS the
-  script that produced any figure, and grades GREEN/AMBER/RED. Use when the user says "audit the
-  claims", "check every number", "is this deliverable sourced", "verify the figures", "fact-check
-  this report", or before sending anything outward-facing (a report, a deck, a client dossier, a
-  store listing, a PR description). One-shot report — grades findings, changes nothing.
+  Trace every factual claim in a deliverable back to its source before it ships: re-runs the scripts behind figures and grades GREEN/AMBER/RED. Use for "audit the claims", "check every number", "fact-check this report", or before a report, deck, dossier or listing goes outward. Changes nothing.
 metadata:
   category: quality
   author: Richicinschi
@@ -88,4 +83,4 @@ Ranked worst-first. Per claim: id, location, the claim, the grade, the source (o
 
 ## Scope note
 
-This audits claims, not prose quality, and it is orthogonal to `/code-review` (defects in code) and `ponytail-audit` (over-engineering). Run it last, on what is about to leave the building.
+This audits claims, not prose quality, and it is orthogonal to `/code-review` (defects in code). Run it last, on what is about to leave the building.

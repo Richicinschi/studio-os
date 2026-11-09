@@ -1,61 +1,61 @@
-# Good and Bad Tests
+# Good tests and bad tests
 
-## Good Tests
+## What good looks like
 
-**Integration-style**: Test through real interfaces, not mocks of internal parts.
+Good tests are integration-style: they go through the real public interface. They do not replace your own parts with fakes.
 
-```typescript
-// GOOD: Tests observable behavior
-test("user can checkout with valid cart", async () => {
-  const cart = createCart();
-  cart.add(product);
-  const result = await checkout(cart, paymentMethod);
-  expect(result.status).toBe("confirmed");
+```dart
+// GOOD: checks a result the caller can see
+test('a car parked for two hours and ten minutes pays for three hours', () {
+  final garage = Garage(hourlyRate: 4);
+  final ticket = garage.enter(at: DateTime(2026, 3, 2, 9, 0));
+  final fee = garage.fee(ticket, leavingAt: DateTime(2026, 3, 2, 11, 10));
+  expect(fee, 12);
 });
 ```
 
-Characteristics:
+Traits of a good test:
 
-- Tests behavior users/callers care about
-- Uses public API only
-- Survives internal refactors
-- Describes WHAT, not HOW
-- One logical assertion per test
+- It covers behavior a caller cares about.
+- It uses the public API and nothing else.
+- It survives internal rewrites.
+- Its name says what happens, not how.
+- It checks one logical outcome.
 
-## Bad Tests
+## What bad looks like
 
-**Implementation-detail tests**: Coupled to internal structure.
+Bad tests are tied to internals.
 
-```typescript
-// BAD: Tests implementation details
-test("checkout calls paymentService.process", async () => {
-  const mockPayment = jest.mock(paymentService);
-  await checkout(cart, payment);
-  expect(mockPayment.process).toHaveBeenCalledWith(cart.total);
+```dart
+// BAD: pins down a call, not an outcome
+test('fee asks the rate table for the hourly price', () {
+  final rates = MockRateTable();   // our own class, not a system edge
+  Garage(rates: rates).fee(ticket, leavingAt: t1);
+  verify(rates.priceFor(ticket.zone)).called(1);
 });
 ```
 
-Red flags:
+Signs of trouble:
 
-- Mocking internal collaborators
-- Testing private methods
-- Asserting on call counts/order
-- Test breaks when refactoring without behavior change
-- Test name describes HOW not WHAT
-- Verifying through external means instead of interface
+- It mocks a collaborator that you own.
+- It reaches into private methods.
+- It asserts on how often or in what order things were called.
+- It breaks on a refactor that changed no behavior.
+- Its name describes the mechanism.
+- It checks the result through a back door instead of the interface.
 
-```typescript
-// BAD: Bypasses interface to verify
-test("createUser saves to database", async () => {
-  await createUser({ name: "Alice" });
-  const row = await db.query("SELECT * FROM users WHERE name = ?", ["Alice"]);
-  expect(row).toBeDefined();
+```dart
+// BAD: goes around the interface to look inside
+test('enter stores the ticket', () async {
+  await garage.enter(at: t0);
+  final rows = await db.rawQuery('SELECT * FROM tickets');
+  expect(rows, isNotEmpty);
 });
 
-// GOOD: Verifies through interface
-test("createUser makes user retrievable", async () => {
-  const user = await createUser({ name: "Alice" });
-  const retrieved = await getUser(user.id);
-  expect(retrieved.name).toBe("Alice");
+// GOOD: asks the interface for what it stored
+test('a ticket issued at entry can be looked up again', () async {
+  final ticket = await garage.enter(at: t0);
+  final found = await garage.findTicket(ticket.id);
+  expect(found.enteredAt, t0);
 });
 ```

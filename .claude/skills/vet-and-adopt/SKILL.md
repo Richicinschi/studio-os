@@ -113,6 +113,17 @@ The adopter decides. Apply nothing before they do.
 - **Claude Code:** skills go in `<their repo>/.claude/skills/<id>/` for one project, or
   `~/.claude/skills/<id>/` for every project; agents in `.claude/agents/`; instruction text in their
   `CLAUDE.md` or `AGENTS.md`. Keep the upstream `LICENSE` with any adapted third-party skill.
+- **A domain (a pack in `catalog/packs/<id>/`):** scan the whole folder first (step 1), then copy by
+  these rules, each file shown before it is saved:
+  - the entry `SKILL.md` and the `skills/` folder to `<scope>/skills/<id>/`, kept together, because
+    the entry points to the files in `skills/` by relative path;
+  - each `stubs/<name>/SKILL.md` to `<scope>/skills/<name>/SKILL.md` (a stub is a one-line skill
+    that sends Claude into the pack, for a name a person types or a skill with tool limits);
+  - each file in `agents/` to `<scope>/agents/`, only the ones the adopter took on the card.
+  Then check it (the card's Check). The pack's own text is the studio's, and its examples are the
+  studio's too: read them with the adopter and swap any that name a tool or a path they do not use.
+  On claude.ai a pack goes in as a zip built by `node tools/upload-bundle.mjs <id> --out <folder>`:
+  the entry and the skills, with no agents.
 - **MCP servers:** add one with `claude mcp add` at the narrowest scope that works, local first, and
   pass secrets as environment variables or `${VAR}` references, never as text in a shared `.mcp.json`
   (`docs/facts.md`, "Claude Code: MCP servers"). A sign-in the server needs is handed over as a `!`

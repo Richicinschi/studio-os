@@ -6,6 +6,10 @@ tokens:
   light: 104
   standard: 408
   full: 511
+other_figures:
+  - 306
+  - 2000
+  - 1000
 ---
 
 # USER.md: who you are

@@ -3,7 +3,6 @@ title: The green run that would have deleted 190 pages
 sources:
   - .studio/memory/project_wiki_chronicle.md
   - .studio/memory/feedback_green_can_be_a_lie.md
-  - docs/superpowers/plans/2026-10-28-runtime-neutral-handoff.md
 ---
 
 # The green run that would have deleted 190 pages

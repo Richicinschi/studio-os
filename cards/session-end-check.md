@@ -2,6 +2,8 @@
 id: session-end-check
 module: 01-continuity
 checked: 2026-11-02
+other_figures:
+  - 43
 ---
 
 # A check before a session ends

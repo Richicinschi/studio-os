@@ -1,86 +1,87 @@
 ---
 name: drawio-diagrams
 description: >-
-  Use when the user wants a diagram, flowchart, architecture/system diagram, ER diagram, UML
-  (class/sequence), network topology, or data-flow figure — especially for a project in this
-  workspace (e.g. "diagram this app's architecture", "draw the data flow",
-  "an ERD for the database"). Also use proactively when explaining a system with 3+ components
-  or a non-trivial data flow that a picture would clarify. Generates editable draw.io
-  (`.drawio`) XML, structurally lints it, and delivers a LOCAL SVG beside it that opens in any
-  browser — no install needed. Best for polished, precise, exportable diagrams; route casual whiteboard
-  sketches to excalidraw and git-rendered diagrams-as-code to mermaid instead.
+  Use when the user wants a diagram: UML, ER, network topology, data flow, a flowchart, or an architecture or system diagram, or a picture to clarify a system with 3+ parts. It makes editable draw.io XML, lints it, delivers a local SVG. Excalidraw suits casual sketches; mermaid, diagrams-as-code.
 metadata:
   category: studio
-  author: Richicinschi (adapted by Claude from Agents365-ai/drawio-skill)
+  author: Richicinschi
   version: 1.0.0
   domain: draw.io diagram authoring (architecture / flow / ERD / UML)
   capabilities: [file_read, file_write, shell]
-  sources:
-    - Agents365-ai/drawio-skill v1.14.0 (MIT) — XML authoring conventions, validate/encode/shapesearch/autolayout scripts, references. See ./LICENSE.
 ---
-
 # drawio-diagrams
 
-Author editable draw.io `.drawio` XML by hand, lint it, and deliver a local SVG beside it.
-Never hand back only a diagrams.net or web-viewer URL: the owner does not open them
-(a style rule the studio broke once and then wrote down). The scripts are aids — the
-diagram is XML you write directly.
+The product of this skill is a pair of files: a `.drawio` document you write as XML, and an `.svg`
+beside it that opens locally. A linter sits between writing and handing over. The scripts in this
+folder assist you; the diagram itself is XML that you author directly.
 
-**Adapted for this studio** (vs. upstream): the network icon-fetcher (`aiicons.py`) and the
-language import-parsers were **removed** — this skill makes **no network calls**. Its only
-capabilities are file read/write and (optional) shelling out to Graphviz / the draw.io CLI.
+Never return just a hosted link (diagrams.net or its viewer). The owner does not open those
+(`.studio/identity/STYLE.md` section 3; it went wrong on 2026-07-28). A link is an optional
+extra.
 
-## This box has no draw.io CLI — default path
+This copy of the skill makes no network calls. It leaves out the brand-icon fetcher and the
+scripts that read code structure. It reads and writes files, and may run Graphviz or the
+draw.io CLI when they are present.
 
-`drawio` is **not installed here** (nor `dot`, Inkscape or rsvg), so the CLI export is
-unavailable. The default flow is:
+## Tooling on this machine
 
-1. Write ONE small generator script that emits both the `.drawio` and a matching hand-built
-   `.svg` from the same node/edge list, so the two never drift. House style to copy:
-   a `.drawio` and `.svg` pair you made before. Run it with
-   `py -3.13` on Windows, `uv run python` on the Mac.
-2. Lint the `.drawio`: `py -3.13 <this-skill-dir>/scripts/validate.py <name>.drawio`
-   (on the Mac: `uv run python <this-skill-dir>/scripts/validate.py <name>.drawio`).
-3. Self-check the render: headless Edge or Chrome, e.g. `msedge.exe --headless=new
-   --screenshot=<png> --window-size=W,H --user-data-dir=<scratch dir> file:///<abs path>.svg`,
-   then read the PNG and fix overlaps or clipping.
-4. Deliver the absolute paths of the `.svg` (to open) and the `.drawio` (to edit).
+There is no draw.io CLI here, and no `dot`, Inkscape or rsvg either. So the usual route is:
 
-Optional, only when the owner asks for one, never instead of the SVG: a browser URL from
-`py -3.13 <this-skill-dir>/scripts/encode_drawio_url.py [--edit] <name>.drawio` (the XML rides
-in the URL `#fragment`, so nothing is uploaded).
+1. Write a small generator that reads one list of nodes and edges and writes both the
+   `.drawio` and a hand-made `.svg`. Because both come from one list, they cannot disagree. Copy
+   the house style of `docs/specs/2026-09-14-analytics-stack-lab-phases.drawio` and
+   the `.svg` next to it. Run the generator with `py -3.13` on Windows or `uv run python` on
+   the Mac.
+2. Lint the document:
+   `py -3.13 <skill-dir>/scripts/validate.py <name>.drawio` (Mac: `uv run python` in its place).
+3. Check the picture with a headless browser. Chrome, for example:
+   `chrome.exe --headless=new --window-size=W,H --user-data-dir=<scratch dir> --screenshot=<png> file:///<abs path>.svg`
+   (Edge takes the same flags as `msedge.exe`). Open the PNG, then fix any overlap or clipped text.
+4. Report the absolute path of the `.svg` (for viewing) and of the `.drawio` (for editing).
 
-To get raster exports, install the **draw.io desktop app** (e.g. on the Mac:
-`brew install --cask drawio`) and use the Export section below. Without it, deliver the
-`.drawio` + the hand-built SVG.
+If the user asks for a browser link, and only as a bonus to the SVG, run the encoder:
 
-## Bundled resources (read on demand — none needed up front)
+```bash
+py -3.13 <skill-dir>/scripts/encode_drawio_url.py --edit <name>.drawio   # editor link
+py -3.13 <skill-dir>/scripts/encode_drawio_url.py <name>.drawio          # viewer link
+```
 
-| File | Read it when |
+The XML sits after the `#` in the link, so the file never leaves the machine.
+
+For PNG or PDF output, put the draw.io desktop app on the machine (Mac: `brew install --cask drawio`)
+and use the export commands near the end of this file. Lacking the app, deliver the `.drawio`
+and the hand-made SVG.
+
+## Which file to open
+
+| Open | When |
 |---|---|
-| `references/diagram-types.md` | The user names a type (ERD, UML class, sequence, architecture, flowchart) — gives the shapes/edges/layout preset |
-| `references/shapes.md` + `scripts/shapesearch.py` | You need a **specific vendor shape** (AWS/Azure/GCP/Cisco/Kubernetes/ER/UML). `py -3.13 scripts/shapesearch.py "<keywords>"` returns the exact official `style=` string — don't guess `shape=mxgraph.*` names (a wrong name renders as a blank box) |
-| `references/autolayout.md` + `scripts/autolayout.py` | The graph is large/layout-heavy (>~15 nodes). Describe it as JSON and run autolayout to place nodes + route edges via Graphviz **(needs `dot` on PATH; if absent, hand-place)** |
-| `references/style-presets.md` + `references/style-extraction.md` | The user asks to learn/save/list/set a reusable style preset |
-| `references/troubleshooting.md` | An export fails or a rendering looks wrong (incl. cross-platform / WSL2 export notes) |
-| `scripts/repair_png.py` | Only after a `-e` PNG export on a box that HAS the draw.io CLI (fixes draw.io's truncated IEND chunk) |
+| `references/diagram-types.md` | The request names a kind: ERD, UML class, sequence, architecture, ML model, flowchart. It gives shapes, edges and layout for each. |
+| `references/shapes.md` with `scripts/shapesearch.py` | You need a vendor shape (AWS, Azure, GCP, Cisco, Kubernetes, UML, ER). `py -3.13 scripts/shapesearch.py "<keywords>"` prints the official `style=` string. A made-up `shape=mxgraph.*` name draws an empty box if it is wrong. |
+| `references/autolayout.md` with `scripts/autolayout.py` | More than about 15 nodes. Describe the graph as JSON and let Graphviz place nodes and bends. It needs `dot`; if that is missing, place by hand. |
+| `references/style-presets.md` with `references/style-extraction.md` | The user wants a reusable style learned, saved, listed or made the default. |
+| `references/troubleshooting.md` | A render looks wrong or an export fails; it also covers WSL2 and Linux notes. |
+| `scripts/repair_png.py` | After a `-e` PNG export on a machine with the CLI. It restores the missing end of the IEND chunk. |
 
-## Workflow
+## Working order
 
-If the request is underspecified, ask 1–3 focused questions (type? scope/components? output
-path?). Skip if it's already clear.
+Ask one to three short questions only when the request is vague: what kind of diagram, which
+parts, where to save it. If the request is clear, go straight on.
 
-1. **Plan** — list components, relationships, layout direction (LR or TB), and grouping by
-   tier/layer. For a workspace project, read its `AGENTS.md` first so the diagram is faithful.
-2. **Generate** — write the `.drawio` XML (skeleton + rules below). Hand-place coordinates for
-   small/styled diagrams; for big graphs use `autolayout.py`.
-3. **Validate** — `py -3.13 <this-skill-dir>/scripts/validate.py <name>.drawio` catches dangling
-   edges, duplicate/reserved ids, broken parents, and overlaps. Fix anything it reports.
-4. **Deliver** — the local `.svg` beside the `.drawio`, both as absolute paths (default flow
-   above, or the CLI's SVG export when it is present). Self-check the render for
-   overlaps/clipping before showing. A diagrams.net URL is optional and never the only deliverable.
+0. **Choose a style.** A user preset flagged as default in `~/.drawio-skill/styles/`, or one the
+   user names, replaces the built-in colours, shapes, edges and font in this file for the
+   diagram. With no preset, use the tables below. See `references/style-presets.md`.
+1. **Plan.** Note the parts, how they connect, the direction (LR or TB), and the tiers. When the
+   diagram describes a project in this workspace, read that project's `AGENTS.md` first so the
+   picture is true to the system.
+2. **Write the XML** using the skeleton and rules below. Hand-place small or styled diagrams;
+   use `autolayout.py` for big graphs.
+3. **Lint.** `validate.py` flags edges that point nowhere, repeated or reserved ids, parents that
+   do not exist, and overlaps. Fix every item it prints.
+4. **Hand over.** Give the `.svg` and the `.drawio` as absolute paths (or the CLI's SVG export if
+   the CLI exists). Inspect the render for overlap and clipping before you show it.
 
-## Draw.io XML structure
+## XML essentials
 
 ### Skeleton
 
@@ -92,93 +93,98 @@ path?). Skip if it's already clear.
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <!-- user shapes start at id 2 -->
+        <!-- your shapes start at id 2 -->
       </root>
     </mxGraphModel>
   </diagram>
 </mxfile>
 ```
 
-**Rules:**
-- `id="0"` and `id="1"` are required root cells — never omit. User shapes start at `id="2"`,
-  `parent="1"` (or the container's id).
-- All styles include `html=1`. Escape `&amp; &lt; &gt; &quot;` in attribute values; use
-  `&#xa;` for line breaks in labels (not `\n`).
-- **Never put `--` inside an XML comment** (illegal; breaks parsing).
+Rules:
+- Cells `0` and `1` always exist. Your own cells begin at `2` and name `parent="1"`, or the id of
+  the container they sit in.
+- Every style has `html=1`. In attribute values write `&amp;`, `&lt;`, `&gt;` and `&quot;`, and
+  use `&#xa;` for a line break in a label, never `\n`.
+- Never put a double hyphen inside an XML comment. It is illegal and stops the file parsing.
 
-### Shapes (vertex)
+### Vertices
 
-| Style keyword | Use for |
-|--------------|---------|
-| `rounded=1` | services, modules |
-| `ellipse;` | start/end, actors |
-| `rhombus;` | decision points |
-| `shape=cylinder3;` | databases |
-| `swimlane;startSize=30;` | titled container / tier |
+| Keyword | Meaning |
+|---|---|
+| `rounded=1` | a service or module |
+| `ellipse;` | a start or end, or an actor |
+| `rhombus;` | a decision |
+| `shape=cylinder3;` | a database |
+| `swimlane;startSize=30;` | a titled container or tier |
 
 ```xml
-<mxCell id="2" value="Label" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-  <mxGeometry x="100" y="100" width="160" height="60" as="geometry" />
+<mxCell id="2" value="Billing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+  <mxGeometry x="120" y="80" width="160" height="60" as="geometry" />
 </mxCell>
 ```
 
 ### Containers
 
-Use real parent-child containment for tiers — don't stack shapes on a big rectangle. Children
-set `parent="<containerId>"` with coordinates **relative to the container**; add
-`pointerEvents=0;` to containers that shouldn't capture child connections.
+Model tiers as real containers, not as shapes laid over a big rectangle. A child gives
+`parent="<container id>"`, and its x and y are measured from the container's corner. Add
+`pointerEvents=0;` to a container that should not swallow connections aimed at its children.
 
 ### Edges
 
-**Every edge must contain `<mxGeometry relative="1" as="geometry" />`** — self-closing edge
-cells don't render.
+An edge must hold a child `<mxGeometry relative="1" as="geometry" />`; a self-closing edge cell is
+not drawn.
 
 ```xml
-<mxCell id="10" value="HTTP" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2" target="3">
+<mxCell id="10" value="gRPC" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2" target="3">
   <mxGeometry relative="1" as="geometry" />
 </mxCell>
 ```
 
-- Always include `rounded=1;orthogonalLoop=1;jettySize=auto` (smart routing).
-- When a node has 2+ connections, pin `exitX/exitY/entryX/entryY` to spread lines across its
-  perimeter (top 0.5/0, right 1/0.5, bottom 0.5/1, left 0/0.5).
-- Add `flowAnimation=1;` to an edge for a moving-dot data-flow animation (SVG/desktop).
-- Add `<Array as="points"><mxPoint x="" y="" /></Array>` waypoints to route around a shape.
+- Always include `rounded=1;orthogonalLoop=1;jettySize=auto` in an edge style, for tidy routing.
+- When a node has two or more links, pin `exitX/exitY/entryX/entryY` so lines spread along its
+  border. The (x, y) fractions of the four side midpoints are top (0.5, 0), bottom (0.5, 1),
+  left (0, 0.5) and right (1, 0.5).
+- `flowAnimation=1;` animates a dot along the line (SVG and desktop only).
+- To steer a line around a shape, give the edge waypoints inside its geometry, as an `Array`
+  named `points` holding `mxPoint` elements.
 
 ### Layout
 
-- Snap all x/y/width/height to multiples of 10.
-- Spacing by size: ≤5 nodes → 200×150px gaps; 6–10 → 280×200; >10 → 350×250.
-- Group related nodes in a band; place hub nodes centrally so edges radiate, not cross.
-- Leave an ~80px corridor between rows/columns for edges to route cleanly.
+- Every x, y, width and height is a multiple of 10.
+- Gaps by size: up to 5 nodes, 200 by 150 px; 6 to 10 nodes, 280 by 200; over 10, 350 by 250.
+- Place related nodes together in a band, and hubs in the middle so links radiate without
+  crossing.
+- Keep roughly 80 px free between rows and columns so edges have a corridor.
 
-### Color palette (default — when no preset active)
+### Colours when no preset is active
 
-| fillColor / strokeColor | Use for |
+| Fill / stroke | For |
 |---|---|
-| `#dae8fc` / `#6c8ebf` (blue) | services, clients |
-| `#d5e8d4` / `#82b366` (green) | databases, success |
-| `#ffe6cc` / `#d79b00` (orange) | APIs, gateways |
-| `#fff2cc` / `#d6b656` (yellow) | queues, decisions |
-| `#f8cecc` / `#b85450` (red) | errors, alerts |
-| `#e1d5e7` / `#9673a6` (purple) | auth, security |
-| `#f5f5f5` / `#666666` (grey) | external / neutral |
+| `#dae8fc` / `#6c8ebf` (blue) | services and clients |
+| `#d5e8d4` / `#82b366` (green) | databases and success |
+| `#ffe6cc` / `#d79b00` (orange) | APIs and gateways |
+| `#fff2cc` / `#d6b656` (yellow) | queues and decisions |
+| `#f8cecc` / `#b85450` (red) | errors and alerts |
+| `#e1d5e7` / `#9673a6` (purple) | auth and security |
+| `#f5f5f5` / `#666666` (grey) | external or neutral parts |
 
-## Diagram-type presets
+The same values sit in `styles/built-in/default.json`.
 
-When the user names a type, read `references/diagram-types.md` for the matching shapes/edges/
-layout: ERD · UML Class · Sequence · Architecture · Flowchart.
+## Kinds of diagram
 
-## Export (only on a box with the draw.io desktop CLI)
+For ERD, UML class, sequence, architecture, ML model and flowchart, open
+`references/diagram-types.md`.
+
+## Export (only where the draw.io CLI exists)
 
 ```bash
-# Preview PNG (NO -e — embedded XML breaks vision APIs), width-capped under the 2576px ceiling
-drawio -x -f png --width 2000 -o diagram.png input.drawio
-# Final, editable (PNG keeps -e; then repair the IEND chunk)
-drawio -x -f png -e -s 2 -o diagram.drawio.png input.drawio && uv run python scripts/repair_png.py diagram.drawio.png
-# SVG / PDF (text formats — -e is safe)
-drawio -x -f svg -e -o diagram.svg input.drawio
+# Preview PNG: no -e (embedded XML breaks image APIs); width kept under the 2576 px limit
+drawio -x -f png --width 2000 -o preview.png model.drawio
+# Final editable PNG: keep -e, then complete the IEND chunk
+drawio -x -f png -e -s 2 -o final.drawio.png model.drawio && uv run python scripts/repair_png.py final.drawio.png
+# SVG and PDF are text formats, -e is safe
+drawio -x -f svg -e -o final.svg model.drawio
 ```
 
-Cross-platform binary-name resolution, headless Linux (`xvfb-run`), and WSL2 specifics are in
+Binary names per platform, headless Linux (`xvfb-run`) and WSL2 are in
 `references/troubleshooting.md`.

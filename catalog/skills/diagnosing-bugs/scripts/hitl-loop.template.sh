@@ -1,41 +1,49 @@
 #!/usr/bin/env bash
-# Human-in-the-loop reproduction loop.
-# Copy this file, edit the steps below, and run it.
-# The agent runs the script; the user follows prompts in their terminal.
+# Template for a reproduction loop that needs a person.
+# Copy it, replace the prompts in the marked block, then run it
+# with: bash hitl-loop.template.sh
+# You (the agent) launch it; the user answers in their own shell.
 #
-# Usage:
-#   bash hitl-loop.template.sh
+# Helpers available inside the block:
+#   step "<instruction>"        print an instruction and wait for Enter
+#   capture VAR "<question>"    print a question and store the reply in VAR
 #
-# Two helpers:
-#   step "<instruction>"          → show instruction, wait for Enter
-#   capture VAR "<question>"      → show question, read response into VAR
-#
-# At the end, captured values are printed as KEY=VALUE for the agent to parse.
+# On exit the script prints every captured value as KEY=VALUE lines,
+# so you can read the answers back.
 
-set -euo pipefail
+set -u
+set -o pipefail
+set -e
 
-step() {
-  printf '\n>>> %s\n' "$1"
-  read -r -p "    [Enter when done] " _
+show() {
+  echo
+  echo ">>> $1"
 }
 
 capture() {
-  local var="$1" question="$2" answer
-  printf '\n>>> %s\n' "$question"
-  read -r -p "    > " answer
-  printf -v "$var" '%s' "$answer"
+  local name="$1" prompt="$2" reply
+  show "$prompt"
+  read -r -p "    > " reply
+  printf -v "$name" '%s' "$reply"
 }
 
-# --- edit below ---------------------------------------------------------
+step() {
+  local text="$1"
+  show "$text"
+  read -rp "    [Enter when done] " _
+}
 
-step "Open the app at http://localhost:3000 and sign in."
+# ===== edit below =====
 
-capture ERRORED "Click the 'Export' button. Did it throw an error? (y/n)"
+step "Start the desktop client and log in as the test user."
 
-capture ERROR_MSG "Paste the error message (or 'none'):"
+capture FROZE "Press 'Sync now'. Did the window freeze? (y/n)"
 
-# --- edit above ---------------------------------------------------------
+capture LAST_STATUS "Type the text shown in the status bar (or 'none'):"
 
-printf '\n--- Captured ---\n'
-printf 'ERRORED=%s\n' "$ERRORED"
-printf 'ERROR_MSG=%s\n' "$ERROR_MSG"
+# ===== edit above =====
+
+echo
+echo '--- Captured ---'
+printf 'FROZE=%s\n' "$FROZE"
+printf 'LAST_STATUS=%s\n' "$LAST_STATUS"

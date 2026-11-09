@@ -1,125 +1,98 @@
-# Shape vocabulary & search
+# Shapes and shape search
 
-Read this when a diagram needs a **specific shape** — a cloud-provider icon
-(AWS/Azure/GCP), a network/Cisco/Kubernetes symbol, a UML/BPMN/ER element, an
-electrical or P&ID part — or any time you'd otherwise *guess* a `style=` string.
+Read this when a diagram needs one specific symbol: a vendor icon from AWS, Azure or GCP, a
+network device, Cisco or Kubernetes part, a UML, BPMN or ER element, or an electrical or P&ID
+item. Read it as well each time you are tempted to type a `style=` string from memory.
 
-There are two ways to get a style:
+There are two sources.
 
-1. **Search the official shape index** (`scripts/shapesearch.py`) — 10,446 real
-   draw.io palette shapes with their exact `style`, `w`, `h`. Use this for
-   branded/vendor icons and anything non-trivial. **Always prefer a searched
-   style over a hand-written `shape=mxgraph.*` guess** — guessed stencil names
-   silently render as a blank box if the name is wrong.
-2. **The cheatsheet below** — the common built-in shapes whose style strings are
-   short and stable enough to write by hand (rectangles, flowchart symbols,
-   UML primitives, containers, edges).
+1. **The shape index**, queried with `scripts/shapesearch.py`. It lists 10,446 real shapes from
+   draw.io's own palettes, each with its exact style and size. Reach for it with vendor icons
+   and anything unusual. A stencil name typed from memory (`shape=mxgraph.*`) that turns out to
+   be wrong gives no error; the shape just draws as an empty box. Use the searched style.
+2. **The short lists at the end of this file**, for plain built-in shapes with a brief, stable
+   style that can safely be typed.
 
-## Searching shapes
+## Searching
 
 ```bash
-uv run python <this-skill-dir>/scripts/shapesearch.py "aws lambda" --limit 5
-uv run python <this-skill-dir>/scripts/shapesearch.py "uml actor" --json
+py -3.13 <skill-dir>/scripts/shapesearch.py "azure function app" --limit 5
+py -3.13 <skill-dir>/scripts/shapesearch.py "bpmn gateway" --json
 ```
 
-- Query is space-separated keywords; matching is tag-based with Soundex
-  fuzziness and `camelCase`/`digit` splitting (`"pid2valve"` → `pid valve`).
-- Prints each match as `Title (WxH)` followed by its full `style=` string. With
-  `--json`, emits `[{style,w,h,title}]` for programmatic use.
-- Copy the `style` verbatim into an `mxCell`, and use the reported `w`/`h` as the
-  `mxGeometry` width/height (vendor icons are drawn at a fixed aspect ratio).
-- Results are ranked by tag relevance, with shapes whose **title** contains the
-  query terms bubbled to the top of each score tier. Ranking is still a
-  heuristic, though, and many shapes share a title (three `Lambda` variants:
-  `aws3`/`aws4`/`aws3d`) — so run with `--limit 5` and pick the row whose title
-  and size match what you actually want rather than blindly taking #1.
+- Give keywords. Matching runs on shape tags, forgives similar-sounding spellings, and splits
+  glued words (`pid2valve` is read as `pid valve`).
+- Text output is two lines per hit: `Title  (WxH)`, then the whole style. With `--json` you get
+  a list of `{style, w, h, title}` objects.
+- Paste the style unchanged into the `mxCell`, and take the geometry width and height from the
+  reported `w` and `h`; vendor icons keep a fixed aspect ratio.
+- Hits are ordered by tag score. Inside one score, titles that contain the query words come
+  first. Titles repeat across libraries (Lambda has `aws3`, `aws4` and `aws3d` versions), so ask
+  for five and choose by title and size.
 
 ```xml
-<mxCell id="2" value="Lambda" style="<paste the searched style here>" vertex="1" parent="1">
-  <mxGeometry x="40" y="40" width="78" height="78" as="geometry"/>
+<mxCell id="2" value="Function" style="<the searched style>" vertex="1" parent="1">
+  <mxGeometry x="60" y="60" width="78" height="78" as="geometry"/>
 </mxCell>
 ```
 
-Covered libraries: AWS (`aws3`/`aws4`), Azure, GCP, Cisco, Kubernetes, UML,
-BPMN, ER, electrical, P&ID, mockup/wireframe, flowchart, network, and the
-general/basic sets. The bundled index (`data/shape-index.json.gz`) is the
-upstream draw.io shape data — see `data/SHAPE-INDEX-NOTICE.md` for attribution.
+The index spans the general and flowchart sets, network gear, mockups, and the cloud and
+engineering families: three AWS generations, Azure, GCP, Cisco, Kubernetes, BPMN, UML, ER,
+electrical and P&ID. It is stored as `data/shape-index.json.gz`; its origin is recorded in
+`data/SHAPE-INDEX-NOTICE.md`.
 
-## AI / LLM brand logos
+## Brand logos for AI and LLM products
 
-draw.io's bundled libraries have no modern AI brand logos, and the upstream skill's icon fetcher is not in this copy: the studio removed it, because it fetched icons over the network. Use a labelled box, or an `image` style pointing at a logo file you have the right to use.
+draw.io has no logos for current AI brands, and this copy of the skill has no icon fetcher.
+Draw such a product as a plain box carrying its name. For data stores use a cylinder
+(`shape=cylinder3;`) or search `shapesearch.py "<name> database"`.
 
-## Cheatsheet — hand-writable styles
+## Styles you can type
 
-These are stable enough to write without searching. Combine with `whiteSpace=wrap;html=1;`.
+Put `whiteSpace=wrap;html=1;` on each of these.
 
-### Common shapes (`shape=` keyword)
+**Basic outlines.** Plain box: `rounded=0;`. Rounded box: `rounded=1;`. Ellipse: `ellipse;`, with
+`aspect=fixed;` when it must be a true circle. Decision diamond: `rhombus;`. Hexagon:
+`shape=hexagon;perimeter=hexagonPerimeter2;`. Cloud: `cloud;`. Speech bubble: `shape=callout;`.
+Cube: `shape=cube;`.
 
-| Need | style |
-|---|---|
-| Rectangle / rounded box | `rounded=0;` / `rounded=1;` |
-| Circle / ellipse | `ellipse;` (`aspect=fixed;` for a true circle) |
-| Diamond (decision) | `rhombus;` |
-| Cylinder (database) | `shape=cylinder3;` |
-| Cloud | `cloud;` |
-| Cube (3D) | `shape=cube;` |
-| Sticky note | `shape=note;` |
-| Document (curled bottom) | `shape=document;` |
-| Folder | `shape=folder;` |
-| Card (cut corner) | `shape=card;` |
-| Process (double border) | `shape=process;` |
-| Step / chevron | `shape=step;` |
-| Parallelogram (I/O) | `shape=parallelogram;perimeter=parallelogramPerimeter;` |
-| Trapezoid | `shape=trapezoid;perimeter=trapezoidPerimeter;` |
-| Hexagon | `shape=hexagon;perimeter=hexagonPerimeter2;` |
-| Manual input | `shape=manualInput;` |
-| Data storage | `shape=dataStorage;` |
-| Off-page connector | `shape=offPageConnector;` |
-| Delay | `shape=delay;` |
-| OR / XOR gate | `shape=or;` / `shape=xor;` |
-| Block arrow | `shape=singleArrow;` / `shape=doubleArrow;` |
-| Callout (speech bubble) | `shape=callout;` |
+**Storage and documents.** Database: `shape=cylinder3;`. Stored data: `shape=dataStorage;`.
+Document: `shape=document;`. Note: `shape=note;`. Folder: `shape=folder;`. Cut-corner card:
+`shape=card;`.
 
-### UML primitives
+**Flowchart steps.** Double-barred process: `shape=process;`. Chevron: `shape=step;`. Manual
+input: `shape=manualInput;`. Delay: `shape=delay;`. Off-page connector: `shape=offPageConnector;`.
+Slanted input/output box: `perimeter=parallelogramPerimeter;shape=parallelogram;`. Trapezoid:
+`perimeter=trapezoidPerimeter;shape=trapezoid;`.
 
-| Element | style |
-|---|---|
-| Actor (stick figure) | `shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;` |
-| Boundary | `shape=umlBoundary;` |
-| Control | `shape=umlControl;` |
-| Entity | `shape=umlEntity;` |
-| Lifeline | `shape=umlLifeline;perimeter=lifelinePerimeter;container=1;` |
-| Frame | `shape=umlFrame;` |
-| Provided interface (lollipop) | `shape=lollipop;direction=south;` |
-| Required interface | `shape=requires;direction=north;` |
-| Component | `shape=component;` |
+**Logic and arrows.** OR gate: `shape=or;`. XOR gate: `shape=xor;`. One-way block arrow:
+`shape=singleArrow;`. Two-way block arrow: `shape=doubleArrow;`.
 
-### Containers (parent-child; children use relative coords)
+**UML parts.**
+- A stick-figure actor needs its label moved below: `verticalLabelPosition=bottom;verticalAlign=top;shape=umlActor;`
+- The three robustness-diagram shapes are `shape=umlBoundary;`, `shape=umlControl;` and
+  `shape=umlEntity;`.
+- A sequence-diagram lifeline: `container=1;shape=umlLifeline;perimeter=lifelinePerimeter;`
+- A labelled frame: `shape=umlFrame;`. A component: `shape=component;`.
+- Interfaces: the lollipop (provided) is `shape=lollipop;direction=south;`; the socket (required)
+  is `shape=requires;direction=north;`.
 
-| Type | style | When |
-|---|---|---|
-| Invisible group | `group;pointerEvents=0;` | No border, no own connections |
-| Titled swimlane | `swimlane;startSize=30;` | Visible title bar / has connections |
-| Any shape as container | append `container=1;pointerEvents=0;` | Box without own connections |
+**Containers.** Children of a container use coordinates relative to it.
+- No border and no links of its own: `group;pointerEvents=0;`
+- Visible title bar, or it receives links: `swimlane;startSize=30;`
+- Any other shape turned into a box that takes no links: add `container=1;pointerEvents=0;`
 
-### Edges
+**Edge settings** to append to an edge style:
+- right-angle routing: `rounded=1;orthogonalLoop=1;jettySize=auto;edgeStyle=orthogonalEdgeStyle;`
+- curved lines: `curved=1;`
+- headless line: `endArrow=none;`; an open head or a thin head: `endArrow=open;`, `endArrow=classicThin;`
+- dashed: `dashed=1;`, and `dashPattern=8 8;` to set the rhythm
+- moving dot: `flowAnimation=1;`
+- text backing: `labelBackgroundColor=#ffffff;`
 
-| Need | add to style |
-|---|---|
-| Orthogonal routing | `edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;` |
-| Curved | `curved=1;` |
-| No arrowhead | `endArrow=none;` |
-| Open/thin arrow | `endArrow=open;` / `endArrow=classicThin;` |
-| Dashed | `dashed=1;` (pattern via `dashPattern=8 8;`) |
-| Flow animation | `flowAnimation=1;` |
-| Label background | `labelBackgroundColor=#ffffff;` |
-
-### Useful property knobs
-
-- `fontStyle` is a bitmask: `1`=bold, `2`=italic, `4`=underline (add to combine: `3`=bold+italic).
-- `direction=north|south|east|west` rotates a shape in 90° steps; `rotation=<deg>` for free rotation.
-- `gradientColor=#RRGGBB;` + `gradientDirection=north;` for a gradient fill.
-- `sketch=1;` gives a hand-drawn look (set globally via a style preset instead when possible).
-
-For richer per-shape detail, the upstream source is jgraph/drawio-mcp's
-`shared/style-reference.md` (Apache-2.0).
+**Useful properties.**
+- `fontStyle` adds up: 1 is bold, 2 italic, 4 underline, so 3 is bold italic.
+- `direction=` takes north, south, east or west and turns a shape by quarter turns;
+  `rotation=<degrees>` allows any angle.
+- A gradient needs `gradientColor=#RRGGBB;` and, optionally, `gradientDirection=north;`.
+- `sketch=1;` gives the hand-drawn look. For a whole diagram, set it through a style preset.

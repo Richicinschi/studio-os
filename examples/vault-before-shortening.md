@@ -31,5 +31,5 @@ The test after freeing space: can you still open and read the full original some
 
 - Start from [templates/memory](../templates/memory/README.md). The index template carries the rule in a comment, and `templates/memory/vault/MEMORY-VAULT.md` is the vault: entries kept word for word, newest at the bottom, each group under a dated heading that says why it moved.
 - Tags are what make a vault usable. Pick a few you will search for later, such as the project and the status, and use them every time.
-- For the front door, the studio's [claude-md-curator](../catalog/skills/claude-md-curator/SOURCE.md) skill archives old handoff entries instead of deleting them. Adopt it through `vet-and-adopt` like any other item.
+- For the front door, the same rule holds: archive old handoff entries to a file of your own instead of deleting them.
 - In claude.ai: keep a vault document in the Project's knowledge, and copy text into it before you cut that text from the Project's instructions.

@@ -1,117 +1,100 @@
-> Source: obra/superpowers `skills/systematic-debugging/condition-based-waiting.md` (MIT, Copyright (c) 2025 Jesse Vincent) @ v7.0.1 2ce8aa15, folded into diagnosing-bugs; licence in `../LICENSE`.
+# Waiting on a condition, not on the clock
 
-# Condition-Based Waiting
+## Why
 
-## Overview
+A test that sleeps for a fixed time is betting on speed. The bet wins on your laptop and loses on a busy CI runner. The result is a test that passes most days and fails on the others.
 
-Flaky tests often guess at timing with arbitrary delays. This creates race conditions where tests pass on fast machines but fail under load or in CI.
+Rule: wait for the thing you actually need to be true. Never wait for a number of milliseconds that you hope is enough.
 
-**Core principle:** Wait for the actual condition you care about, not a guess about how long it takes.
-
-## When to Use
+## Should this test use it?
 
 ```dot
-digraph when_to_use {
-    "Test uses setTimeout/sleep?" [shape=diamond];
-    "Testing timing behavior?" [shape=diamond];
-    "Document WHY timeout needed" [shape=box];
-    "Use condition-based waiting" [shape=box];
+digraph choose {
+    rankdir=LR;
+    "Test has a sleep or fixed delay" [shape=box];
+    "Is the delay itself under test?" [shape=diamond];
+    "Keep it, and write down why" [shape=box];
+    "Poll for the condition" [shape=box];
 
-    "Test uses setTimeout/sleep?" -> "Testing timing behavior?" [label="yes"];
-    "Testing timing behavior?" -> "Document WHY timeout needed" [label="yes"];
-    "Testing timing behavior?" -> "Use condition-based waiting" [label="no"];
+    "Test has a sleep or fixed delay" -> "Is the delay itself under test?";
+    "Is the delay itself under test?" -> "Keep it, and write down why" [label="yes (debounce, throttle)"];
+    "Is the delay itself under test?" -> "Poll for the condition" [label="no"];
 }
 ```
 
-**Use when:**
-- Tests have arbitrary delays (`setTimeout`, `sleep`, `time.sleep()`)
-- Tests are flaky (pass sometimes, fail under load)
-- Tests timeout when run in parallel
-- Waiting for async operations to complete
+Reach for it when:
+- the test sleeps (`setTimeout`, `sleep`, `time.sleep()`) to let async work finish
+- the test passes alone and fails under load
+- the test times out only when suites run in parallel
 
-**Don't use when:**
-- Testing actual timing behavior (debounce, throttle intervals)
-- Always document WHY if using arbitrary timeout
+Leave the sleep in when the timing is the behaviour being checked, such as a debounce window or a throttle interval. Explain the number in a comment.
 
-## Core Pattern
+## The swap
 
 ```typescript
-// ❌ BEFORE: Guessing at timing
-await new Promise(r => setTimeout(r, 50));
-const result = getResult();
-expect(result).toBeDefined();
+// Before: a guess
+await new Promise(r => setTimeout(r, 120));
+expect(cache.get('user:7')).toBeDefined();
 
-// ✅ AFTER: Waiting for condition
-await waitFor(() => getResult() !== undefined);
-const result = getResult();
-expect(result).toBeDefined();
+// After: the real condition
+await waitFor(() => cache.get('user:7'), 'user:7 to be cached');
+expect(cache.get('user:7')).toBeDefined();
 ```
 
-## Quick Patterns
+## Common conditions
 
-| Scenario | Pattern |
-|----------|---------|
-| Wait for event | `waitFor(() => events.find(e => e.type === 'DONE'))` |
-| Wait for state | `waitFor(() => machine.state === 'ready')` |
-| Wait for count | `waitFor(() => items.length >= 5)` |
-| Wait for file | `waitFor(() => fs.existsSync(path))` |
-| Complex condition | `waitFor(() => obj.ready && obj.value > 10)` |
+| What you wait for | Condition |
+|-------------------|-----------|
+| A message arrives | `waitFor(() => inbox.find(m => m.kind === 'READY'), 'READY message')` |
+| A status flips | `waitFor(() => job.status === 'finished', 'job to finish')` |
+| A quota is reached | `waitFor(() => rows.length >= 8, '8 rows')` |
+| A file shows up | `waitFor(() => fs.existsSync(outPath), 'output file')` |
+| Two things at once | `waitFor(() => conn.open && conn.peers > 2, 'open connection with peers')` |
 
-## Implementation
+## A minimal helper
 
-Generic polling function:
 ```typescript
 async function waitFor<T>(
-  condition: () => T | undefined | null | false,
-  description: string,
-  timeoutMs = 5000
+  check: () => T | undefined | null | false,
+  what: string,
+  limitMs = 5000
 ): Promise<T> {
-  const startTime = Date.now();
-
-  while (true) {
-    const result = condition();
-    if (result) return result;
-
-    if (Date.now() - startTime > timeoutMs) {
-      throw new Error(`Timeout waiting for ${description} after ${timeoutMs}ms`);
+  const deadline = Date.now() + limitMs;
+  for (;;) {
+    const value = check();
+    if (value) return value;
+    if (Date.now() > deadline) {
+      throw new Error(`Gave up waiting for ${what} after ${limitMs}ms`);
     }
-
-    await new Promise(r => setTimeout(r, 10)); // Poll every 10ms
+    await new Promise(r => setTimeout(r, 10));
   }
 }
 ```
 
-See `condition-based-waiting-example.ts` in this directory for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
+`condition-based-waiting-example.ts` next to this file has a fuller set, with helpers for event streams.
 
-## Common Mistakes
+## Mistakes to avoid
 
-**❌ Polling too fast:** `setTimeout(check, 1)` - wastes CPU
-**✅ Fix:** Poll every 10ms
+- Polling every 1 ms burns CPU for nothing. Poll about every 10 ms.
+- A loop with no deadline hangs forever when the condition never comes true. Always set a limit and make the error say what was awaited.
+- Reading the state once before the loop gives you a stale value. Call the getter inside the loop, every pass.
 
-**❌ No timeout:** Loop forever if condition never met
-**✅ Fix:** Always include timeout with clear error
+## When a fixed delay is right
 
-**❌ Stale data:** Cache state before loop
-**✅ Fix:** Call getter inside loop for fresh data
-
-## When Arbitrary Timeout IS Correct
+Sometimes you must wait a known amount of time after a condition holds.
 
 ```typescript
-// Tool ticks every 100ms - need 2 ticks to verify partial output
-await waitForEvent(manager, 'TOOL_STARTED'); // First: wait for condition
-await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
-// 200ms = 2 ticks at 100ms intervals - documented and justified
+// The worker flushes its buffer every 250 ms. We need one full flush
+// to see the partial batch, so wait for the start, then one interval.
+await waitFor(() => worker.state === 'running', 'worker to start');
+await new Promise(r => setTimeout(r, 250));
 ```
 
-**Requirements:**
-1. First wait for triggering condition
-2. Based on known timing (not guessing)
-3. Comment explaining WHY
+Three conditions apply:
+1. Wait for the triggering condition first.
+2. The delay comes from a timing you know, not one you guessed.
+3. A comment says why.
 
-## Real-World Impact
+## What it fixed once
 
-From debugging session (2025-10-03):
-- Fixed 15 flaky tests across 3 files
-- Pass rate: 60% → 100%
-- Execution time: 40% faster
-- No more race conditions
+In one suite, swapping guessed delays for condition waits took 15 intermittently failing tests across 3 files from about 60% passing to 100%, and the run finished roughly 40% sooner.

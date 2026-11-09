@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone shipping numbers, charts or dashboards that must trace back to a source.
 - **Pack / module:** data-work / 09-data-work
-- **Last scan:** SAFE (risk 0/100), SkillSpector v2.2.3 with --no-llm, 2026-11-02
+- **Last scan:** SAFE (risk 0/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

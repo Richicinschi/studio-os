@@ -2,6 +2,8 @@
 id: vault
 module: 01-continuity
 checked: 2026-11-02
+other_figures:
+  - 33
 ---
 
 # The memory vault
@@ -44,7 +46,7 @@ The menu marks the item **have** when the vault file exists and the front door o
 ## Needs
 
 - Nothing beyond Claude Code.
-- The [memory index](memory-index.md): the vault holds what leaves it. The front door's own archive is the [claude-md-curator](claude-md-curator.md) item.
+- The [memory index](memory-index.md): the vault holds what leaves it. The front door can keep its own archive the same way: old entries move to a file, never to the bin.
 
 ## Steps
 

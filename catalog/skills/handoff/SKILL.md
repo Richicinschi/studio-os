@@ -1,6 +1,7 @@
 ---
 name: handoff
-description: Close out a work session cleanly. Use when the owner signals the session is ending — "I'm going to sleep", "we'll continue in a new session", "let's wrap up", "update the docs", "end of day", "/handoff" — or when the Stop hygiene gate reports untidiness. Sweeps durable knowledge into memory, archives the session and regenerates the graph, then commits and pushes every repo and, with the owner's yes to the exact list, returns each to a single branch. The resolution half of the Stop gate, which only detects.
+description: >-
+  Close out a work session cleanly. Use when the owner signals the end ("going to sleep", "we'll continue in a new session", "wrap up", "update the docs", "/handoff") or the Stop gate reports untidiness. Saves memory, archives the session, commits and pushes every repo, tidies branches on his yes.
 metadata:
   category: workflow
 ---

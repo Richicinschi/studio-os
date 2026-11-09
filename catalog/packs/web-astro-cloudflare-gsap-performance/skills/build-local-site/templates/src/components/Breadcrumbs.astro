@@ -1,0 +1,48 @@
+---
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  crumbs: Crumb[];
+}
+
+const { crumbs } = Astro.props;
+
+// The trail always starts at the homepage, so callers pass only the rest.
+const trail: Crumb[] = [{ label: 'Home', href: '/' }, ...crumbs];
+
+// Google wants no `item` on the last entry, which is why that crumb has no href.
+const listItems = trail.map((crumb, i) => ({
+  '@type': 'ListItem',
+  position: i + 1,
+  name: crumb.label,
+  ...(crumb.href ? { item: new URL(crumb.href, Astro.site).href } : {}),
+}));
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: listItems,
+};
+---
+
+<nav aria-label="Breadcrumb" class="mx-auto max-w-7xl px-5 py-3 lg:px-8">
+  <ol class="flex flex-wrap items-center gap-1.5 text-sm">
+    {trail.map((crumb, i) => (
+      <li class="flex items-center gap-1.5">
+        {i > 0 && <span class="text-stone-300" aria-hidden="true">/</span>}
+        {crumb.href ? (
+          <a href={crumb.href} class="text-stone-500 transition-colors hover:text-stone-700">
+            {crumb.label}
+          </a>
+        ) : (
+          <span class="text-stone-700">{crumb.label}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />

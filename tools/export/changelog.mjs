@@ -32,12 +32,32 @@ export function diffItems(prev = {}, next = {}) {
   };
 }
 
-export function changelogSection(version, date, diff, notes = []) {
+// Removals recorded in the manifest (`removed`: kind, id, was, in, and a `replacedBy` domain or a `note`)
+// for this version, grouped by what replaces them, so an adopter's recorded decision about a removed item
+// finds its answer instead of a silent gap.
+function removedLines(removed, version, shippedPacks) {
+  const here = removed.filter((r) => r.in === version);
+  if (!here.length) return [];
+  const code = (s) => `\`${s}\``;
+  const groups = new Map();
+  for (const r of here) {
+    const to = r.replacedBy && shippedPacks.includes(r.replacedBy) ? `the domain ${code(r.replacedBy)}`
+      : r.note ? r.note
+      : r.replacedBy ? `none in this version; its domain ${code(r.replacedBy)} is not shipped yet`
+      : 'no longer part of the kit';
+    groups.set(to, [...(groups.get(to) || []), `${r.kind}:${r.id}`]);
+  }
+  return ['**Removed in this version, with what replaces each:**', '',
+    ...[...groups].map(([to, keys]) => `- ${keys.sort().map(code).join(', ')} → ${to}`), ''];
+}
+
+export function changelogSection(version, date, diff, notes = [], { removed = [], shippedPacks = [] } = {}) {
   const list = (label, keys) => (keys.length ? [`**${label}:** ${keys.map((k) => `\`${k}\``).join(', ')}`, ''] : []);
-  const any = diff.added.length + diff.changed.length + diff.removed.length > 0;
+  const gone = removedLines(removed, version, shippedPacks);
+  const any = diff.added.length + diff.changed.length + diff.removed.length + gone.length > 0;
   return [`## v${version} (${date})`, '',
     ...notes.map((n) => `- ${n}`), ...(notes.length ? [''] : []),
-    ...list('Added', diff.added), ...list('Changed', diff.changed), ...list('Removed', diff.removed),
+    ...list('Added', diff.added), ...list('Changed', diff.changed), ...list('Removed', diff.removed), ...gone,
     ...(any ? [] : ['No catalog changes.', '']), ''].join('\n');
 }
 

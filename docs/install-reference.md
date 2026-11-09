@@ -93,30 +93,3 @@ gitleaks version
 
 The first two lines install nvm and load it into the open terminal, as on macOS. On an ARM machine, use the `linux_arm64` file. Expected: a Node version that starts with `v22`, and a gitleaks version.
 
-## Optional: the upstream superpowers plugin
-
-Superpowers is an outside collection of skills for Claude Code, published as a plugin: a bundle Claude Code installs from a marketplace, a list of plugins. The kit already ships the studio's adapted copies of the superpowers skills it uses, so you do not need the plugin. This section is for one case: you prefer the original (upstream) plugin to the kit's copies. Then take the version the studio triaged, 7.0.1, and scan it first. Never install it beside the kit's adapted copies: both would load, and the plugin alone adds about 1,465 tokens to every session (an estimate). Its [card](../cards/superpowers.md) has the details; the facts are in [facts.md](facts.md), "Installing superpowers".
-
-1. **Scan it before you install it.** It needs Git and the scanner above; on Windows, turn on UTF-8 mode first, as above.
-
-   ```bash
-   git clone --depth 1 --branch v7.0.1 https://github.com/obra/superpowers.git superpowers-7.0.1
-   skillspector scan superpowers-7.0.1 --no-llm
-   ```
-
-   Expected: a red verdict. On 2026-11-02, the SkillSpector build that reports version 2.2.3 rated 7.0.1 `DO_NOT_INSTALL` at 100/100 ([facts.md](facts.md), "Installing superpowers"). A fresh install takes a newer version, whose score and finding counts may differ ([facts.md](facts.md), "Installing SkillSpector"). The verdict does not settle it. Most findings come from the repository's plans, release notes and tests, which never load into a session. 52 are in `skills/` and `hooks/`, which do load, and the studio's triage found 47 of those 52 false positives. The scan also misses the one call that leaves your machine: the brainstorming skill's optional browser companion loads a logo from the vendor's website, on by default, which sends your IP address and the plugin's version. Read the loaded findings with your Claude ("Vet superpowers 7.0.1") before you go on; the decision is yours.
-2. **Switch the logo request off** before you use the plugin: set `SUPERPOWERS_DISABLE_TELEMETRY=1` in the environment Claude Code starts in, or under the `env` key of a `settings.json`, for example `~/.claude/settings.json` for every project ([facts.md](facts.md), "Installing superpowers" and "Claude Code: measuring context and asking multiple choice"):
-
-   ```json
-   { "env": { "SUPERPOWERS_DISABLE_TELEMETRY": "1" } }
-   ```
-
-   Merge that key into the file if it already exists; do not replace the file.
-3. **Install it,** inside Claude Code; the commands are the same on every system:
-
-   ```text
-   /plugin marketplace add obra/superpowers#v7.0.1
-   /plugin install superpowers@superpowers-dev
-   ```
-
-4. **Confirm it** in a terminal with `claude plugin list`. Expected: `superpowers@superpowers-dev` at `Version: 7.0.1`.

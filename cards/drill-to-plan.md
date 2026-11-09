@@ -1,7 +1,10 @@
 ---
 id: drill-to-plan
 module: 03-planning
-checked: 2026-11-02
+checked: 2026-11-09
+tokens:
+  description: 72
+  body: 1801
 ---
 
 # Drill to a plan
@@ -18,8 +21,8 @@ checked: 2026-11-02
 Read-only: names, descriptions and counts. No skill body is opened, and nothing uses the network.
 
 - A skill of the same name: `test -f .claude/skills/drill-to-plan/SKILL.md && echo project` in each repository in `adoption/inventory.md`, and `test -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/drill-to-plan/SKILL.md" && echo user`.
-- Another skill doing the same job: the front matter only (the lines between the first two `---`) of every `SKILL.md` at both levels, looking for a description about interviews, requirements or specs. The kit's [brainstorming](brainstorming.md), or the plugin's `superpowers:brainstorming` (`claude plugin list`), counts as the lighter cousin.
-- Where specs live today, counts only: `ls docs/superpowers/specs/*.md docs/specs/*.md 2>/dev/null | wc -l`, and any spec-folder rule in `CLAUDE.md` or `AGENTS.md`.
+- Another skill doing the same job: the front matter only (the lines between the first two `---`) of every `SKILL.md` at both levels, looking for a description about interviews, requirements or specs. The kit's [brainstorming](brainstorming.md) counts as the lighter cousin.
+- Where specs live today, counts only: `ls docs/specs/*.md specs/*.md 2>/dev/null | wc -l`, and any spec-folder rule in `CLAUDE.md` or `AGENTS.md`.
 - Your commit rules, which replace the skill's own: `grep -n -i 'commit' CLAUDE.md AGENTS.md 2>/dev/null`.
 
 The menu marks the item **have** when a `drill-to-plan` skill exists at either level, **partly** when only a lighter design skill such as brainstorming covers the job, and **not yet** otherwise.
@@ -51,10 +54,10 @@ The menu marks the item **have** when a `drill-to-plan` skill exists at either l
 1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/drill-to-plan/`: scans it with SkillSpector (`skillspector scan catalog/skills/drill-to-plan --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is prose, a spec template and a question bank, with no scripts; the kit's own scan of 2026-11-02 rated it `SAFE`, and your scan of your copy is still the gate. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
 2. **Claude:** on your yes, writes the copy into the scope you chose and replaces the studio-specific parts (module 03 marks them):
    - the project folders it explores first, which name the studio's own projects and its project registry: "the repository you are in", or your projects;
-   - where it saves specs, which are the studio's project folders and a dated file in `docs/superpowers/specs/`: your folder;
+   - where it saves specs, which are the studio's project folders and a dated file in `docs/specs/`: your folder;
    - its commit step, written for the studio's signing and authorship rules, a push that leaves the merge to the studio, and a worktree rule for its root folder: your commit rules, or "leave the spec uncommitted for me to review";
    - "Honour the studio rules", which points at the studio's own rules file and coding guidelines: your instruction file;
-   - the names `brainstorming` and `writing-plans`, which the copy now gives bare, as the kit ships them (in `SKILL.md` and in the spec template's last line): kept when you take the kit's [brainstorming](brainstorming.md) and [writing-plans](writing-plans.md); otherwise the names you use (the plugin's, `superpowers:brainstorming` and `superpowers:writing-plans`, or your own planner). If you have no planner, the hand-off becomes "give me the approved spec";
+   - the names `brainstorming` and `writing-plans`, which the copy now gives bare, as the kit ships them (in `SKILL.md` and in the spec template's last line): kept when you take the kit's [brainstorming](brainstorming.md) and [writing-plans](writing-plans.md); otherwise the names you use (your own design and planning skills). If you have no planner, the hand-off becomes "give me the approved spec";
    - in `templates/spec-skeleton.md` and `references/question-bank.md`, the example answers drawn from the studio's own stack and products: examples from your stack, or none;
    - the author line in the front matter, which names the studio, to yours.
 

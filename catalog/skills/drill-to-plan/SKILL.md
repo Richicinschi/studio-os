@@ -1,14 +1,7 @@
 ---
 name: drill-to-plan
 description: >-
-  Use when the user wants to be DRILLED / INTERVIEWED / GRILLED into a finished plan —
-  turning a vague goal (or a rough draft) into a big, decision-resolved design spec via
-  adaptive, one-question-at-a-time interrogation. Trigger on "drill me into a plan",
-  "interview me to a spec", "grill me on this design / idea", "plan a huge md", "drill me",
-  "drill-to-plan", or any time the ask is underspecified and the user wants to be questioned
-  until the design is airtight. The heavyweight, exhaustive cousin of brainstorming; its
-  output (an approved spec) feeds writing-plans. NOT a study/quiz tool — it extracts what the
-  user WANTS, it does not test what they know.
+  Use when the user wants to be drilled, interviewed or grilled into a finished plan: a vague goal becomes a decision-resolved design spec by one-question-at-a-time interrogation. Triggers: "drill me", "interview me to a spec", "grill me". Heavier than brainstorming; feeds writing-plans.
 metadata:
   category: planning
   author: Richicinschi (Claude-authored, the owner-orchestrated)
@@ -122,7 +115,7 @@ think") do NOT count — get a real yes, or keep drilling the parts they hesitat
 Write a comprehensive spec from `templates/spec-skeleton.md`, filling every covered dimension
 and logging the decisions resolved during the drill. **Location (project-aware):**
 - project topic → `apps/<slug>/plans/<topic>.md` or `games/<slug>/docs/plans/<topic>.md`
-- studio / cross-cutting → `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
+- studio / cross-cutting → `docs/specs/YYYY-MM-DD-<topic>-design.md`
 
 Each section scaled to its complexity. Big = thorough coverage of real decisions, NOT padding.
 Carry the user's actual words/decisions; don't silently invent. Anything unresolved goes under

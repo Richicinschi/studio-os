@@ -1,0 +1,62 @@
+# syntax=docker/dockerfile:1
+
+# Node service image, two stages.
+#   builder : node:22-slim  (installs everything, builds, prunes dev packages)
+#   runtime : node:22-slim  (production modules and build output only)
+# Replace each REPLACE_WITH_CURRENT_DIGEST with the digest of the current tag.
+
+# ---- Stage 1: builder ------------------------------------------------------
+FROM node:22-slim@sha256:REPLACE_WITH_CURRENT_DIGEST AS builder
+
+WORKDIR /build
+
+# Manifests alone first, so the install layer is reused until they change.
+COPY package.json package-lock.json ./
+
+# Full install, dev packages included, since the build needs them.
+# --ignore-scripts stops dependencies from running install hooks.
+RUN npm ci --ignore-scripts
+
+# Now the sources.
+COPY . .
+
+# Compile or bundle (tsc, vite, and so on).
+RUN npm run build
+
+# Strip dev packages so node_modules is production-only.
+RUN npm prune --production
+
+# ---- Stage 2: runtime ------------------------------------------------------
+FROM node:22-slim@sha256:REPLACE_WITH_CURRENT_DIGEST AS runtime
+
+# tini runs as PID 1 and forwards signals, which node does not do well alone.
+RUN apt-get update && apt-get install -y --no-install-recommends tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# Standard OCI metadata; fill in the real values.
+LABEL org.opencontainers.image.title="shopapi" \
+      org.opencontainers.image.description="Production Node.js application" \
+      org.opencontainers.image.vendor="ExampleCo" \
+      org.opencontainers.image.source="https://git.example.com/shopapi" \
+      org.opencontainers.image.licenses="MIT"
+
+WORKDIR /app
+
+# Only what the app needs to run, owned by the base image's node user.
+COPY --from=builder --chown=node:node /build/node_modules ./node_modules
+COPY --from=builder --chown=node:node /build/dist ./dist
+COPY --from=builder --chown=node:node /build/package.json ./
+
+# Not root.
+USER node
+
+# Change to the port your app listens on.
+EXPOSE 3000
+
+# Fails the check when the endpoint answers with a non-2xx status.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["node", "-e", "fetch('http://localhost:3000/health').then(r => { if (!r.ok) process.exit(1) })"]
+
+# tini first, then the app.
+ENTRYPOINT ["tini", "--"]
+CMD ["node", "dist/index.js"]

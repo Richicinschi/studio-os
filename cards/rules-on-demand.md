@@ -6,6 +6,9 @@ tokens:
   light: 63
   standard: 89
   full: 114
+other_figures:
+  - 30000
+  - 1000
 ---
 
 # Rules loaded only when needed

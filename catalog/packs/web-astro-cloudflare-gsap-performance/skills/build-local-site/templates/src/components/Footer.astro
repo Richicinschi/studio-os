@@ -1,0 +1,91 @@
+---
+import { Icon } from 'astro-icon/components';
+import { business } from '../data/business';
+import { serviceTypes } from '../data/serviceTypes';
+import { serviceAreas } from '../data/serviceAreas';
+import { serviceUrl, areaUrl } from '../lib/urls';
+
+// Street is optional: print it only when the business filled it in.
+const { street, city, state, zip } = business.address;
+const addressLine = `${street ? `${street}, ` : ''}${city}, ${state} ${zip}`;
+
+const heading = 'mb-4 text-xs font-semibold uppercase tracking-wider text-stone-500';
+const link = 'text-sm text-stone-400 transition-colors hover:text-white';
+const rowIcon = 'mt-0.5 size-4 shrink-0 text-stone-500';
+---
+
+<footer class="bg-brand-950 text-white">
+  <div class="h-px w-full bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
+
+  <div class="mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8">
+    <div class="border-b border-white/10 pb-10">
+      <a href="/" class="group inline-flex items-center gap-2.5">
+        <div class="flex size-10 items-center justify-center rounded-lg bg-brand-800">
+          <svg class="size-5 text-brand-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-display text-xl text-white">Riverbend</span>
+          <span class="text-[10px] font-medium uppercase tracking-[0.2em] text-stone-500">Plumbing Co</span>
+        </div>
+      </a>
+      <p class="mt-4 max-w-md text-sm leading-relaxed text-stone-400">
+        {business.tagline}. Licensed, insured and locally owned since {business.yearEstablished}.
+      </p>
+    </div>
+
+    <div class="grid gap-8 pt-10 sm:grid-cols-2 lg:grid-cols-3">
+      <div>
+        <h3 class={heading}>Our Services</h3>
+        <ul class="space-y-2.5">
+          {serviceTypes.map((s) => (
+            <li><a href={serviceUrl(s.slug)} class={link}>{s.name}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class={heading}>Service Areas</h3>
+        <ul class="space-y-2.5">
+          {serviceAreas.map((a) => (
+            <li><a href={areaUrl(a.slug)} class={link}>{a.name}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class={heading}>Contact Info</h3>
+        <ul class="space-y-3">
+          <li class="flex items-start gap-2.5">
+            <Icon name="lucide:map-pin" class={rowIcon} />
+            <span class="text-sm text-stone-400">{addressLine}</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <Icon name="lucide:phone" class={rowIcon} />
+            <a href={business.phoneHref} class={link}>{business.phone}</a>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <Icon name="lucide:mail" class={rowIcon} />
+            <a href={`mailto:${business.email}`} class={link}>{business.email}</a>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <Icon name="lucide:clock" class={rowIcon} />
+            <div class="text-sm text-stone-400">
+              {business.hours.map((row) => <p>{row.days}: {row.hours}</p>)}
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row">
+      <p class="text-xs text-stone-600">&copy; {new Date().getFullYear()} {business.name}. All rights reserved.</p>
+      <div class="flex gap-4 text-xs text-stone-600">
+        <span>{business.license}</span>
+        <!-- Sample badge: keep it only if the business can prove it, otherwise delete it. -->
+        <span>BBB A+ Rated</span>
+      </div>
+    </div>
+  </div>
+</footer>

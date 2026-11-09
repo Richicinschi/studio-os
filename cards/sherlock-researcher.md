@@ -2,6 +2,11 @@
 id: sherlock-researcher
 module: 08-agents-and-council
 checked: 2026-11-02
+tokens:
+  description: 57
+  body: 356
+other_figures:
+  - 230000
 ---
 
 # The researcher

@@ -41,6 +41,16 @@ const ownerRewrite = (name) => ({
   replacement: (match, possessive, offset, str) => `${startsSentence(str, offset) ? 'The' : 'the'} owner${possessive || ''}`,
 });
 
+// The outside workflow collection the core was first written from kept its working folders under its own name.
+// The kit uses neutral folder names everywhere (skills, scripts and prose); the name is assembled here so that
+// no file of the kit, this one included, carries it.
+const OUTSIDE = ['super', 'powers'].join('');
+export const FOLDER_REWRITES = [
+  { reason: 'workflow-folder', pattern: new RegExp(`docs/${OUTSIDE}/plans`, 'g'), replacement: 'docs/plans' },
+  { reason: 'workflow-folder', pattern: new RegExp(`docs/${OUTSIDE}/specs`, 'g'), replacement: 'docs/specs' },
+  { reason: 'workflow-folder', pattern: new RegExp(`\\.${OUTSIDE}/`, 'g'), replacement: '.studio-work/' },
+];
+
 export const PATH_REWRITES = [
   { reason: 'hub-path', pattern: /[a-z]:[\\/]+AppDev(?=[\\/]|\b)/gi, replacement: '<HUB>' },
   { reason: 'hub-path', pattern: /(?<![\w.])\/(?:mnt\/)?[a-z]\/AppDev(?=\/|\b)/gi, replacement: '<HUB>' },
@@ -54,7 +64,7 @@ export const PATH_REWRITES = [
 export function rewriteText(text, { owner } = {}) {
   const hits = [];
   let out = text;
-  for (const r of owner ? [...PATH_REWRITES, ownerRewrite(owner)] : PATH_REWRITES) {
+  for (const r of owner ? [...FOLDER_REWRITES, ...PATH_REWRITES, ownerRewrite(owner)] : [...FOLDER_REWRITES, ...PATH_REWRITES]) {
     out = out.replace(r.pattern, (...args) => {
       hits.push(r.reason);
       return typeof r.replacement === 'function' ? r.replacement(...args) : r.replacement;
@@ -138,33 +148,22 @@ export const STUDIO_REWRITES = [
   { file: 'catalog/skills/handoff/SKILL.md', phrase: '[[feedback_memory_vault]]', replacement: 'the vault rule', why: 'a studio memory note' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'node .studio/guardrails/session-hygiene.mjs', replacement: 'node <your setup>/hooks/session-end-check.mjs', why: 'the studio\'s Stop hook; the kit ships its own (cards/session-end-check.md)' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'node .studio/guardrails/studio-doctor.mjs', replacement: 'node <your setup check, if you keep one>', why: 'the studio\'s own machine check, not in the kit' },
-  { file: 'catalog/skills/git-guardrails/SKILL.md', phrase: 'the hub\'s PreToolUse guard (G6, `.studio/guardrails/`)', replacement: 'a stricter guard of your own', why: 'the studio\'s guard library, by its internal code' },
-  { file: 'catalog/skills/git-guardrails/SKILL.md', phrase: 'or beside G6: G6 lets', replacement: 'or beside a guard that lets', why: 'the studio\'s guard, by its internal code' },
-  { file: 'catalog/skills/git-guardrails/SKILL.md', phrase: 'for a repo or agent the hub\'s own guard does not cover', replacement: 'for a repo or agent no stricter guard covers', why: 'the studio\'s own repository and guard' },
-  { file: 'catalog/skills/git-guardrails/SKILL.md', pattern: 'Complements the orchestrator\'s own\\s+PreToolUse backstop;', replacement: 'Complements any stricter guard you already run;', why: 'a studio project by name' },
-  { file: 'catalog/skills/git-guardrails/SKILL.md', pattern: 'Never install it in the hub\\n> or beside', replacement: 'Never install it\n> beside', why: 'the studio\'s own repository' },
-  { file: 'catalog/skills/git-guardrails/SKILL.md', pattern: 'The cases are tested in\\s+`\\.studio/guardrails/test/git-guardrails-skill\\.test\\.mjs` in the hub\\.', replacement: 'The studio tests these cases against its own copy; Check step 1 tests yours.', why: 'a studio test file' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'If he is merely pausing', replacement: 'If they are merely pausing', why: 'the owner, by pronoun' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'delete only what he says yes to', replacement: 'delete only what they say yes to', why: 'the owner, by pronoun' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'did not name, and he treats them as his call', replacement: 'did not name, and the owner treats them as their own call', why: 'the owner, by pronoun' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: '- anything he did not name.', replacement: '- anything they did not name.', why: 'the owner, by pronoun' },
-  { file: 'catalog/skills/council/SKILL.md', phrase: '⚠ Subagents can\'t talk to each other directly (they\'re isolated, one-shot)', replacement: '⚠ The seats are dispatched one-shot and never answer each other here', why: 'the kit\'s facts say a subagent can message another agent; the skill\'s point is that the chair runs the rounds' },
-  { file: 'catalog/skills/building-pydantic-ai-agents/SKILL.md', phrase: 'scan: SkillSpector 0/100 SAFE', replacement: 'scan: see SOURCE.md', why: 'a scan figure older than the one the kit records in SOURCE.md' },
-  { file: 'catalog/skills/finishing-a-development-branch/SKILL.md', phrase: 'hard rules 11 and 13 in `.studio/rules/hard-rules.md`', replacement: 'the rules on risky acts and on merge commits', why: 'studio rule numbers and a studio path' },
-  { file: 'catalog/skills/drawio-diagrams/SKILL.md', phrase: '(`.studio/identity/STYLE.md` §3, broken once on 2026-07-28)', replacement: '(a style rule the studio broke once and then wrote down)', why: 'a studio file, section and date' },
-  { file: 'catalog/skills/drawio-diagrams/SKILL.md', phrase: '`docs/superpowers/specs/2026-09-14-analytics-stack-lab-phases.drawio` + `.svg`', replacement: 'a `.drawio` and `.svg` pair you made before', why: 'a studio spec file' },
-  { file: 'catalog/skills/drawio-diagrams/references/autolayout.md', pattern: '## Importers — visualize code structure[\\s\\S]*?(?=\\n## |$)', replacement: '## Importers\n\nThe upstream skill\'s code importers are not in this copy: the studio removed them. To diagram a codebase, list its modules and their imports into the graph JSON that `scripts/autolayout.py` reads, by hand or with Claude, then run autolayout on it.\n', why: 'it taught five scripts the copy does not ship' },
-  { file: 'catalog/skills/drawio-diagrams/references/autolayout.md', pattern: '- \\*\\*Import edges are static\\*\\*[^\\n]*\\n', replacement: '', why: 'a limitation of the importers the copy does not ship' },
-  { file: 'catalog/skills/drawio-diagrams/references/shapes.md', pattern: '## AI / LLM brand logos[\\s\\S]*?(?=\\n## |$)', replacement: '## AI / LLM brand logos\n\ndraw.io\'s bundled libraries have no modern AI brand logos, and the upstream skill\'s icon fetcher is not in this copy: the studio removed it, because it fetched icons over the network. Use a labelled box, or an `image` style pointing at a logo file you have the right to use.\n', why: 'it taught a script the copy does not ship' },
+  { file: 'catalog/packs/advisor-council-for-big-decisions/skills/council.md', phrase: '⚠ Subagents can\'t talk to each other directly (they\'re isolated, one-shot)', replacement: '⚠ The seats are dispatched one-shot and never answer each other here', why: 'the kit\'s facts say a subagent can message another agent; the skill\'s point is that the chair runs the rounds' },
   { file: '*', phrase: 'hard rule 11', replacement: 'the rule that each risky act needs a recorded yes', why: 'a studio rule number' },
-  { file: '*', phrase: 'hard rule 14', replacement: 'the scan-first rule', why: 'a studio rule number' },
+  {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "This page lists only what exists in the studio:[^\\n]*\\n",replacement: "This page lists the skills this kit ships in `.claude/skills/`, the skills inside any domain you installed, and Claude Code's built-in slash commands.\n",why: "the studio's skill index and sync files, which the kit does not ship"},
+  {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "A name followed by \"pack X\" lives inside that pack\\. Read `library/X/SKILL\\.md`, find the skill in its table, open the file it names and follow it\\.",replacement: "A name followed by \"pack X\" lives inside the domain X you installed. Read `.claude/skills/X/SKILL.md`, find the skill in its table, open the file it names and follow it.",why: "the studio's library folder"},
+  {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "- When no row fits, read[^\\n]*\\n- Keep this page true\\.[^\\n]*\\n",replacement: "- When no row fits, list `.claude/skills/` and read the descriptions.\n",why: "the studio's skill index, library index and sync script"},
+  {file: "catalog/skills/using-agent-skills/SKILL.md",phrase: "For an outside skill: `vet-external-skill`, then `writing-great-skills`",replacement: "For an outside skill: `vet-and-adopt`, then `writing-great-skills`",why: "the studio's vetting skill; the kit's is vet-and-adopt"},
+  {file: "catalog/packs/web-astro-cloudflare-gsap-performance/skills/site-architecture.md",phrase: "\"see how [reminders](/features/reminders) work\"",replacement: "\"see how reminders work\", linked to the reminders page",why: "an example link to a page of an imagined site; the kit cannot resolve a site path"},
   { file: '*', phrase: '.studio/rules/hard-rules.md', replacement: 'your rules file', why: 'a studio path' },
   { file: '*', phrase: '.studio/rules/coding-guidelines.md', replacement: 'your coding guidelines', why: 'a studio path' },
-  { file: '*', phrase: '.studio/rules/*.md', replacement: 'your rules files', why: 'a studio path' },
   { file: '*', phrase: '.studio/registry/projects.md', replacement: 'your project registry', why: 'a studio path' },
   { file: '*', phrase: '.studio/runtime/runtimes.json', replacement: 'the studio\'s list of runtimes (not in this kit)', why: 'a studio path' },
   { file: '*', phrase: '.studio/memory/', replacement: 'your memory folder', why: 'a studio path' },
-  { file: '*', phrase: '.studio/guardrails/gen-vendor-stubs.mjs', replacement: 'the studio\'s stub generator (not in this kit)', why: 'a studio script' },
   { file: '*', phrase: '.studio/guardrails/skills-primer.mjs', replacement: 'a start-up hook of your own (the studio\'s is not in this kit)', why: 'a studio script' },
   { file: '*', phrase: 'memory `feedback_workflow_concurrency_cap`', replacement: 'a studio note on how many agents run at once', why: 'a studio memory note' },
   { file: '*', phrase: '`feedback_workflow_concurrency_cap`', replacement: 'the same note', why: 'a studio memory note' },
@@ -189,7 +188,7 @@ export function loadLocalRewrites(file) {
 }
 
 export const PATHS_ALLOW = [
-  { file: 'catalog/skills/brainstorming/scripts/server.cjs', phrase: 'Tailscale SSH', why: 'an upstream superpowers comment naming a product among remote-shell cases; no network detail' },
+  { file: 'catalog/skills/brainstorming/scripts/server.cjs', phrase: 'Tailscale SSH', why: 'an upstream comment naming a product among remote-shell cases; no network detail' },
 ];
 
 // Any IPv4 address is reported except unspecified, loopback, masks and the RFC 5737 documentation

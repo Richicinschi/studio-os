@@ -1,7 +1,10 @@
 ---
 id: writing-plans
 module: 03-planning
-checked: 2026-11-02
+checked: 2026-11-09
+tokens:
+  description: 49
+  body: 2537
 ---
 
 # Writing plans from an approved design
@@ -18,13 +21,12 @@ checked: 2026-11-02
 Read-only: names, descriptions, settings as set or not set, and counts. No skill body is opened, and nothing uses the network.
 
 - A skill of the same name: `test -f .claude/skills/writing-plans/SKILL.md && echo project` in each repository in `adoption/inventory.md`, and `test -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/writing-plans/SKILL.md" && echo user`.
-- The upstream plugin, which carries it as `superpowers:writing-plans`: `claude plugin list`, reading only a `superpowers@...` entry and its `Version`.
 - Another skill doing the same job: the front matter only (the lines between the first two `---`) of every `SKILL.md` at both levels, looking for a description about implementation plans or task lists.
-- Where plans live today, counts only: `ls docs/superpowers/plans/*.md docs/plans/*.md plans/*.md 2>/dev/null | wc -l`, and any plan-folder rule in `CLAUDE.md` or `AGENTS.md`.
+- Where plans live today, counts only: `ls docs/plans/*.md plans/*.md 2>/dev/null | wc -l`, and any plan-folder rule in `CLAUDE.md` or `AGENTS.md`.
 - The agents its execution menu names: `ls .claude/agents/ "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents/" 2>/dev/null`, file names only, looking for `bob-builder.md`, `linus-reviewer.md`, or your own builder and reviewer.
 - Whether you sign commits: `git config --get commit.gpgsign` in each repository (`true`, or nothing).
 
-The menu marks the item **have** when a `writing-plans` skill exists at either level or the superpowers plugin is installed, **partly** when another planning skill or an instruction-file rule covers the job, and **not yet** otherwise.
+The menu marks the item **have** when a `writing-plans` skill exists at either level, **partly** when another planning skill or an instruction-file rule covers the job, and **not yet** otherwise.
 
 ## Ask
 
@@ -50,14 +52,13 @@ The menu marks the item **have** when a `writing-plans` skill exists at either l
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/writing-plans/`: scans it with SkillSpector (`skillspector scan catalog/skills/writing-plans --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is one prose file with its licence and no scripts. The studio rescanned its adapted copies of superpowers 7.0.1 the same way and found no new real finding; `VENDORED.md` lists every change it made. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
-2. **Claude:** on your yes, writes the copy into the scope you chose, keeps the upstream `LICENSE` (MIT), and changes:
+1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/writing-plans/`: scans it with SkillSpector (`skillspector scan catalog/skills/writing-plans --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is one prose file with no scripts. The maintainers' latest scan result is in the skill's `SOURCE.md` ("Last scan"); your own scan is the one that decides. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
+2. **Claude:** on your yes, writes the copy into the scope you chose and rewrites for your setup:
    - the author line in the front matter, which names the studio, to yours;
-   - "Save plans to": the copy uses `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`; Claude puts your folder there, or keeps that one;
+   - "Save plans to": the copy uses `docs/plans/YYYY-MM-DD-<feature-name>.md`; Claude puts your folder there, or keeps that one;
    - the execution menu at the end, which names the kit's `bob-builder` (a builder subagent per task) and `linus-reviewer` (one reviewer at the end): your own agents' names, or the two roles described without names. If you take neither executor skill, the menu and the plan header's "REQUIRED SUB-SKILL" line say instead that the plan is handed back to you;
    - the commit step, `git commit -S -m ...`, which signs: Claude keeps `-S` when you sign ([signed commits](signed-commits.md)) and drops it when you do not, because a signing commit fails without a key;
-   - the line that sends worktree setup to `using-git-worktrees`: kept if you take [using-git-worktrees](using-git-worktrees.md), dropped otherwise;
-   - the studio's `VENDORED.md`, replaced by a short note of your own: the upstream, version 7.0.1, and what you changed.
+   - the line that sends worktree setup to `using-git-worktrees`: kept if you take [using-git-worktrees](using-git-worktrees.md), dropped otherwise.
 
    Claude shows the result before it saves it.
 3. **Claude:** adds one line to your front door (`CLAUDE.md` or `AGENTS.md`) saying where plans live, so every session finds them. It shows the line first.
@@ -81,7 +82,7 @@ If either check fails, the item is not done: the plan row stays unticked. A skil
 - **Tick as you go.** A plan is only a record if its boxes are ticked as each step lands. When the studio's wiki generator read its plans back, not one of 187 had every box ticked ([module 03](../modules/03-planning/README.md)).
 - **A plan can turn into the code.** Its self-review compares the plan's length with the spec's; a plan several times longer than the spec is a transcript of the program, not a plan. Trim it to signatures, test names and assertions.
 - **Signing:** with `-S` left in and no signing key, every commit step fails. Decide in step 2.
-- **Models:** the upstream version advises the most capable model for its reviews; the kit's copy leaves the model to the session, following the studio's rule that subagents keep the session's model ([module 02](../modules/02-context-and-models/README.md)). Choose your own rule.
+- **Models:** the kit's copy leaves the model to the session, following the studio's rule that subagents keep the session's model ([module 02](../modules/02-context-and-models/README.md)). Choose your own rule.
 - **Company repositories:** a plan committed to `docs/` stays in the repository's history. Ask whether your company wants plans there before the first commit.
-- **Cost:** its description loads into every session, about 21 tokens (an estimate, bytes divided by 4, description only, as on the other cards); the full skill, about 2,600 tokens (estimate), loads only when it is used.
+- **Cost:** its description loads into every session, about 49 tokens (an estimate, bytes divided by 4, description only, as on the other cards); the full skill, about 2,600 tokens (estimate), loads only when it is used.
 - **Where specs come from:** [brainstorming](brainstorming.md) (the lighter design conversation) and [drill-to-plan](drill-to-plan.md) (the heavier interview) both end in an approved spec for this skill.

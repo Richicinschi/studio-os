@@ -1,43 +1,52 @@
 #!/usr/bin/env bash
-# Extract one task's full text from an implementation plan into a file the
-# implementer reads in one call, so the task text never has to be pasted
-# through the controller's context.
+# task-brief: copy one task's section out of a plan into its own file, so an
+# implementer can read the task in one call and the text never passes through
+# the controller's context.
 #
 # Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
-# Default OUTFILE: <repo-root>/.superpowers/sdd/<plan-basename>/task-<N>-brief.md
-# (per plan and per worktree; concurrent runs of the SAME plan in the same
-# working tree share it).
+# Default OUTFILE: <repo-root>/.studio-work/sdd/<plan-basename>/task-<N>-brief.md
+# That folder is per plan and per working tree; two runs of the same plan in
+# one working tree share it.
+#
+# A task section starts at a heading like "### Task 4: ..." and ends at the
+# next "Task <number>" heading. Headings inside fenced code are ignored.
 set -euo pipefail
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
   echo "usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]" >&2
   exit 2
 fi
 
-plan=$1
-n=$2
-[ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
-
-if [ $# -eq 3 ]; then
-  out=$3
-else
-  # Invoke via bash rather than direct exec: some extractors (Python zipfile)
-  # strip Unix exec bits when unpacking marketplace packages (#2040).
-  dir=$("${BASH:-bash}" "$(cd "$(dirname "$0")" && pwd)/sdd-workspace" "$plan")
-  out="$dir/task-${n}-brief.md"
+plan_file=$1
+task_no=$2
+if [ ! -f "$plan_file" ]; then
+  echo "no such plan file: $plan_file" >&2
+  exit 2
 fi
 
-awk -v n="$n" '
-  /^```/ { infence = !infence }
-  !infence && /^#+[ \t]+Task[ \t]+[0-9]+/ {
-    intask = ($0 ~ ("^#+[ \t]+Task[ \t]+" n "([^0-9]|$)"))
-  }
-  intask { print }
-' "$plan" > "$out"
+if [ "$#" -eq 3 ]; then
+  brief=$3
+else
+  # Run the sibling through bash instead of executing it: unpacking a package
+  # with some tools drops the executable bit.
+  here=$(cd "$(dirname "$0")" && pwd)
+  workspace=$("${BASH:-bash}" "$here/sdd-workspace" "$plan_file")
+  brief="$workspace/task-${task_no}-brief.md"
+fi
 
-if [ ! -s "$out" ]; then
-  echo "task ${n} not found in ${plan} (no heading matching 'Task ${n}')" >&2
+awk -v want="$task_no" '
+  /^```/ { fenced = !fenced }
+  !fenced && /^#+[ \t]+Task[ \t]+[0-9]+/ {
+    # The requested label is used as a pattern, so "4a" and "1.5" work too.
+    inside = ($0 ~ ("^#+[ \t]+Task[ \t]+" want "([^0-9]|$)"))
+  }
+  inside { print }
+' "$plan_file" > "$brief"
+
+if [ ! -s "$brief" ]; then
+  echo "task ${task_no} not found in ${plan_file} (no heading matching 'Task ${task_no}')" >&2
   exit 3
 fi
 
-echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines"
+lines=$(wc -l < "$brief" | tr -d ' ')
+echo "wrote ${brief}: ${lines} lines"

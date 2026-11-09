@@ -2,6 +2,8 @@
 id: project-registry
 module: 11-workspace-layout
 checked: 2026-11-02
+other_figures:
+  - 57
 ---
 
 # A project registry

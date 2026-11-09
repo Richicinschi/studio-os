@@ -1,11 +1,7 @@
-# Batching Small Same-Shape Work
+# Batching
 
-Part of subagent-driven-development.
+Companion to subagent-driven-development.
 
-**Batch small same-shape work.** When the plan lists several tasks that are
-each a small, independent edit of the same kind — the same one-line fix,
-constant change, or field addition repeated across files — do not dispatch
-one subagent per task. Compose ONE dispatch brief listing every file and
-its change, send the whole batch to a single subagent, and review its diff
-as one unit. Reserve one-dispatch-per-task for work that needs its own
-judgment, its own tests, or its own review surface.
+A plan sometimes holds a run of tiny tasks that are all the same kind of edit applied to different files: one line changed, a constant swapped, a field added. When the edits are small and independent, do not dispatch one subagent per task. Write one brief that names every file with its change, give the batch to a single subagent, and review the resulting diff as a whole.
+
+When a task needs thinking of its own, tests of its own, or a separate surface to review, it stays a dispatch of its own.

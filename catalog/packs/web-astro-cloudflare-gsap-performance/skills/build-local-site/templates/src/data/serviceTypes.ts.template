@@ -1,0 +1,135 @@
+// ============================================================
+// Service types
+// ============================================================
+// One entry per job the business sells. Each entry yields:
+//   /services/<slug>/               the service page
+//   /services/<area>/<slug>/        a combo page per area
+//   menus, internal links and schema
+//
+// Slugs are lowercase, hyphenated, URL safe.
+// ============================================================
+
+export interface ProcessStep {
+  /** e.g. "Inspection" */
+  title: string;
+  description: string;
+}
+
+export interface PriceRange {
+  /** Name of the tier or job, e.g. "Hydro jetting" */
+  label: string;
+  /** Low end in dollars */
+  min: number;
+  /** High end in dollars */
+  max: number;
+  /** Optional unit, e.g. "per drain" or "per visit" */
+  unit?: string;
+}
+
+export interface ServiceType {
+  /** e.g. "drain-cleaning" */
+  slug: string;
+  /** e.g. "Drain Cleaning" */
+  name: string;
+  /** Compact name for menus and breadcrumbs */
+  shortName: string;
+  /** One sentence for cards */
+  shortDescription: string;
+  /** Two or three sentences for full pages and schema */
+  description: string;
+  /** Picture under /public, e.g. "/images/services/drain-cleaning.webp" */
+  image: string;
+  /** Lucide name in astro-icon form, e.g. "lucide:droplets" */
+  icon: string;
+  /** Urgent job? Turns on the emergency banner and badges */
+  emergency: boolean;
+  /** Show on the homepage? */
+  featured: boolean;
+  /** Exactly four steps describing the job from start to finish */
+  processSteps: ProcessStep[];
+  /** One or more priced tiers in USD. Pages show each tier, and use the lowest min and highest max as the headline span. */
+  priceRanges: PriceRange[];
+  /** Search terms for planning only; never rendered */
+  keywords: string[];
+  /** Slugs of services that pair well with this one */
+  relatedServices: string[];
+}
+
+// Template for one entry (copy, uncomment, fill in):
+//
+// {
+//   slug: 'drain-cleaning',
+//   name: 'Drain Cleaning',
+//   shortName: 'Drains',
+//   shortDescription: 'Clears blocked sinks, showers and sewer lines.',
+//   description: 'We clear stubborn clogs and restore normal flow in kitchens, baths and main lines.',
+//   image: '/images/services/drain-cleaning.webp',
+//   icon: 'lucide:droplets',
+//   emergency: true,
+//   featured: true,
+//   processSteps: [
+//     { title: 'Inspect', description: 'A camera finds where the blockage sits.' },
+//     { title: 'Clear', description: 'Jetting or snaking removes it.' },
+//     { title: 'Test', description: 'We run water to confirm the line is open.' },
+//     { title: 'Advise', description: 'Tips to keep it from blocking again.' },
+//   ],
+//   priceRanges: [
+//     { label: 'Simple clog', min: 99, max: 199, unit: 'per drain' },
+//     { label: 'Hydro jetting', min: 350, max: 600 },
+//   ],
+//   keywords: ['drain cleaning', 'clogged drain', 'hydro jetting'],
+//   relatedServices: ['sewer-repair', 'water-heater-repair'],
+// },
+
+export const serviceTypes: ServiceType[] = [
+  // 5 to 10 entries work well
+];
+
+/** Look a service up by slug; undefined when nothing matches. */
+export function getServiceBySlug(slug: string): ServiceType | undefined {
+  return serviceTypes.find((s) => s.slug === slug);
+}
+
+/** Display name for a slug; falls back to a title-cased slug. */
+export function getServiceName(slug: string): string {
+  const found = getServiceBySlug(slug);
+  if (found) return found.name;
+  return slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+/** Lowest min and highest max across a service's tiers; zeros when none are set. */
+export function getPriceSpan(service: ServiceType): { min: number; max: number } {
+  const tiers = service.priceRanges;
+  if (!tiers.length) return { min: 0, max: 0 };
+  return {
+    min: Math.min(...tiers.map((t) => t.min)),
+    max: Math.max(...tiers.map((t) => t.max)),
+  };
+}
+
+/** True when at least one tier has a real price. Pages show prices and price schema only then. */
+export function hasPrices(service: ServiceType): boolean {
+  return service.priceRanges.some((t) => t.max > 0);
+}
+
+/** Services flagged as urgent. */
+export function getEmergencyServices(): ServiceType[] {
+  return serviceTypes.filter((s) => s.emergency);
+}
+
+/** Services flagged for the homepage. */
+export function getFeaturedServices(): ServiceType[] {
+  return serviceTypes.filter((s) => s.featured);
+}
+
+/** Related services as full objects. */
+export function getRelatedServices(slug: string): ServiceType[] {
+  const base = getServiceBySlug(slug);
+  if (!base) return [];
+  return base.relatedServices
+    .map((s) => getServiceBySlug(s))
+    .filter((s): s is ServiceType => s !== undefined);
+}

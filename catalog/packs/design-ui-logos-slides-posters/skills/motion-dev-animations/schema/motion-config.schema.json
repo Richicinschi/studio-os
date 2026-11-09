@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Motion.dev animation spec",
+  "description": "Describes one Motion.dev animation so it can be linted before code is written.",
+  "required": ["component", "type", "props"],
+  "type": "object",
+  "definitions": {
+    "stateObject": {
+      "type": "object"
+    },
+    "seconds": {
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "properties": {
+    "description": {
+      "description": "Plain-language summary of what the animation does.",
+      "type": "string"
+    },
+    "framework": {
+      "description": "Where the animation will run.",
+      "enum": ["vanilla", "vue", "astro", "svelte", "nextjs", "react"]
+    },
+    "type": {
+      "description": "Which family of animation this is.",
+      "enum": ["layout", "scroll", "gesture", "entrance"]
+    },
+    "component": {
+      "description": "The motion element used, such as motion.div.",
+      "pattern": "^motion[.](a|article|aside|button|circle|div|footer|h[1-6]|header|img|li|main|nav|ol|p|path|rect|section|span|svg|ul)$",
+      "type": "string"
+    },
+    "props": {
+      "description": "The props placed on the motion element.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "animate": { "description": "State to move to.", "$ref": "#/definitions/stateObject" },
+        "initial": { "description": "State before the first paint.", "$ref": "#/definitions/stateObject" },
+        "exit": { "description": "State when leaving; needs AnimatePresence.", "$ref": "#/definitions/stateObject" },
+        "whileHover": { "description": "State while the pointer is over it.", "$ref": "#/definitions/stateObject" },
+        "whileTap": { "description": "State while pressed.", "$ref": "#/definitions/stateObject" },
+        "whileFocus": { "description": "State while it has keyboard focus.", "$ref": "#/definitions/stateObject" },
+        "whileInView": { "description": "State once it is scrolled into view.", "$ref": "#/definitions/stateObject" },
+        "transition": {
+          "description": "How the change plays: tween, spring or inertia.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "duration": {
+              "description": "Seconds; applies to tweens.",
+              "maximum": 5,
+              "minimum": 0,
+              "type": "number"
+            },
+            "delay": {
+              "description": "Seconds to wait before starting.",
+              "maximum": 10,
+              "minimum": 0,
+              "type": "number"
+            },
+            "type": { "description": "Kind of transition.", "enum": ["tween", "spring", "inertia"] },
+            "stiffness": {
+              "description": "Spring pull. Around 100 is slow, around 500 is fast.",
+              "maximum": 1000,
+              "minimum": 50,
+              "type": "number"
+            },
+            "damping": {
+              "description": "Spring friction. Around 10 bounces, around 50 does not.",
+              "maximum": 100,
+              "minimum": 5,
+              "type": "number"
+            },
+            "mass": {
+              "description": "Spring weight. Around 0.5 is light, around 5 is heavy.",
+              "maximum": 10,
+              "minimum": 0.1,
+              "type": "number"
+            },
+            "ease": {
+              "title": "Easing",
+              "description": "A named easing or four cubic-bezier numbers.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "anticipate", "backIn", "backInOut", "backOut", "circIn", "circInOut",
+                    "circOut", "easeIn", "easeInOut", "easeOut", "linear"
+                  ]
+                },
+                {
+                  "items": { "description": "One bezier coordinate.", "type": "number" },
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "type": "array"
+                }
+              ]
+            }
+          }
+        },
+        "viewport": {
+          "description": "When whileInView fires.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "amount": {
+              "description": "Fraction of the element that must show, from 0 to 1.",
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            "once": { "description": "True to play a single time.", "type": "boolean" },
+            "margin": {
+              "pattern": "^-?[0-9]+px( -?[0-9]+px)?( -?[0-9]+px)?( -?[0-9]+px)?$",
+              "description": "Shift of the trigger line in px, one to four values.",
+              "type": "string"
+            }
+          }
+        },
+        "drag": {
+          "description": "True for both axes, or the axis name.",
+          "oneOf": [{ "enum": ["y", "x"] }, { "type": "boolean" }]
+        },
+        "dragConstraints": {
+          "description": "Pixel limits for dragging.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "bottom": { "description": "Lowest allowed offset in px.", "type": "number", "title": "Bottom edge" },
+            "right": { "description": "Rightmost allowed offset in px.", "type": "number", "title": "Right edge" },
+            "left": { "description": "Leftmost allowed offset in px.", "type": "number", "title": "Left edge" },
+            "top": { "description": "Highest allowed offset in px.", "type": "number", "title": "Top edge" }
+          }
+        },
+        "layout": { "description": "Animate size and position changes (FLIP).", "type": "boolean" },
+        "layoutId": { "description": "Shared id for morphing between elements.", "type": "string" }
+      }
+    },
+    "performance": {
+      "description": "Measured or targeted runtime cost.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "gpuAccelerated": {
+          "description": "True when only transform and opacity change.",
+          "type": "boolean"
+        },
+        "bundleSize": {
+          "description": "Animation code size in bytes; the studio budget is 50KB.",
+          "maximum": 51200,
+          "type": "number"
+        },
+        "fps": {
+          "description": "Frame rate aimed at; 60 or more is the floor.",
+          "maximum": 144,
+          "minimum": 30,
+          "type": "number"
+        }
+      }
+    },
+    "accessibility": {
+      "required": ["reducedMotion"],
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "keyboardNav": { "description": "Works from the keyboard.", "type": "boolean" },
+        "reducedMotion": { "description": "Respects prefers-reduced-motion.", "type": "boolean" },
+        "focusVisible": { "description": "Shows where focus is.", "type": "boolean" },
+        "screenReaderFriendly": {
+          "description": "Nothing important is conveyed by motion alone.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -6,123 +6,42 @@ Every item the studio uses, by pack. `shipped` items are in this kit; `link-only
 
 | Item | Kind | Pack | Module | Status | Where |
 |---|---|---|---|---|---|
-| ab-testing | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| ad-creative | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| ai-seo | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| analytics | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| aso | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| astro-dev | skill | catalog | - | catalog-only | [upstream](https://github.com/gigio1023/astro-dev-skill) |
-| brand | skill | catalog | - | catalog-only | [upstream](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
-| browser-testing-with-devtools | skill | catalog | - | catalog-only | [upstream](https://github.com/addyosmani/agent-skills) |
-| build-local-site | skill | catalog | - | catalog-only | [upstream](https://github.com/savvity/local-business-builder) |
-| churn-prevention | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| cold-email | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| community-marketing | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| competitor-profiling | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| competitors | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| content-strategy | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| copy-editing | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| copywriting | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| cro | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| customer-research | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| emails | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| firebase-apk-scanner | skill | catalog | - | catalog-only | [upstream](https://github.com/trailofbits/skills) |
-| firebase-auth-basics | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| firebase-basics | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| firebase-crashlytics | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| firebase-firestore | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| firebase-hosting-basics | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| firebase-remote-config-basics | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| firebase-security-rules-auditor | skill | catalog | - | catalog-only | [upstream](https://github.com/firebase/skills) |
-| flutter-add-integration-test | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-add-widget-preview | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-add-widget-test | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-apply-architecture-best-practices | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-build-responsive-layout | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-fix-layout-issues | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-implement-json-serialization | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-setup-declarative-routing | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-setup-localization | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| flutter-use-http-package | skill | catalog | - | catalog-only | [upstream](https://github.com/flutter/skills) |
-| godot-audit | skill | catalog | - | catalog-only | studio only, not in this kit |
-| godot-camera-systems | skill | catalog | - | catalog-only | [upstream](https://github.com/thedivergentai/GD-Agentic-Skills) |
-| godot-export-builds | skill | catalog | - | catalog-only | [upstream](https://github.com/thedivergentai/GD-Agentic-Skills) |
-| godot-particles | skill | catalog | - | catalog-only | [upstream](https://github.com/thedivergentai/GD-Agentic-Skills) |
-| godot-shaders-basics | skill | catalog | - | catalog-only | [upstream](https://github.com/thedivergentai/GD-Agentic-Skills) |
-| godot-tweening | skill | catalog | - | catalog-only | [upstream](https://github.com/thedivergentai/GD-Agentic-Skills) |
-| gsap-core | skill | catalog | - | catalog-only | [upstream](https://github.com/greensock/gsap-skills) |
-| gsap-scrolltrigger | skill | catalog | - | catalog-only | [upstream](https://github.com/greensock/gsap-skills) |
-| gsap-timeline | skill | catalog | - | catalog-only | [upstream](https://github.com/greensock/gsap-skills) |
-| iso-figures | skill | catalog | - | catalog-only | [upstream](https://github.com/wheresryan22/anatomy) |
-| launch | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| lead-magnets | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| legal-analytics-consent | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-apple-gate | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-cross-store | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-data-surface-scan | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-doc-draft | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-flow-grader | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-gdpr-audit | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-guardrails | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-health-claims | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-play-gate | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-privacy-review | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-reg-monitor | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-signoff-orchestrator | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-terms-review-nl | skill | catalog | - | catalog-only | studio only, not in this kit |
-| legal-withdrawal-check | skill | catalog | - | catalog-only | studio only, not in this kit |
-| marketing-ideas | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| marketing-plan | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| marketing-psychology | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| motion-design | skill | catalog | - | catalog-only | [upstream](https://github.com/LottieFiles/motion-design-skill) |
-| motion-dev-animations | skill | catalog | - | catalog-only | [upstream](https://github.com/199-biotechnologies/motion-dev-animations-skill) |
-| offers | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| onboarding | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| paywalls | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| performance-optimization | skill | catalog | - | catalog-only | [upstream](https://github.com/addyosmani/agent-skills) |
-| ponytail-audit | skill | catalog | - | catalog-only | [upstream](https://github.com/DietrichGebert/ponytail) |
-| pricing | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| product-marketing | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| production-docker | skill | catalog | - | catalog-only | [upstream](https://github.com/vstorm-co/production-stack-skills) |
-| programmatic-seo | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| public-relations | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| referrals | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| review-animations | skill | catalog | - | catalog-only | [upstream](https://github.com/emilkowalski/skills) |
-| save-session | skill | catalog | - | catalog-only | studio only, not in this kit |
-| schema | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| seo-audit | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| signup | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| site-architecture | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| social | skill | catalog | - | catalog-only | [upstream](https://github.com/coreyhaines31/marketingskills) |
-| start-project | skill | catalog | - | catalog-only | studio only, not in this kit |
-| teach | skill | catalog | - | catalog-only | [upstream](https://github.com/mattpocock/skills) |
-| ui-ux-pro-max | skill | catalog | - | catalog-only | [upstream](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
-| update-wiki-graph | skill | catalog | - | catalog-only | studio only, not in this kit |
-| using-firebase | skill | catalog | - | catalog-only | [upstream](https://github.com/SpillwaveSolutions/using-firebase) |
+| plain-writing | skill | catalog | - | catalog-only | studio only, not in this kit |
+| research-with-sources | skill | catalog | - | catalog-only | studio only, not in this kit |
 | vet-external-skill | skill | catalog | - | catalog-only | studio only, not in this kit |
-| web-perf | skill | catalog | - | catalog-only | [upstream](https://github.com/cloudflare/skills) |
-| workers-best-practices | skill | catalog | - | catalog-only | [upstream](https://github.com/cloudflare/skills) |
-| wrangler | skill | catalog | - | catalog-only | [upstream](https://github.com/cloudflare/skills) |
 | dataviz | external | catalog | 09-data-work | catalog-only | not published |
-| anthropic-document-skills | external | data-work | 09-data-work | link-only | [upstream](https://github.com/anthropics/skills) |
-| building-pydantic-ai-agents | skill | data-work | 09-data-work | shipped | [skills/building-pydantic-ai-agents](skills/building-pydantic-ai-agents/SOURCE.md) |
 | claim-auditor | skill | data-work | 09-data-work | shipped | [skills/claim-auditor](skills/claim-auditor/SOURCE.md) |
-| codebase-design | skill | data-work | 09-data-work | shipped | [skills/codebase-design](skills/codebase-design/SOURCE.md) |
 | diagnosing-bugs | skill | data-work | 09-data-work | shipped | [skills/diagnosing-bugs](skills/diagnosing-bugs/SOURCE.md) |
 | drawio-diagrams | skill | data-work | 09-data-work | shipped | [skills/drawio-diagrams](skills/drawio-diagrams/SOURCE.md) |
-| modern-python | skill | data-work | 09-data-work | shipped | [skills/modern-python](skills/modern-python/SOURCE.md) |
-| production-fastapi | skill | data-work | 09-data-work | shipped | [skills/production-fastapi](skills/production-fastapi/SOURCE.md) |
-| supply-chain-risk-auditor | skill | data-work | 09-data-work | shipped | [skills/supply-chain-risk-auditor](skills/supply-chain-risk-auditor/SOURCE.md) |
 | tdd | skill | data-work | 09-data-work | shipped | [skills/tdd](skills/tdd/SOURCE.md) |
 | baseline-before-claim | practice | data-work | 12-experiments-and-evaluation | shipped | [card](../cards/baseline-before-claim.md) |
 | negative-results | practice | data-work | 12-experiments-and-evaluation | shipped | [card](../cards/negative-results.md) |
 | real-data-seed | practice | data-work | 12-experiments-and-evaluation | shipped | [card](../cards/real-data-seed.md) |
 | sealed-holdout | practice | data-work | 12-experiments-and-evaluation | shipped | [card](../cards/sealed-holdout.md) |
 | success-criteria-first | practice | data-work | 12-experiments-and-evaluation | shipped | [card](../cards/success-criteria-first.md) |
-| superpowers | external | foundation | 03-planning | link-only | [upstream](https://github.com/obra/superpowers) |
 | skillspector | external | foundation | 05-skills | link-only | [upstream](https://github.com/NVIDIA/SkillSpector) |
 | writing-great-skills | skill | foundation | 05-skills | shipped | [skills/writing-great-skills](skills/writing-great-skills/SOURCE.md) |
-| claude-md-curator | skill | way-of-working | 01-continuity | shipped | [skills/claude-md-curator](skills/claude-md-curator/SOURCE.md) |
+| advisor-council-for-big-decisions | pack | undefined | - | shipped | [packs/advisor-council-for-big-decisions](packs/advisor-council-for-big-decisions/SKILL.md) |
+| android-swiftui-react-native-app-building | pack | undefined | - | shipped | [packs/android-swiftui-react-native-app-building](packs/android-swiftui-react-native-app-building/SKILL.md) |
+| app-legal-privacy-terms-store-review | pack | undefined | - | shipped | [packs/app-legal-privacy-terms-store-review](packs/app-legal-privacy-terms-store-review/SKILL.md) |
+| audio-video-media | pack | undefined | - | shipped | [packs/audio-video-media](packs/audio-video-media/SKILL.md) |
+| dependency-supply-chain-risk-checks | pack | undefined | - | shipped | [packs/dependency-supply-chain-risk-checks](packs/dependency-supply-chain-risk-checks/SKILL.md) |
+| design-ui-logos-slides-posters | pack | undefined | - | shipped | [packs/design-ui-logos-slides-posters](packs/design-ui-logos-slides-posters/SKILL.md) |
+| django-flask-laravel-shops-and-chat | pack | undefined | - | shipped | [packs/django-flask-laravel-shops-and-chat](packs/django-flask-laravel-shops-and-chat/SKILL.md) |
+| engineering-testing-performance-code-design | pack | undefined | - | shipped | [packs/engineering-testing-performance-code-design](packs/engineering-testing-performance-code-design/SKILL.md) |
+| games-design-prototype-playtest-assets | pack | undefined | - | shipped | [packs/games-design-prototype-playtest-assets](packs/games-design-prototype-playtest-assets/SKILL.md) |
+| godot-camera-shaders-particles-export | pack | undefined | - | shipped | [packs/godot-camera-shaders-particles-export](packs/godot-camera-shaders-particles-export/SKILL.md) |
+| learning-lessons-explanations-practice | pack | undefined | - | shipped | [packs/learning-lessons-explanations-practice](packs/learning-lessons-explanations-practice/SKILL.md) |
+| marketing-copy-emails-seo-signups | pack | undefined | - | shipped | [packs/marketing-copy-emails-seo-signups](packs/marketing-copy-emails-seo-signups/SKILL.md) |
+| marketing-plans-offers-pricing-launches | pack | undefined | - | shipped | [packs/marketing-plans-offers-pricing-launches](packs/marketing-plans-offers-pricing-launches/SKILL.md) |
+| mobile-apps-flutter-firebase | pack | undefined | - | shipped | [packs/mobile-apps-flutter-firebase](packs/mobile-apps-flutter-firebase/SKILL.md) |
+| phone-app-testing-release-and-agents | pack | undefined | - | shipped | [packs/phone-app-testing-release-and-agents](packs/phone-app-testing-release-and-agents/SKILL.md) |
+| python-backend-fastapi-docker-agents | pack | undefined | - | shipped | [packs/python-backend-fastapi-docker-agents](packs/python-backend-fastapi-docker-agents/SKILL.md) |
+| stock-research-backtests-trading-safety | pack | undefined | - | shipped | [packs/stock-research-backtests-trading-safety](packs/stock-research-backtests-trading-safety/SKILL.md) |
+| unity-editor-scripts-prefabs-builds | pack | undefined | - | shipped | [packs/unity-editor-scripts-prefabs-builds](packs/unity-editor-scripts-prefabs-builds/SKILL.md) |
+| web-api-security-login-and-graphql | pack | undefined | - | shipped | [packs/web-api-security-login-and-graphql](packs/web-api-security-login-and-graphql/SKILL.md) |
+| web-astro-cloudflare-gsap-performance | pack | undefined | - | shipped | [packs/web-astro-cloudflare-gsap-performance](packs/web-astro-cloudflare-gsap-performance/SKILL.md) |
+| web-search-and-scraping-into-files | pack | undefined | - | shipped | [packs/web-search-and-scraping-into-files](packs/web-search-and-scraping-into-files/SKILL.md) |
 | decision-log | practice | way-of-working | 01-continuity | shipped | [card](../cards/decision-log.md) |
 | front-door | practice | way-of-working | 01-continuity | shipped | [card](../cards/front-door.md) |
 | handoff | skill | way-of-working | 01-continuity | shipped | [skills/handoff](skills/handoff/SOURCE.md) |
@@ -133,10 +52,9 @@ Every item the studio uses, by pack. `shipped` items are in this kit; `link-only
 | context-habits | practice | way-of-working | 02-context-and-models | shipped | [card](../cards/context-habits.md) |
 | rules-on-demand | practice | way-of-working | 02-context-and-models | shipped | [card](../cards/rules-on-demand.md) |
 | brainstorming | skill | way-of-working | 03-planning | shipped | [skills/brainstorming](skills/brainstorming/SOURCE.md) |
-| coding-guidelines | external | way-of-working | 03-planning | link-only | [upstream](https://github.com/multica-ai/andrej-karpathy-skills) |
+| coding-guidelines | practice | way-of-working | 03-planning | shipped | [card](../cards/coding-guidelines.md) |
 | drill-to-plan | skill | way-of-working | 03-planning | shipped | [skills/drill-to-plan](skills/drill-to-plan/SOURCE.md) |
 | executing-plans | skill | way-of-working | 03-planning | shipped | [skills/executing-plans](skills/executing-plans/SOURCE.md) |
-| frontend-design | skill | way-of-working | 03-planning | shipped | [skills/frontend-design](skills/frontend-design/SOURCE.md) |
 | setup-check | practice | way-of-working | 03-planning | shipped | [card](../cards/setup-check.md) |
 | verification-before-completion | skill | way-of-working | 03-planning | shipped | [skills/verification-before-completion](skills/verification-before-completion/SOURCE.md) |
 | verify-before-push | practice | way-of-working | 03-planning | shipped | [card](../cards/verify-before-push.md) |
@@ -163,19 +81,10 @@ Every item the studio uses, by pack. `shipped` items are in this kit; `link-only
 | identity-soul | practice | way-of-working | 07-identity-and-contract | shipped | [card](../cards/identity-soul.md) |
 | identity-style | practice | way-of-working | 07-identity-and-contract | shipped | [card](../cards/identity-style.md) |
 | identity-user | practice | way-of-working | 07-identity-and-contract | shipped | [card](../cards/identity-user.md) |
-| atlas-operator | agent | way-of-working | 08-agents-and-council | shipped | [agents/atlas-operator.md](agents/atlas-operator.md) |
 | bob-builder | agent | way-of-working | 08-agents-and-council | shipped | [agents/bob-builder.md](agents/bob-builder.md) |
-| council | skill | way-of-working | 08-agents-and-council | shipped | [skills/council](skills/council/SOURCE.md) |
-| fred-advocate | agent | way-of-working | 08-agents-and-council | shipped | [agents/fred-advocate.md](agents/fred-advocate.md) |
-| jony-designer | agent | way-of-working | 08-agents-and-council | shipped | [agents/jony-designer.md](agents/jony-designer.md) |
-| karen-skeptic | agent | way-of-working | 08-agents-and-council | shipped | [agents/karen-skeptic.md](agents/karen-skeptic.md) |
 | linus-reviewer | agent | way-of-working | 08-agents-and-council | shipped | [agents/linus-reviewer.md](agents/linus-reviewer.md) |
-| lorn-founder | agent | way-of-working | 08-agents-and-council | shipped | [agents/lorn-founder.md](agents/lorn-founder.md) |
-| marie-architect | agent | way-of-working | 08-agents-and-council | shipped | [agents/marie-architect.md](agents/marie-architect.md) |
-| midas-treasurer | agent | way-of-working | 08-agents-and-council | shipped | [agents/midas-treasurer.md](agents/midas-treasurer.md) |
 | receiving-code-review | skill | way-of-working | 08-agents-and-council | shipped | [skills/receiving-code-review](skills/receiving-code-review/SOURCE.md) |
 | requesting-code-review | skill | way-of-working | 08-agents-and-council | shipped | [skills/requesting-code-review](skills/requesting-code-review/SOURCE.md) |
-| saul-counsel | agent | way-of-working | 08-agents-and-council | shipped | [agents/saul-counsel.md](agents/saul-counsel.md) |
 | sherlock-researcher | agent | way-of-working | 08-agents-and-council | shipped | [agents/sherlock-researcher.md](agents/sherlock-researcher.md) |
 | mcp-least-access | practice | way-of-working | 10-tools-and-mcp | shipped | [card](../cards/mcp-least-access.md) |
 | claude-ai-project | practice | way-of-working | 11-workspace-layout | shipped | [card](../cards/claude-ai-project.md) |

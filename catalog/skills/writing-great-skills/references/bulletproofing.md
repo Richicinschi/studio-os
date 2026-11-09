@@ -1,82 +1,74 @@
-> Source: obra/superpowers `skills/writing-skills/references/bulletproofing.md` (MIT, Copyright (c) 2025 Jesse Vincent) @ v7.0.1 2ce8aa15, folded into writing-great-skills; licence in `../LICENSE`.
+# Bulletproofing a skill against rationalization
 
-# Bulletproofing Skills Against Rationalization
+Reach for this file when your baseline run shows a discipline failure: the agent knows the rule and talks itself out of it under pressure. Skills that enforce a discipline (a backup before a migration, a test before code) need to survive a clever agent looking for a way round.
 
-Part of writing-great-skills. Use it when the baseline failure is a
-discipline failure: the agent knows the rule and skips it under pressure.
+## Scope
 
-## Bulletproofing Skills Against Rationalization
+This toolkit fits discipline failures only. It does not fit output of the wrong shape or a missing element. For those, piling on prohibitions backfires, so describe the form you want instead. The research on why pressure and framing change compliance is not part of the studio copy; the practical effect is that every tactic below works by removing an exit.
 
-Skills that enforce discipline (like TDD) need to resist rationalization. Agents are smart and will find loopholes when under pressure.
+## Name the loopholes
 
-**Scope:** this toolkit is for discipline failures — an agent that knows the rule and skips it under pressure. For wrong-shaped output or omitted elements, prohibition-based bulletproofing backfires; use the forms in upstream writing-skills' "Match the Form to the Failure" section instead (not kept in the studio copy).
+Stating a rule is not enough. Forbid the specific workarounds, because the agent will try each one.
 
-**Psychology note:** Understanding WHY persuasion techniques work helps you apply them systematically. Upstream's `persuasion-principles.md` (not kept in the studio copy) gathers the research foundation (Cialdini, 2021; Meincke et al., 2025) on authority, commitment, scarcity, social proof, and unity principles.
+Weak:
 
-### Close Every Loophole Explicitly
-
-Don't just state the rule - forbid specific workarounds:
-
-<Bad>
 ```markdown
-Write code before test? Delete it.
+Skip the backup? Don't.
 ```
-</Bad>
 
-<Good>
+Strong:
+
 ```markdown
-Write code before test? Delete it. Start over.
+Skipped the backup before the migration? Restore the state, take the backup, start the migration again.
 
 **No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
+- A "small" schema change still needs it
+- A backup taken afterwards does not count
+- A copy on the same disk does not count
+- Restoring means restoring
 ```
-</Good>
 
-### Address "Spirit vs Letter" Arguments
+## Letter and spirit
 
-Add foundational principle early:
+State a founding principle near the top:
 
 ```markdown
-**Violating the letter of the rules is violating the spirit of the rules.**
+**Breaking the letter of a rule breaks its spirit.**
 ```
 
-This cuts off entire class of "I'm following the spirit" rationalizations.
+One line closes the whole family of "I am honouring the intent, just not the wording" arguments.
 
-### Build Rationalization Table
+## Excuse table
 
-Capture rationalizations from baseline testing (see testing-skills-with-subagents.md). Every excuse agents make goes in the table:
+Fill it from baseline runs (see `testing-skills-with-subagents.md`, the sibling file in writing-great-skills). Each excuse the agent actually produced gets a row and a short answer.
 
 ```markdown
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
+| Excuse | Answer |
+|--------|--------|
+| "It is only a rename" | Renames break foreign keys. The backup takes a minute. |
+| "Staging is identical to production" | Then the backup is trivial too. Take it. |
+| "The migration is reversible" | Reversible is a claim until a restore proves it. |
 ```
 
-### Create Red Flags List
+## Red flags
 
-Make it easy for agents to self-check when rationalizing:
+Give the agent a list to scan while it is rationalizing:
 
 ```markdown
-## Red Flags - STOP and Start Over
+## Red flags: stop and go back
 
-- Code before test
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "This is different because..."
+- Running the migration before the backup
+- "I will back up right after"
+- "The down-script is enough"
+- "This one is different because..."
 
-**All of these mean: Delete code. Start over with TDD.**
+**Each of these means: stop, take the backup, restart the migration.**
 ```
 
-### Update SDO for Violation Symptoms
+## Symptoms in the description
 
-Add to description: symptoms of when you're ABOUT to violate the rule:
+Put the signs that the agent is about to break the rule into the description, so the skill fires at that moment:
 
 ```yaml
-description: use when implementing any feature or bugfix, before writing implementation code
+description: Use before running any schema migration, when tempted to migrate first and back up later, or when a change looks too small to need one.
 ```

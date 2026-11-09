@@ -1,0 +1,30 @@
+# Firebase local state and logs
+.firebase/
+*-debug.log
+firebase-debug.*.log
+emulator-data/
+
+# Node (functions)
+node_modules/
+functions/lib/
+npm-debug.log*
+
+# Python (functions)
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.env
+
+# Credentials: never commit
+service-account*.json
+*-credentials.json
+*.pem
+*.key
+*.p12
+secrets/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store

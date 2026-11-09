@@ -1,0 +1,11 @@
+/* Tailwind v4 entry: one import, theme tokens in CSS */
+@import "tailwindcss";
+
+/* tokens below become utilities such as bg-primary and font-sans */
+@theme inline {
+  /* --font-rubik comes from the fonts entry in astro.config.ts */
+  --font-sans: var(--font-rubik);
+  --font-mono: 'Fira Code', monospace;
+  --color-secondary: oklch(0.75 0.12 160);
+  --color-primary: oklch(0.55 0.22 285);
+}

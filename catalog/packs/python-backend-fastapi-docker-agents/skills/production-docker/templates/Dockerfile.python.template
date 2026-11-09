@@ -1,0 +1,63 @@
+# syntax=docker/dockerfile:1
+
+# Python service image, two stages.
+#   builder : python:3.11-slim-bookworm  (compiles wheels, thrown away afterwards)
+#   runtime : distroless/python3-debian12 (no shell, no package manager, runs as 65532)
+# The pair is chosen so the Python minor version agrees: debian12 distroless ships
+# Python 3.11, and packages built under another minor version fail to import there.
+# Replace each REPLACE_WITH_CURRENT_DIGEST with the digest of the current tag.
+
+# ---- Stage 1: builder ------------------------------------------------------
+FROM python:3.11-slim-bookworm@sha256:REPLACE_WITH_CURRENT_DIGEST AS builder
+
+WORKDIR /build
+
+# Only needed when a dependency has to compile native code.
+# One RUN, with the apt lists removed again before the layer closes.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# The manifest alone first, so editing app code does not redo the install.
+COPY requirements.txt .
+
+# Install into /install so the runtime stage can copy a single folder.
+#   --no-cache-dir  keeps pip's wheel cache out of the layer
+#   --no-compile    skips .pyc files
+RUN pip install \
+    --no-cache-dir \
+    --no-compile \
+    --prefix=/install \
+    -r requirements.txt
+
+# ---- Stage 2: runtime ------------------------------------------------------
+FROM gcr.io/distroless/python3-debian12@sha256:REPLACE_WITH_CURRENT_DIGEST AS runtime
+
+# Standard OCI metadata; fill in the real values.
+LABEL org.opencontainers.image.title="shopapi" \
+      org.opencontainers.image.description="Production Python application" \
+      org.opencontainers.image.vendor="ExampleCo" \
+      org.opencontainers.image.source="https://git.example.com/shopapi" \
+      org.opencontainers.image.licenses="MIT"
+
+# Bring over the packages installed in the builder.
+COPY --from=builder /install/lib/python3.11/site-packages /usr/lib/python3.11/site-packages
+
+# App code is owned by the image's built-in nonroot account (UID 65532).
+COPY --chown=65532:65532 ./app /app
+
+WORKDIR /app
+
+# Drop root here, so a process that breaks out is not root on the host.
+USER 65532
+
+# Change to the port your app listens on.
+EXPOSE 8000
+
+# curl and wget do not exist in distroless, so ask the Python stdlib.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+
+# Exec form, so signals reach the app directly.
+ENTRYPOINT ["python", "-m", "app.main"]

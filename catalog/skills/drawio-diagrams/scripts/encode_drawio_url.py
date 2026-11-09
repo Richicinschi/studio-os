@@ -1,58 +1,68 @@
 #!/usr/bin/env python3
-"""Encode a .drawio XML file into a diagrams.net browser URL.
+# -*- coding: utf-8 -*-
+"""Turn a .drawio file into a diagrams.net link that carries the diagram itself.
 
-Used as the browser fallback when the draw.io desktop CLI is unavailable.
-The diagram XML is carried in the URL fragment (after `#`), so nothing is
-uploaded to any server.
+The XML travels in the URL fragment (the part after '#'), which a browser never
+sends to the server, so nothing is uploaded.
 
-Two modes:
-  (default)  read-only viewer  -> https://viewer.diagrams.net/...#R<payload>
-  --edit     editable editor   -> https://app.diagrams.net/...#create=<payload>
+  encode_drawio_url.py <file.drawio>          read-only viewer link
+  encode_drawio_url.py --edit <file.drawio>   link that opens the editor
 
-Usage: uv run python encode_drawio_url.py [--edit] <path/to/input.drawio>
+Exit codes: 0 on success, 2 on a wrong argument count.
 """
 import base64
 import json
 import sys
-import urllib.parse
 import zlib
+from urllib.parse import quote
+
+VIEWER_HOST = "viewer.diagrams.net"
+EDITOR_HOST = "app.diagrams.net"
+VIEWER_BASE = "https://" + VIEWER_HOST + "/?" + "&".join(["tags=%7B%7D", "lightbox=1", "edit=_blank"]) + "#R"
+EDITOR_BASE = "https://" + EDITOR_HOST + "/?" + "&".join(["grid=0", "pv=0", "border=10", "edit=_blank"]) + "#create="
 
 
-def _deflate_b64(xml: str) -> str:
-    # draw.io's loader runs JS decodeURIComponent on the inflated string, so the
-    # XML MUST be percent-encoded (encodeURIComponent) BEFORE deflate — otherwise
-    # a literal `%` or any non-ASCII (e.g. CJK) label makes the browser throw
-    # "URI malformed" and the diagram never opens. encodeURIComponent leaves
-    # only A-Za-z0-9 and -_.!~*'() unescaped, which `quote` reproduces here.
-    pre = urllib.parse.quote(xml, safe="!~*'()")
-    c = zlib.compressobj(9, zlib.DEFLATED, -zlib.MAX_WBITS)
-    compressed = c.compress(pre.encode("utf-8")) + c.flush()
-    # Standard base64 (atob rejects url-safe -/_); strip newlines.
-    return base64.b64encode(compressed).decode("utf-8").replace("\n", "")
+def pack(xml):
+    """Percent-encode, raw-deflate, base64 (the order draw.io's loader undoes).
+
+    The loader calls decodeURIComponent on the inflated text, so a bare '%' or a
+    non-ASCII label would make it fail with "URI malformed" unless the XML is
+    percent-encoded first. The safe set below matches encodeURIComponent.
+    """
+    keep = "".join(["!", "~", "*", "'", "(", ")"])
+    escaped = quote(xml, safe=keep).encode("utf-8")
+    deflater = zlib.compressobj(level=9, wbits=-zlib.MAX_WBITS)
+    raw = deflater.compress(escaped) + deflater.flush()
+    return base64.b64encode(raw).decode("ascii")
 
 
-def encode(xml: str) -> str:
-    """Read-only viewer URL (mxGraph `#R` raw-inflate format)."""
-    return (
-        "https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&edit=_blank#R"
-        + urllib.parse.quote(_deflate_b64(xml), safe="")
-    )
+def encode(xml):
+    """Link to the read-only viewer."""
+    return VIEWER_BASE + quote(pack(xml), safe="")
 
 
-def edit_url(xml: str) -> str:
-    """Editable editor URL — opens directly in the draw.io editor."""
-    payload = json.dumps({"type": "xml", "compressed": True, "data": _deflate_b64(xml)})
-    return (
-        "https://app.diagrams.net/?grid=0&pv=0&border=10&edit=_blank#create="
-        + urllib.parse.quote(payload, safe="")
-    )
+def edit_url(xml):
+    """Link that opens the diagram in the editor."""
+    fields = {}
+    fields["type"] = "xml"
+    fields["compressed"] = True
+    fields["data"] = pack(xml)
+    envelope = json.dumps(fields)
+    return EDITOR_BASE + quote(envelope, safe="")
+
+
+def main(argv):
+    wants_edit = "--edit" in argv
+    paths = [word for word in argv if word not in ("--edit",)]
+    if len(paths) != 1:
+        program = "encode_drawio_url.py"
+        sys.stderr.write("usage: " + program + " [--edit] <path>\n")
+        return 2
+    with open(paths[0], encoding="utf-8") as source:
+        xml = source.read()
+    print(edit_url(xml) if wants_edit else encode(xml))
+    return 0
 
 
 if __name__ == "__main__":
-    args = [a for a in sys.argv[1:] if a != "--edit"]
-    if len(args) != 1:
-        print("usage: encode_drawio_url.py [--edit] <path>", file=sys.stderr)
-        sys.exit(2)
-    with open(args[0], "r", encoding="utf-8") as f:
-        xml = f.read()
-    print(edit_url(xml) if "--edit" in sys.argv[1:] else encode(xml))
+    sys.exit(main(sys.argv[1:]))

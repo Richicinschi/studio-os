@@ -1,7 +1,10 @@
 ---
 id: improve
 module: 04-delegation
-checked: 2026-11-02
+checked: 2026-11-09
+tokens:
+  description: 74
+  body: 3184
 ---
 
 # improve: an audit turned into plans
@@ -53,12 +56,11 @@ The menu marks the item **have** when an `improve` skill exists at either level,
 - Claude Code. With subagents the audit runs in parallel; without them it audits directly.
 - A git repository: each plan records the commit it was written against, and `execute` needs a separate worktree.
 - `gh`, signed in, only for `--issues`. How to install it is not documented in docs/facts.md as of 2026-11-02.
-- The upstream `LICENSE`, kept with your copy. The `LICENSE` file in the kit's copy is MIT, copyright shadcn; the licence is not in docs/facts.md as of 2026-11-02, so Claude reads that file at the upstream before you take it.
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/improve/`: scans it with SkillSpector (`skillspector scan catalog/skills/improve --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. The kit's own scan of 2026-11-02, with the SkillSpector build that reports 2.2.3 (a fresh install is newer and may score it differently; [docs/facts.md](../docs/facts.md), "Installing SkillSpector"), rated it `DO_NOT_INSTALL` at 65/100 from four findings, each a false positive on a closer read: a defence against prompt injection read as an injection, a note that reading `~/.netrc` is a normal convention, a checklist line, and licence text (`tools/export/scan-triage.md` in the kit). It has no code files. Then Claude recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
-2. **Claude:** on your yes, writes the copy into the scope you chose, with `LICENSE` and the `references/` folder, and changes:
+1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/improve/`: scans it with SkillSpector (`skillspector scan catalog/skills/improve --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. The kit's maintainers' latest scan result is in `catalog/skills/improve/SOURCE.md`; your own scan is the one that decides (a fresh install is newer than the kit's build and may score it differently; [docs/facts.md](../docs/facts.md), "Installing SkillSpector"). The skill has no code files. Then Claude recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
+2. **Claude:** on your yes, writes the copy into the scope you chose, with its `references/` folder, and changes:
    - in its first phase, the line that adds the studio's root decision file to the design documents it reads: your decision log's path, or nothing;
    - the author line in the front matter, which names the studio, to yours;
    - the executor line in `references/closing-the-loop.md`, which leaves the model out so the executor runs on the session's model unless `CLAUDE_CODE_SUBAGENT_MODEL` is set ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), and cites a studio rule for it: the citation becomes your own reason, and when question 2 chose a cheaper default, the line names that model.
@@ -68,7 +70,7 @@ The menu marks the item **have** when an `improve` skill exists at either level,
 
 ## Check
 
-1. The files are in place: `test -f <scope>/improve/SKILL.md && test -f <scope>/improve/LICENSE && echo present` prints `present`.
+1. The files are in place: `test -f <scope>/improve/SKILL.md && test -d <scope>/improve/references && echo present` prints `present`.
 2. **you:** in a new session, in a repository, say "audit this repo and write plans". Claude starts with recon: your README, your instruction file, the configuration and the exact build and test commands. Then it shows a table of findings ranked by leverage and asks which to turn into plans, before it writes any. Afterwards `git status` shows no change outside `plans/` (or `advisor-plans/`).
 
 If Claude edits a source file, or writes plans before you pick findings, the item is not done: the plan row stays unticked.
@@ -89,4 +91,4 @@ If Claude edits a source file, or writes plans before you pick findings, the ite
 - **Secrets stay out.** A finding names the file, the line and the kind of credential, never its value.
 - **A fresh worktree is bare.** It shares the history but not installed dependencies or build output, so the executor installs them first; that is expected.
 - **Not writing-plans.** improve turns an audit into plans; [writing-plans](writing-plans.md) turns a spec you approved into a plan. The studio keeps both.
-- **Cost:** its name and description load into every session, about 129 tokens (an estimate, bytes divided by 4); the full skill, about 3,900 tokens (estimate), loads only when it is used, with its references as it reads them.
+- **Cost:** its name and description load into every session, about 74 tokens (an estimate, bytes divided by 4); the full skill, about 3,184 tokens (estimate), loads only when it is used, with its references as it reads them.

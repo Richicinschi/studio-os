@@ -1,15 +1,15 @@
-# Handling a Report That Isn't DONE
+# Reports that are not DONE
 
-Part of subagent-driven-development.
+Companion to subagent-driven-development.
 
-**DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
+**DONE_WITH_CONCERNS** means the work is finished and the implementer has doubts. Read them first. If a doubt touches correctness or scope, resolve it before any review. If it is only an observation (say, a file has grown large), note it and go on to review.
 
-**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
+**NEEDS_CONTEXT** means information was missing. Supply it and dispatch again.
 
-**BLOCKED:** The implementer cannot complete the task. Assess the blocker:
-1. If it's a context problem, provide more context and re-dispatch
-2. If the task requires more reasoning, rule on the hard part yourself, ledger the ruling, and re-dispatch with it (the model stays the session's; see SKILL.md's Model Selection)
-3. If the task is too large, break it into smaller pieces
-4. If the plan itself is wrong, rule on the correction, ledger it, and re-dispatch with the ruling carried in the dispatch
+**BLOCKED** means the implementer could not finish. Work out the cause and choose:
+1. Context was missing: add it and dispatch again.
+2. The task calls for more reasoning: decide the hard part yourself, write the ruling to the ledger, and dispatch again with the ruling inside the prompt. The model remains the session's own (Model Selection, SKILL.md).
+3. The task is too large: cut it into smaller tasks.
+4. The plan is mistaken: rule on the fix, record it in the ledger, and carry the ruling in the new dispatch.
 
-**Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
+Never wave an escalation through. Never make the same model retry with nothing changed. When an implementer says it is stuck, something has to change.

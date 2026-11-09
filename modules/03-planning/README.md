@@ -25,7 +25,7 @@ At the end, a green check is taken as proof. In the studio's experience a passin
 
 ## The mechanism
 
-- **Brainstorm, spec, plan, execute.** The superpowers library has a skill for each step, and the kit ships the studio's adapted copies. `brainstorming` explores what you want and turns it into a design you approve, written down as a spec. `writing-plans` turns the approved spec into small tasks, each with its own check. `executing-plans` carries the plan out in the session that runs it, task by task, keeping a ledger and ending with one review of the whole branch; `subagent-driven-development` runs independent tasks through subagents instead. No building before the spec has your yes.
+- **Brainstorm, spec, plan, execute.** The kit has a skill for each step. `brainstorming` explores what you want and turns it into a design you approve, written down as a spec. `writing-plans` turns the approved spec into small tasks, each with its own check. `executing-plans` carries the plan out in the session that runs it, task by task, keeping a ledger and ending with one review of the whole branch; `subagent-driven-development` runs independent tasks through subagents instead. No building before the spec has your yes.
 - **`drill-to-plan` when the ask is vague and big.** It interviews you one question at a time, each with its recommended answer for you to accept or override. It keeps a coverage checklist (goal, users, scope, data, error handling, testing, risks and more) and stops when it can predict your next three answers. Its output is an approved spec for `writing-plans`. For a small, clear ask, skip it and just act.
 - **Verify against a baseline before saying done.** `verification-before-completion` asks for evidence before any claim of success. The studio adds a baseline: compare the result with something recorded before the change. Three habits come with it:
   - Ask what would have to break for the check to go red. If the answer is "nothing that matters", the check is decoration.
@@ -45,12 +45,12 @@ The studio's memory now marks that recipe as broken, says never to commit a run 
 
 ## Apply it in Claude Code
 
-1. **Adopt the planning skills** (`brainstorming`, `writing-plans`, and `verification-before-completion`) through your adoption plan; each has its card in `cards/`. The upstream superpowers plugin is an optional alternative, after its scan ([install reference](../../docs/install-reference.md#optional-the-upstream-superpowers-plugin)).
+1. **Adopt the planning skills** (`brainstorming`, `writing-plans`, and `verification-before-completion`) through your adoption plan; each has its card in `cards/`.
 2. **Small and clear (about an hour):** just ask, with one line on what done means and how you will check it.
 3. **A day's work:** say "let's brainstorm this" to start `brainstorming`, then approve the spec it writes.
 4. **Vague and big, or someone else's vague ask:** adopt [drill-to-plan](../../catalog/skills/drill-to-plan/SOURCE.md) through `vet-and-adopt` as ADAPT, and say "drill me into a plan". (studio-specific: the project folders it explores first, the paths where it saves specs, and its commit rules; replace them with your own.)
 5. **With an approved spec,** say "write the plan" for `writing-plans`. Run it with `executing-plans`, best started in a fresh session, or `subagent-driven-development` when its tasks are independent.
-6. **Decide where specs and plans live,** and write it into your front door. The studio keeps them where the shipped `brainstorming` and `writing-plans` save them, `docs/superpowers/specs/` and `docs/superpowers/plans/`, with the date at the start of each file name.
+6. **Decide where specs and plans live,** and write it into your front door. The studio keeps them where the shipped `brainstorming` and `writing-plans` save them, `docs/specs/` and `docs/plans/`, with the date at the start of each file name.
 7. **Tick each plan step as it is done.** When the studio's wiki generator read its plans back, not one of 187 had every box ticked.
 8. **Before you say done,** run `verification-before-completion` and compare with your baseline. For data work: the row count before and after, a total that must match the source, a query whose answer you already know. A drop is a failure until it is explained.
 
@@ -62,4 +62,4 @@ The studio's memory now marks that recipe as broken, says never to commit a run 
 4. **Keep the baseline habit.** Give Claude the numbers you expect before you ask for the result, ask it to compare and to report every difference, and check one result by hand.
 5. **`drill-to-plan` works here too** as an uploaded custom skill, after `vet-and-adopt` (`docs/facts.md`, "claude.ai: custom skills and the built-in document skills").
 
-Catalog items used: [drill-to-plan](../../catalog/skills/drill-to-plan/SOURCE.md), [brainstorming](../../catalog/skills/brainstorming/SOURCE.md), [writing-plans](../../catalog/skills/writing-plans/SOURCE.md), [executing-plans](../../catalog/skills/executing-plans/SOURCE.md), [verification-before-completion](../../catalog/skills/verification-before-completion/SOURCE.md), [frontend-design](../../catalog/skills/frontend-design/SOURCE.md); the upstream `superpowers` plugin is listed in the catalog as an optional alternative.
+Catalog items used: [drill-to-plan](../../catalog/skills/drill-to-plan/SOURCE.md), [brainstorming](../../catalog/skills/brainstorming/SOURCE.md), [writing-plans](../../catalog/skills/writing-plans/SOURCE.md), [executing-plans](../../catalog/skills/executing-plans/SOURCE.md), [verification-before-completion](../../catalog/skills/verification-before-completion/SOURCE.md).

@@ -1,0 +1,87 @@
+# Production stack sketch: api, postgres, redis.
+# Shows health-gated startup, memory and CPU caps, restart policy and split networks.
+
+services:
+  # the application
+  api:
+    image: shopapi:${APP_VERSION:-latest}
+    build:
+      target: runtime
+      dockerfile: Dockerfile
+      context: .
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      - ENVIRONMENT=production
+    ports: ["${API_PORT:-8000}:8000"]
+    networks: [frontend, backend]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      test:
+        - CMD
+        - python
+        - -c
+        - from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health/live', timeout=4)
+    deploy:
+      resources:
+        reservations: {cpus: "0.5", memory: 192M}
+        limits: {cpus: "2.0", memory: 768M}
+
+  # database
+  postgres:
+    restart: unless-stopped
+    image: postgres:16-alpine
+    env_file: [.env.db]   # put POSTGRES_USER and POSTGRES_PASSWORD here
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-shopapi}
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    networks: [backend]
+    # No published port, so the host cannot reach it.
+    # For local work only, add:  ports: ["5432:5432"]
+    healthcheck:
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      test:
+        - CMD-SHELL
+        - pg_isready --username=${POSTGRES_USER:-postgres} --dbname=${POSTGRES_DB:-shopapi}
+    deploy:
+      resources:
+        reservations: {cpus: "0.5", memory: 384M}
+        limits: {cpus: "2.0", memory: 2G}
+
+  # cache
+  redis:
+    restart: unless-stopped
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory-policy", "allkeys-lru", "--maxmemory", "256mb"]
+    volumes:
+      - redis_data:/data
+    networks: [backend]
+    healthcheck:
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      test: [CMD, redis-cli, ping]
+    deploy:
+      resources:
+        reservations: {cpus: "0.1", memory: 96M}
+        limits: {cpus: "0.75", memory: 640M}
+
+# frontend faces the outside; backend is sealed off from it.
+networks:
+  frontend: {}
+  backend:
+    internal: true   # containers here cannot reach the internet
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,181 @@
+{
+  "placeholders": {
+    "__SITE_URL__": "Full live URL with https:// and no trailing slash such as https://www.riverbend-plumbing.example",
+    "__PROJECT_SLUG__": "Lowercase hyphenated name for package.json such as riverbend-plumbing",
+    "__PRIMARY_COLOR__": "Brand colour as HSL numbers, used to derive the brand-50 to brand-950 shades (e.g., 205 70% 35%)",
+    "__ACCENT_COLOR__": "Call-to-action colour as HSL numbers (e.g., 28 90% 52%)"
+  },
+  "reusableFiles": [
+    {
+      "description": "TypeScript settings that extend Astro's strict preset",
+      "path": "tsconfig.json"
+    },
+    {
+      "description": "Blog content collection schema for Astro 7",
+      "path": "src/content.config.ts"
+    },
+    {
+      "description": "Helpers that build URLs for services, areas, combo pages and posts",
+      "path": "src/lib/urls.ts"
+    },
+    {
+      "description": "Page shell: head with SEO, fonts and analytics, then header, slot and footer",
+      "path": "src/layouts/BaseLayout.astro"
+    },
+    {
+      "description": "Head tags: title, description, canonical, Open Graph, Twitter card and JSON-LD",
+      "path": "src/components/SEO.astro"
+    },
+    {
+      "description": "Sticky header with links, phone button and a mobile drawer",
+      "path": "src/components/Header.astro"
+    },
+    {
+      "description": "Footer with service and area links, contact details and copyright",
+      "path": "src/components/Footer.astro"
+    },
+    {
+      "description": "Breadcrumb trail that also prints BreadcrumbList schema",
+      "path": "src/components/Breadcrumbs.astro"
+    },
+    {
+      "description": "Expandable FAQ list that also prints FAQPage schema",
+      "path": "src/components/SeoFaq.astro"
+    },
+    {
+      "description": "Link groups to sibling services and the same service in nearby towns",
+      "path": "src/components/SeoRelatedLinks.astro"
+    },
+    {
+      "description": "Grid linking to every other area page",
+      "path": "src/components/SeoServiceAreas.astro"
+    },
+    {
+      "description": "Review cards with rating summary and Review schema",
+      "path": "src/components/SeoTestimonials.astro"
+    },
+    {
+      "description": "Homepage: hero, stats, services, process, reviews, areas and closing call to action",
+      "path": "src/pages/index.astro"
+    },
+    {
+      "description": "About page: story, team, values and trust signals",
+      "path": "src/pages/about.astro"
+    },
+    {
+      "description": "Contact page: form, contact details, hours and an urgent-call box",
+      "path": "src/pages/contact.astro"
+    },
+    {
+      "description": "Directory of every service",
+      "path": "src/pages/services/index.astro"
+    },
+    {
+      "description": "One page per service, paths taken from serviceTypes",
+      "path": "src/pages/services/[service].astro"
+    },
+    {
+      "description": "One page per area and service pair: the page type that targets "service in area" searches",
+      "path": "src/pages/services/[area]/[service].astro"
+    },
+    {
+      "description": "Directory of every area served",
+      "path": "src/pages/areas/index.astro"
+    },
+    {
+      "description": "One page per area, paths taken from serviceAreas",
+      "path": "src/pages/areas/[area].astro"
+    },
+    {
+      "description": "Blog listing read from the content collection",
+      "path": "src/pages/blog/index.astro"
+    },
+    {
+      "description": "Single blog post rendered from the content collection",
+      "path": "src/pages/blog/[slug].astro"
+    }
+  ],
+  "dataTemplates": [
+    {
+      "requiredFields": [
+        "hours",
+        "schemaType",
+        "zip",
+        "state",
+        "city",
+        "address",
+        "email",
+        "phone",
+        "name"
+      ],
+      "description": "Single source of business facts: name, contacts, address, hours, schema.org type, socials. Generated from what the owner supplies.",
+      "path": "src/data/business.ts"
+    },
+    {
+      "requiredFields": [
+        "nearby",
+        "state",
+        "county",
+        "name",
+        "slug"
+      ],
+      "description": "List of towns served, each with slug, name, county, state, coordinates and neighbouring slugs for cross-links. Generated from the owner's locations.",
+      "path": "src/data/serviceAreas.ts"
+    },
+    {
+      "requiredFields": [
+        "relatedServices",
+        "shortDescription",
+        "name",
+        "slug"
+      ],
+      "description": "List of services sold, each with slug, name, short description, icon and related services. Generated from the owner's service list.",
+      "path": "src/data/serviceTypes.ts"
+    },
+    {
+      "requiredFields": [
+        "testimonials",
+        "faqs",
+        "intro",
+        "h1",
+        "metaDescription",
+        "title"
+      ],
+      "description": "Per-page SEO text: FAQ builder and review picker. Titles, meta text, H1s, intros, FAQs and testimonials should differ for every area and service pair.",
+      "path": "src/data/seoContent.ts"
+    }
+  ],
+  "configFiles": [
+    {
+      "placeholders": [
+        "__SITE_URL__"
+      ],
+      "description": "Astro 7 config: static output, Tailwind v4 via Vite, sitemap, icons, Cloudflare adapter",
+      "path": "astro.config.mjs"
+    },
+    {
+      "placeholders": [
+        "__SITE_URL__",
+        "__PROJECT_SLUG__"
+      ],
+      "description": "npm manifest pinning Astro 7, Tailwind v4 and the other dependencies",
+      "path": "package.json"
+    },
+    {
+      "placeholders": [
+        "__SITE_URL__"
+      ],
+      "description": "Allow-all robots file that points at the sitemap index",
+      "path": "public/robots.txt"
+    },
+    {
+      "placeholders": [
+        "__ACCENT_COLOR__",
+        "__PRIMARY_COLOR__"
+      ],
+      "description": "Tailwind v4 entry stylesheet: fonts, brand and neutral colour scales, keyframes, stagger and glass utilities, hover and prose styles. Its own tokens are __FONT_DISPLAY__, __FONT_BODY__ and __BRAND_50__ to __BRAND_950__; the two colour placeholders below are the HSL inputs a caller uses to work those shades out.",
+      "path": "src/styles/global.css"
+    }
+  ],
+  "description": "Map of the template files used to scaffold a local business site"
+}

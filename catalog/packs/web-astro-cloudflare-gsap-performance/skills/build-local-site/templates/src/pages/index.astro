@@ -1,0 +1,531 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness, openingHoursSchema } from '../data/business';
+import { serviceTypes, getPriceSpan, hasPrices } from '../data/serviceTypes';
+import { serviceAreas } from '../data/serviceAreas';
+import { serviceUrl, areaUrl, contactUrl } from '../lib/urls';
+import { reviews } from '../data/seoContent';
+
+const years = yearsInBusiness();
+const siteId = business.website;
+const pageTitle = `${business.name} | Fairmont TX Plumber`;
+
+// No reviews yet means no rating block and no rating schema.
+const avgRating = reviews.length
+  ? (reviews.reduce((total, r) => total + r.rating, 0) / reviews.length).toFixed(1)
+  : null;
+
+// Four-step walkthrough shown in the interactive section
+const steps = [
+  {
+    step: 1,
+    title: 'Give Us a Call',
+    icon: 'lucide:phone-call',
+    summary: 'Tell us what is wrong and we book a visit.',
+    detail: `Phone ${business.phone} or use the web form. A few quick questions let us size up the problem, share what it may involve, and pick the soonest open slot. In an emergency, a plumber heads your way at once.`,
+    image: '/images/hero.webp',
+  },
+  {
+    step: 2,
+    title: 'On-Site Assessment',
+    icon: 'lucide:search',
+    summary: 'We look closely and quote a clear price.',
+    detail: 'A licensed plumber shows up on schedule and checks the problem with proper tools such as inspection cameras, pressure gauges and leak detectors. You hear what needs doing and get the estimate in writing before we begin. Nothing is a surprise.',
+    image: '/images/leak-repair.webp',
+  },
+  {
+    step: 3,
+    title: 'Expert Repair',
+    icon: 'lucide:wrench',
+    summary: 'The fix is done properly, with good parts.',
+    detail: 'Once you say yes, we start straight away. Parts are trade-grade, the work follows state plumbing code, and we keep the house tidy as we go. Most repairs wrap up in a single day.',
+    image: '/images/repiping.webp',
+  },
+  {
+    step: 4,
+    title: 'Final Walkthrough',
+    icon: 'lucide:check-circle',
+    summary: 'We test it all and check you are happy.',
+    detail: 'When the work is finished, we test the whole system, clear the area and show you what was done. We stay until you are satisfied, and our workmanship guarantee covers every job.',
+    image: '/images/water-heater.webp',
+  },
+];
+
+// Sample claims: keep only the badges this business can prove, and delete the rest.
+const stats = [
+  { icon: 'lucide:award', label: `${years}+ Years Experience` },
+  { icon: 'lucide:shield-check', label: 'A+ BBB Rating' },
+  { icon: 'lucide:clock', label: '24/7 Emergency Service' },
+  { icon: 'lucide:badge-check', label: 'Licensed & Insured' },
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteId}/#website`,
+      url: siteId,
+      name: business.name,
+      description: business.description,
+      publisher: { '@id': `${siteId}/#business` },
+    },
+    {
+      '@type': business.schemaType,
+      '@id': `${siteId}/#business`,
+      name: business.name,
+      legalName: business.legalName,
+      url: siteId,
+      telephone: business.phone,
+      email: business.email,
+      description: business.description,
+      founder: {
+        '@type': 'Person',
+        name: business.owner,
+      },
+      foundingDate: `${business.yearEstablished}`,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: business.address.city,
+        addressRegion: business.address.state,
+        postalCode: business.address.zip,
+        addressCountry: 'US',
+      },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: business.coordinates.lat,
+        longitude: business.coordinates.lng,
+      },
+      openingHoursSpecification: openingHoursSchema(),
+      areaServed: serviceAreas.map((a) => ({
+        '@type': 'City',
+        name: a.name,
+        containedInPlace: {
+          '@type': 'AdministrativeArea',
+          name: a.county,
+        },
+      })),
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Plumbing Services',
+        itemListElement: serviceTypes.map((s) => ({
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: s.name,
+            description: s.shortDescription,
+          },
+        })),
+      },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${siteId}/#webpage`,
+      url: siteId,
+      name: pageTitle,
+      isPartOf: { '@id': `${siteId}/#website` },
+      about: { '@id': `${siteId}/#business` },
+      description: business.description,
+    },
+  ],
+};
+---
+
+<BaseLayout title={pageTitle} description={business.description} schema={schema}>
+  <!-- ===== Hero ===== -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-brand-900 to-brand-800">
+    <div class="absolute inset-0">
+      <img
+        class="h-full w-full object-cover opacity-20"
+        src="/images/hero.webp"
+        alt="Professional plumber working in a older home"
+        width="2048"
+        height="2048"
+        loading="eager"
+      />
+    </div>
+    <!-- soft glow in the upper right corner -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(59,130,246,0.15),_transparent_70%)]" />
+
+    <div class="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+      <div class="max-w-2xl animate-fade-up">
+        <h1 class="font-display text-4xl text-white sm:text-5xl lg:text-6xl">
+          A Fairmont Plumber You Can Count On
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-brand-200">
+          {business.tagline}. Home and business plumbing throughout
+          {business.serviceRadius}, from a team with {years}+ years in the trade.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a
+            href={business.phoneHref}
+            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-6 py-3 text-sm font-semibold text-brand-950 shadow-lg transition-all hover:bg-amber-400 hover:shadow-xl"
+          >
+            <Icon name="lucide:phone" class="size-5" />
+            Call {business.phone}
+          </a>
+          <a
+            href={contactUrl()}
+            class="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-all hover:bg-white/20"
+          >
+            <Icon name="lucide:message-square" class="size-5" />
+            Request a Quote
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Stats bar ===== -->
+  <section class="bg-brand-950">
+    <div class="mx-auto grid max-w-7xl grid-cols-2 gap-px sm:grid-cols-4">
+      {stats.map((s) => (
+        <div class="flex items-center justify-center gap-3 bg-brand-950 px-4 py-5">
+          <Icon name={s.icon} class="size-5 shrink-0 text-amber-400" />
+          <span class="text-sm font-medium text-white">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ===== Services ===== -->
+  <section class="py-16 lg:py-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="text-center">
+        <h2 class="font-display text-3xl text-brand-900 sm:text-4xl">
+          Plumbing Services We Offer
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-stone-600">
+          A burst pipe at midnight or a whole new build, each job gets careful work
+          and the same high standard.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {serviceTypes.map((service, idx) => (
+          <a
+            href={serviceUrl(service.slug)}
+            class={`card-hover group relative animate-fade-up rounded-xl border border-stone-200 bg-white p-6 stagger-${Math.min(idx + 1, 6)}`}
+          >
+            {service.emergency && (
+              <span class="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                <Icon name="lucide:zap" class="size-3" />
+                24/7
+              </span>
+            )}
+            <div class="flex size-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-100">
+              <Icon name={service.icon} class="size-6" />
+            </div>
+            <h3 class="mt-4 font-display text-lg text-brand-900">
+              {service.name}
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-stone-600">
+              {service.shortDescription}
+            </p>
+            {hasPrices(service) && (
+              <p class="mt-3 text-sm font-semibold text-brand-700">
+                From ${getPriceSpan(service).min}
+              </p>
+            )}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== How we work ===== -->
+  <section class="bg-brand-950 py-16 lg:py-24" id="how-we-work">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="text-center">
+        <span class="inline-flex items-center gap-2 rounded-full bg-brand-900 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
+          <Icon name="lucide:settings" class="size-3.5" />
+          Simple Process
+        </span>
+        <h2 class="mt-4 font-display text-3xl text-white sm:text-4xl">
+          How We Work
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-brand-300">
+          We keep every job open and easy to follow, from the first phone call to the last check. This is what happens when you book with us.
+        </p>
+      </div>
+
+      <div class="mt-14 lg:flex lg:gap-10">
+        <!-- vertical tab list -->
+        <div class="flex gap-2 overflow-x-auto pb-4 lg:w-80 lg:shrink-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-0">
+          {steps.map((item, i) => (
+            <button
+              type="button"
+              class={`hww-tab group flex w-64 shrink-0 items-start gap-4 rounded-xl px-5 py-4 text-left transition-all lg:w-full ${i === 0 ? 'bg-brand-800/80 ring-1 ring-brand-600/40' : 'hover:bg-brand-900'}`}
+              data-step={item.step}
+              data-title={item.title}
+              data-detail={item.detail}
+              data-image={item.image}
+            >
+              <div class={`flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors ${i === 0 ? 'bg-amber-500 text-brand-950' : 'bg-brand-800 text-brand-400 group-hover:bg-brand-700'}`}>
+                <Icon name={item.icon} class="size-5" />
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class={`text-xs font-bold ${i === 0 ? 'text-amber-400' : 'text-brand-500'}`}>Step {item.step}</span>
+                </div>
+                <h3 class={`mt-0.5 text-sm font-semibold ${i === 0 ? 'text-white' : 'text-brand-200'}`}>
+                  {item.title}
+                </h3>
+                <p class={`mt-1 text-xs leading-relaxed ${i === 0 ? 'text-brand-300' : 'text-brand-400'}`}>
+                  {item.summary}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <!-- detail panel -->
+        <div class="mt-8 flex-1 lg:mt-0">
+          <div class="relative overflow-hidden rounded-2xl">
+            <img
+              id="hww-image"
+              class="h-64 w-full object-cover transition-opacity duration-300 sm:h-80 lg:h-96"
+              src={steps[0].image}
+              alt={`Step 1: ${steps[0].title}`}
+              width="1408"
+              height="768"
+            />
+            <!-- dark fade behind the text -->
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-950/90 via-brand-950/60 to-transparent px-6 pb-6 pt-20 sm:px-8 sm:pb-8 sm:pt-28">
+              <div class="flex items-center gap-3">
+                <span class="flex size-8 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-brand-950" id="hww-step-num">1</span>
+                <h3 class="font-display text-xl text-white sm:text-2xl" id="hww-title">{steps[0].title}</h3>
+              </div>
+              <p class="mt-3 max-w-xl text-sm leading-relaxed text-brand-200 sm:text-base" id="hww-detail">
+                {steps[0].detail}
+              </p>
+            </div>
+          </div>
+
+          <!-- step dots -->
+          <div class="mt-4 flex items-center justify-center gap-2 lg:justify-start">
+            {[1, 2, 3, 4].map((n) => (
+              <button
+                type="button"
+                class={`hww-dot size-2.5 rounded-full transition-all ${n === 1 ? 'w-8 bg-amber-500' : 'bg-brand-700 hover:bg-brand-600'}`}
+                data-dot={n}
+                aria-label={`Go to step ${n}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const tabButtons = document.querySelectorAll<HTMLButtonElement>('.hww-tab');
+    const dotButtons = document.querySelectorAll<HTMLButtonElement>('.hww-dot');
+    const heroImg = document.getElementById('hww-image') as HTMLImageElement;
+    const numEl = document.getElementById('hww-step-num');
+    const titleEl = document.getElementById('hww-title');
+    const detailEl = document.getElementById('hww-detail');
+    const TOTAL_STEPS = 4;
+
+    function showStep(n: number) {
+      const chosen = Array.from(tabButtons).find((b) => Number(b.dataset.step) === n);
+      if (!chosen || !heroImg || !numEl || !titleEl || !detailEl) return;
+
+      tabButtons.forEach((b) => {
+        const on = b === chosen;
+        b.classList.toggle('bg-brand-800/80', on);
+        b.classList.toggle('ring-1', on);
+        b.classList.toggle('ring-brand-600/40', on);
+        b.classList.toggle('hover:bg-brand-900', !on);
+
+        const iconBox = b.querySelector('div:first-child') as HTMLElement;
+        if (iconBox) {
+          iconBox.classList.toggle('bg-amber-500', on);
+          iconBox.classList.toggle('text-brand-950', on);
+          iconBox.classList.toggle('bg-brand-800', !on);
+          iconBox.classList.toggle('text-brand-400', !on);
+          iconBox.classList.toggle('group-hover:bg-brand-700', !on);
+        }
+
+        const label = b.querySelector('span:first-of-type') as HTMLElement;
+        if (label) {
+          label.classList.toggle('text-amber-400', on);
+          label.classList.toggle('text-brand-500', !on);
+        }
+
+        const heading = b.querySelector('h3') as HTMLElement;
+        if (heading) {
+          heading.classList.toggle('text-white', on);
+          heading.classList.toggle('text-brand-200', !on);
+        }
+
+        const blurb = b.querySelector('p') as HTMLElement;
+        if (blurb) {
+          blurb.classList.toggle('text-brand-300', on);
+          blurb.classList.toggle('text-brand-400', !on);
+        }
+      });
+
+      dotButtons.forEach((d) => {
+        const on = Number(d.dataset.dot) === n;
+        d.classList.toggle('bg-amber-500', on);
+        d.classList.toggle('w-8', on);
+        d.classList.toggle('bg-brand-700', !on);
+      });
+
+      // fade out, swap the picture, fade back in
+      heroImg.style.opacity = '0';
+      setTimeout(() => {
+        heroImg.src = chosen.dataset.image || '';
+        heroImg.alt = `Step ${n}: ${chosen.dataset.title}`;
+        heroImg.style.opacity = '1';
+      }, 150);
+
+      numEl.textContent = String(n);
+      titleEl.textContent = chosen.dataset.title || '';
+      detailEl.textContent = chosen.dataset.detail || '';
+    }
+
+    tabButtons.forEach((b) => {
+      b.addEventListener('click', () => showStep(Number(b.dataset.step)));
+    });
+    dotButtons.forEach((d) => {
+      d.addEventListener('click', () => showStep(Number(d.dataset.dot)));
+    });
+
+    // rotate steps on a timer; a click slows the rotation down
+    let current = 1;
+    const advance = () => {
+      current = current >= TOTAL_STEPS ? 1 : current + 1;
+      showStep(current);
+    };
+    let rotator = setInterval(advance, 6000);
+
+    document.getElementById('how-we-work')?.addEventListener('click', () => {
+      clearInterval(rotator);
+      const activeTab = document.querySelector('.hww-tab.bg-brand-800\\/80') as HTMLElement | null;
+      if (activeTab) {
+        current = Number(activeTab.dataset.step);
+      }
+      rotator = setInterval(advance, 15000);
+    });
+  </script>
+
+  <!-- ===== Reviews ===== -->
+  <section class="border-y border-stone-200/60 bg-white py-14 lg:py-20">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-2xl text-brand-900 sm:text-3xl">
+            Words From Our Customers
+          </h2>
+          {avgRating && (
+            <div class="mt-2 flex items-center gap-2">
+              <div class="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map(() => (
+                  <Icon name="lucide:star" class="size-5 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <span class="text-sm font-medium text-stone-600">
+                {avgRating} average across {reviews.length} reviews
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 flex gap-5 overflow-x-auto px-5 pb-4 lg:px-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div class="mx-auto flex max-w-7xl gap-5">
+        {reviews.map((review) => (
+          <div class="w-80 shrink-0 rounded-xl border border-stone-200/60 bg-stone-50 p-6">
+            <div class="flex items-center gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Icon
+                  name="lucide:star"
+                  class={`size-4 ${i < Math.floor(review.rating) ? 'fill-amber-400 text-amber-400' : 'text-stone-200'}`}
+                />
+              ))}
+            </div>
+            <p class="mt-3 line-clamp-4 text-sm leading-relaxed text-stone-600">
+              "{review.text}"
+            </p>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="flex size-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
+                {review.author.charAt(0)}
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-stone-800">{review.author}</p>
+                <p class="text-xs text-stone-400">{new Date(review.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Service areas ===== -->
+  <section class="bg-stone-100 py-16 lg:py-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="text-center">
+        <h2 class="font-display text-3xl text-brand-900 sm:text-4xl">
+          Where We Work
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-stone-600">
+          We cover {business.serviceRadius} and aim to reach you quickly with
+          dependable service.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {serviceAreas.map((area, idx) => (
+          <a
+            href={areaUrl(area.slug)}
+            class={`card-hover group animate-fade-up rounded-xl border border-stone-200 bg-white p-6 stagger-${Math.min(idx + 1, 6)}`}
+          >
+            <div class="flex items-center gap-3">
+              <Icon name="lucide:map-pin" class="size-5 text-brand-600" />
+              <h3 class="font-display text-lg text-brand-900">{area.name}</h3>
+            </div>
+            <p class="mt-1 text-sm text-stone-500">{area.county}</p>
+            <div class="mt-3 flex items-center gap-1.5 text-sm text-stone-600">
+              <Icon name="lucide:clock" class="size-4 text-brand-500" />
+              <span>{area.responseTime} response</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Call to action ===== -->
+  <section class="bg-brand-900">
+    <div class="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-16">
+      <div class="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div>
+          <h2 class="font-display text-3xl text-white">Got a Plumbing Problem?</h2>
+          <p class="mt-2 text-brand-200">
+            Phone us or drop a note. Small leak or large project, we are glad to help.
+          </p>
+        </div>
+        <div class="flex shrink-0 flex-wrap gap-4">
+          <a
+            href={business.phoneHref}
+            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-6 py-3 text-sm font-semibold text-brand-950 shadow-lg transition-all hover:bg-amber-400"
+          >
+            <Icon name="lucide:phone" class="size-5" />
+            {business.phone}
+          </a>
+          <a
+            href={contactUrl()}
+            class="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-white/20"
+          >
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,213 +1,272 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Superpowers Brainstorming</title>
+  <title>Brainstorm companion</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <style>
     /*
-     * BRAINSTORM COMPANION FRAME TEMPLATE
-     *
-     * This template provides a consistent frame with:
-     * - OS-aware light/dark theming
-     * - Header branding and connection status
-     * - Scrollable main content area
-     * - CSS helpers for common UI patterns
-     *
-     * Content is injected via placeholder comment in #frame-content.
+     * Frame for fragment screens.
+     * The server swaps two comment markers: the branding one inside the top bar, and the content one inside
+     * #frame-content. Colours follow the system light or dark setting through a prefers-color-scheme media query. Everything from
+     * "text styles" down is what a fragment may use; visual-companion.md shows the markup for each.
      */
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; }
-
-    /* ===== THEME VARIABLES ===== */
     :root {
-      --bg-primary: #f5f5f7;
-      --bg-secondary: #ffffff;
-      --bg-tertiary: #e5e5e7;
-      --border: #d1d1d6;
-      --text-primary: #1d1d1f;
-      --text-secondary: #86868b;
-      --text-tertiary: #aeaeb2;
-      --accent: #0071e3;
-      --accent-hover: #0077ed;
-      --success: #34c759;
-      --warning: #ff9f0a;
-      --error: #ff3b30;
-      --selected-bg: #e8f4fd;
-      --selected-border: #0071e3;
+      color-scheme: light dark;
+
+      --page-bg: #f4f4f1;
+      --bg-secondary: #fff;
+      --bg-tertiary: #e8e8e3;
+      --border: #d2d2ca;
+      --text-primary: #1e1f22;
+      --text-secondary: #707076;
+      --text-tertiary: #a2a2a8;
+      --accent: #1c6ae0;
+      --accent-hover: #3a80ee;
+      --success: #2a9d4c;
+      --warning: #e68a00;
+      --error: #d63c3c;
+      --selected-bg: #e4eefc;
+      --selected-border: #1c6ae0;
+
+      /* Short names the rules below use, so the public variables above can change without touching them. */
+      --page: var(--page-bg);
+      --surface: var(--bg-secondary);
+      --sunken: var(--bg-tertiary);
+      --line: var(--border);
+      --ink: var(--text-primary);
+      --ink-soft: var(--text-secondary);
+      --ink-faint: var(--text-tertiary);
+      --brand: var(--accent);
+      --pick-fill: var(--selected-bg);
+      --pick-line: var(--selected-border);
     }
 
+    /* Dark palette: only the public variables change; the short names above follow them. */
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg-primary: #1d1d1f;
-        --bg-secondary: #2d2d2f;
-        --bg-tertiary: #3d3d3f;
-        --border: #424245;
-        --text-primary: #f5f5f7;
-        --text-secondary: #86868b;
-        --text-tertiary: #636366;
-        --accent: #0a84ff;
-        --accent-hover: #409cff;
-        --selected-bg: rgba(10, 132, 255, 0.15);
-        --selected-border: #0a84ff;
+        --page-bg: #1a1b1d;
+        --bg-secondary: #27282b;
+        --bg-tertiary: #36373b;
+        --border: #45464b;
+        --text-primary: #f0f0ee;
+        --text-secondary: #8c8d93;
+        --text-tertiary: #66676d;
+        --accent: #4f9cff;
+        --accent-hover: #78b2ff;
+        --selected-bg: rgb(79 156 255 / 15%);
+        --selected-border: #4f9cff;
       }
     }
 
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; padding: 0; }
+    html { height: 100%; overflow: hidden; }
+
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
       display: flex;
       flex-direction: column;
-      line-height: 1.5;
+      height: 100%;
+      overflow: hidden;
+      background: var(--page);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
     }
 
-    /* ===== FRAME STRUCTURE ===== */
-    .brand { display: flex; align-items: center; min-width: 0; overflow: hidden; color: var(--text-secondary); line-height: 1; }
-    .brand a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; min-width: 0; max-width: 100%; line-height: 1; }
-    .brand-copy { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1; transform: translateY(-1px); }
-    .brand-logo { display: block; height: 1em; width: auto; max-width: 180px; flex-shrink: 0; filter: invert(1); }
-    @media (prefers-color-scheme: dark) {
-      .brand-logo { filter: none; }
-    }
-    .status { font-size: 0.7rem; color: var(--status-color, var(--success)); display: flex; align-items: center; gap: 0.4rem; justify-self: end; white-space: nowrap; line-height: 1; }
-    .status::before { content: ''; width: 6px; height: 6px; background: var(--status-color, var(--success)); border-radius: 50%; }
-
-    .main { flex: 1; overflow-y: auto; }
-    #frame-content { padding: 2rem; min-height: 100%; }
-
-    .header {
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border);
-      padding: 0.5rem 1.5rem;
-      flex-shrink: 0;
+    /* ---- top bar: brand text and connection pill ---- */
+    .top-bar {
+      flex: none;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: 1fr auto;
       align-items: center;
-      gap: 1rem;
+      column-gap: 1rem;
       min-height: 42px;
+      padding-block: .5rem;
+      padding-inline: 1.5rem;
+      background: var(--surface);
+      border-bottom: solid 1px var(--line);
     }
-    .header .brand { justify-self: start; width: 100%; font-size: 0.75rem; line-height: 1; }
-    .header .status { grid-column: 2; line-height: 1; }
-    .header span {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
+    .brand { min-width: 0; overflow: hidden; font-size: 12px; line-height: 1; }
+    .brand-text { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+    /* helper.js sets data-state on the pill; each state only changes --status-color. */
+    .status {
+      --status-color: var(--success);
+      grid-column: 2;
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      font-size: 11px;
+      line-height: 1;
+      color: var(--status-color);
     }
-    .header .selected-text {
-      color: var(--accent);
-      font-weight: 500;
+    .status[data-state="connecting"] { --status-color: var(--ink-faint); }
+    .status[data-state="reconnecting"] { --status-color: var(--warning); }
+    .status[data-state="disconnected"] { --status-color: var(--error); }
+    .status::before {
+      content: "";
+      inline-size: 6px;
+      block-size: 6px;
+      border-radius: 50%;
+      background: currentColor;
     }
 
-    /* ===== TYPOGRAPHY ===== */
-    h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
-    h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
-    .section { margin-bottom: 2rem; }
-    .label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .scroll-area { flex: 1; overflow: auto; }
+    #frame-content { min-height: 100%; padding: 2rem; }
 
-    /* ===== OPTIONS (for A/B/C choices) ===== */
-    .options { display: flex; flex-direction: column; gap: 0.75rem; }
+    /* ---- text styles ---- */
+    h2 { margin-block-end: .5rem; font-weight: 650; font-size: 1.5rem; }
+    h3 { margin-block-end: .25rem; font-weight: 650; font-size: 1.1rem; }
+    .section { margin-block-end: 2rem; }
+    .subtitle { margin-block-end: 1.5rem; }
+    .label {
+      margin-block-end: .5rem;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ---- options: lettered choices ---- */
+    .options { display: grid; gap: .75rem; }
     .option {
-      background: var(--bg-secondary);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: flex-start;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
       gap: 1rem;
-    }
-    .option:hover { border-color: var(--accent); }
-    .option.selected { background: var(--selected-bg); border-color: var(--selected-border); }
-    .option .letter {
-      background: var(--bg-tertiary);
-      color: var(--text-secondary);
-      width: 1.75rem; height: 1.75rem;
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 0.85rem; flex-shrink: 0;
-    }
-    .option.selected .letter { background: var(--accent); color: white; }
-    .option .content { flex: 1; }
-    .option .content h3 { font-size: 0.95rem; margin-bottom: 0.15rem; }
-    .option .content p { color: var(--text-secondary); font-size: 0.85rem; margin: 0; }
-
-    /* ===== CARDS (for showing designs/mockups) ===== */
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-    .card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
+      padding: 1rem 1.25rem;
+      border: solid 2px var(--line);
+      border-radius: 10px;
+      background: var(--surface);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: border-color .15s, background-color .15s;
     }
-    .card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .card.selected { border-color: var(--selected-border); border-width: 2px; }
-    .card-image { background: var(--bg-tertiary); aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; }
-    .card-body { padding: 1rem; }
-    .card-body h3 { margin-bottom: 0.25rem; }
-    .card-body p { color: var(--text-secondary); font-size: 0.85rem; }
+    :is(.option, .card).selected { border-color: var(--pick-line); }
+    .option .letter {
+      flex: none;
+      display: grid;
+      place-items: center;
+      inline-size: 1.75rem;
+      block-size: 1.75rem;
+      border-radius: 6px;
+      background: var(--sunken);
+      color: var(--ink-soft);
+      font-weight: 650;
+      font-size: .85rem;
+    }
+    .option.selected .letter { color: #fff; background: var(--brand); }
+    .option .content { flex: 1; min-inline-size: 0; }
+    .option .content h3 { margin-block-end: 2px; font-size: .95rem; }
+    .option.selected { background-color: var(--pick-fill); }
 
-    /* ===== MOCKUP CONTAINER ===== */
-    .mockup {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+    /* ---- cards: designs to compare ---- */
+    /* Boxes that wrap into as many columns as fit, and share the row when there are few. */
+    .cards, .split, .pros-cons { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .cards > * { flex: 1 1 280px; }
+    .split > * { flex: 1 1 320px; }
+    .pros-cons > * { flex: 1 1 220px; }
+    .split { gap: 1.5rem; }
+    .split > .mockup { margin-block-end: 0; }
+    .card {
       overflow: hidden;
-      margin-bottom: 1.5rem;
+      border: solid 1px var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color .15s, translate .15s, box-shadow .15s;
+    }
+    .card:hover { translate: 0 -2px; box-shadow: 0 6px 16px rgb(0 0 0 / 12%); }
+    .card-image {
+      display: grid;
+      place-items: center;
+      aspect-ratio: 16 / 10;
+      background: var(--sunken);
+    }
+    .card-body { padding: 16px; }
+    .card.selected { border-width: 2px; }
+
+    :is(.option, .card):hover { border-color: var(--brand); }
+
+    /* ---- mockup frame and split view ---- */
+    .mockup {
+      overflow: hidden;
+      margin-block-end: 1.5rem;
+      border: solid 1px var(--line);
+      border-radius: 10px;
+      background: var(--surface);
     }
     .mockup-header {
-      background: var(--bg-tertiary);
-      padding: 0.5rem 1rem;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      border-bottom: 1px solid var(--border);
+      padding: .5rem 1rem;
+      border-block-end: solid 1px var(--line);
+      background: var(--sunken);
+      font-size: .75rem;
     }
-    .mockup-body { padding: 1.5rem; }
+    .mockup-body { padding: 24px; }
 
-    /* ===== SPLIT VIEW (side-by-side comparison) ===== */
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 700px) { .split { grid-template-columns: 1fr; } }
+    /* ---- pros and cons: --tone colours the heading ---- */
+    .pros-cons { margin-block: 1rem; }
+    .pros, .cons { padding: 1rem; border-radius: 8px; background: var(--surface); }
+    .pros { --tone: var(--success); }
+    .cons { --tone: var(--error); }
+    .pros h4, .cons h4 { margin-block-end: .5rem; color: var(--tone); font-size: .85rem; }
+    :is(.pros, .cons) ul { margin-inline-start: 1.25rem; font-size: .85rem; }
+    .pros li + li, .cons li + li { margin-block-start: .25rem; }
 
-    /* ===== PROS/CONS ===== */
-    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
-    .pros, .cons { background: var(--bg-secondary); border-radius: 8px; padding: 1rem; }
-    .pros h4 { color: var(--success); font-size: 0.85rem; margin-bottom: 0.5rem; }
-    .cons h4 { color: var(--error); font-size: 0.85rem; margin-bottom: 0.5rem; }
-    .pros ul, .cons ul { margin-left: 1.25rem; font-size: 0.85rem; color: var(--text-secondary); }
-    .pros li, .cons li { margin-bottom: 0.25rem; }
-
-    /* ===== PLACEHOLDER (for mockup areas) ===== */
+    /* ---- wireframe parts ---- */
     .placeholder {
-      background: var(--bg-tertiary);
-      border: 2px dashed var(--border);
-      border-radius: 8px;
       padding: 2rem;
+      border-radius: 8px;
+      border: dashed 2px var(--line);
+      background: var(--sunken);
+      color: var(--ink-faint);
       text-align: center;
-      color: var(--text-tertiary);
+    }
+    .mock-nav {
+      display: flex;
+      gap: 1.5rem;
+      padding: .75rem 1rem;
+      background: var(--brand);
+      color: #fff;
+      font-size: .9rem;
+    }
+    .mock-sidebar { min-inline-size: 180px; padding: 1rem; background: var(--sunken); }
+    .mock-content { flex: 1; padding: 1.5rem; }
+    .mock-button {
+      padding: .5rem 1rem;
+      border: 0;
+      border-radius: 6px;
+      background: var(--brand);
+      color: #fff;
+      font-size: .85rem;
+    }
+    .mock-input {
+      inline-size: 100%;
+      padding: .5rem;
+      border-radius: 6px;
+      background: var(--page);
+      border: solid 1px var(--line);
     }
 
-    /* ===== INLINE MOCKUP ELEMENTS ===== */
-    .mock-nav { background: var(--accent); color: white; padding: 0.75rem 1rem; display: flex; gap: 1.5rem; font-size: 0.9rem; }
-    .mock-sidebar { background: var(--bg-tertiary); padding: 1rem; min-width: 180px; }
-    .mock-content { padding: 1.5rem; flex: 1; }
-    .mock-button { background: var(--accent); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; }
-    .mock-input { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; width: 100%; }
+    /* ---- muted text, shared by every element that explains rather than asks ---- */
+    .brand, .subtitle, .label, .mockup-header,
+    .option .content p, .card-body p, .pros ul, .cons ul { color: var(--ink-soft); }
+    .option .content p, .card-body p { font-size: .85rem; }
+
+    /* end of frame styles */
   </style>
+  <link rel="icon" href="data:,">
 </head>
 <body>
-  <div class="header">
+  <header class="top-bar">
     <!-- BRANDING -->
-    <div class="status">Connecting…</div>
-  </div>
+    <span class="status">Connecting…</span>
+  </header>
 
-  <div class="main">
-    <div id="frame-content">
+  <main class="scroll-area">
+    <section id="frame-content" aria-label=Screen>
       <!-- CONTENT -->
-    </div>
-  </div>
-
+    </section>
+  </main>
 </body>
 </html>

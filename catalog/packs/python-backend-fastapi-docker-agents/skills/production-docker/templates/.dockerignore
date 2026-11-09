@@ -1,0 +1,58 @@
+# Build-context filter for production images.
+# Anything listed here never reaches the Docker daemon.
+
+# Source control
+.git
+.gitignore
+
+# Local env files and credentials (the example file stays)
+.env
+.env.*
+!.env.example
+
+# Python leftovers
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv
+.mypy_cache
+.ruff_cache
+.pytest_cache
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node leftovers
+node_modules
+.npm
+.yarn
+
+# Editors
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Not needed at run time
+tests/
+test/
+docs/
+*.md
+!README.md
+
+# Docker's own files, so a build cannot recurse into itself
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Pipelines
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Operating system noise
+.DS_Store
+Thumbs.db

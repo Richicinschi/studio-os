@@ -4,14 +4,14 @@ description: >-
   Use when someone wants to adopt the Studio OS kit, or a new version of it, into their own Claude
   setup. Runs the adoption in five phases: a read-only audit on their yes; one question at a time
   about their work, data rules and tools; the feature menu, each item flagged with importance and
-  context cost; an approved spec and a plan in small waves; wave 1 carried out item by item through
+  context cost, and the domains that fit their work; an approved spec and a plan in small waves; wave 1 carried out item by item through
   vet-and-adopt; and a verify phase with proof in the same sitting. Trigger on "start the adoption",
   "adopt the kit", "drill me to adopt", "set me up like the studio", "update my adoption", "what is
   new in the kit", "check my setup". Never installs anything itself.
 metadata:
   category: adoption
   author: Studio OS kit (forked from the studio's drill-to-plan)
-  version: 2.0.0
+  version: 3.0.0
 ---
 
 # drill-to-adopt
@@ -66,18 +66,31 @@ True:
   commit, which git hosts a tool such as `gh` works with, the context window's size and any share of
   it. Not there: say so and tell them what to check and where, or offer a web lookup as its own
   question and cite what it finds. Never from memory, never as a passing remark.
+- **Plans and prices come from `docs/facts.md` too.** Whenever a plan comes up (their answer to the
+  plan question, a limit, a feature that depends on a plan, the cost of anything), look it up there
+  first and name the section: "Installing the tools on Windows, macOS and Linux" says which plans
+  include Claude Code, and "Claude Code: plans, account, attribution and where session content goes"
+  covers accounts and data. If the plan they name does not fit what they plan to do (the free
+  claude.ai plan and Claude Code, for one), say so at once, with the section, before the next question.
+  "Not documented" is an answer only after you have read those sections.
 - Flag a fact whose `checked:` date is older than 90 days: "this may have changed since <date>".
 - Keep verified, inferred and assumed apart in what you say.
 - State the cost in time, tokens or money before a step that has one: per item, never as a running
   total. A whole-setup total appears twice only: at the menu and in the handover.
-- Every count you state comes from the file it describes (count the rows of `spec.md` §4 before you
-  say "N items"), and a token total is computed with the sizes they chose.
+- Every count you state comes from a listing you ran in this sitting, never from memory: files
+  installed (list the destination folder and count the lines), rows in a plan (count the rows of
+  `plan.md`), items in the spec (count the rows of `spec.md` §4). Quote the count and the command that
+  gave it. A token total is computed with the sizes they chose.
+- **Never write a person's name into a file.** Not theirs, and not the machine user's, git's or the
+  account's, unless they give it to you and ask for it. The spec's Adopter field says "the adopter"
+  (or stays empty), and nothing in `adoption/` names a person you did not hear named in this run.
 - Say plainly what the kit does not cover.
 
 ## Before the first question
 
 1. Read `ADOPT.md`, `catalog/features.json` (the menu: every item, its module, importance, why,
-   loads and token estimate, and its card), `catalog/INDEX.md`, and the `questions:` in the front
+   loads and token estimate, and its card; and `domains`, the packs this kit ships, each with its
+   skills, agents and token costs), `catalog/INDEX.md`, and the `questions:` in the front
    matter of every `modules/*/README.md`. Read an item's card, `cards/<id>.md`, before you ask about it.
 2. Find the mode and the phase by testing one path: does `adoption/` exist in their setup? Test that
    name only; never list, glob or search their setup folder before their yes to the audit. No
@@ -229,7 +242,7 @@ overlaps one, shows on the menu as `you have: <name>`, and its route question of
 - replace yours;
 - keep both, with a warning: both load every session, and Claude sees two skills for one job. The
   studio lived through this while a plugin and its own adapted copy of that plugin's skills were both
-  installed (`cards/superpowers.md`, Watch out).
+  installed.
 
 ### The feature menu (one question)
 
@@ -266,6 +279,33 @@ the smallest that solves their problem; offer growing it in update mode.
 
 Write every answer to `adoption/features.md` (from `templates/adoption/features.md`) as it comes.
 They may also edit that file by hand; a re-run reads it and never asks again.
+
+### Domains (one question)
+
+A domain is a pack: a set of skills for one kind of job, installed together, from `domains` in
+`catalog/features.json`. Each costs one short description every session (its `alwaysOnTokens`); its
+index and the skills inside load only when a task reaches them. Ask this after the menu, once, and
+only about the domains that fit what they told you in round 1:
+
+- Offer a domain only when their work, profiles or tools make it plausible, and name the one line
+  from the domain's `why`. Do not offer a domain merely because it exists: a domain they
+  never named a job for stays out of the question.
+- A domain whose pack is not in `catalog/packs/` is not in this version of the kit, so it is not
+  offered, whatever the studio uses.
+- When no domain fits, the options are only **"None of these fit"** and "Not sure". Never list a domain you
+  have said does not fit, and never name the kit's other domains in the question.
+- Options: the fitting domains, each with its every-session cost (about N tokens, an estimate), then
+  **"None of these fit"**, which is a valid answer and installs nothing, then "Not sure: none for
+  now; update mode offers them again".
+- Record the answer in `adoption/features.md` like any menu item: one row per chosen domain, with
+  its id, the every-session cost and the scope (this project or every project). A "none" answer is
+  written as a row too, so a re-run does not ask again.
+- Read the domain's card, `cards/pack-<id>.md`, before you ask its questions, and ask them under the
+  same rules as any other card. Installing a domain is a row in the plan like any other and goes
+  through `vet-and-adopt`, which scans the pack, then copies its entry and skills into
+  `.claude/skills/<id>/`, its agents into `.claude/agents/` and its standalone stubs beside it.
+- Someone who only uses claude.ai takes the pack as a zip: `node tools/upload-bundle.mjs <id> --out
+  <folder>` builds it, and START-HERE ("If you only use claude.ai") says how to upload it.
 
 ### The total
 
@@ -433,3 +473,19 @@ Say in one line what is still needed and which phase the next run starts from.
    under the same rules. Never re-ask a decided item unless the changelog says it changed.
 4. Append an "Update to vX.Y.Z" section to their spec, add rows to their plan, and continue with
    phases 4 and 5 for the new rows.
+
+## Scenarios this skill must handle
+
+Read these when you change the skill; each is a way the run can go wrong.
+
+- **No domain fits.** The adopter's work is writing and note-taking, and nothing in `domains` matches.
+  Ask the domain question with only "None of these fit" and "Not sure". The right result is a
+  recorded "no domain" row in `adoption/features.md`, no pack in the plan, and no pack installed. It
+  is a finding, not a failure ([Voice and honesty](#voice-and-honesty)).
+- **A domain they have in part.** They already keep a skill that runs a panel. The card's Detect marks
+  the domain **partly**; the route question offers keep, fold, replace or both with the warning.
+- **A pack the kit does not ship.** They ask for a domain the studio uses that is not in `domains`.
+  Say it is not in this kit, and offer the gap report's routes: an outside candidate through
+  `vet-and-adopt`, or a skill they write themselves.
+- **claude.ai only.** No agents install; the zip carries the entry and the skills, and a skill that
+  needs a local tool says so in its "Without local tools" section.

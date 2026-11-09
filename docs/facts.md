@@ -37,19 +37,12 @@ references:
   - https://github.com/gitleaks/gitleaks/releases
   - https://github.com/gitleaks/gitleaks/blob/master/.pre-commit-hooks.yaml
   - https://github.com/microsoft/winget-pkgs/tree/master/manifests/g/Gitleaks/Gitleaks
-  - https://github.com/obra/superpowers
-  - https://github.com/obra/superpowers/blob/v7.0.1/.claude-plugin/marketplace.json
-  - https://github.com/obra/superpowers/tree/v7.0.1/skills
-  - https://github.com/obra/superpowers/releases
-  - https://github.com/obra/superpowers/blob/v7.0.1/skills/brainstorming/scripts/server.cjs
   - https://github.com/NVIDIA/SkillSpector
   - https://github.com/NVIDIA/SkillSpector/blob/main/pyproject.toml
   - https://docs.python.org/3/using/cmdline.html#envvar-PYTHONUTF8
   - https://support.claude.com/en/articles/9517075-what-are-projects
   - https://support.claude.com/en/articles/11817273-how-does-claude-s-memory-work
   - https://support.claude.com/en/articles/12512180-using-skills-in-claude
-  - https://github.com/anthropics/skills
-  - https://github.com/anthropics/claude-plugins-official
   - https://code.claude.com/docs/en/tools-reference
   - https://code.claude.com/docs/en/headless
   - https://github.com/git/git/blob/master/Documentation/RelNotes/2.34.0.adoc
@@ -92,7 +85,6 @@ references:
   - https://docs.docker.com/reference/cli/docker/system/info/
   - https://docs.docker.com/reference/cli/docker/container/rm/
   - https://docs.docker.com/engine/cli/formatting/
-  - https://github.com/multica-ai/andrej-karpathy-skills
   - https://github.com/NVIDIA/SkillSpector/tags
 ---
 
@@ -325,35 +317,6 @@ gitleaks version
 - The command that scans staged changes, as gitleaks' own pre-commit hook runs it: `gitleaks git --pre-commit --redact --staged --verbose`. ([source](https://github.com/gitleaks/gitleaks/blob/master/.pre-commit-hooks.yaml))
 - Two more of its flags: `--no-banner` ("suppress banner") and `--exit-code` ("exit code when leaks have been encountered (default 1)"). Its exit codes: 0, no leaks present; 1, leaks or error encountered; 126, unknown flag. ([source](https://github.com/gitleaks/gitleaks))
 
-## Installing superpowers
-
-The kit ships the studio's adapted copy of the superpowers skills it uses (module 03 and 04 items, each with a `VENDORED.md` listing what changed). The upstream plugin is the optional alternative. The commands are the same on every operating system and are typed inside Claude Code. This pins the version the studio triaged and vendored, 7.0.1 (commit `2ce8aa15`):
-
-```text
-/plugin marketplace add obra/superpowers#v7.0.1
-/plugin install superpowers@superpowers-dev
-```
-
-From a terminal instead: `claude plugin marketplace add obra/superpowers#v7.0.1`, then `claude plugin install superpowers@superpowers-dev`.
-
-Scan exactly that version before you install it (Windows PowerShell: run `$env:PYTHONUTF8=1` first):
-
-```bash
-git clone --depth 1 --branch v7.0.1 https://github.com/obra/superpowers.git superpowers-7.0.1
-skillspector scan superpowers-7.0.1 --no-llm
-```
-
-- Expect the scan to say no. On 2026-11-02, SkillSpector's static scan (the build that reports 2.2.3; see "Installing SkillSpector") rated 7.0.1 at 100/100, CRITICAL, `DO_NOT_INSTALL`, from 195 findings: 64 high, 128 medium, 3 low. 143 of them are in material Claude Code never loads: the repository's plans, tests, release notes, GitHub templates and other tools' folders. 52 load: 50 in `skills/` and 2 in `hooks/`; read those before you decide. The studio's triage found 47 of the 52 false positives. The earlier 6.0.3 got the same verdict from 270 findings. ([source](https://github.com/NVIDIA/SkillSpector))
-- The scan does not flag the one call that leaves your machine. The brainstorming skill's optional browser companion loads its logo from the vendor's website, on by default, which tells them your IP address and the superpowers version. To stop it, set `SUPERPOWERS_DISABLE_TELEMETRY=1` in the environment Claude Code starts in, or under the `env` key of your `settings.json` (see "Claude Code: measuring context and asking multiple choice"); Claude Code's own `DISABLE_TELEMETRY` and `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` stop it too. The kit's adapted `brainstorming` has the request removed. ([source](https://github.com/obra/superpowers), [source](https://github.com/obra/superpowers/blob/v7.0.1/skills/brainstorming/scripts/server.cjs))
-- 7.0.1 adds a skill, `diagnosing-superpowers`, that reads your session transcripts and can search the vendor's GitHub issues with your symptom terms without asking first; the studio skipped it. ([source](https://github.com/obra/superpowers/tree/v7.0.1/skills))
-- What the plugin loads into every session: about 1,465 tokens on 7.0.1, its start-up text (about 800) plus 15 skill descriptions (about 667), an estimate (bytes divided by 4) measured on 2026-11-02.
-- Claude Code pins a marketplace to a branch or tag with `#<ref>`, for example `/plugin marketplace add your-org/plugins#v1.2.0`. ([source](https://code.claude.com/docs/en/plugins/install))
-- The superpowers repository is itself a marketplace named `superpowers-dev` whose plugin source is the repository itself, so pinning it to tag `v7.0.1` pins the plugin; at that tag the plugin's version is 7.0.1. ([source](https://github.com/obra/superpowers/blob/v7.0.1/.claude-plugin/marketplace.json))
-- The README's own routes install the newest release: `/plugin install superpowers@claude-plugins-official`, or `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace`. The newest release on 2026-11-02 is v7.0.1 (2026-10-21). The studio uninstalled the plugin and runs its adapted copy of 7.0.1. ([source](https://github.com/obra/superpowers), [source](https://github.com/obra/superpowers/releases))
-- `claude plugin list` shows each plugin's `Version`, `Scope` and `Status`; after the pinned install it lists `superpowers@superpowers-dev` at `Version: 7.0.1`. ([source](https://code.claude.com/docs/en/plugins/install))
-- Plugins from third-party marketplaces do not update themselves by default. ([source](https://code.claude.com/docs/en/plugins/install))
-- A version argument on `claude plugin install` itself: not documented as of 2026-11-02. ([source](https://code.claude.com/docs/en/plugins/install))
-
 ## Installing SkillSpector
 
 The same command on Windows, macOS and Linux, once uv is installed:
@@ -411,8 +374,7 @@ PYTHONUTF8=1 skillspector scan <path or git URL> --no-llm
 - Custom skills are available on Free, Pro, Max, Ultra, Team and Enterprise and need code execution turned on; Team and Enterprise owners can turn skill creation off. ([source](https://support.claude.com/en/articles/12512180-using-skills-in-claude))
 - To upload one: zip the skill folder, then Customize > Skills > "+" > "+ Create skill" > "Upload a skill". ([source](https://support.claude.com/en/articles/12512180-using-skills-in-claude))
 - The built-in document skills work with Excel, Word, PowerPoint and PDF files. On Free, Pro, Max and Ultra, turn on Settings > Capabilities > "Code execution and file creation" ("Create and edit files" in the newer layout), then switch the skills on in Customize > Skills. On Team they are on for the organization by default; on Enterprise the owners set them in Organization settings > Plugins & skills > Policy. ([source](https://support.claude.com/en/articles/12512180-using-skills-in-claude))
-- Their source is published in `anthropics/skills` (the `docx`, `pdf`, `pptx` and `xlsx` folders) as source-available, not open source. ([source](https://github.com/anthropics/skills))
-- A `dataviz` skill is not documented as an Anthropic built-in, in claude.ai or in Claude Code, as of 2026-11-02, and it is in neither `anthropics/skills` nor `anthropics/claude-plugins-official`. ([source](https://support.claude.com/en/articles/12512180-using-skills-in-claude), [source](https://code.claude.com/docs/en/skills))
+- A `dataviz` skill is not documented as an Anthropic built-in, in claude.ai or in Claude Code, as of 2026-11-02. ([source](https://support.claude.com/en/articles/12512180-using-skills-in-claude), [source](https://code.claude.com/docs/en/skills))
 
 ## claude.ai: connectors
 
@@ -425,10 +387,5 @@ PYTHONUTF8=1 skillspector scan <path or git URL> --no-llm
 
 ## Licences of the external items
 
-- superpowers: MIT. ([source](https://github.com/obra/superpowers))
 - SkillSpector: Apache-2.0. ([source](https://github.com/NVIDIA/SkillSpector))
-- The document skills (`docx`, `pdf`, `pptx`, `xlsx`): "© 2025 Anthropic, PBC. All rights reserved."; their use is governed by your agreement with Anthropic, or by its Consumer or Commercial Terms of Service. ([source](https://github.com/anthropics/skills))
-- frontend-design: Apache-2.0, in Anthropic's official plugin marketplace, installed with `/plugin install frontend-design@claude-plugins-official`. The kit ships the studio's vendored copy of its skill text of 2026-09-01, with the licence in its folder. ([source](https://github.com/anthropics/claude-plugins-official), [source](https://code.claude.com/docs/en/plugins/install))
-- dataviz: no licence published, because no source is published. ([source](https://github.com/anthropics/skills))
 - gitleaks, which the hook templates call: MIT. ([source](https://github.com/gitleaks/gitleaks))
-- The coding guidelines, `multica-ai/andrej-karpathy-skills`: its README's "License" section reads "MIT", and the repository has no `LICENSE` file at its root (a request for one returned 404 on 2026-11-02). ([source](https://github.com/multica-ai/andrej-karpathy-skills))

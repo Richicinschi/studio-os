@@ -2,6 +2,9 @@
 id: git-guardrails
 module: 06-git-and-guardrails
 checked: 2026-11-02
+tokens:
+  description: 75
+  body: 910
 ---
 
 # A guard on Claude's git commands
@@ -84,4 +87,4 @@ If step 1 prints `exit 0` for the force-push, the script differs from the one in
 - **It also blocks [git-cleanup](git-cleanup.md)'s force deletions** (`git branch -D`).
 - **A shared repository:** `.claude/settings.json` and `.claude/hooks/` are usually committed, so the guard reaches your team too. Agree it first, or put the entry in `.claude/settings.local.json`, your own settings for one project (a hand-made one goes in `.gitignore`), with the script in your user folder.
 - **Windows:** the script is bash. Claude Code runs hook commands through Git Bash on Windows, or through PowerShell when Git Bash is not installed ([docs/facts.md](../docs/facts.md), "Claude Code: hooks"), so install Git for Windows (Needs); Check step 2 is the proof on your machine.
-- **Token cost:** the hook loads nothing into context. If you keep the skill, its description loads every session, about 120 tokens, and its body about 950 tokens when it runs: estimates (bytes divided by 4) measured on version 1.2.0 before the kit's rewrite of its notes, so your copy may be a little smaller.
+- **Token cost:** the hook loads nothing into context. If you keep the skill, its description loads every session, about 75 tokens, and its body about 950 tokens when it runs: estimates (bytes divided by 4) measured on version 1.2.0 before the kit's rewrite of its notes, so your copy may be a little smaller.

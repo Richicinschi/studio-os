@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- small predicates ----
+    function signedIn()      { return request.auth != null; }
+    function me(uid)         { return signedIn() && request.auth.uid == uid; }
+    function isAdmin()       { return signedIn() && request.auth.token.admin == true; }
+    function hasRole(r)      { return signedIn() && request.auth.token.role == r; }
+    function ownsExisting()  { return signedIn() && resource.data.authorId == request.auth.uid; }
+    function ownsIncoming()  { return signedIn() && request.resource.data.authorId == request.auth.uid; }
+    function keysInclude(k)  { return request.resource.data.keys().hasAll(k); }
+    function keysWithin(k)   { return request.resource.data.keys().hasOnly(k); }
+    function textBetween(f, lo, hi) {
+      return request.resource.data[f] is string
+          && request.resource.data[f].size() >= lo
+          && request.resource.data[f].size() <= hi;
+    }
+
+    // ---- users ----
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if me(uid)
+                    && keysInclude(['email', 'createdAt'])
+                    && request.resource.data.createdAt == request.time;
+      allow update: if me(uid);
+      allow delete: if me(uid) || isAdmin();
+
+      match /private/{docId} {
+        allow read, write: if me(uid);
+      }
+    }
+
+    // the length caps below are example values, a starting point, not measured values
+    // ---- posts and their comments ----
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if ownsIncoming()
+                    && keysInclude(['title', 'content', 'authorId', 'createdAt'])
+                    && textBetween('title', 1, 200)
+                    && textBetween('content', 1, 50000)
+                    && request.resource.data.createdAt == request.time;
+      allow update: if (ownsExisting() || isAdmin())
+                    && request.resource.data.authorId == resource.data.authorId
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if ownsExisting() || isAdmin();
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if ownsIncoming();
+        allow update, delete: if ownsExisting();
+      }
+    }
+
+    // ---- admin area ----
+    match /admin/{doc=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // ---- public config, admin-written ----
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- everything else is closed ----
+    match /{doc=**} {
+      allow read, write: if false;
+    }
+  }
+}

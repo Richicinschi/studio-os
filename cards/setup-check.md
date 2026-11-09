@@ -2,6 +2,8 @@
 id: setup-check
 module: 03-planning
 checked: 2026-11-02
+other_figures:
+  - 29
 ---
 
 # Check my setup

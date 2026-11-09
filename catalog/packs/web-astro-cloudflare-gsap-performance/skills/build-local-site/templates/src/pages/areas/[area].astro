@@ -1,0 +1,198 @@
+---
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness, openingHoursSchema } from '../../data/business';
+import { serviceTypes, getPriceSpan, hasPrices } from '../../data/serviceTypes';
+import { serviceAreas, getNearbyAreas } from '../../data/serviceAreas';
+import type { ServiceArea } from '../../data/serviceAreas';
+import { areaUrl, comboUrl, contactUrl } from '../../lib/urls';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SeoFaq from '../../components/SeoFaq.astro';
+import SeoTestimonials from '../../components/SeoTestimonials.astro';
+
+export function getStaticPaths() {
+  return serviceAreas.map((area) => ({ params: { area: area.slug }, props: { area } }));
+}
+
+interface Props {
+  area: ServiceArea;
+}
+
+const { area } = Astro.props;
+const neighbours = getNearbyAreas(area);
+
+const pageTitle = `Plumber in ${area.name}, TX`;
+const metaDescription = `Licensed plumber for ${area.name}, ${area.county}, TX. Typical arrival ${area.responseTime}. Repairs, installs and urgent calls for homes and businesses. Phone ${business.phone}.`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': business.schemaType,
+  name: business.name,
+  description: `${business.name} sends licensed plumbers to homes and businesses in ${area.name}, ${area.county}, Texas.`,
+  telephone: business.phone,
+  url: business.website,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: area.name,
+    addressRegion: 'TX',
+    postalCode: area.zipCodes[0],
+    addressCountry: 'US',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: area.lat, longitude: area.lng },
+  areaServed: [
+    { '@type': 'City', name: area.name },
+    { '@type': 'AdministrativeArea', name: area.county },
+  ],
+  openingHoursSpecification: openingHoursSchema(),
+};
+
+const facts = [
+  { term: 'County', value: area.county },
+  { term: 'Population', value: area.population.toLocaleString() },
+  { term: 'ZIP Codes', value: area.zipCodes.join(', ') },
+];
+const factLabel = 'text-xs font-medium uppercase tracking-wide text-stone-400';
+---
+
+<BaseLayout title={pageTitle} description={metaDescription} schema={localBusinessSchema}>
+  <Breadcrumbs crumbs={[{ label: 'Service Areas', href: '/areas/' }, { label: area.name }]} />
+
+  <!-- Intro and fact card -->
+  <section class="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-8">
+    <div class="grid gap-8 lg:grid-cols-3 lg:gap-12">
+      <div class="lg:col-span-2">
+        <h1 class="font-display text-3xl text-brand-900 sm:text-4xl lg:text-5xl">{pageTitle}</h1>
+        <p class="mt-6 text-lg leading-relaxed text-stone-600">{area.description}</p>
+        <p class="mt-4 text-stone-600">
+          {business.name} has worked in {area.name} and {area.county} for {yearsInBusiness()} years.
+          A leak at midnight, a new water heater or a full repipe of an old house: our licensed
+          plumbers do honest work at fair prices, and we live in the same communities as our customers.
+        </p>
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="rounded-xl border border-stone-200/60 bg-white p-6 shadow-sm">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-stone-400">At a glance</h2>
+
+          <dl class="mt-4 space-y-4">
+            {facts.map((f) => (
+              <div>
+                <dt class={factLabel}>{f.term}</dt>
+                <dd class="mt-0.5 text-sm font-semibold text-stone-800">{f.value}</dd>
+              </div>
+            ))}
+            <div>
+              <dt class={factLabel}>Arrival time</dt>
+              <dd class="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-brand-700">
+                <Icon name="lucide:clock" class="size-4 text-brand-500" />
+                {area.responseTime}
+              </dd>
+            </div>
+          </dl>
+
+          <div class="mt-6 border-t border-stone-100 pt-5">
+            <a
+              href={business.phoneHref}
+              class="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+            >
+              <Icon name="lucide:phone" class="size-4" />
+              {business.phone}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- One card per service, each linking to its combo page -->
+  <section class="border-t border-stone-200/60 bg-white py-16">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 class="font-display text-2xl text-brand-900 sm:text-3xl">What we do in {area.name}</h2>
+      <p class="mt-3 max-w-2xl text-stone-600">
+        Routine upkeep through to big installs. Open a service to see details and prices for {area.name}.
+      </p>
+
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {serviceTypes.map((s) => (
+          <a
+            href={comboUrl(area.slug, s.slug)}
+            class="group rounded-xl border border-stone-200/60 bg-stone-50 p-5 transition-all hover:border-brand-200 hover:bg-white hover:shadow-md"
+          >
+            <div class="flex items-center justify-between">
+              <Icon name={s.icon} class="size-6 text-brand-600" />
+              {s.emergency && (
+                <span class="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-600 ring-1 ring-red-200/60">
+                  Urgent
+                </span>
+              )}
+            </div>
+            <h3 class="mt-3 text-base font-semibold text-stone-800 group-hover:text-brand-800">{s.name}</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-stone-500">{s.shortDescription}</p>
+            {hasPrices(s) && (
+              <p class="mt-3 text-xs font-medium text-brand-700">
+                ${getPriceSpan(s).min.toLocaleString()} to ${getPriceSpan(s).max.toLocaleString()}
+              </p>
+            )}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {neighbours.length > 0 && (
+    <section class="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <h2 class="font-display text-2xl text-brand-900 sm:text-3xl">Towns close to {area.name}</h2>
+      <p class="mt-3 max-w-2xl text-stone-600">Beyond {area.name}, we also cover these neighbouring places.</p>
+
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {neighbours.map((n) => (
+          <a
+            href={areaUrl(n.slug)}
+            class="group rounded-xl border border-stone-200/60 bg-white p-5 transition-all hover:border-brand-200 hover:shadow-md"
+          >
+            <div class="flex items-center gap-3">
+              <Icon name="lucide:map-pin" class="size-5 text-brand-500" />
+              <span class="font-semibold text-stone-800 group-hover:text-brand-800">{n.name}</span>
+            </div>
+            <p class="mt-2 text-sm text-stone-500">{n.county}</p>
+            <p class="mt-1 text-xs text-stone-400">Residents: {n.population.toLocaleString()}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <div class="border-t border-stone-200/60 bg-white">
+    <SeoFaq area={area} />
+  </div>
+
+  <div class="mx-auto max-w-7xl px-5 lg:px-8">
+    <SeoTestimonials area={area} />
+  </div>
+
+  <section class="mt-16 bg-brand-900 py-16">
+    <div class="mx-auto max-w-4xl px-5 text-center lg:px-8">
+      <h2 class="font-display text-2xl text-white sm:text-3xl">Plumber wanted in {area.name}?</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-brand-200">
+        {business.name} is local and licensed ({business.license}), serving {area.county} since {business.yearEstablished}.
+        Phone today and we will get someone moving.
+      </p>
+      <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a
+          href={business.phoneHref}
+          class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-brand-900 shadow-sm transition-all hover:bg-stone-100 hover:shadow-md"
+        >
+          <Icon name="lucide:phone" class="size-4" />
+          {business.phone}
+        </a>
+        <a
+          href={contactUrl()}
+          class="inline-flex items-center gap-2 rounded-lg border border-brand-300/40 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-brand-800"
+        >
+          <Icon name="lucide:mail" class="size-4" />
+          Get a quote
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

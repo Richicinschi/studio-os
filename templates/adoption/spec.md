@@ -1,6 +1,6 @@
 # Adoption spec
 
-**Adopter:** <name or initials, as you like> · **Kit version:** v<X.Y.Z> · **Date:** <YYYY-MM-DD>
+**Adopter:** the adopter (a name only if the adopter gives one and asks for it) · **Kit version:** v<X.Y.Z> · **Date:** <YYYY-MM-DD>
 **Written by:** drill-to-adopt · **Approved:** <date of the explicit yes>
 
 ## 1. Profile

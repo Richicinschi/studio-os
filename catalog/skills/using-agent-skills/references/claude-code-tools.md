@@ -1,31 +1,22 @@
-> Source: obra/superpowers `skills/using-superpowers/references/claude-code-tools.md` (MIT, Copyright (c) 2025 Jesse Vincent) @ v7.0.1 2ce8aa15, folded into using-agent-skills; licence in `../LICENSE`. Studio rule: the orchestrator below runs on a different model only when the owner names one; otherwise every subagent keeps the session's model.
+> House rule: pick another model for the orchestrator below only if the owner names it. Without that, each subagent inherits the model of the session.
 
-# Claude Code Tool Notes
+# Claude Code: running a plan one layer down
 
-Claude Code is the reference harness: skills speak its vocabulary
-(`Agent` for a subagent dispatch, todos, `Skill`). These notes cover the
-one place Claude Code can run a plan cheaper than the skills' default
-shape. It is opt-in by your human partner and changes nothing the skills
-require.
+The skills are written for Claude Code: its `Agent` tool starts a subagent, it keeps a todo list, and it has a `Skill` tool. It also lets you move the coordination of a long plan off the expensive main session. This is optional and needs the owner's request. No skill depends on it.
 
-## Cheaper orchestration for subagent-driven development
+## Why bother
 
-The controller session is the most expensive seat in a
-subagent-driven-development run: it reads every dispatch
-result and every report, and it usually runs on the session's most
-capable model. Claude Code supports nested subagents (three layers below
-the main conversation by default; `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`
-adjusts it), so the whole loop can run one layer down.
+In a `subagent-driven-development` run the main session is the costly seat. It reads every report that comes back and normally runs on the strongest model available. Claude Code lets subagents start subagents (up to three levels under the main conversation; set `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` to change the limit), so the whole loop can sit one level lower.
 
-When your human partner asks for it — or has said the session model is
-too expensive to spend on coordination — dispatch ONE orchestrator
-subagent on a mid-tier model with the plan path and the instruction to
-use subagent-driven-development end to end. The orchestrator
-dispatches its own implementers and reviewers per that skill's Model
-Selection; the workspace and ledger live on disk, so nothing is lost to
-the extra layer. Its final message must carry the "Rulings I made" list
-verbatim — that list is how the decisions reach your human partner, and
-you relay it, not summarize it.
+## How
 
-Do this only for a whole plan. Nesting a single task's dispatch buys
-nothing and adds a seat.
+Do it only when the owner asks, or when he has said the session model is too pricey for coordination.
+
+1. Start exactly one orchestrator subagent. Give it the path to the plan and tell it to run `subagent-driven-development` from the first task to the last.
+2. Put it on a mid-tier model only if the owner named that model. Otherwise it inherits the session's model, like every other subagent.
+3. The orchestrator starts its own implementers and reviewers and picks their models as that skill describes. The workspace and the ledger stay on disk, so the extra level loses nothing.
+4. Its last message must contain the list headed "Rulings I made", word for word. That list is how its judgment calls reach the owner. Pass it on as written; do not condense it.
+
+## Limit
+
+Use this for a complete plan only. Wrapping a single task in an orchestrator adds a seat and saves nothing.

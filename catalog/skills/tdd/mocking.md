@@ -1,59 +1,58 @@
-# When to Mock
+# When to use a test double
 
-Mock at **system boundaries** only:
+Replace things only at the edge of your system:
 
-- External APIs (payment, email, etc.)
-- Databases (sometimes - prefer test DB)
-- Time/randomness
-- File system (sometimes)
+- Third-party services (payments, mail, push)
+- Databases, though a throwaway test database is often better
+- The clock and random numbers
+- The file system, in some cases
 
-Don't mock:
+Leave these real:
 
-- Your own classes/modules
-- Internal collaborators
-- Anything you control
+- Your own classes and modules
+- Collaborators inside your code
+- Anything you can control
 
-## Designing for Mockability
+## Make the edges easy to replace
 
-At system boundaries, design interfaces that are easy to mock:
+### 1. Pass dependencies in
 
-**1. Use dependency injection**
+Hand the outside thing to the function. Do not build it inside.
 
-Pass external dependencies in rather than creating them internally:
-
-```typescript
-// Easy to mock
-function processPayment(order, paymentClient) {
-  return paymentClient.charge(order.total);
+```dart
+// Easy to replace in a test
+Future<Receipt> sendReceipt(Order order, MailClient mail) {
+  return mail.send(order.email, renderReceipt(order));
 }
 
-// Hard to mock
-function processPayment(order) {
-  const client = new StripeClient(process.env.STRIPE_KEY);
-  return client.charge(order.total);
+// Hard to replace: builds its own client from a secret
+Future<Receipt> sendReceipt(Order order) {
+  final mail = SmtpClient(Platform.environment['SMTP_PASS']!);
+  return mail.send(order.email, renderReceipt(order));
 }
 ```
 
-**2. Prefer SDK-style interfaces over generic fetchers**
+### 2. One function per outside operation
 
-Create specific functions for each external operation instead of one generic function with conditional logic:
+Give each remote call its own named function. Avoid one catch-all function that branches on its arguments.
 
-```typescript
-// GOOD: Each function is independently mockable
-const api = {
-  getUser: (id) => fetch(`/users/${id}`),
-  getOrders: (userId) => fetch(`/users/${userId}/orders`),
-  createOrder: (data) => fetch('/orders', { method: 'POST', body: data }),
-};
+```dart
+// GOOD: each call can be faked on its own
+class WeatherApi {
+  Future<Forecast> forecastFor(String city) => _get('/forecast/$city');
+  Future<List<Alert>> alertsFor(String region) => _get('/alerts/$region');
+  Future<void> subscribe(Subscription s) => _post('/subscriptions', s);
+}
 
-// BAD: Mocking requires conditional logic inside the mock
-const api = {
-  fetch: (endpoint, options) => fetch(endpoint, options),
-};
+// BAD: the fake must inspect the path to decide what to return
+class WeatherApi {
+  Future<dynamic> request(String path, {Object? body}) => _send(path, body);
+}
 ```
 
-The SDK approach means:
-- Each mock returns one specific shape
-- No conditional logic in test setup
-- Easier to see which endpoints a test exercises
-- Type safety per endpoint
+What you gain from the first shape:
+
+- Each fake returns exactly one shape.
+- Test setup has no branching.
+- You can see at a glance which calls a test relies on.
+- Types are checked per call.

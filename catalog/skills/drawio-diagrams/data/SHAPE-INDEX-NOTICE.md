@@ -1,17 +1,24 @@
-# Shape index attribution
+# Where the shape index comes from
 
-`shape-index.json.gz` is a gzipped copy of the shape search index from
-[jgraph/drawio-mcp](https://github.com/jgraph/drawio-mcp) (`shape-search/search-index.json`),
-which is generated from the official draw.io / diagrams.net client shape
-libraries. Both upstream sources are licensed under the **Apache License 2.0**.
+The compressed file `shape-index.json.gz` next to this notice is not the studio's work. It is the
+shape search index published in the jgraph/drawio-mcp repository
+(<https://github.com/jgraph/drawio-mcp>, path `shape-search/search-index.json`), which that project
+builds from the shape libraries shipped with the official draw.io (diagrams.net) client. Both the
+repository and the client are released under the Apache License 2.0, and that licence applies to this
+data.
 
-- Each entry is `{style, w, h, title, tags, type}` for one palette shape.
-- 10,446 shapes spanning AWS, Azure, GCP, Cisco, Kubernetes, UML, BPMN, P&ID,
-  electrical, flowchart, network, and the general shape sets.
-- Used read-only by `scripts/shapesearch.py` to resolve exact official style
-  strings instead of hand-guessing them.
+What it holds:
 
-To refresh against a newer draw.io release, regenerate upstream with
-`shape-search/generate-index.js` in the drawio-mcp repo, then re-gzip:
+- One record per palette shape, with the fields `style`, `w`, `h`, `title`, `tags` and `type`.
+- 10,446 shapes in all. The general shape sets come first; the families include network, flowchart,
+  electrical, P&ID, BPMN, UML, Kubernetes, Cisco and the three big clouds (GCP, Azure, AWS).
 
-    gzip -9 -c search-index.json > data/shape-index.json.gz
+How the skill uses it: `scripts/shapesearch.py` reads the file and never writes it, so a diagram gets
+the exact official style string for a shape instead of a guessed one.
+
+To bring the index up to date with a newer draw.io release, run `shape-search/generate-index.js` in the
+drawio-mcp repository and compress the result:
+
+```bash
+gzip -9 -c search-index.json > data/shape-index.json.gz
+```

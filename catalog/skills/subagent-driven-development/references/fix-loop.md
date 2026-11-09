@@ -1,77 +1,63 @@
-# The Fix Loop
+# Fix loop
 
-Part of subagent-driven-development. A task review (switched on for this
-task) reported spec ❌, a Critical or Important finding, or a ⚠️ item you
-confirmed as a real gap.
+Companion to subagent-driven-development. You are here because a task review (turned on for that task) came back with spec ❌, a Critical or Important finding, or a ⚠️ item you checked and found to be a real gap.
 
-Before the loop starts, two routes leave it immediately:
+Ledger lines this procedure writes (exact formats):
 
-- Record Minor findings in the progress ledger as you go
-  (`Task <N>: minor (deferred): <one-liner>`), and point the final
-  whole-branch review at that list so it can triage which must be fixed
-  before merge. A roll-up nobody reads is a silent discard. Minor findings
-  never enter the loop.
-- A finding labeled plan-mandated — or any finding that conflicts with
-  what the plan's text requires — is yours to rule on: weigh the finding
-  against the plan text, decide with the spec as the binding authority, and
-  ledger the ruling before you act on it. Do not dismiss the finding because
-  the plan mandates it, and do not dispatch a fix that contradicts the plan
-  without a recorded ruling.
-Everything else enters the loop. A fix round is one fix dispatch plus one
-scoped re-review. Five rounds maximum per task:
+```
+Task <N>: minor (deferred): <one-liner>
+Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)
+Task <N>: parked — <finding> — Ruling: <why the code stands>
+Task <N>: Ruling: <finding> — <what you decided and why>
+```
 
-**Rounds 1-3 — resume the original implementer.** Send it the open findings
-verbatim. Its context is intact: it knows the task, the code, and its own
-choices. If your harness cannot send another message to a live subagent,
-dispatch a fresh implementer carrying the brief path, the report-file path,
-and the findings — the report file is the persistent memory either way.
+## Findings that skip the loop
 
-**Rounds 4-5 — dispatch a fresh implementer** (`bob-builder`, model omitted
-per SKILL.md's Model Selection), with the brief path, the report-file path,
-the open findings, and this framing: "A prior implementer attempted this task
-[N] times; you own it now. Read the report file for what was tried." A loop
-that survives three resumes usually means the implementer cannot see its
-own problem — fresh eyes are the move.
+**Minor findings.** Write each to the ledger as you receive it, in the first format above. At the end, direct the whole-branch reviewer to those lines so it can choose the ones that need fixing before the merge. A list that no one reads is a silent discard. A Minor finding never starts a loop.
 
-**Every round, either way:** the implementer fixes, re-runs the tests
-covering the amended code, appends its fix report to the same report file,
-and returns the short contract. Before re-dispatching the reviewer, confirm
-the fix report contains the covering tests, the command run, and the
-output; dispatch the re-review once all three are present. Name the
-covering test files in the fix message — a one-line fix does not need the
-whole suite.
+**Plan-mandated findings.** Some findings are labelled plan-mandated, and others simply clash with the plan's wording. You rule on these. Compare the finding with the plan text, let the spec be the final authority, and write the ruling in the ledger before you act on the finding. Do not drop a finding just because the plan asks for the thing in question. Do not send a fix that goes against the plan unless a ruling is on record.
 
-**The re-review is scoped.** Run `bash scripts/review-package PLAN_FILE FIX_BASE HEAD`
-where FIX_BASE is the head the previous review saw, and dispatch
-[re-review-prompt.md](../re-review-prompt.md) with the findings list, the
-brief, the report file, and the printed diff path. The re-reviewer verdicts
-each finding ADDRESSED or NOT ADDRESSED and flags new breakage in the fix
-diff only. New Critical/Important breakage in the fix diff joins the open
-findings list. Out-of-scope observations go to the ledger as deferred
-minors — they never extend the loop.
+All other findings go through the loop below.
 
-**After each round,** append to the ledger:
-`Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
+## Rounds
 
-Never fix findings yourself in the controller session — your context stays
-clean for coordination, and controller fixes skip review.
+One round is a fix dispatch followed by a scoped re-review. A task gets five rounds at most.
 
-**The breaker.** When round 5's re-review still leaves findings open, stop
-dispatching. Adjudicate each open finding yourself — you hold the plan and
-the cross-task context the reviewer lacks:
+| Rounds | Who fixes | How |
+|---|---|---|
+| 1 to 3 | The original implementer | Resume it and send the open findings unchanged. It still has its context: the task, the code, its own choices. If the harness cannot message a live subagent, start a fresh implementer and hand over the brief path, the report path and the findings. Either way the report file is the memory. |
+| 4 and 5 | A fresh `bob-builder` (model omitted, as in Model Selection in SKILL.md) | Give it the brief path, the report path and the open findings, plus the framing text shown below. When a loop outlasts three resumes, that usually means the implementer cannot see its own problem. Hand the task to someone who has not seen it before. |
 
-- **The reviewer is wrong, or the point is contestable:** park it —
-  `Task <N>: parked — <finding> — Ruling: <why the code stands>`. The final
-  review sees both sides.
-- **Real, but nothing downstream builds on it:** park it the same way, with
-  a ruling that says it's real and deferred.
-- **Real and load-bearing** — a later task builds on it, or it reveals a
-  plan defect: rule on the smallest change that unblocks the dependent work,
-  ledger it as `Task <N>: Ruling: <finding> — <what you decided and why>`,
-  and carry it into the next task's dispatch. Parking a structural failure
-  silently lets every dependent task build on it. Stop only when the defect
-  leaves every path forward a guess.
+Framing text for a fresh implementer (send it as written):
 
-Adjudicate only at the cap. Adjudicating earlier to end a loop is
-pre-judging with a different name. Every adjudication is a ledger entry —
-a silent discard is forbidden.
+```
+A prior implementer attempted this task [N] times; you own it now. Read the report file for what was tried.
+```
+
+Within every round:
+1. The implementer changes the code and re-runs the tests that cover it.
+2. It appends a fix report to the same report file and replies with the short contract.
+3. Before you call the re-reviewer, check the fix report for three things: the covering tests, the command that was run, and the output. Dispatch once all three are there.
+4. In the fix message, say which test files cover the change. Re-running the entire suite for a one-line change is unnecessary.
+
+Then make the package for the fix range. FIX_BASE is the head the last review looked at:
+
+```
+bash scripts/review-package PLAN_FILE FIX_BASE HEAD
+```
+
+Dispatch the [re-review template](../re-review-prompt.md) with four inputs: the findings, the brief, the report and the diff path. The reviewer rates every finding ADDRESSED or NOT ADDRESSED, and hunts for fresh damage in the fix diff alone. Fresh Critical or Important damage joins the open findings. Anything it spots elsewhere is logged as a deferred minor and never lengthens the loop.
+
+Close each round with the fix-round line from the ledger formats above.
+
+You never make these fixes in the controller session. That keeps your context lean, and a fix made there would skip review.
+
+## The breaker
+
+If findings are still open after round 5's re-review, dispatch nothing more. You rule on each open finding, since you see the plan and the neighbouring tasks and the reviewer does not. Three cases:
+
+- **Reviewer mistaken, or reasonable people could differ.** Park the finding with the "parked" format above. The final review will see both sides.
+- **Valid, but nothing later depends on it.** Park it in the same form, with a ruling that calls it real and postponed.
+- **Valid and load-bearing**: later work rests on it, or it shows a defect in the plan. Choose the smallest change that frees the dependent work. Record it with the last format above, and pass it along in the next task's dispatch. A structural failure parked in silence lets each dependent task build on a bad base. Stop only if the flaw leaves every path forward a guess.
+
+Rule at the cap and nowhere else. Ruling sooner, just to close a loop, is pre-judging by another name. Each ruling is a ledger entry, and a silent discard is never allowed.

@@ -1,7 +1,10 @@
 ---
 id: verification-before-completion
 module: 03-planning
-checked: 2026-11-02
+checked: 2026-11-09
+tokens:
+  description: 58
+  body: 1087
 ---
 
 # Verification before completion
@@ -18,17 +21,16 @@ checked: 2026-11-02
 Read-only: names and descriptions only. No skill body is opened, and nothing uses the network.
 
 - A skill of the same name: `test -f .claude/skills/verification-before-completion/SKILL.md && echo project` in each repository in `adoption/inventory.md`, and `test -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/verification-before-completion/SKILL.md" && echo user`.
-- The upstream plugin, which carries it as `superpowers:verification-before-completion`: `claude plugin list`, reading only a `superpowers@...` entry and its `Version`.
 - Another skill doing the same job: the front matter only (the lines between the first two `---`) of every `SKILL.md` at both levels, looking for a description about verifying, evidence, or checking before calling work done. The kit's [claim-auditor](claim-auditor.md) does a different job (see Watch out).
 - A rule in your instruction files: `grep -n -i -E 'verif|evidence|baseline' CLAUDE.md AGENTS.md 2>/dev/null`.
 
-The menu marks the item **have** when a `verification-before-completion` skill exists at either level or the superpowers plugin is installed, **partly** when only an instruction-file rule or another skill covers it, and **not yet** otherwise.
+The menu marks the item **have** when a `verification-before-completion` skill exists at either level, **partly** when only an instruction-file rule or another skill covers it, and **not yet** otherwise.
 
 ## Ask
 
 1. **"Take verification-before-completion?"** Recommended when your work is software, ML or data.
    - Keep what you have. Recommended when Detect says **have**.
-   - ADOPT the kit's copy as it is. The studio changed nothing in its body, only the front matter. Recommended when Detect says **not yet**.
+   - ADOPT the kit's copy as it is. Recommended when Detect says **not yet**.
    - ADAPT: add a baseline part in your words, so a result is compared with a number recorded before the change. Recommended when your work changes data, counts or generated files, whatever Detect says.
    - FOLD the idea into your instruction file: "never say done, fixed or passing without running the command that proves it in the same message, and quoting its result". Recommended when Detect says **partly** and you want one place for the rule.
    - Not sure: the option recommended above for what Detect found: keep what you have for **have**; otherwise ADAPT when your work changes data, counts or generated files, FOLD for **partly**, and ADOPT for **not yet**. Claude shows the file before it saves it.
@@ -47,8 +49,8 @@ The menu marks the item **have** when a `verification-before-completion` skill e
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/verification-before-completion/`: scans it with SkillSpector (`skillspector scan catalog/skills/verification-before-completion --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is one short prose file with its licence and no scripts. The studio rescanned its adapted copies of superpowers 7.0.1 the same way and found no new real finding; `VENDORED.md` lists every change it made. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
-2. **Claude:** on your yes, writes the copy into the scope you chose, keeps the upstream `LICENSE` (MIT), changes the author line in the front matter, which names the studio, to yours, and replaces the studio's `VENDORED.md` with a short note of your own (the upstream, version 7.0.1, what you changed). For ADAPT it adds a short "Baseline" part, written for your work:
+1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/verification-before-completion/`: scans it with SkillSpector (`skillspector scan catalog/skills/verification-before-completion --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is one short prose file with no scripts. The maintainers' latest scan result is in the skill's `SOURCE.md`; your own scan is the one that decides. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
+2. **Claude:** on your yes, writes the copy into the scope you chose and changes the author line in the front matter, which names the studio, to yours. For ADAPT it adds a short "Baseline" part, written for your work:
    - before a change, record the number that must not move without a reason: a row count, a total that must match the source, the answer to a query you already know, a file count;
    - after it, compare and report both numbers; a drop is a failure until it is explained;
    - ask what would have to break for a check to go red, and prove a new check can fail by breaking its input once;
@@ -75,6 +77,6 @@ If Claude claims a result without running the command, the item is not done: the
 - **Running a check is not trusting it.** The skill makes Claude run the check fresh; it does not ask whether the check could fail. That is what the baseline in ADAPT adds, and why the studio pairs the two ([module 03](../modules/03-planning/README.md)).
 - **claim-auditor is a different job.** [claim-auditor](claim-auditor.md) traces the claims in a finished deliverable back to their sources; this skill runs the checks before Claude says "done". The studio keeps both.
 - **Subagents report success too.** "The agent said it worked" is not evidence; Claude checks the diff and runs the suite. This matters most with [dispatching-parallel-agents](dispatching-parallel-agents.md) and [subagent-driven-development](subagent-driven-development.md).
-- **Two copies:** with the superpowers plugin also installed, Claude sees this skill twice, under two names, and both descriptions load ([superpowers](superpowers.md)).
+- **Two copies:** if you also have another skill that does the same job, both descriptions load. Keep one.
 - **Cost:** its description loads into every session, about 56 tokens (an estimate, bytes divided by 4, description only, as on the other cards); the full skill, about 980 tokens (estimate), loads only when it is used.
 - **claude.ai:** the same habit works as a Project instruction: give Claude the numbers you expect before you ask for the result, ask it to report every difference, and check one result by hand ([module 03](../modules/03-planning/README.md)).

@@ -12,7 +12,7 @@ const ext = { id: 'tool', kind: 'external', status: 'link-only', pack: 'foundati
 test('inventory ignores folders without SKILL.md and the agents index', () => {
   const hub = makeFixtureHub();
   try {
-    assert.deepEqual(hubInventory(hub), { skills: ['alpha', 'beta'], agents: ['gamma'] });
+    assert.deepEqual(hubInventory(hub), { skills: ["alpha", "beta"], agents: ["gamma"], packs: [], hiddenPacks: [] });
   } finally { rmSync(hub, { recursive: true, force: true }); }
 });
 

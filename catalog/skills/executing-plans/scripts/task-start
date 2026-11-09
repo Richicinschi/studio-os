@@ -1,28 +1,38 @@
 #!/usr/bin/env bash
-# Begin one task of an inline plan execution in a single call: extract the
-# task's brief (via subagent-driven-development's task-brief, so both skills
-# share one workspace) and record BASE, the commit the task's review range is
-# cut from. One tool call instead of two, because every call in an inline
-# session is a turn that re-reads the whole context.
+# task-start PLAN_FILE TASK_NUMBER
 #
-# Usage: task-start PLAN_FILE TASK_NUMBER
-# Prints:
-#   brief: <path to the task's brief file>
-#   base:  <full SHA of HEAD>
+# Opens a task in one call. It has the sibling skill's task-brief cut the
+# task's text into the shared workspace, then notes the current commit as
+# BASE, the point the task's review range starts from.
+#
+# Output, two lines:
+#   brief: <path of the brief file>
+#   base: <full SHA of HEAD>
+# Exit codes: 2 for bad usage; task-brief's own code when it fails; 1 when
+# task-brief printed no path.
 set -euo pipefail
 
-if [ $# -ne 2 ]; then
+die_usage() {
   echo "usage: task-start PLAN_FILE TASK_NUMBER" >&2
   exit 2
+}
+[ "$#" -eq 2 ] || die_usage
+
+plan_file=$1
+task_no=$2
+
+here=$(cd "$(dirname "$0")" && pwd)
+sdd_scripts="$here/../../subagent-driven-development/scripts"
+sdd_scripts=$(cd "$sdd_scripts" && pwd)
+
+report=$("$sdd_scripts/task-brief" "$plan_file" "$task_no")
+
+# task-brief reports "wrote <path>: <n> lines"; pull the path back out.
+brief_path=$(printf '%s\n' "$report" | sed -n 's/^wrote \(.*\): [0-9][0-9]* lines$/\1/p')
+if [ -z "$brief_path" ]; then
+  echo "task-brief did not report a path: $report" >&2
+  exit 1
 fi
 
-plan=$1
-n=$2
-sdd="$(cd "$(dirname "$0")/../../subagent-driven-development/scripts" && pwd)"
-
-out=$("$sdd/task-brief" "$plan" "$n")
-brief=$(printf '%s\n' "$out" | sed -n 's/^wrote \(.*\): [0-9][0-9]* lines$/\1/p')
-[ -n "$brief" ] || { echo "task-brief did not report a path: $out" >&2; exit 1; }
-
-echo "brief: $brief"
-echo "base: $(git rev-parse HEAD)"
+printf 'brief: %s\n' "$brief_path"
+printf 'base: %s\n' "$(git rev-parse HEAD)"

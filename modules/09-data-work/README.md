@@ -52,11 +52,10 @@ Two findings matter to anyone weighing a plugin like it. Its licence was source-
 An adoption order for a data analyst, each item through `vet-and-adopt`, which recommends SKIP, FOLD, ADAPT (take it rewritten in your words, for your tools) or ADOPT:
 
 1. `claim-auditor` first; it pays off on your next report. ADAPT its list of claims that are RED on sight (graded RED until checked independently, whatever their source) to what is sensitive in your company (studio-specific: its examples come from the studio's own kinds of work).
-2. `modern-python` and `tdd`, if you write Python. ADAPT `tdd` to your own test runner, for Python usually pytest, which `modern-python` sets up (studio-specific: `tdd` names the runners of the studio's own stacks).
-3. `supply-chain-risk-auditor` before your next package install. It needs `gh`, GitHub's command-line tool; installing it is not covered in `docs/facts.md`, so use GitHub's own install page, then check that `gh --version` prints a version. [Its card](../../cards/supply-chain-risk-auditor.md) lists what else it needs. ADAPT its package managers to yours.
+2. `tdd`, if you write code. ADAPT it to your own test runner, for Python usually pytest (studio-specific: `tdd` names the runners of the studio's own stacks).
+3. Before your next package install, read what the package would run: its install scripts and its maintainers. A skill for this is not in this version of the kit.
 4. `drawio-diagrams` when you document a pipeline (studio-specific: its trigger examples name the studio's own work).
-5. If you build agents: `building-pydantic-ai-agents` as the reference, and `production-fastapi` when the agent calls or serves HTTP.
-6. Later, if they fit: `diagnosing-bugs` for a failure or a slowdown, `codebase-design` for code that will grow.
+5. Later, if it fits: `diagnosing-bugs` for a failure or a slowdown.
 
 Then put the tool-contract checklist into the front door of the repository where you build the agent, under its rules: its `AGENTS.md`, or its `CLAUDE.md` when it has only that. In a company repository, ask first, or keep the checklist in a local file that stays out of git ([module 11](../11-workspace-layout/README.md)):
 
@@ -73,4 +72,4 @@ Then put the tool-contract checklist into the front door of the repository where
 4. Paste the tool-contract checklist into the instructions of any Project where you design agents.
 5. To use `claim-auditor` itself, it must be vetted first, and vetting needs a terminal with the scanner (START-HERE, "Install steps that come later"). With one, vet it there, write it in your words (ADAPT), then upload it as a custom skill (same facts section). Without one, use the prompt pattern in step 3.
 
-Catalog items used here: [claim-auditor](../../catalog/skills/claim-auditor/SOURCE.md) · [modern-python](../../catalog/skills/modern-python/SOURCE.md) · [tdd](../../catalog/skills/tdd/SOURCE.md) · [production-fastapi](../../catalog/skills/production-fastapi/SOURCE.md) · [building-pydantic-ai-agents](../../catalog/skills/building-pydantic-ai-agents/SOURCE.md) · [supply-chain-risk-auditor](../../catalog/skills/supply-chain-risk-auditor/SOURCE.md) · [drawio-diagrams](../../catalog/skills/drawio-diagrams/SOURCE.md) · [diagnosing-bugs](../../catalog/skills/diagnosing-bugs/SOURCE.md) · [codebase-design](../../catalog/skills/codebase-design/SOURCE.md). Named in the catalog without files in the kit: `anthropic-document-skills` (link-only: it points to Anthropic's own skills, turned on as step 1 says) and `dataviz` (catalog-only: no files and no published source, so it cannot be adopted).
+Catalog items used here: [claim-auditor](../../catalog/skills/claim-auditor/SOURCE.md) · [tdd](../../catalog/skills/tdd/SOURCE.md) · [drawio-diagrams](../../catalog/skills/drawio-diagrams/SOURCE.md) · [diagnosing-bugs](../../catalog/skills/diagnosing-bugs/SOURCE.md). Named in the catalog without files in the kit: `dataviz` (catalog-only: no files and no published source, so it cannot be adopted).

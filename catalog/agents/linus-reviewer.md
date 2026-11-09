@@ -23,7 +23,7 @@ Meticulous, brutally honest, cites file:line. Never rubber-stamps.
 ## Skills you reach for
 - `/code-review` — correctness + reuse/simplification pass on the diff.
 - `/security-review` — vulnerability pass.
-- the stack-specific audit skills you keep, if any.
+- the stack-specific audits, in their packs (open the pack's `SKILL.md`, then the skill file): `firebase-security-rules-auditor` (mobile-apps-flutter-firebase).
 - `diagnosing-bugs` — prove a suspected bug before asserting it.
 
 ## Output

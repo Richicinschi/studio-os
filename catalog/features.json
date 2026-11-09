@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -28,7 +28,7 @@
           "importance": "recommended",
           "why": "A new day starts from zero; the handoff note, and the skill that writes it, let the next session start where you stopped.",
           "loads": "every-session",
-          "everySessionTokens": 127,
+          "everySessionTokens": 73,
           "onDemandTokens": 1816,
           "heavy": false,
           "card": "cards/handoff.md"
@@ -77,17 +77,6 @@
           "files": [
             "templates/memory/vault/MEMORY-VAULT.md"
           ]
-        },
-        {
-          "id": "claude-md-curator",
-          "kind": "skill",
-          "importance": "optional",
-          "why": "Only once your front door passes about 30,000 characters: it moves old entries to an archive, never deletes them.",
-          "loads": "every-session",
-          "everySessionTokens": 179,
-          "onDemandTokens": 1563,
-          "heavy": false,
-          "card": "cards/claude-md-curator.md"
         },
         {
           "id": "decision-log",
@@ -167,8 +156,8 @@
           "importance": "recommended",
           "why": "Building starts before anyone says what \"done\" means; this turns an idea into a design you approve first.",
           "loads": "every-session",
-          "everySessionTokens": 54,
-          "onDemandTokens": 3331,
+          "everySessionTokens": 67,
+          "onDemandTokens": 3520,
           "heavy": false,
           "card": "cards/brainstorming.md"
         },
@@ -193,27 +182,30 @@
           "importance": "recommended",
           "why": "An approved design becomes small tasks, each with its own check, so progress can be seen and resumed.",
           "loads": "every-session",
-          "everySessionTokens": 21,
-          "onDemandTokens": 2539,
+          "everySessionTokens": 49,
+          "onDemandTokens": 2537,
           "heavy": false,
           "card": "cards/writing-plans.md"
         },
         {
           "id": "coding-guidelines",
-          "kind": "external",
-          "title": "The coding guidelines",
+          "kind": "practice",
+          "title": "Coding guidelines for Claude",
           "importance": {
             "default": "optional",
             "software": "recommended",
             "ml": "recommended",
             "data": "recommended"
           },
-          "why": "Agents overbuild, guess silently and change more than asked; four short rules keep code simple and changes surgical.",
-          "loads": "every-session",
-          "everySessionTokens": 631,
-          "onDemandTokens": null,
+          "why": "Four short rules that stop Claude guessing, overbuilding and tidying code you did not mention.",
+          "loads": "on-demand",
+          "everySessionTokens": 0,
+          "onDemandTokens": 445,
           "heavy": false,
-          "card": "cards/coding-guidelines.md"
+          "card": "cards/coding-guidelines.md",
+          "files": [
+            "templates/rules/coding-guidelines.md"
+          ]
         },
         {
           "id": "drill-to-plan",
@@ -221,7 +213,7 @@
           "importance": "optional",
           "why": "For a vague, big ask: it interviews you one question at a time until the spec leaves no decision open.",
           "loads": "every-session",
-          "everySessionTokens": 166,
+          "everySessionTokens": 72,
           "onDemandTokens": 1801,
           "heavy": false,
           "card": "cards/drill-to-plan.md"
@@ -232,36 +224,10 @@
           "importance": "optional",
           "why": "Claude carries out a written plan task by task in one session, with a ledger that survives forgetting and one review at the end.",
           "loads": "every-session",
-          "everySessionTokens": 43,
-          "onDemandTokens": 4360,
+          "everySessionTokens": 53,
+          "onDemandTokens": 4127,
           "heavy": false,
           "card": "cards/executing-plans.md"
-        },
-        {
-          "id": "frontend-design",
-          "kind": "skill",
-          "importance": {
-            "default": "optional",
-            "software": "recommended"
-          },
-          "why": "For software work with a user interface: deliberate visual choices instead of templated defaults.",
-          "loads": "every-session",
-          "everySessionTokens": 51,
-          "onDemandTokens": 2276,
-          "heavy": false,
-          "card": "cards/frontend-design.md"
-        },
-        {
-          "id": "superpowers",
-          "kind": "external",
-          "title": "superpowers, the upstream plugin",
-          "importance": "optional",
-          "why": "The upstream plugin, if you prefer it to the kit's adapted copy of its skills. Heavy: about 1,465 tokens at start-up.",
-          "loads": "every-session",
-          "everySessionTokens": 1465,
-          "onDemandTokens": null,
-          "heavy": true,
-          "card": "cards/superpowers.md"
         },
         {
           "id": "verification-before-completion",
@@ -274,8 +240,8 @@
           },
           "why": "A passing check is often a broken check; nothing is called done until the command that proves it has run.",
           "loads": "every-session",
-          "everySessionTokens": 57,
-          "onDemandTokens": 841,
+          "everySessionTokens": 58,
+          "onDemandTokens": 1087,
           "heavy": false,
           "card": "cards/verification-before-completion.md"
         },
@@ -311,8 +277,8 @@
           "importance": "optional",
           "why": "When work splits into independent parts, they run at the same time instead of one after another.",
           "loads": "every-session",
-          "everySessionTokens": 27,
-          "onDemandTokens": 1479,
+          "everySessionTokens": 54,
+          "onDemandTokens": 1463,
           "heavy": false,
           "card": "cards/dispatching-parallel-agents.md"
         },
@@ -322,8 +288,8 @@
           "importance": "optional",
           "why": "Reads a whole codebase and writes ranked, self-contained plans for other sessions to carry out; it changes nothing itself.",
           "loads": "every-session",
-          "everySessionTokens": 127,
-          "onDemandTokens": 3640,
+          "everySessionTokens": 74,
+          "onDemandTokens": 3184,
           "heavy": false,
           "card": "cards/improve.md"
         },
@@ -351,8 +317,8 @@
           "importance": "optional",
           "why": "Runs a plan's independent tasks through subagents, with one review at the end, while the main thread keeps deciding.",
           "loads": "every-session",
-          "everySessionTokens": 22,
-          "onDemandTokens": 4953,
+          "everySessionTokens": 63,
+          "onDemandTokens": 4171,
           "heavy": false,
           "card": "cards/subagent-driven-development.md"
         }
@@ -380,8 +346,8 @@
           "importance": "recommended",
           "why": "Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable.",
           "loads": "every-session",
-          "everySessionTokens": 114,
-          "onDemandTokens": 2361,
+          "everySessionTokens": 74,
+          "onDemandTokens": 2045,
           "heavy": false,
           "card": "cards/writing-great-skills.md"
         },
@@ -391,8 +357,8 @@
           "importance": "optional",
           "why": "Once you lose track of your skills: one router that names each skill and when to reach for it.",
           "loads": "every-session",
-          "everySessionTokens": 86,
-          "onDemandTokens": 1000,
+          "everySessionTokens": 56,
+          "onDemandTokens": 1207,
           "heavy": false,
           "card": "cards/using-agent-skills.md"
         }
@@ -408,8 +374,8 @@
           "importance": "recommended",
           "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
           "loads": "every-session",
-          "everySessionTokens": 118,
-          "onDemandTokens": 954,
+          "everySessionTokens": 75,
+          "onDemandTokens": 910,
           "heavy": false,
           "card": "cards/git-guardrails.md"
         },
@@ -459,8 +425,8 @@
           },
           "why": "When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own.",
           "loads": "every-session",
-          "everySessionTokens": 26,
-          "onDemandTokens": 2185,
+          "everySessionTokens": 33,
+          "onDemandTokens": 1932,
           "heavy": false,
           "card": "cards/finishing-a-development-branch.md"
         },
@@ -475,8 +441,8 @@
           },
           "why": "When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any.",
           "loads": "every-session",
-          "everySessionTokens": 39,
-          "onDemandTokens": 3079,
+          "everySessionTokens": 46,
+          "onDemandTokens": 2344,
           "heavy": false,
           "card": "cards/git-cleanup.md"
         },
@@ -611,8 +577,8 @@
           },
           "why": "Sets up a separate worktree for a branch, so parallel work never switches branches under another session.",
           "loads": "every-session",
-          "everySessionTokens": 49,
-          "onDemandTokens": 1926,
+          "everySessionTokens": 57,
+          "onDemandTokens": 1637,
           "heavy": false,
           "card": "cards/using-git-worktrees.md"
         },
@@ -709,17 +675,6 @@
       "title": "Agents and the council",
       "items": [
         {
-          "id": "atlas-operator",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A council seat for ship discipline: what ships next, what is blocked, what to cut.",
-          "loads": "every-session",
-          "everySessionTokens": 69,
-          "onDemandTokens": 389,
-          "heavy": false,
-          "card": "cards/atlas-operator.md"
-        },
-        {
           "id": "bob-builder",
           "kind": "agent",
           "importance": "optional",
@@ -729,50 +684,6 @@
           "onDemandTokens": 302,
           "heavy": false,
           "card": "cards/bob-builder.md"
-        },
-        {
-          "id": "council",
-          "kind": "skill",
-          "importance": "optional",
-          "why": "One model gives one view of a big decision; the council asks several seats that disagree and returns one brief.",
-          "loads": "every-session",
-          "everySessionTokens": 154,
-          "onDemandTokens": 1260,
-          "heavy": false,
-          "card": "cards/council.md"
-        },
-        {
-          "id": "fred-advocate",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A council seat for the person at the other end: do they care, understand and benefit?",
-          "loads": "every-session",
-          "everySessionTokens": 58,
-          "onDemandTokens": 277,
-          "heavy": false,
-          "card": "cards/fred-advocate.md"
-        },
-        {
-          "id": "jony-designer",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A council seat for design and polish: does it look and feel considered?",
-          "loads": "every-session",
-          "everySessionTokens": 60,
-          "onDemandTokens": 311,
-          "heavy": false,
-          "card": "cards/jony-designer.md"
-        },
-        {
-          "id": "karen-skeptic",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A board that nods along is worthless: this seat's whole job is to find what is wrong with a plan before you commit.",
-          "loads": "every-session",
-          "everySessionTokens": 57,
-          "onDemandTokens": 276,
-          "heavy": false,
-          "card": "cards/karen-skeptic.md"
         },
         {
           "id": "linus-reviewer",
@@ -786,42 +697,9 @@
           "why": "Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line.",
           "loads": "every-session",
           "everySessionTokens": 51,
-          "onDemandTokens": 327,
+          "onDemandTokens": 369,
           "heavy": false,
           "card": "cards/linus-reviewer.md"
-        },
-        {
-          "id": "lorn-founder",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A council seat that asks whether a thing deserves your time at all, before how to build it.",
-          "loads": "every-session",
-          "everySessionTokens": 69,
-          "onDemandTokens": 325,
-          "heavy": false,
-          "card": "cards/lorn-founder.md"
-        },
-        {
-          "id": "marie-architect",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A council seat that asks whether this is the simplest thing that works, and fights over-engineering.",
-          "loads": "every-session",
-          "everySessionTokens": 64,
-          "onDemandTokens": 289,
-          "heavy": false,
-          "card": "cards/marie-architect.md"
-        },
-        {
-          "id": "midas-treasurer",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "A council seat for money: does it pay, and soon? The simplest paid test first.",
-          "loads": "every-session",
-          "everySessionTokens": 59,
-          "onDemandTokens": 281,
-          "heavy": false,
-          "card": "cards/midas-treasurer.md"
         },
         {
           "id": "receiving-code-review",
@@ -834,8 +712,8 @@
           },
           "why": "Review feedback taken on trust, or argued away, both go wrong; this checks each point before acting on it.",
           "loads": "every-session",
-          "everySessionTokens": 59,
-          "onDemandTokens": 1480,
+          "everySessionTokens": 64,
+          "onDemandTokens": 1533,
           "heavy": false,
           "card": "cards/receiving-code-review.md"
         },
@@ -850,21 +728,10 @@
           },
           "why": "A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges.",
           "loads": "every-session",
-          "everySessionTokens": 27,
-          "onDemandTokens": 754,
+          "everySessionTokens": 49,
+          "onDemandTokens": 705,
           "heavy": false,
           "card": "cards/requesting-code-review.md"
-        },
-        {
-          "id": "saul-counsel",
-          "kind": "agent",
-          "importance": "optional",
-          "why": "An on-call council seat for legal, privacy and policy questions; it cites the rule and is cautious.",
-          "loads": "every-session",
-          "everySessionTokens": 57,
-          "onDemandTokens": 315,
-          "heavy": false,
-          "card": "cards/saul-counsel.md"
         },
         {
           "id": "sherlock-researcher",
@@ -873,7 +740,7 @@
           "why": "Deep research across many sources, with every claim cited, for questions one search will not settle.",
           "loads": "every-session",
           "everySessionTokens": 57,
-          "onDemandTokens": 344,
+          "onDemandTokens": 356,
           "heavy": false,
           "card": "cards/sherlock-researcher.md"
         }
@@ -884,32 +751,6 @@
       "title": "Data work",
       "items": [
         {
-          "id": "anthropic-document-skills",
-          "kind": "external",
-          "title": "Anthropic's document skills in claude.ai",
-          "importance": {
-            "default": "optional",
-            "data": "recommended"
-          },
-          "why": "Excel, Word, PowerPoint and PDF files made and read in claude.ai; built in, switched on in settings.",
-          "loads": "on-demand",
-          "everySessionTokens": 0,
-          "onDemandTokens": null,
-          "heavy": false,
-          "card": "cards/anthropic-document-skills.md"
-        },
-        {
-          "id": "building-pydantic-ai-agents",
-          "kind": "skill",
-          "importance": "optional",
-          "why": "For agents built in Python with Pydantic AI: tools, structured output, streaming and testing.",
-          "loads": "every-session",
-          "everySessionTokens": 90,
-          "onDemandTokens": 2973,
-          "heavy": false,
-          "card": "cards/building-pydantic-ai-agents.md"
-        },
-        {
           "id": "claim-auditor",
           "kind": "skill",
           "importance": {
@@ -919,24 +760,10 @@
           },
           "why": "A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships.",
           "loads": "every-session",
-          "everySessionTokens": 140,
-          "onDemandTokens": 1057,
+          "everySessionTokens": 74,
+          "onDemandTokens": 1069,
           "heavy": false,
           "card": "cards/claim-auditor.md"
-        },
-        {
-          "id": "codebase-design",
-          "kind": "skill",
-          "importance": {
-            "default": "optional",
-            "software": "recommended"
-          },
-          "why": "Shared words for designing modules with small interfaces, so code stays testable as it grows.",
-          "loads": "every-session",
-          "everySessionTokens": 75,
-          "onDemandTokens": 1545,
-          "heavy": false,
-          "card": "cards/codebase-design.md"
         },
         {
           "id": "diagnosing-bugs",
@@ -950,7 +777,7 @@
           "why": "For a hard bug or a slowdown: it builds a feedback loop that can fail before it guesses at a cause.",
           "loads": "every-session",
           "everySessionTokens": 60,
-          "onDemandTokens": 2762,
+          "onDemandTokens": 2563,
           "heavy": false,
           "card": "cards/diagnosing-bugs.md"
         },
@@ -960,43 +787,10 @@
           "importance": "optional",
           "why": "Turns a system or data flow into an editable diagram file, kept on your machine.",
           "loads": "every-session",
-          "everySessionTokens": 181,
-          "onDemandTokens": 1992,
+          "everySessionTokens": 74,
+          "onDemandTokens": 2113,
           "heavy": false,
           "card": "cards/drawio-diagrams.md"
-        },
-        {
-          "id": "modern-python",
-          "kind": "skill",
-          "importance": "optional",
-          "why": "Sets up Python projects with uv and ruff, for new projects or a move off pip, Poetry or black.",
-          "loads": "every-session",
-          "everySessionTokens": 40,
-          "onDemandTokens": 2454,
-          "heavy": false,
-          "card": "cards/modern-python.md"
-        },
-        {
-          "id": "production-fastapi",
-          "kind": "skill",
-          "importance": "optional",
-          "why": "For a FastAPI service: logging, health checks, shutdown, error handling and security patterns.",
-          "loads": "every-session",
-          "everySessionTokens": 139,
-          "onDemandTokens": 6081,
-          "heavy": false,
-          "card": "cards/production-fastapi.md"
-        },
-        {
-          "id": "supply-chain-risk-auditor",
-          "kind": "skill",
-          "importance": "optional",
-          "why": "A package installed because a snippet needed it: this checks who maintains your dependencies and how risky each is.",
-          "loads": "every-session",
-          "everySessionTokens": 70,
-          "onDemandTokens": 1373,
-          "heavy": false,
-          "card": "cards/supply-chain-risk-auditor.md"
         },
         {
           "id": "tdd",
@@ -1009,8 +803,8 @@
           },
           "why": "Agent tool calls that were never tested fail in front of users; this builds features test-first, red then green.",
           "loads": "every-session",
-          "everySessionTokens": 61,
-          "onDemandTokens": 1953,
+          "everySessionTokens": 65,
+          "onDemandTokens": 1969,
           "heavy": false,
           "card": "cards/tdd.md"
         }
@@ -1169,6 +963,442 @@
           ]
         }
       ]
+    }
+  ],
+  "domains": [
+    {
+      "id": "advisor-council-for-big-decisions",
+      "title": "Advisor council for big decisions",
+      "description": "Use when the user faces a real fork and wants a panel of different viewpoints: founder, skeptic, designer, architect, counsel, treasurer, user advocate and operator, with one synthesised answer.",
+      "why": "A panel of eight viewpoints (founder, skeptic, designer, architect, counsel, treasurer, user advocate, operator) for a real fork.",
+      "skills": [
+        "council"
+      ],
+      "agents": [
+        "atlas-operator",
+        "fred-advocate",
+        "jony-designer",
+        "karen-skeptic",
+        "lorn-founder",
+        "marie-architect",
+        "midas-treasurer",
+        "saul-counsel"
+      ],
+      "alwaysOnTokens": 49,
+      "indexTokens": 194,
+      "card": "cards/pack-advisor-council-for-big-decisions.md"
+    },
+    {
+      "id": "android-swiftui-react-native-app-building",
+      "title": "Building phone apps: Android, SwiftUI and React Native",
+      "description": "Use when the user builds, reviews or looks over an Android app with Compose, an iPhone app or SwiftUI screen (including whether Apple will accept it), or a React Native or Expo app, or fixes a Play Store or App Store rejection.",
+      "why": "Build or review an Android, iPhone or React Native app, and fix a store rejection.",
+      "skills": [
+        "android-compose-and-play-policy",
+        "swiftui-and-ios-review",
+        "react-native-and-expo-basics"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 57,
+      "indexTokens": 322,
+      "card": "cards/pack-android-swiftui-react-native-app-building.md"
+    },
+    {
+      "id": "app-legal-privacy-terms-store-review",
+      "title": "App legal: privacy policy, terms and store review",
+      "description": "Use when the user needs a privacy policy or terms of service for an app drafted or reviewed, or a legal check before Apple or Google store submission. An automated review, not legal advice: a lawyer signs off.",
+      "why": "Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice.",
+      "skills": [
+        "legal-analytics-consent",
+        "legal-apple-gate",
+        "legal-cross-store",
+        "legal-data-surface-scan",
+        "legal-doc-draft",
+        "legal-flow-grader",
+        "legal-gdpr-audit",
+        "legal-guardrails",
+        "legal-health-claims",
+        "legal-play-gate",
+        "legal-privacy-review",
+        "legal-reg-monitor",
+        "legal-signoff-orchestrator",
+        "legal-terms-review-nl",
+        "legal-withdrawal-check"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 53,
+      "indexTokens": 1217,
+      "card": "cards/pack-app-legal-privacy-terms-store-review.md"
+    },
+    {
+      "id": "audio-video-media",
+      "title": "Audio, video and media",
+      "description": "Use when the user brings a video, audio or recording, or asks to understand, clip, clean up, transcribe, subtitle or shrink one, to make a narrated, launch, AI-generated or story video, or to post media. Open this before replying, even to ask for the file or other details.",
+      "why": "Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos.",
+      "skills": [
+        "watch-a-video",
+        "clip-into-shorts",
+        "cut-spoken-recording",
+        "transcribe-recording",
+        "video-edit-craft",
+        "video-editor-bridge",
+        "judge-media-by-measurement",
+        "narrated-video",
+        "subtitle-stills",
+        "publish-ready-media",
+        "motion-video-from-html",
+        "ai-video-generation",
+        "story-short-film"
+      ],
+      "agents": [
+        "media-critic"
+      ],
+      "alwaysOnTokens": 69,
+      "indexTokens": 1135,
+      "card": "cards/pack-audio-video-media.md"
+    },
+    {
+      "id": "dependency-supply-chain-risk-checks",
+      "title": "Dependency supply-chain risk checks",
+      "description": "Use when the user wants the packages a project depends on checked for supply-chain risk: single maintainers, abandoned or takeover-prone libraries, past vulnerabilities.",
+      "why": "The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities.",
+      "skills": [
+        "supply-chain-risk-auditor"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 43,
+      "indexTokens": 199,
+      "card": "cards/pack-dependency-supply-chain-risk-checks.md"
+    },
+    {
+      "id": "design-ui-logos-slides-posters",
+      "title": "Design, UX and accessibility",
+      "description": "Use when the user asks for a logo, poster, presentation or slides, a chart or report, a style guide, a page from a Figma file, a look and feel, a polish of a bland screen, an app illustration, a newsletter for email, or an accessibility check. Open this before replying, even to ask questions.",
+      "why": "A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check.",
+      "skills": [
+        "design-direction",
+        "fix-ai-looking-ui",
+        "design-system-capture",
+        "design-tool-bridge",
+        "slide-deck",
+        "template-charts-reports",
+        "platform-formatted-document",
+        "logo-design",
+        "poster-and-social-cards",
+        "product-ui-illustration",
+        "visual-qa-gate",
+        "accessibility-review",
+        "frontend-design",
+        "ui-styles-palettes-fonts",
+        "brand",
+        "motion-design",
+        "motion-dev-animations",
+        "review-animations"
+      ],
+      "agents": [
+        "design-critic"
+      ],
+      "alwaysOnTokens": 74,
+      "indexTokens": 1366,
+      "card": "cards/pack-design-ui-logos-slides-posters.md"
+    },
+    {
+      "id": "django-flask-laravel-shops-and-chat",
+      "title": "Web back ends: Django, Flask, Laravel, shops, chat and jobs",
+      "description": "Use when the user builds or upgrades a Django, Flask or Laravel project, an online shop or content system back end, live chat or live updates, or a background job that must retry.",
+      "why": "Django, Flask and Laravel projects: shops, content back ends, live chat and updates, retrying background jobs.",
+      "skills": [
+        "django-flask-laravel-conventions",
+        "realtime-chat-and-queues",
+        "store-and-cms-backend"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 45,
+      "indexTokens": 297,
+      "card": "cards/pack-django-flask-laravel-shops-and-chat.md"
+    },
+    {
+      "id": "engineering-testing-performance-code-design",
+      "title": "Engineering: browser testing, performance and code design",
+      "description": "Use when the user tests a web page in a real browser, speeds up slow code or pages, or wants help shaping the structure of a codebase.",
+      "why": "Test a web page in a real browser, speed up slow code or pages, and shape the structure of a codebase.",
+      "skills": [
+        "browser-testing-with-devtools",
+        "codebase-design",
+        "performance-optimization"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 34,
+      "indexTokens": 342,
+      "card": "cards/pack-engineering-testing-performance-code-design.md"
+    },
+    {
+      "id": "games-design-prototype-playtest-assets",
+      "title": "Games: design, prototype, playtest, art and ports",
+      "description": "Use when the user is making a game in any engine: designing the idea, building a first playable, testing it by playing, making art, laying out screens, balancing numbers, porting their own game, or setting up a game folder.",
+      "why": "Make a game in any engine: the idea, a first playable, playtesting, art, screens and balancing numbers.",
+      "skills": [
+        "game-design-brief",
+        "prototype-a-game-fast",
+        "playtest-by-driving-the-game",
+        "game-art-pipeline",
+        "game-ui-from-mockup",
+        "game-balance-and-economy",
+        "port-your-own-game",
+        "game-project-agent-setup"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 56,
+      "indexTokens": 680,
+      "card": "cards/pack-games-design-prototype-playtest-assets.md"
+    },
+    {
+      "id": "godot-camera-shaders-particles-export",
+      "title": "Godot games: camera, shaders, particles, export and audit",
+      "description": "Use when the user works on a Godot game: GDScript errors and typed code, scenes and nodes, running or testing a change, menus and saves, editor tools, cameras, shaders, particles, tweening, exporting builds, or auditing a project.",
+      "why": "Godot games: cameras, shaders, particle effects, tweening and animation, exporting builds, and a project audit.",
+      "skills": [
+        "godot-audit",
+        "godot-camera-systems",
+        "godot-export-builds",
+        "godot-particles",
+        "godot-shaders-basics",
+        "godot-tweening",
+        "godot-scene-and-script-craft",
+        "godot-test-and-verify",
+        "godot-input-save-and-ui",
+        "godot-editor-bridge"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 58,
+      "indexTokens": 888,
+      "card": "cards/pack-godot-camera-shaders-particles-export.md"
+    },
+    {
+      "id": "learning-lessons-explanations-practice",
+      "title": "Learning: lessons and explanations from zero",
+      "description": "Use when the user wants to learn something from zero: lesson by lesson teaching, patterns, spaced rechecks and practice, before any test or mock.",
+      "why": "Learn something from zero: lesson by lesson, with spaced rechecks and practice before any test.",
+      "skills": [
+        "teach"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 37,
+      "indexTokens": 154,
+      "card": "cards/pack-learning-lessons-explanations-practice.md"
+    },
+    {
+      "id": "marketing-copy-emails-seo-signups",
+      "title": "Marketing: copy, emails, search, signups and tests",
+      "description": "Use when the user wants web or sales copy edited or written, emails and cold outreach, search optimisation, a signup, onboarding, paywall or churn fix, page conversion, an A/B test, analytics set-up or app-store optimisation.",
+      "why": "Web and sales copy, emails and cold outreach, search optimisation, signup and onboarding, paywalls, A/B tests and analytics.",
+      "skills": [
+        "copywriting",
+        "copy-editing",
+        "content-strategy",
+        "emails",
+        "cold-email",
+        "seo-audit",
+        "ai-seo",
+        "programmatic-seo",
+        "cro",
+        "signup",
+        "onboarding",
+        "paywalls",
+        "churn-prevention",
+        "ab-testing",
+        "analytics",
+        "aso"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 57,
+      "indexTokens": 1096,
+      "card": "cards/pack-marketing-copy-emails-seo-signups.md"
+    },
+    {
+      "id": "marketing-plans-offers-pricing-launches",
+      "title": "Marketing: plans, offers, pricing and launches",
+      "description": "Use when the user wants a marketing plan or ideas, an offer or pricing, a product launch, a referral or PR push, a competitor study, customer interviews or surveys, ads, or social and community posts.",
+      "why": "A marketing plan, an offer and its pricing, a product launch, referrals, ads, competitor and customer studies, social posts.",
+      "skills": [
+        "marketing-plan",
+        "marketing-ideas",
+        "marketing-psychology",
+        "product-marketing",
+        "offers",
+        "pricing",
+        "launch",
+        "lead-magnets",
+        "referrals",
+        "public-relations",
+        "competitors",
+        "competitor-profiling",
+        "customer-research",
+        "community-marketing",
+        "social",
+        "ad-creative"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 50,
+      "indexTokens": 1033,
+      "card": "cards/pack-marketing-plans-offers-pricing-launches.md"
+    },
+    {
+      "id": "mobile-apps-flutter-firebase",
+      "title": "Mobile apps: Flutter and Firebase",
+      "description": "Use when the user builds a Flutter app or uses Firebase: screens and layouts, tests, JSON, routing, translations, sign-in, databases, remote settings, crash reports, hosting and security rules.",
+      "why": "Flutter apps and Firebase: screens, tests, routing, translations, sign-in, databases, crash reports, hosting and security rules.",
+      "skills": [
+        "flutter-add-integration-test",
+        "flutter-add-widget-preview",
+        "flutter-add-widget-test",
+        "flutter-apply-architecture-best-practices",
+        "flutter-build-responsive-layout",
+        "flutter-fix-layout-issues",
+        "flutter-implement-json-serialization",
+        "flutter-setup-declarative-routing",
+        "flutter-setup-localization",
+        "flutter-use-http-package",
+        "firebase-auth-basics",
+        "firebase-basics",
+        "firebase-crashlytics",
+        "firebase-firestore",
+        "firebase-hosting-basics",
+        "firebase-remote-config-basics",
+        "firebase-security-rules-auditor",
+        "using-firebase"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 49,
+      "indexTokens": 1275,
+      "card": "cards/pack-mobile-apps-flutter-firebase.md"
+    },
+    {
+      "id": "phone-app-testing-release-and-agents",
+      "title": "Phone apps: testing, release checks, crash reports, agents and adb",
+      "description": "Use when the user tries an app on a phone or emulator, checks a screen or an APK build, prepares a store release, reads crash reports, adds animation or widgets, lets an AI agent use a phone, or changes phone settings with adb.",
+      "why": "Try an app on a phone, read crash reports, prepare a store release, and let an AI agent use a phone.",
+      "skills": [
+        "phone-agent-safety",
+        "inspect-your-own-app-build",
+        "phone-cleanup-and-settings-by-adb",
+        "drive-a-phone-or-emulator",
+        "mobile-ui-build-bar",
+        "app-store-and-play-release-gate",
+        "crash-and-release-monitoring",
+        "mobile-animation-and-widgets"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 57,
+      "indexTokens": 672,
+      "card": "cards/pack-phone-app-testing-release-and-agents.md"
+    },
+    {
+      "id": "python-backend-fastapi-docker-agents",
+      "title": "Python back ends: FastAPI, Docker and AI agents",
+      "description": "Use when the user sets up a Python project, builds a FastAPI service, hardens a Docker image, or builds an AI agent in Python with Pydantic AI.",
+      "why": "Set up a Python project, build a FastAPI service, harden a Docker image, or build an AI agent in Python.",
+      "skills": [
+        "modern-python",
+        "production-fastapi",
+        "production-docker",
+        "building-pydantic-ai-agents"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 36,
+      "indexTokens": 458,
+      "card": "cards/pack-python-backend-fastapi-docker-agents.md"
+    },
+    {
+      "id": "stock-research-backtests-trading-safety",
+      "title": "Stocks, backtests, trading safety and budgets",
+      "description": "Use when the user researches a company or stock, values it, asks if a trading result is skill or luck, backtests a rule, paper trades, sets trading limits, finds market data, asks what markets say about an event, or tracks spending.",
+      "why": "Research a company, test a trading rule without fooling yourself, and set trading limits. No buy or sell advice.",
+      "skills": [
+        "single-stock-research-report",
+        "valuation-models",
+        "is-it-edge-or-luck",
+        "backtest-without-fooling-yourself",
+        "paper-trade-first",
+        "trading-safety-gates",
+        "market-data-sources",
+        "stock-screen-by-criteria",
+        "read-the-odds-prediction-markets",
+        "personal-budget-and-bookkeeping"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 58,
+      "indexTokens": 803,
+      "card": "cards/pack-stock-research-backtests-trading-safety.md"
+    },
+    {
+      "id": "unity-editor-scripts-prefabs-builds",
+      "title": "Unity games: editor, scripts, prefabs, tests and builds",
+      "description": "Use when the user builds a Unity game: C# scripts, scenes and prefabs, running and testing in the editor, profiling, importing assets, multiplayer basics, and building for PC, Android or iOS.",
+      "why": "Unity games: C# scripts, scenes and prefabs, testing in the editor, profiling and builds for PC and phones.",
+      "skills": [
+        "unity-editor-loop",
+        "unity-scripts-and-prefabs",
+        "unity-playtest-and-profile",
+        "unity-build-and-platform-targets",
+        "unity-asset-pipeline",
+        "unity-networking-and-multiplayer"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 48,
+      "indexTokens": 490,
+      "card": "cards/pack-unity-editor-scripts-prefabs-builds.md"
+    },
+    {
+      "id": "web-api-security-login-and-graphql",
+      "title": "Web back ends: API design, security, sign-in and GraphQL",
+      "description": "Use when the user designs or reviews a web API or OpenAPI file, checks a server's headers and security, adds sign-in, roles or password resets, or builds or fixes a GraphQL API.",
+      "why": "Design or review a web API, check a server's security headers, add sign-in and roles, build GraphQL.",
+      "skills": [
+        "api-design-and-lint",
+        "secure-by-default-http",
+        "auth-and-sessions",
+        "graphql-and-federation"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 45,
+      "indexTokens": 332,
+      "card": "cards/pack-web-api-security-login-and-graphql.md"
+    },
+    {
+      "id": "web-astro-cloudflare-gsap-performance",
+      "title": "Websites: Astro, Cloudflare, animation and speed",
+      "description": "Use for websites and Cloudflare Workers: Astro pages, deploying or reviewing a Worker (wrangler), GSAP animation (tweens, easing, scroll, timelines), site structure, structured data, speed, local business sites. Open before starting.",
+      "why": "Astro sites, Cloudflare Workers, GSAP animation, site structure, structured data, speed and local business sites.",
+      "skills": [
+        "astro-dev",
+        "gsap-core",
+        "gsap-scrolltrigger",
+        "gsap-timeline",
+        "wrangler",
+        "workers-best-practices",
+        "web-perf",
+        "build-local-site",
+        "site-architecture",
+        "schema"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 59,
+      "indexTokens": 762,
+      "card": "cards/pack-web-astro-cloudflare-gsap-performance.md"
+    },
+    {
+      "id": "web-search-and-scraping-into-files",
+      "title": "Searching the web and pulling page data into files, lawfully",
+      "description": "Use when the user wants data, prices or text pulled from web pages, wants to search the web for a list of businesses or results and save them to a file or spreadsheet, or asks whether a site may be scraped.",
+      "why": "Pull data from web pages or search results into a file or spreadsheet, and check whether a site allows it.",
+      "skills": [
+        "web-scrape-and-search-api"
+      ],
+      "agents": [],
+      "alwaysOnTokens": 52,
+      "indexTokens": 188,
+      "card": "cards/pack-web-search-and-scraping-into-files.md"
     }
   ],
   "later": [

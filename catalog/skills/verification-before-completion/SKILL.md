@@ -1,127 +1,110 @@
 ---
 name: verification-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: Use before you claim work is complete, fixed, or passing, and before committing or creating PRs. It requires running verification commands and confirming output prior to making any success claim. Evidence before assertions, always.
 metadata:
   category: quality
-  author: Richicinschi (adapted by Claude from obra/superpowers)
+  author: Richicinschi
   version: 1.0.0
   domain: evidence before any claim of done
-  sources:
-    - obra/superpowers · skills/verification-before-completion (MIT) @ v7.0.1 2ce8aa15; see ./LICENSE and ./VENDORED.md
 ---
+# Verification before completion
 
-# Verification Before Completion
+A claim of success is a statement about the world. Check the world first, then speak.
 
-## Overview
+Breaking the letter of the rule breaks the rule. Following its wording while dodging its point is a breach too. If you find a phrasing that "technically" avoids it, the rule applies to that phrasing too.
 
-**Core principle:** Evidence before claims, always.
+## The law
 
-**Violating the letter of this rule is violating the spirit of this rule.**
+You may not say that work is done, fixed or passing unless you ran the proving command in this same message and read what it printed. An earlier run does not count. A feeling of certainty does not count.
 
-## The Iron Law
+## The check, in order
 
-```
-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
-```
+Before you state any status, and before you sound pleased about it:
 
-If you haven't run the verification command in this message, you cannot claim it passes.
+1. Name the command that would prove the claim.
+2. Run the full command again, fresh and complete. Not a subset, not a remembered result.
+3. Read all the output. Note the exit code and count the failures.
+4. Compare the output with the claim.
+   - It disagrees: report the real state, with the output as proof.
+   - It agrees: make the claim and attach the output.
+5. Only now write the claim.
 
-## The Gate Function
+Skipping any step is lying, not verifying. A guess presented as a result is a lie.
 
-```
-BEFORE claiming any status or expressing satisfaction:
+## What each claim needs
 
-1. IDENTIFY: What command proves this claim?
-2. RUN: Execute the FULL command (fresh, complete)
-3. READ: Full output, check exit code, count failures
-4. VERIFY: Does output confirm the claim?
-   - If NO: State actual status with evidence
-   - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim
+| Claim | What proves it | What does not |
+|-------|----------------|---------------|
+| Tests pass | Test run printed zero failures | An old run, "it ought to pass" |
+| Lint is clean | Linter printed zero errors | Linting one folder and assuming the rest |
+| Build works | Build command exited 0 | A clean lint, a quiet log |
+| Bug is fixed | The original symptom no longer reproduces | The code changed, so it must be fixed |
+| New test guards the bug | You saw it fail without the fix and pass with it | It passed once |
+| Sub-agent finished | The diff in version control shows the change | The agent said it succeeded |
+| Spec is satisfied | You walked the spec line by line | The tests are green |
 
-Skip any step = lying, not verifying
-```
+## Warning signs
 
-## Common Failures
+Stop and run the check when you notice any of these in yourself:
 
-| Claim | Requires | Not Sufficient |
-|-------|----------|----------------|
-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
-| Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | VCS diff shows changes | Agent reports "success" |
-| Requirements met | Line-by-line checklist | Tests passing |
+- Writing "should", "probably", "seems to", "looks right".
+- Wanting to cheer ("Great!", "Perfect!", "Done!", "Nice!", "All set!", etc.) before a command has run.
+- About to commit, push or open a PR with nothing run.
+- Taking a delegate's success report at face value.
+- Having checked only part of the thing.
+- Thinking "just this once" or "one exception won't hurt".
+- Being tired and wanting the task to be over.
+- Any sentence that implies success when no command backs it.
 
-## Red Flags - STOP
+## Excuses and the answer to each
 
-- Using "should", "probably", "seems to"
-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
-- Trusting agent success reports
-- Relying on partial verification
-- Thinking "just this once"
-- Tired and wanting work over
-- **ANY wording implying success without having run verification**
+| Excuse | Answer |
+|--------|--------|
+| "It should work now." | Run it. |
+| "I am sure." | Sureness is not output. |
+| "Only this once." | There is no once. |
+| "The linter passed." | A linter does not compile or run the code. |
+| "The agent reported success." | Look at the diff yourself. |
+| "I am worn out." | Tiredness is a reason to rest, not to skip the run. |
+| "Checking part of it is enough." | A part proves only that part. |
+| "I phrased it differently, so the rule is not triggered." | The rule covers the meaning, not the words. |
 
-## Rationalization Prevention
+## Patterns
 
-| Excuse | Reality |
-|--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Verify independently |
-| "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Partial proves nothing |
-| "Different words so rule doesn't apply" | Spirit over letter |
+Tests:
 
-## Key Patterns
+- Right: run `npm test`, see `212 passed, 0 failed`, then say "all 212 tests pass".
+- Wrong: say "that ought to fix the failing tests".
 
-**Tests:**
-```
-✅ [Run test command] [See: 34/34 pass] "All tests pass"
-❌ "Should pass now" / "Looks correct"
-```
+Regression test for a bug:
 
-**Regression tests (TDD Red-Green):**
-```
-✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
-❌ "I've written a regression test" (without red-green verification)
-```
+- Right: write the test, run it green, undo the fix, run it and see it go red, restore the fix, run it green again.
+- Wrong: say "I added a regression test" having run it only against the fixed code.
 
-**Build:**
-```
-✅ [Run build] [See: exit 0] "Build passes"
-❌ "Linter passed" (linter doesn't check compilation)
-```
+Build:
 
-**Requirements:**
-```
-✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
-❌ "Tests pass, phase complete"
-```
+- Right: run `cargo build --release`, see exit code 0, then say "the release build succeeds".
+- Wrong: say "clippy is quiet, so it builds".
 
-**Agent delegation:**
-```
-✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
-❌ Trust agent report
-```
+Spec or plan:
 
-## When To Apply
+- Right: reopen the plan, list every item, check each against the code or a run, then report what is done and what is missing.
+- Wrong: say "the suite is green, so the phase is finished".
 
-**ALWAYS before:**
-- ANY variation of success/completion claims
-- ANY expression of satisfaction
-- ANY positive statement about work state
-- Committing, PR creation, task completion
-- Moving to next task
-- Delegating to agents
+Delegated work:
 
-**Rule applies to:**
-- Exact phrases
-- Paraphrases and synonyms
-- Implications of success
-- ANY communication suggesting completion/correctness
+- Right: the agent says it finished, you read the diff, you run the checks yourself, you report what you found.
+- Wrong: pass the agent's report on as your own finding.
+
+## When it applies
+
+Always run the check before:
+
+- Any statement of success or completion, in any wording.
+- Any expression of satisfaction or relief about the work.
+- Any positive remark about the state of the code.
+- A commit, a push, a PR, or closing a task.
+- Starting the next task.
+- Handing work to an agent.
+
+The rule covers exact phrases, paraphrases, synonyms, and anything that implies the work is finished or correct.

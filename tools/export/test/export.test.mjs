@@ -159,3 +159,75 @@ test('the first release passes the lint, then writes one changelog section and t
     assert.equal(state.hubCommit, 'abc123');
   } finally { s.done(); }
 });
+
+// ---- v3: the committed manifest names no outside repository
+import { loadManifest } from '../manifest.mjs';
+const realManifest = () => loadManifest(path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..', '..', '..', 'export.manifest.json'));
+
+test('no catalog-only item with an upstream link remains', () => {
+  const linked = realManifest().items.filter((it) => it.status === 'catalog-only' && /https?:\/\//.test(String(it.upstream || '')));
+  assert.deepEqual(linked.map((it) => `${it.kind}:${it.id}`), []);
+});
+
+test('link-only items are only tools the kit installs', () => {
+  const linkOnly = realManifest().items.filter((it) => it.status === 'link-only').map((it) => it.id);
+  assert.deepEqual(linkOnly, ['skillspector']);
+});
+
+test('every removal in the manifest records its version and a replacement or a reason', () => {
+  const m = realManifest();
+  assert.ok(Array.isArray(m.removed) && m.removed.length > 0);
+  for (const r of m.removed) {
+    assert.ok(r.kind && r.id && r.was && /^\d+\.\d+\.\d+$/.test(r.in), JSON.stringify(r));
+    assert.ok(!m.items.some((it) => it.kind === r.kind && it.id === r.id), `${r.kind}:${r.id} is both removed and listed`);
+  }
+  for (const id of ['outside-workflow-plugin', 'anthropic-document-skills', 'coding-guidelines']) {
+    const rec = m.removed.find((r) => r.kind === 'external' && r.id === id);
+    assert.ok(rec && (rec.replacedBy || rec.note), `external:${id} needs a replacement or a note`);
+  }
+});
+
+test('a release stamps its version into the manifest and the feature menu, and no private item reaches the file', () => {
+  const s = setup();
+  try {
+    assert.equal(s.run({ release: '3.1.0', notes: ['Stamp.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
+    const onDisk = JSON.parse(readFileSync(path.join(s.root, 'export.manifest.json'), 'utf8'));
+    assert.equal(onDisk.version, '3.1.0');
+    assert.deepEqual(onDisk.items.map((i) => i.id).sort(), manifest.items.map((i) => i.id).sort());
+    assert.equal(JSON.parse(readFileSync(path.join(s.root, 'catalog/features.json'), 'utf8')).version, '3.1.0');
+  } finally { s.done(); }
+});
+
+// ---- the kit names no outside workflow collection anywhere
+test('the kit holds the outside workflow collection\'s name in no file', async () => {
+  const { readdirSync, statSync } = await import('node:fs');
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..', '..', '..');
+  const needle = new RegExp(['super', 'powers'].join(''), 'i');
+  const hits = [];
+  const walk = (dir) => {
+    for (const ent of readdirSync(dir, { withFileTypes: true })) {
+      if (['.git', 'node_modules'].includes(ent.name) || /\.local\.(txt|json)$/.test(ent.name)) continue;
+      const p = path.join(dir, ent.name);
+      if (ent.isDirectory()) walk(p);
+      else if (statSync(p).size < 2_000_000 && needle.test(path.relative(root, p)) || (statSync(p).size < 2_000_000 && !/\.(png|gz|zip|svg|webp)$/.test(ent.name) && needle.test(readFileSync(p, 'utf8')))) hits.push(path.relative(root, p).split(path.sep).join('/'));
+    }
+  };
+  walk(root);
+  assert.deepEqual(hits, []);
+});
+
+test('a shipped file that cites an item the private list keeps out of the kit fails the privacy gate, by position only', () => {
+  const s = setup();
+  try {
+    const id = `${FIXTURE_OWNER.toLowerCase()}-voice`;
+    mkdirSync(path.join(s.hub, '.claude/skills', id), { recursive: true });
+    writeFileSync(path.join(s.hub, '.claude/skills', id, 'SKILL.md'), `---\nname: ${id}\ndescription: Private.\n---\n`);
+    s.w('tools/export/private.local.txt', `skill:${id}\n`);
+    writeFileSync(path.join(s.hub, '.claude/skills/alpha/SKILL.md'), `---\nname: alpha\ndescription: Use when alpha.\nmetadata:\n  author: Richicinschi (Claude-authored)\n---\n# alpha\n\nAfter this, see \`${id}\`.\n`);
+    assert.equal(s.run(), 1, s.lines.join('\n'));
+    const out = s.lines.join('\n');
+    assert.match(out, /privacy: FAIL/);
+    assert.match(out, /catalog\/skills\/alpha\/SKILL\.md:\d+ denied term #\d+/);
+    assert.equal(out.includes(id), false, 'the name is never printed');
+  } finally { s.done(); }
+});

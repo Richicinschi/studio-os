@@ -11,9 +11,10 @@ import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } 
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { loadManifest } from './manifest.mjs';
+import { loadManifest, hubInventory } from './manifest.mjs';
 import { loadDenyList, loadOwnerName, loadLocalRewrites, STUDIO_REWRITES } from './rules.mjs';
 import { buildKit } from './build.mjs';
+import { resolvePacks } from './packs.mjs';
 import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, isLocalOnly } from './gates.mjs';
 import { itemHashes, diffItems, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
 import { lintKit } from './lint-content.mjs';
@@ -51,6 +52,9 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       if (page && src) extraSources[page] = [...(extraSources[page] || []), src];
     }
     const priv = lines.filter((x) => !x.startsWith('source ')).map((l) => { const [kind, id] = l.split(':'); return { id, kind, status: 'private', pack: 'none' }; });
+    // What the list keeps out of the kit by name is also denied in every file the export builds, so a core skill
+    // that cites such an item fails the privacy gate (reported by list position, never by name).
+    deny = [...deny, ...[...priv.map((p) => p.id), ...hubInventory(hub).hiddenPacks.map((p) => p.id)].filter((id, i, a) => id && !deny.includes(id) && a.indexOf(id) === i)];
     manifest = { ...manifest, items: [...manifest.items, ...priv.filter((p) => !manifest.items.some((it) => it.kind === p.kind && it.id === p.id))] };
   }
 
@@ -73,6 +77,15 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       const rel = path.relative(root, src).split(path.sep).join('/');
       return !(rel === '.git' || rel.startsWith('.git/') || rel.split('/').includes('node_modules') || isLocalOnly(rel));
     } });
+    // Which packs ship is computed from the hub, never flipped by hand; each withheld pack prints its skill-level reasons.
+    // A release stamps its own version into the manifest, so the feature menu and the adoption the drill
+    // records name the kit version they came from; the file on disk gets it once every gate has passed.
+    const rawManifest = release ? { ...manifest, version: release } : manifest;
+    manifest = resolvePacks(hub, rawManifest);
+    for (const it of manifest.items.filter((i) => i.kind === 'pack' && i.status === 'withheld')) {
+      log([`pack ${it.id}: withheld`, ...(it.reasons || []).map((x) => `  - ${x}`)].join(String.fromCharCode(10)));
+    }
+    for (const it of manifest.items.filter((i) => i.kind === 'pack' && i.status === 'shipped')) log(`pack ${it.id}: ships`);
     let built;
     try { built = buildKit({ hub, out: stage, manifest, scans, owner, rewrites: [...localRewrites, ...rewrites] }); } catch (e) { log(`export: ${e.message}`); return 1; }
 
@@ -104,9 +117,12 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       cpSync(path.join(stage, g), path.join(root, g), { recursive: true });
     }
     if (release) {
+      // The committed file, not the in-memory manifest: that one also holds the private items from the local list.
+      const committed = loadManifest(path.join(root, 'export.manifest.json'));
+      writeFileSync(path.join(root, 'export.manifest.json'), `${JSON.stringify({ ...committed, version: release }, null, 2)}\n`);
       const items = itemHashes(root, built.itemFiles);
       const diff = diffItems(prev?.items, items);
-      prependChangelog(path.join(root, 'CHANGELOG.md'), changelogSection(release, today, diff, notes));
+      prependChangelog(path.join(root, 'CHANGELOG.md'), changelogSection(release, today, diff, notes, { removed: manifest.removed || [], shippedPacks: manifest.items.filter((it) => it.kind === 'pack' && it.status === 'shipped').map((it) => it.id) }));
       writeFileSync(local('state.json'), `${JSON.stringify({ version: release, date: today, hubCommit: hubGit(hub, ['rev-parse', 'HEAD']), items }, null, 2)}\n`);
       log(`released v${release}: ${diff.added.length} added, ${diff.changed.length} changed, ${diff.removed.length} removed`);
     }

@@ -1,0 +1,180 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/*
+  Site stylesheet. Fill these tokens before the first build:
+    __FONT_DISPLAY__   heading font family, e.g. DM Serif Display
+    __FONT_BODY__      body font family, e.g. DM Sans
+    __BRAND_50__ .. __BRAND_950__   the eleven brand shades (hex)
+  The fonts must also be loaded in BaseLayout.astro.
+*/
+
+/* The stagger-N classes are built from a number at render time, so Tailwind
+   cannot see them in the source. Ask it to emit all six. */
+@source inline("stagger-{1,2,3,4,5,6}");
+
+@theme {
+  --font-display: '__FONT_DISPLAY__', Georgia, serif;
+  --font-body: '__FONT_BODY__', system-ui, sans-serif;
+
+  /* Brand scale, lightest to darkest. A blue example to copy from:
+     50 #eff6ff, 100 #dbeafe, 200 #bfdbfe, 300 #93c5fd, 400 #60a5fa, 500 #3b82f6,
+     600 #2563eb, 700 #1d4ed8, 800 #1e40af, 900 #1e3a8a, 950 #172554 */
+  --color-brand-50: __BRAND_50__;
+  --color-brand-100: __BRAND_100__;
+  --color-brand-200: __BRAND_200__;
+  --color-brand-300: __BRAND_300__;
+  --color-brand-400: __BRAND_400__;
+  --color-brand-500: __BRAND_500__;
+  --color-brand-600: __BRAND_600__;
+  --color-brand-700: __BRAND_700__;
+  --color-brand-800: __BRAND_800__;
+  --color-brand-900: __BRAND_900__;
+  --color-brand-950: __BRAND_950__;
+
+  /* Neutral greys with a warm tint */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+  --color-stone-950: #0c0a09;
+
+  /* Amber, the call-to-action colour on every site */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
+
+  /* Entrance animations; the keyframes follow */
+  --animate-fade-up: fadeUp 600ms ease-out both;
+  --animate-fade-in: fadeIn 500ms ease-out both;
+  --animate-slide-down: slideDown 400ms ease-out both;
+  --animate-scale-in: scaleIn 300ms ease-out both;
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideDown {
+  from { transform: translateY(-12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Delay steps for staggered entrances: class="animate-fade-up stagger-3".
+   Plain declarations only, which is all @utility may hold. */
+@utility stagger-1 { animation-delay: 100ms; }
+@utility stagger-2 { animation-delay: 200ms; }
+@utility stagger-3 { animation-delay: 300ms; }
+@utility stagger-4 { animation-delay: 400ms; }
+@utility stagger-5 { animation-delay: 500ms; }
+@utility stagger-6 { animation-delay: 600ms; }
+
+/* Frosted panels */
+@utility glass {
+  background: rgb(255 255 255 / 70%);
+  backdrop-filter: blur(0.75rem);
+  -webkit-backdrop-filter: blur(0.75rem);
+  border: 1px solid rgb(255 255 255 / 30%);
+}
+@utility glass-dark {
+  background: rgb(0 0 0 / 50%);
+  backdrop-filter: blur(0.75rem);
+  -webkit-backdrop-filter: blur(0.75rem);
+  border: 1px solid rgb(255 255 255 / 10%);
+}
+
+/* Accent bar beside a heading. Only spacing lives here: the bar needs ::before,
+   and @utility cannot hold pseudo-selectors. */
+@utility editorial-line {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+/* Anything with :hover or a pseudo-element belongs in @layer components. */
+@layer components {
+  .editorial-line::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: 9999px;
+    background: var(--color-brand-600);
+  }
+
+  .card-hover {
+    transition: transform 250ms ease-out, box-shadow 250ms ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 10px 25px -5px rgb(0 0 0 / 10%),
+      0 8px 10px -6px rgb(0 0 0 / 5%);
+  }
+
+  /* Long-form reading style, used for blog posts and area copy */
+  .prose-editorial {
+    font-family: var(--font-body);
+    line-height: 1.8;
+    color: var(--color-stone-700);
+  }
+  .prose-editorial :is(h1, h2, h3, h4) {
+    font-family: var(--font-display);
+    color: var(--color-stone-900);
+    line-height: 1.35;
+  }
+  .prose-editorial h2 {
+    margin: 2.5rem 0 1rem;
+    font-size: 1.65rem;
+  }
+  .prose-editorial h3 {
+    margin: 2rem 0 0.75rem;
+    font-size: 1.3rem;
+  }
+  .prose-editorial a {
+    color: var(--color-brand-700);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose-editorial a:hover {
+    color: var(--color-brand-500);
+  }
+  .prose-editorial blockquote {
+    border-left: 3px solid var(--color-brand-400);
+    padding-left: 1.25rem;
+    font-style: italic;
+    color: var(--color-stone-600);
+  }
+  .prose-editorial ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+  .prose-editorial ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+  }
+  .prose-editorial li {
+    margin-bottom: 0.5rem;
+  }
+}

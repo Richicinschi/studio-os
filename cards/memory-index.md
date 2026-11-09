@@ -6,6 +6,9 @@ tokens:
   light: 51
   standard: 55
   full: 55
+other_figures:
+  - 33
+  - 1650
 ---
 
 # The memory folder with its index

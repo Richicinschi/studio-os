@@ -1,199 +1,178 @@
 ---
 name: diagnosing-bugs
 description: >-
-  Diagnosis loop for hard bugs and performance regressions. Use when the user says
-  "diagnose"/"debug this", or reports something broken/throwing/failing/slow. The core move is
-  building a tight red-capable feedback loop before hypothesising.
+  Method for hard bugs and performance regressions. Trigger: the user says "diagnose" or "debug
+  this", or reports something broken, throwing, failing or slow. The core move: build a tight,
+  red-capable feedback loop first, then hypothesise.
 metadata:
   category: engineering
-  author: Richicinschi (adapted by Claude from mattpocock/skills and obra/superpowers)
+  author: Richicinschi
   version: 1.1.0
   domain: systematic bug + perf-regression diagnosis
-  sources:
-    - mattpocock/skills · engineering/diagnosing-bugs (MIT) — body + hitl-loop helper kept; see ./LICENSE
-    - obra/superpowers · skills/systematic-debugging (MIT) @ v7.0.1 2ce8aa15 — folded in (audit W7, 2026-11-02) — the Iron Law, Red Flags and Common Rationalizations sections and references/; see ./LICENSE and ../vendored.json
 ---
-
 # Diagnosing Bugs
 
-A discipline for hard bugs. Skip phases only when explicitly justified.
+Hard bugs yield to one thing: a command that fails when the bug is present and passes when it is gone. Get that command first. Everything after it is routine. Skip a phase only when that choice is explicitly justified.
 
-## The Iron Law
-
-*From obra/superpowers `systematic-debugging` (MIT) @ v7.0.1.*
+## The one rule
 
 ```
-NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
+NO FIX BEFORE THE ROOT CAUSE IS FOUND
 ```
 
-If you haven't completed Phases 1–4 (a red loop, a minimised repro, a hypothesis a probe confirmed), you cannot propose fixes.
+Do not propose or apply a fix until you know the root cause. "Know" means you have finished phases 1 to 4: a command that goes red, a repro cut to its core, a ranked set of guesses, and a probe that confirmed one of them.
 
-When exploring the codebase, read the project's `AGENTS.md` (and `CONTEXT.md` if it exists) to get a clear mental model of the relevant modules, and check `DECISIONS.md` / any ADRs in the area you're touching.
+Before you start, read the project's `AGENTS.md`, its `CONTEXT.md` if one exists, and any `DECISIONS.md` or ADR near the code you will touch. They give you the module map and the choices already made.
 
-## Phase 1 — Build a feedback loop
+## Phase 1: Build the feedback loop
 
-**This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
+This phase is the whole skill. With a sharp pass/fail signal on this exact bug, you will find the cause, because bisecting, hypothesis testing and instrumenting all just feed on that signal. Without one, reading more code will not help. Put a disproportionate share of your effort into this phase. Be aggressive, be creative, and refuse to give up.
 
-Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
+### Ways to get a signal, roughly best first
 
-### Ways to construct one — try them in roughly this order
+1. A failing test at whatever seam reaches the bug (unit, integration or end to end).
+2. A curl or HTTP script against a running dev server.
+3. A CLI run on a fixture input, with stdout diffed against a known-good snapshot.
+4. A headless browser script (Playwright or Puppeteer) that drives the page and asserts on the DOM, console or network.
+5. A replay: save a real request, payload or event log to disk, then push it through the code path alone.
+6. A throwaway harness: boot a small slice of the system with its dependencies mocked, and call the buggy path with one function call.
+7. A property or fuzz loop for "wrong output sometimes": feed 1000 random inputs and watch for the bad case.
+8. A bisection harness for "worked at state A, broken at state B" (commit, dataset, version): script "set up state, check, report" so `git bisect run` can drive it.
+9. A differential loop: run one input through the old and new version, or two configs, and diff the results.
+10. A human-in-the-loop script, as a last resort. When only a person can click, use `scripts/hitl-loop.template.sh` so their steps are structured and their answers come back to you as data.
 
-1. **Failing test** at whatever seam reaches the bug — unit, integration, e2e.
-2. **Curl / HTTP script** against a running dev server.
-3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
-4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
-5. **Replay a captured trace.** Save a real network request / payload / event log to disk; replay it through the code path in isolation.
-6. **Throwaway harness.** Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
-7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
-8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
-9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
-10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
+### Make the loop tighter
 
-Build the right feedback loop, and the bug is 90% fixed.
+Once any loop exists, improve it on three axes:
 
-### Tighten the loop
+- Speed: cache setup, skip unrelated start-up, narrow the test scope.
+- Sharpness: assert on the specific symptom, not on "did not crash".
+- Determinism: pin the clock, seed the RNG, isolate the filesystem, freeze the network.
 
-Treat the loop as a product. Once you have _a_ loop, **tighten** it:
+A flaky loop that takes 30 seconds is nearly worthless. A deterministic one that takes 2 seconds is a major advantage.
 
-- Can I make it faster? (Cache setup, skip unrelated init, narrow the test scope.)
-- Can I make the signal sharper? (Assert on the specific symptom, not "didn't crash".)
-- Can I make it more deterministic? (Pin time, seed RNG, isolate filesystem, freeze network.)
+Get the loop right and nine tenths of the work is already done.
 
-A 30-second flaky loop is barely better than no loop; a 2-second deterministic one is tight — a debugging superpower.
+### Bugs that come and go
 
-### Non-deterministic bugs
+Do not chase a clean repro. Chase a higher failure rate. Run the trigger 100 times, run copies in parallel, add load, shrink the timing window, insert sleeps. A bug that fails half the time can be debugged. One that fails 1% of the time cannot, so keep pushing the rate up.
 
-The goal is not a clean repro but a **higher reproduction rate**. Loop the trigger 100×, parallelise, add stress, narrow timing windows, inject sleeps. A 50%-flake bug is debuggable; 1% is not — keep raising the rate until it's debuggable.
+### No loop possible
 
-### When you genuinely cannot build a loop
+Stop. Say so explicitly and list what you tried. Then ask the user for one of: access to an environment where it reproduces, a captured artifact (HAR file, log dump, core dump, a screen recording with timestamps), or permission to add temporary instrumentation in production. Do not start guessing causes without a loop.
 
-Stop and say so explicitly. List what you tried. Ask the user for: (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. Do **not** proceed to hypothesise without a loop.
+### Exit test for phase 1
 
-### Completion criterion — a tight loop that goes red
+You are done when you can name one command, which you have run at least once already (paste the invocation and its output), and that is all of these:
 
-Phase 1 is done when the loop is **tight** and **red-capable**: you can name **one command** — a script path, a test invocation, a curl — that you have **already run at least once** (paste the invocation and its output), and that is:
+- [ ] Red-capable: it runs the real buggy code path and asserts the user's exact symptom. It can fail on this bug and pass once the bug is fixed. "Runs without error" does not count.
+- [ ] Deterministic: same result each run (for flaky bugs, a measured and pinned high failure rate).
+- [ ] Fast: seconds, not minutes.
+- [ ] Runnable by you alone: no human needed, except through the hitl template.
 
-- [ ] **Red-capable** — it drives the actual bug code path and asserts the **user's exact symptom**, so it can go red on this bug and green once fixed. Not "runs without erroring" — it must be able to _catch this specific bug_.
-- [ ] **Deterministic** — same verdict every run (flaky bugs: a pinned, high reproduction rate, per above).
-- [ ] **Fast** — seconds, not minutes.
-- [ ] **Agent-runnable** — you can run it unattended; a human in the loop only via `scripts/hitl-loop.template.sh`.
+If you notice yourself reading code to build a theory before that command exists, stop. Theorising too early is exactly the mistake this skill exists to prevent. No red-capable command means no phase 2.
 
-If you catch yourself reading code to build a theory before this command exists, **stop — jumping straight to a hypothesis is the exact failure this skill prevents.** No red-capable command, no Phase 2.
+## Phase 2: Reproduce, then shrink
 
-## Phase 2 — Reproduce + minimise
+Run the loop and watch it fail. Check three things:
 
-Run the loop. Watch it go red — the bug appears.
+- [ ] It shows the failure the user described, not a neighbouring one. A wrong bug means a wrong fix.
+- [ ] It fails again on repeat runs (or often enough, for an intermittent bug).
+- [ ] You have recorded the exact symptom (error text, bad output, timing) so later phases can check the fix against it.
 
-Confirm:
+Then shrink. Find the smallest scenario that still fails. Remove inputs, callers, config, data and steps one at a time, rerunning after each removal, and keep only what the failure needs. A small repro leaves fewer suspects for phase 3, and it becomes the regression test in phase 5.
 
-- [ ] The loop produces the failure mode the **user** described — not a different failure that happens to be nearby. Wrong bug = wrong fix.
-- [ ] The failure is reproducible across multiple runs (or, for non-deterministic bugs, reproducible at a high enough rate to debug against).
-- [ ] You have captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
+You are finished shrinking when removing any single remaining piece turns the loop green. Do not move on until the bug is both reproduced and shrunk.
 
-### Minimise
+## Phase 3: Hypothesise
 
-Once it's red, shrink the repro to the **smallest scenario that still goes red**. Cut inputs, callers, config, data, and steps **one at a time**, re-running the loop after each cut — keep only what's load-bearing for the failure.
+Write down 3 to 5 candidate causes, ranked, before you test any. One candidate at a time makes you anchor on whatever came to mind first.
 
-Why bother: a minimal repro shrinks the hypothesis space in Phase 3 (fewer moving parts left to suspect) and becomes the clean regression test in Phase 5.
+Each candidate must be falsifiable, so it has to make a prediction:
 
-Done when **every remaining element is load-bearing** — removing any one of them makes the loop go green.
+> If <X> is the cause, then <changing Y> makes the bug vanish, or <changing Z> makes it worse.
 
-Do not proceed until you have reproduced **and** minimised.
+A candidate with no prediction is a hunch. Sharpen it or drop it.
 
-## Phase 3 — Hypothesise
+Show the ranked list to the user before you test. They may know a deploy touched candidate 3, or have already ruled one out. It costs little and can save hours. If they are away, go ahead with your own ranking.
 
-Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
+## Phase 4: Instrument
 
-Each hypothesis must be **falsifiable**: state the prediction it makes.
+Every probe must test one prediction from phase 3. Change one variable at a time.
 
-> Format: "If <X> is the cause, then <changing Y> will make the bug disappear / <changing Z> will make it worse."
+Prefer tools in this order:
 
-If you cannot state the prediction, the hypothesis is a vibe — discard or sharpen it.
-
-**Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
-
-## Phase 4 — Instrument
-
-Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
-
-Tool preference:
-
-1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
-2. **Targeted logs** at the boundaries that distinguish hypotheses.
+1. A debugger or REPL, where the environment allows. One breakpoint can replace ten log lines.
+2. Targeted logs placed at the boundaries that separate the candidates.
 3. Never "log everything and grep".
 
-**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
+Give every debug log line a unique tag such as `[DEBUG-7c1e]`. Removal is then one search. Untagged logs get shipped; tagged ones get deleted.
 
-**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
+Performance bugs differ. Logs are usually the wrong instrument for them. Take a baseline measurement first (a timing harness, `performance.now()`, a profiler, a query plan), then bisect against it. Measure before you fix.
 
-## Phase 5 — Fix + regression test
+## Phase 5: Fix and lock it in
 
-Write the regression test **before the fix** — but only if there is a **correct seam** for it.
+Write the regression test before the fix, but only at a seam that is right for it. A right seam exercises the real bug pattern the way production reaches it. A seam that is too shallow gives false comfort: a single-caller test for a bug that needs several callers, or a unit test that cannot rebuild the chain of events that caused the failure.
 
-A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
+If no right seam exists, that is a finding in itself. Record it: the architecture is stopping the bug from being pinned down. Carry that into the post-mortem.
 
-**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Flag this for the next phase.
+When a right seam exists:
 
-If a correct seam exists:
+1. Turn the shrunk repro into a failing test there.
+2. Run it and watch it fail.
+3. Make the fix.
+4. Run it and watch it pass.
+5. Rerun the phase 1 loop on the original, unshrunk scenario.
 
-1. Turn the minimised repro into a failing test at that seam.
-2. Watch it fail.
-3. Apply the fix.
-4. Watch it pass.
-5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+## Phase 6: Clean up and learn
 
-## Phase 6 — Cleanup + post-mortem
+Required before you declare it done:
 
-Required before declaring done:
+- [ ] The original repro no longer fails (rerun the phase 1 loop).
+- [ ] The regression test passes, or the missing seam is written down.
+- [ ] Every `[DEBUG-...]` line is gone (search for the tag).
+- [ ] Throwaway prototypes are deleted, or moved somewhere clearly labelled as debug.
+- [ ] The commit or PR message names the hypothesis that proved right, so the next person learns from it.
 
-- [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
-- [ ] Regression test passes (or absence of seam is documented)
-- [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
-- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
-- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
+Then ask what would have stopped this bug from existing. If the answer is structural (no test seam, tangled callers, hidden coupling), hand the details to the `improve` skill. Make that recommendation after the fix lands, when you know more than you did at the start.
 
-**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) hand off to the `/improve-codebase-architecture` skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.
+## Warning signs: stop and go back to phase 1
 
-## Red Flags - STOP and Follow Process
+If any of these thoughts show up, stop:
 
-*From obra/superpowers `systematic-debugging` (MIT) @ v7.0.1.*
+- "Patch it now, look into it later."
+- "Change X and see what happens."
+- "Bundle a few changes and run the tests."
+- "I will skip the test and check by hand."
+- "It is probably X, so I will fix X."
+- "I do not really get it, but this might work."
+- "The pattern says X, but I will bend it."
+- Announcing "Here are the main problems:" and listing fixes before any investigation.
+- Proposing a solution before tracing the data flow.
+- "Just one more attempt", when you have already tried two or more.
+- Each fix exposing a fresh problem somewhere else.
 
-If you catch yourself thinking:
-- "Quick fix for now, investigate later"
-- "Just try changing X and see if it works"
-- "Add multiple changes, run tests"
-- "Skip the test, I'll manually verify"
-- "It's probably X, let me fix that"
-- "I don't fully understand but this might work"
-- "Pattern says X but I'll adapt it differently"
-- "Here are the main problems: [lists fixes without investigation]"
-- Proposing solutions before tracing data flow
-- **"One more fix attempt" (when already tried 2+)**
-- **Each fix reveals new problem in different place**
+All of these mean: return to phase 1.
 
-**ALL of these mean: STOP. Return to Phase 1.**
+After three failed fixes, stop fixing. Raise the design itself with your human partner before a fourth try.
 
-**If 3+ fixes failed:** stop fixing and question the architecture with your human partner before a fourth attempt.
+## Excuses and the reply to each
 
-## Common Rationalizations
+| Excuse | Reply |
+|--------|-------|
+| "It is a simple bug, no process needed." | Simple bugs have causes too, and the process is quick when the bug is simple. |
+| "It is an emergency, no time." | Guess-and-check thrashing takes longer than the method. |
+| "Try this first, investigate after." | The first patch sets the pattern for everything after it. Start correctly. |
+| "I will write the test once the fix works." | A fix with no test behind it does not last. Writing the test first shows it can fail. |
+| "Several fixes at once saves time." | You cannot isolate what worked, and it causes new bugs. |
+| "The reference is long, I will adapt the pattern." | If you only half understand a pattern, you will get it wrong. Read all of it. |
+| "I can see the problem, let me fix it." | Seeing a symptom is not understanding the cause. |
+| "One more try" after two failures. | Three or more failures mean an architectural problem. Question the design instead of patching again. |
 
-*From obra/superpowers `systematic-debugging` (MIT) @ v7.0.1.*
+## Deeper techniques
 
-| Excuse | Reality |
-|--------|---------|
-| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
-| "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
-| "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
-| "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
-| "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
-| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+These files sit in `references/`:
 
-## Supporting techniques
-
-From obra/superpowers `systematic-debugging`, in `references/`:
-
-- [`root-cause-tracing.md`](references/root-cause-tracing.md) — trace a bug backward through the call stack to its original trigger (with `find-polluter.sh`, a bisection script for the test that leaves state behind).
-- [`defense-in-depth.md`](references/defense-in-depth.md) — add validation at every layer once the root cause is found.
-- [`condition-based-waiting.md`](references/condition-based-waiting.md) — replace arbitrary timeouts with condition polling (worked example: `condition-based-waiting-example.ts`).
+- [`root-cause-tracing.md`](references/root-cause-tracing.md): walk a failure back up the call chain to where the bad value began. It includes `find-polluter.sh`, a script that finds the test leaving stray state behind.
+- [`defense-in-depth.md`](references/defense-in-depth.md): after the cause is fixed, add checks at each layer the data crosses.
+- [`condition-based-waiting.md`](references/condition-based-waiting.md): swap fixed sleeps for polling on a condition. The worked code is `condition-based-waiting-example.ts`.

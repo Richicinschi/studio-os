@@ -3,9 +3,13 @@ id: handoff
 module: 01-continuity
 checked: 2026-11-02
 tokens:
+  description: 73
+  body: 1816
   light: 68
   standard: 197
   full: 197
+other_figures:
+  - 260
 ---
 
 # The handoff note, and the skill that writes it
@@ -83,7 +87,7 @@ Light takes steps 1 to 3 and 8 to 10; on claude.ai, step 7 takes the place of st
    - the studio's rule that memory is written in its root folder and committed from a separate worktree branch → dropped; memory is committed where your memory folder lives;
    - the studio's commit rules (signed, no trailers, a hook that refuses them) and its list of repositories that take changes only through a PR → your own: signing only if you took [signed commits](signed-commits.md), and your own list of protected branches, or none;
    - the branch clean-up, which in the kit copy lists every merged branch and finished worktree and deletes only what the studio says yes to, with pointers to a studio memory note, its record of approvals and its rule numbers → the same list-ask-delete, on your yes to the exact list, with those pointers dropped; or dropped;
-   - the links to the studio's vault rule and to its curator → your `memory/vault/MEMORY-VAULT.md`, and [claude-md-curator](claude-md-curator.md) only if you take it.
+   - the links to the studio's vault rule and to its curator → your `memory/vault/MEMORY-VAULT.md`.
    It shows the whole file before saving.
 5. **Claude:** for FOLD, adds the sweep, the note and the last-message rule to your existing skill, with the diff shown.
 6. **Claude:** for full, follows the [session-end check](session-end-check.md) card's steps, which add the check as a `Stop` hook in your settings; that card has its own check and undo.
@@ -112,7 +116,7 @@ If Claude guesses, asks you, or reads an older note; or if the skill does not st
 
 ## Watch out
 
-- **Cost.** The two front-door lines are 272 bytes, about 68 tokens every session; the front door card leaves them out until you take this item. The kit copy's description is 515 bytes, about 129 tokens every session, and its body, 7,371 bytes (measured 2026-11-02), about 1,843 tokens, loads only when it runs. A note loads only when a task continues earlier work: a filled one written for this card was 1,039 bytes, about 260 tokens. All estimates, bytes divided by 4; your adapted copy differs, so measure its description with `wc -c`.
+- **Cost.** The two front-door lines are 272 bytes, about 68 tokens every session; the front door card leaves them out until you take this item. The kit copy's description is about 73 tokens every session, and its body, about 1,816 tokens, loads only when it runs. A note loads only when a task continues earlier work: a filled one written for this card was 1,039 bytes, about 260 tokens. All estimates, bytes divided by 4; your adapted copy differs, so measure its description with `wc -c`.
 - **Facts, not intentions.** "Done" lists what was checked and how. A note that records what was attempted as if it worked sends the next session off on a false start.
 - **Pausing is not ending.** The skill fires on phrases like "end of day". When you are only pausing, Claude says so and skips it: a close-out on a session that is about to continue is wasted.
 - **Never as part of a handoff:** merging a PR, force-pushing, rewriting history or tagging. Keep these lines from the kit copy; each is a separate act that waits for your own yes.

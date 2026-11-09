@@ -1,97 +1,120 @@
-# Auto-layout (Graphviz)
+# Auto-layout with Graphviz
 
-Read this when a diagram is **large or layout-heavy** — dependency/call graphs, code/module structure, or roughly **more than ~15 nodes** — where hand-placing `x`/`y` coordinates is slow, error-prone, and overlap-prone.
+Read this for a big diagram, such as a dependency graph or a module map with more than about 15
+nodes, where typing x and y by hand is slow and breeds overlaps.
 
-Instead of computing coordinates by hand in the Generate step, describe the graph as JSON and let `scripts/autolayout.py` place the nodes and route the edges with Graphviz, then continue the normal workflow (Export draft → Self-check → …) on the produced `.drawio`.
+You write the graph as JSON. `scripts/autolayout.py` hands it to Graphviz, which decides where
+each node goes and how each edge bends, and the script saves an ordinary `.drawio`. After that
+you continue as usual: lint, check the render, deliver. A small or finely styled diagram is
+better placed by hand, since auto-layout trades control for scale.
 
-For small or carefully-styled diagrams, keep hand-placing — auto-layout trades fine control for scale.
+## Requirement
 
-## Dependency
-
-Requires Graphviz `dot` on PATH:
-
-```bash
-# macOS
-brew install graphviz
-# Debian/Ubuntu
-sudo apt install graphviz
-```
-
-The script exits with a clear message if `dot` is missing — fall back to hand-placed coordinates in that case.
-
-## Usage
+Graphviz, with `dot` on PATH.
 
 ```bash
-uv run python <this-skill-dir>/scripts/autolayout.py graph.json -o diagram.drawio
+brew install graphviz        # macOS
+sudo apt install graphviz    # Debian or Ubuntu
 ```
 
-It prints `wrote diagram.drawio (N nodes, M edges)` to stderr and writes a normal `.drawio` file. From there, continue at the **Export draft** step of the main workflow (preview PNG with `--width 2000`, self-check, review loop, final export with `-e` + `repair_png.py`).
+This Windows machine has no `dot`. The script then stops with a plain message, and you place
+the nodes yourself.
 
-## Input format
+## Running it
+
+```bash
+py -3.13 <skill-dir>/scripts/autolayout.py graph.json -o diagram.drawio
+```
+
+(On the Mac use `uv run python`.) With `-o`, the file is written and stderr reports
+`wrote diagram.drawio (N nodes, M edges)`. Without `-o`, the XML is printed to stdout. The
+`--mono` flag turns the group colours off.
+
+## The JSON
 
 ```json
 {
-  "direction": "TB",
+  "direction": "LR",
   "nodes": [
-    {"id": "client", "label": "Web Client", "style": "rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;"},
-    {"id": "gw", "label": "API Gateway", "group": "edge", "groupLabel": "Edge tier"},
-    {"id": "db", "label": "User DB", "style": "shape=cylinder3;whiteSpace=wrap;html=1;", "width": 120, "height": 80, "group": "data"}
+    {"id": "web", "label": "Web app", "style": "rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;"},
+    {"id": "auth", "label": "Auth service", "group": "platform", "groupLabel": "Platform"},
+    {"id": "ledger", "label": "Ledger DB", "style": "shape=cylinder3;whiteSpace=wrap;html=1;", "width": 140, "height": 90, "group": "storage"}
   ],
   "edges": [
-    {"source": "client", "target": "gw", "label": "HTTPS"},
-    {"source": "gw", "target": "db"}
+    {"source": "web", "target": "auth", "label": "token"},
+    {"source": "auth", "target": "ledger"}
   ]
 }
 ```
 
-**Fields**
+Fields:
+- `direction` (optional, default `TB`): `TB` flows downward, `LR` flows rightward.
+- `nodes[].id` (required): unique, and never `0` or `1`, which draw.io reserves for its root cells.
+- `nodes[].label` (optional): the text shown; it falls back to the id, and XML escaping is
+  automatic.
+- `nodes[].style` (optional): any draw.io style. Without it, a grouped node takes its group's
+  colour and an ungrouped one is blue. A style you give is never overridden.
+- `nodes[].width` and `height` (optional, 120 by 60): pixel size; dot plans with the true size.
+- `nodes[].group` (optional): a key, or a `/` path such as `app/cache`, for nested containers.
+- `nodes[].groupLabel` (optional): the title for the node's innermost container. The last path
+  segment is used if no node supplies one, and the first node to name a path wins.
+- `edges[].source` and `target` (required): ids of existing nodes.
+- `edges[].label` (optional): text on the link.
 
-| Field | Required | Default | Notes |
-|---|---|---|---|
-| `direction` | no | `TB` | `TB` (top→bottom) or `LR` (left→right) — the layout rank direction |
-| `nodes[].id` | **yes** | — | Unique; must not be `0` or `1` (reserved for draw.io root cells) |
-| `nodes[].label` | no | the `id` | Display text; auto XML-escaped |
-| `nodes[].style` | no | group colour, else blue | Any draw.io style string — reuse the role/shape styles from `diagram-types.md` and the active preset. A styleless node is tinted by its group (see **Containers / grouping**); an explicit style always wins |
-| `nodes[].width` / `height` | no | `120` / `60` | Pixels; dot lays out at this real size |
-| `nodes[].group` | no | none | Group key, or a `/`-delimited path (`"core/db"`) for **nested** containers — nodes sharing a path are boxed together (see **Containers / grouping**) |
-| `nodes[].groupLabel` | no | last path segment | Title shown on the node's deepest container (first node with the path wins) |
-| `edges[].source` / `target` | **yes** | — | Must match node ids |
-| `edges[].label` | no | empty | Edge text |
+## How things are placed
 
-## How it places things
+- Graphviz computes a layered layout. The script turns its inch coordinates into pixels and
+  snaps them to the 10 px grid.
+- Edges use `splines=ortho`; each bend that dot picks is written as a waypoint, so lines go
+  around nodes instead of through them.
+- Presets are not known to the script. To use one, copy its role and shape styles into every
+  node's `style` before running.
 
-- Node positions come from `dot` (hierarchical layered layout), converted to draw.io pixels and snapped to the grid (multiples of 10).
-- Edges use `splines=ortho`: dot's orthogonal route is replayed as draw.io waypoints, so edges go **around** nodes instead of through them.
-- Apply the active style preset by setting each node's `style` to the preset's role/shape values before calling the script — the script does not know about presets.
+## Groups
 
-## Containers / grouping
+Give nodes a `group` and the script draws one dashed container per group, with the title on top,
+and tells dot to keep the members together (a Graphviz cluster). Members become children of
+their container and use coordinates relative to it; nodes without a group stay at the top
+level. The result is boxes of related modules, not a tangle.
 
-Give nodes a `group` key and the script wraps each group in a labeled container (a dashed box with the group title at top) and tells dot to keep that group's nodes together via a Graphviz cluster. Grouped nodes become children of their container (`parent="<container>"`, relative coordinates); ungrouped nodes stay at the top level. This turns a flat hairball into a "boxes of related modules" architecture view.
+- **Nesting.** In `"app/cache"`, the node sits in a `cache` box that is itself inside an `app` box.
+  Each prefix of a path becomes a container, so a deep package tree maps onto nested boxes. A
+  node can sit straight in `app` beside an `app/cache` sub-box.
+- **Colour.** The first top-level group takes the first palette pair, the next group the next
+  pair, and so on, drawn from `styles/built-in/default.json` in this order: primary, success,
+  accent, secondary, warning, danger, neutral (blue, green, orange, purple, yellow, red, grey).
+  The container outline and title use the pair, and so do member nodes with no style. With
+  `--mono` you get grey dashed boxes and default blue nodes. Graphs without groups are not
+  affected.
+- **Size.** Each container wraps its members and child boxes with 24 px of padding. dot's cluster
+  margin is the same 24 px, so the boxes equal dot's clusters, which dot never lets overlap.
+- **Title.** It is drawn in the top padding.
+- **Shift.** Should top padding cross the page's top or left edge, everything moves so no
+  coordinate is negative.
+- Containers own no edges. A link still joins one node to another and may cross box borders.
 
-**Nesting.** A `group` value with `/` separators builds nested containers: `"core/db"` puts the node inside a `db` box that itself sits inside a `core` box. Every path prefix becomes a container, so an arbitrarily deep package tree maps to nested boxes. A node can also sit *directly* in a parent box (`group: "core"`) alongside a sibling sub-box (`group: "core/db"`).
-
-- **Colour by group.** Each top-level group is assigned a colour from the skill's own palette (`styles/built-in/default.json`, cycled in role order: blue → green → orange → purple → yellow → red → grey). A node with no `style` of its own is tinted with its group's colour, and the container's border + title match — so related modules read as a coloured cluster instead of monochrome boxes. A node that carries its own `style` (e.g. from an applied preset) is left untouched. Pass `--mono` to turn colouring off (dashed grey boxes, default-blue nodes — the previous look). Ungrouped graphs are unaffected.
-- Each container box is the bounding box of its members and child boxes plus a uniform padding. The dot cluster margin is set to that same padding, so each box equals dot's cluster box — which dot keeps non-overlapping at **any nesting depth**.
-- The title sits in the top padding (`verticalAlign=top`); the box title is the path's last segment, or a member's `groupLabel`.
-- Containers are visual only (no edges of their own). Edges still connect node→node and route across containers normally.
-- If a container's top padding would cross the page origin, the whole diagram is shifted so nothing lands at a negative coordinate.
-
-## Validate before previewing
-
-`scripts/validate.py` is a deterministic structural linter — run it on the produced `.drawio` before the (slower, vision-based) self-check:
+## Lint the result
 
 ```bash
-uv run python <this-skill-dir>/scripts/validate.py diagram.drawio
+py -3.13 <skill-dir>/scripts/validate.py diagram.drawio
 ```
 
-It catches dangling edge endpoints, duplicate/reserved ids, broken parent references (errors), plus off-grid/negative geometry and overlapping sibling nodes (warnings) — without launching draw.io. Exit status is non-zero on any error (or any warning with `--strict`), so it can gate the workflow. Auto-layout output should always pass clean; a failure means a malformed input graph (e.g. an edge referencing a missing node id).
+Output from this script should lint clean. A failure means the input graph was faulty, for
+instance an edge naming a node that does not exist.
 
-## Importers
+The exit status makes it usable as a gate: it is non-zero when any error is found, and with
+`--strict` also when any warning is found, so a script or pipeline can stop on it.
 
-The upstream skill's code importers are not in this copy: the studio removed them. To diagram a codebase, list its modules and their imports into the graph JSON that `scripts/autolayout.py` reads, by hand or with Claude, then run autolayout on it.
+## Graphs from source code
 
-## Limitations
+This copy has no importers. Build the JSON with any analyser you trust, such as dependency-cruiser
+for JavaScript or go-callvis for Go. Keep only edges inside the project, and think about
+removing transitive edges with Graphviz `tred`, because dense import graphs turn into a ball.
 
-- **Placement is topological, not semantic** — dot minimises edge crossings, which may put a node in a different column than you'd choose by hand. Re-export with the other `direction`, or hand-tune the produced XML afterwards (it's a normal `.drawio`).
-- **Parallel edges** between the same `(source, target)` pair share one route.
-- **Containers don't add edges** — `group`/nesting only boxes nodes for layout; edges remain node→node. For hand-built swimlane/architecture containers with their own connections, see SKILL.md "Containers and groups".
+## Limits
+
+- Placement follows structure, not meaning. dot minimises crossings and may put a node in a
+  column you would not pick. Try the other `direction`, or edit the XML afterwards.
+- Two edges with the same source and target share one route.
+- Containers only box nodes for layout. Swimlanes or tiers that need their own links must be
+  built by hand (see "Containers" in `SKILL.md`).

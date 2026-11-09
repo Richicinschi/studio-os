@@ -2,6 +2,9 @@
 id: linus-reviewer
 module: 08-agents-and-council
 checked: 2026-11-02
+tokens:
+  description: 51
+  body: 369
 ---
 
 # The reviewer seat
@@ -82,7 +85,7 @@ If Claude reviews in the main thread, the report has no verdict, or the review c
 
 ## Watch out
 
-- **Its description loads every session:** about 51 tokens (its 202 bytes divided by 4, an estimate). Its instructions, about 327 tokens (estimate), load only when it runs. When subagent descriptions load is not documented ([docs/facts.md](../docs/facts.md)); the kit counts them as every session.
+- **Its description loads every session:** about 51 tokens (its 202 bytes divided by 4, an estimate). Its instructions, about 369 tokens (estimate), load only when it runs. When subagent descriptions load is not documented ([docs/facts.md](../docs/facts.md)); the kit counts them as every session.
 - **Two output formats can meet.** When [requesting-code-review](requesting-code-review.md) starts this seat, its brief asks for Strengths, Issues by severity and "Ready to merge?", while the seat's own instructions ask for APPROVE or CHANGES REQUESTED. Which one wins is not documented; pick one when you adapt them, so every review reads the same.
 - **Read-only is only as strong as the tool list.** The seat keeps Bash, and a subagent given Bash can change files without Write or Edit ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"); a git command can also move your checkout. The kit's review brief tells the reviewer to inspect with `git show`, `git diff` and `git log` and to look at another revision in a separate folder; keep that rule.
 - **What it reads leaves your machine.** The code it reviews is session content, which Claude Code sends over the network ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"); where WebSearch and WebFetch send their requests beyond that is not in docs/facts.md as of 2026-11-02. Check your company's data rules for that code, and take both web tools out of the `tools:` line if they require it.

@@ -1,247 +1,205 @@
 ---
 name: finishing-a-development-branch
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work
+description: Use when implementation is complete and all tests pass, and you must decide how to integrate the work: open a PR or keep the branch.
 metadata:
   category: workflow
-  author: Richicinschi (adapted by Claude from obra/superpowers)
+  author: Richicinschi
   version: 1.0.0
-  domain: integrating a finished branch (PR, keep, or discard)
-  sources:
-    - obra/superpowers · skills/finishing-a-development-branch (MIT) @ v7.0.1 2ce8aa15; see ./LICENSE and ./VENDORED.md
+  domain: wrapping up completed branch work
 ---
+# Finishing a development branch
 
-# Finishing a Development Branch
+Order of work: prove the tests are green, find out where you stand, offer the menu, do what they pick, tidy only what is yours.
 
-## Overview
+Say first that you are wrapping up this branch with this skill.
 
-**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up.
+## 1. Run the suite
 
-**Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+Run the whole test suite of the project (for example `npm test`, `pytest` or `cargo test`). Run it against the exact tree you will hand over, not an older state.
 
-## Step 1: Verify Tests
-
-Run the project's full test suite (`npm test` / `cargo test` / `pytest` / `go test ./...`).
-
-**If tests fail**, report the failures and stop — the menu comes after a green suite:
+If anything fails, print the failures and stop. No menu until the suite is green.
 
 ```
-Tests failing (<N> failures). Must fix before completing:
+Tests failing (<N> failures). Fix these before finishing:
 
-[Show failures]
+[the failures]
 ```
 
-**If tests pass:** continue to Step 2.
+## 2. Find out where you stand
 
-## Step 2: Detect Environment
+Record three values now. Later steps change directory, and cleanup needs the old values.
 
 ```bash
 GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
 GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
-# Capture now, while still inside the workspace — Step 5 changes directory
-# before cleanup (Step 6) needs this value
 WORKTREE_PATH=$(git rev-parse --show-toplevel)
 ```
 
-This determines which menu to show and how cleanup works:
+| Situation | Menu | Cleanup |
+|-----------|------|---------|
+| `GIT_DIR` equals `GIT_COMMON` (plain repo) | the 2-item menu | nothing to remove |
+| They differ, on a named branch | the 2-item menu | by provenance, see section 6 |
+| They differ, detached HEAD | the detached menu | none; the host owns the workspace |
 
-| State | Menu | Cleanup |
-|-------|------|---------|
-| `GIT_DIR == GIT_COMMON` (normal repo) | Standard 2 options | No worktree to clean up |
-| `GIT_DIR != GIT_COMMON`, named branch | Standard 2 options | Provenance-based (see Step 6) |
-| `GIT_DIR != GIT_COMMON`, detached HEAD | Reduced 2 options (no merge) | Externally managed — leave in place |
+## 3. Name the base branch
 
-## Step 3: Determine Base Branch
+The base is the branch this work was cut from. Check the plan, the chat and the upstream setting. If none does, ask: "This branch was cut from <best guess>. Right?" Wait for a yes. A PR or merge aimed at the wrong base is costly to undo.
 
-The base branch is whatever this work forked from — usually named in the
-plan, the conversation, or the branch's upstream. If it is not already
-known, ask: "This branch split from <your best guess> - is that correct?"
-Confirm before merging: merging into the wrong base is expensive to undo.
+## 4. Offer the menu
 
-## Step 4: Present Options
+Studio rule (your rules file, rules 11 and 13): merging is for your human partner alone. The PR lands with a merge commit, via `gh pr merge N --merge`. No squash, no rebase. A local merge has no place on the menu.
 
-**Normal repo and named-branch worktree — present exactly these 2 options:**
+Named branch, in a plain repo or a worktree. Show exactly this:
 
 ```
-Implementation complete. What would you like to do?
+The work is done. What now?
 
-1. Push and create a Pull Request (you merge it)
-2. Keep the branch as-is (I'll handle it later)
+1. Push and open a Pull Request (you merge it)
+2. Keep the branch as it is (I'll deal with it later)
 
-Which option?
+Which one?
 ```
 
-**Studio rule (the rules on risky acts and on merge commits):**
-merging is your human partner's act, through the PR, with a merge commit
-(`gh pr merge N --merge`), never a squash or a rebase. A local merge is not
-on the menu; it happens only when they ask for one in so many words (see
-"If your human partner asks for a local merge" below).
-
-**Detached HEAD — present exactly these 2 options:**
+Detached HEAD. Show exactly this:
 
 ```
-Implementation complete. You're on a detached HEAD (externally managed workspace).
+The work is done. This is a detached HEAD (a workspace managed from outside).
 
-1. Push as new branch and create a Pull Request
-2. Keep as-is (I'll handle it later)
+1. Push as a new branch and open a Pull Request
+2. Keep as it is (I'll deal with it later)
 
-Which option?
+Which one?
 ```
 
-Present the menu exactly as written — concise, with every option coming
-from the list above. Discarding the work happens only in response to your
-human partner explicitly asking for it (see "If your human partner asks to
-discard the work" below). Wait for their answer; the integration decision
-is theirs.
+Add nothing to either list. Then wait. Never offer deletion. It follows only from their own plain request (section 5c).
 
-## Step 5: Execute Choice
+## 5. Do what they picked
 
-### Option 1: Push and Create PR
+### Option 1: push and open the PR
 
 ```bash
 git push -u origin <feature-branch>
-# From a detached HEAD, name the new branch on the remote:
-# git push origin HEAD:refs/heads/<new-branch>
+# detached HEAD: git push origin HEAD:refs/heads/<new-branch>
 ```
 
-Then create the pull/merge request against <base-branch> with the forge's
-tooling — its CLI if one is available, or the creation URL most forges
-print when you push — following the repo's PR template and conventions if
-present, and report the URL to your human partner. They merge it; you do
-not.
+Open the PR against the base branch. Use the forge CLI if there is one, otherwise the URL the push prints. Follow the repo's PR template and conventions. Give your partner the PR URL. The merge is theirs to press, not yours.
 
-Keep the worktree — your human partner iterates on PR feedback there.
+Leave the worktree alone: PR feedback gets fixed there.
 
-### Option 2: Keep As-Is
+Any commit you make on the way is signed: `git commit -S`, with the repo's own identity.
 
-Report: "Keeping branch <name>. Worktree preserved at <path>."
+### Option 2: keep it
 
-### If your human partner asks for a local merge
+Say: "Branch <name> stays. Worktree kept at <path>."
 
-Only on their explicit ask for this branch, and only after the grant row
-for it is in your grants ledger (the rule that each risky act needs a recorded yes; the guards refuse the
-merge without it). Never in the hub's shared root: switching its branch or
-committing there breaks every other live session, so a hub branch always
-merges through its PR. In a project repo:
+### 5b. They ask for a local merge
+
+Do this only if they ask, for this branch, in so many words. First check that your grants ledger holds the grant row for it (the rule that each risky act needs a recorded yes). No row: stop, do not merge. A local merge happens in a project repo, where the before-tool guards do not run, so this check is yours and nothing else will catch a missing row.
+
+The hub's shared root is off limits here: other live sessions work in that checkout, and switching its branch or committing there would break them. Hub branches always go through their PR.
+
+Inside a project repo:
 
 ```bash
-# Get main repo root for CWD safety
 MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
 cd "$MAIN_ROOT"
 
-# Merge first — verify success before removing anything
 git checkout <base-branch>
 git pull
 git merge --no-ff <feature-branch>
 
-# Verify tests on merged result
 <test command>
 ```
 
-If tests fail on the merged result: stop, leave the worktree and branch in
-place, and investigate — nothing has been pushed, so the merge is local
-and recoverable.
+Merge first, then confirm it worked before you remove anything. If `git merge` stops on a conflict, stop and report it, and remove nothing. If the merged result fails its tests, also stop: keep the branch and the worktree and look into it. Nothing was pushed, so the damage is local.
 
-Once the merged result is green: clean up the worktree (Step 6), then
-delete the branch:
+Only once the merge is complete and the merged tests are green, tidy the worktree (section 6) and then run:
 
 ```bash
 git branch -d <feature-branch>
 ```
 
-### If your human partner asks to discard the work
+### 5c. They ask to discard
 
-This path exists only as a response to an explicit request to throw the
-work away. Confirm first:
+Run this path only when they ask outright to throw the work away. Show first:
 
 ```
-This will permanently delete:
+This deletes for good:
 - Branch <name>
-- All commits: <commit-list>
+- Commits: <commit-list>
 - Worktree at <path>
 
 Type 'discard' to confirm.
 ```
 
-Wait for that exact confirmation. When it arrives:
+Wait for the word `discard`. Any other reply is not a confirmation. Then:
 
 ```bash
 MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
 cd "$MAIN_ROOT"
 ```
 
-Then clean up the worktree (Step 6) and force-delete the branch:
+Clean up the worktree (section 6), then:
 
 ```bash
 git branch -D <feature-branch>
 ```
 
-## Step 6: Cleanup Workspace
+## 6. Tidy the workspace
 
-**Runs for a local merge and confirmed discards.** Options 1 and 2 always
-preserve the worktree. Both callers have already changed directory to the
-main repo root — worktree removal must run from outside the worktree —
-and use the `GIT_DIR`/`GIT_COMMON`/`WORKTREE_PATH` values captured in
-Step 2, from before that directory change.
+Only a local merge or a confirmed discard gets here. Options 1 and 2 never remove the worktree. Run removal from the main repo root, never from inside the worktree, and use the values saved in section 2.
 
-**If `GIT_DIR == GIT_COMMON`:** Normal repo, no worktree to clean up. Done.
+- `GIT_DIR` equals `GIT_COMMON`: a plain repo, no worktree. Nothing to do.
+- This session made the worktree (through using-git-worktrees): you remove it. Studio worktrees all sit in one folder next to the repo, together with those of other live sessions, so the location says nothing. Only creating it yourself in this session counts.
 
-**If this session created the worktree** (with using-git-worktrees): we
-own cleanup. The studio keeps worktrees in a folder beside the repo, shared
-with every other live session, so the path proves nothing; only a worktree
-you made in this session is yours:
+  ```bash
+  git worktree remove "$WORKTREE_PATH"
+  git worktree prune
+  ```
 
-```bash
-git worktree remove "$WORKTREE_PATH"
-git worktree prune  # Self-healing: clean up any stale registrations
-```
+- Anyone else made it: the host or another session owns it. Leave it. If your platform has a workspace-exit tool, use that.
 
-**If removal is refused** (`contains modified or untracked files`): the
-worktree holds files that exist nowhere else — uncommitted plans, notes,
-or scratch work. Never `--force` on your own initiative. Show your human
-partner what is at stake and ask:
+If git refuses because the tree has modified or untracked files, some of them may be the only copy (plans, notes, scratch). Never add `--force` on your own. List them and ask:
 
 ```bash
 git -C "$WORKTREE_PATH" status --porcelain -uall
 ```
 
 ```
-Worktree removal refused — these files were never committed:
+Removal refused. These files were never committed:
 
 <file list>
 
-1. Commit them to <branch> before cleanup (signed: git commit -S)
+1. Commit them to <branch> first (signed: git commit -S)
 2. Move them into <main repo root>
-3. Delete them (unrecoverable)
+3. Delete them (cannot be undone)
 
-Which?
+Which one?
 ```
 
-Carry out the choice, then remove the worktree.
+Do what they choose, then remove the worktree.
 
-**Otherwise:** The host environment owns this workspace — leave it in
-place. If your platform provides a workspace-exit tool, use it.
+## At a glance
 
-## Quick Reference
+| Path | Merge | Push | Worktree kept | Branch deleted |
+|------|-------|------|---------------|----------------|
+| 1. PR | your partner, with `--merge` | yes | yes | no |
+| 2. Keep | none | no | yes | no |
+| Local merge (asked for, grant row present, not in the hub root) | `--no-ff` | no | no | yes, `-d` |
+| Discard (asked for, typed `discard`) | none | no | no | yes, `-D` |
 
-| Option | Merge | Push | Keep Worktree | Cleanup Branch |
-|--------|-------|------|---------------|----------------|
-| 1. Create PR | your partner, `--merge` | yes | yes | - |
-| 2. Keep as-is | - | - | yes | - |
-| Local merge (explicit request + grant row; never the hub root) | yes, `--no-ff` | - | - | yes |
-| Discard (explicit request only) | - | - | - | yes (force) |
+## Excuses that do not hold
 
-## Common Rationalizations
-
-| Excuse | Reality |
-|--------|---------|
-| "Tests passed earlier this session" | Run the suite on the tree you are about to integrate. A green run only proves the tree it ran on. |
-| "They obviously want it merged" | Integration is your human partner's decision. Present the menu and wait. |
-| "They seem done with this feature — I'll offer to discard it" | The menu is complete as written. Discard happens only when your human partner asks for it in so many words. |
-| "'Yeah, get rid of it' counts as confirmation" | Only the typed word `discard` authorizes deletion. |
-| "The PR is up, so the worktree is clutter now" | PR feedback gets fixed in that worktree. It stays until the work lands. |
-| "This other worktree looks stale — I'll clean it too" | Clean up only the worktree this session created. Every other one belongs to another session or the host. |
-| "Removal refused — `--force` is just finishing the cleanup" | The refusal means files exist only in that worktree. `--force` destroys them permanently. Show your human partner and ask. |
-| "The merged-result failure is probably flaky" | A failing merged result stops everything. Branch and worktree stay put while you investigate. |
-| "The base branch is obviously main" | Confirm the fork point or ask. Merging into the wrong base is expensive to undo. |
-| "The push was rejected — force-push will fix it" | A rejected push means the remote moved. Investigate; force-push only on your human partner's explicit request, after its grant row (the rule that each risky act needs a recorded yes). |
-| "The PR is green, I'll merge it to save them a step" | Merging is theirs. Report the URL and stop. |
+| Thought | Why it fails |
+|---------|--------------|
+| "It passed earlier in this session." | Earlier proves an earlier tree. Run it again on this one. |
+| "Obviously they want it merged." | Merging is their decision. Show the menu and wait. |
+| "The feature looks finished, so I'll suggest dropping it." | The menu is fixed. Discarding comes only from their own request. |
+| "'Yeah, bin it' is a confirmation." | Only the typed word `discard` counts. |
+| "The PR is open, so the worktree is just clutter." | Review fixes get made there. Keep it until the PR lands. |
+| "That other worktree looks abandoned, I'll remove it too." | You remove only what this session created. The rest belongs to others. |
+| "Removal was refused, `--force` just finishes the job." | The refusal means unsaved files live only there. Force destroys them. Ask. |
+| "That failure on the merged result is probably flaky." | A red merged result halts everything. Keep branch and worktree and investigate. |
+| "The base is obviously main." | Confirm it first. Fixing a wrong base later is painful. |
+| "The push was rejected, a force-push will sort it." | The remote has new commits. Find out why. Force-push only at your partner's explicit request, once its grant row is recorded (the rule that each risky act needs a recorded yes). |
+| "CI is green, so I may as well press merge for them." | Merging is their job. Hand over the URL and stop there. |

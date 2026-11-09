@@ -7,7 +7,8 @@ import { isLicenceFile } from './rules.mjs';
 
 export const STATUSES = ['shipped', 'link-only', 'catalog-only', 'private'];
 export const PACKS = ['foundation', 'way-of-working', 'data-work', 'catalog', 'none'];
-export const KINDS = ['skill', 'agent', 'external', 'practice'];
+export const KINDS = ['skill', 'agent', 'external', 'practice', 'pack'];
+export const PACK_STATUSES = ['public', 'shipped', 'private', 'withheld'];
 export const IMPORTANCE = ['core', 'recommended', 'optional'];
 export const LOADS = ['none', 'on-demand', 'every-session'];
 export const WHY_MAX = 140;
@@ -16,7 +17,7 @@ const SHIP_PACKS = ['foundation', 'way-of-working', 'data-work'];
 export const loadManifest = (file) => JSON.parse(readFileSync(file, 'utf8'));
 
 // The feature menu: everything the kit ships or links to, practices included.
-export const isMenuItem = (it) => it.kind === 'practice' || it.status === 'shipped' || it.status === 'link-only';
+export const isMenuItem = (it) => it.kind !== 'pack' && (it.kind === 'practice' || it.status === 'shipped' || it.status === 'link-only');
 const keyOf = (it) => `${it.kind}:${it.id}`;
 
 // importance and why are a string (every profile) or an object { default, data?, ml?, software? }.
@@ -60,6 +61,11 @@ export function validateManifest(m) {
     if (seen.has(key)) errors.push(`${key}: listed twice`);
     seen.add(key);
     if (!KINDS.includes(it.kind)) errors.push(`${key}: kind must be one of ${KINDS.join(', ')}`);
+    if (it.kind === 'pack') {
+      if (!PACK_STATUSES.includes(it.status)) errors.push(`${key}: a pack is public, shipped, private or withheld`);
+      if (['shipped', 'public'].includes(it.status) && !(typeof it.why === 'string' && it.why.trim() && it.why.length <= WHY_MAX)) errors.push(`${key}: a shipped or public pack needs a why of at most ${WHY_MAX} characters`);
+      continue;
+    }
     if (!STATUSES.includes(it.status)) errors.push(`${key}: status must be one of ${STATUSES.join(', ')}`);
     if (!PACKS.includes(it.pack)) errors.push(`${key}: pack must be one of ${PACKS.join(', ')}`);
     if (it.kind === 'external' && (!it.upstream || !it.licence || !it.install)) errors.push(`${key}: an external item needs upstream, licence and install`);
@@ -72,24 +78,41 @@ export function validateManifest(m) {
   return errors;
 }
 
+// Reads the hub's shape: core skills and agents in .claude, packs in library/<id>/pack.json. An installed pack
+// entry (a .pack.json marker), a standalone stub and a pack's agent copy are the pack's own, not core items.
 export function hubInventory(hub) {
   const sdir = path.join(hub, '.claude', 'skills');
   const adir = path.join(hub, '.claude', 'agents');
-  const skills = readdirSync(sdir, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && existsSync(path.join(sdir, d.name, 'SKILL.md')))
-    .map((d) => d.name).sort();
-  const agents = existsSync(adir)
-    ? readdirSync(adir).filter((f) => f.endsWith('.md') && !['AGENTS.md', 'README.md', 'CLAUDE.md'].includes(f)).map((f) => f.slice(0, -3)).sort()
+  const ldir = path.join(hub, 'library');
+  const allPacks = existsSync(ldir)
+    ? readdirSync(ldir, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync(path.join(ldir, d.name, 'pack.json')))
+      .map((d) => {
+        const p = JSON.parse(readFileSync(path.join(ldir, d.name, 'pack.json'), 'utf8'));
+        return { id: p.id || d.name, hubOnly: p.public === false, skills: (p.skills || []).map((k) => k.id), agents: (p.agents || []).map((k) => k.id), standalone: (p.standalone || []).map((k) => k.id) };
+      }).sort((x, y) => x.id.localeCompare(y.id))
     : [];
-  return { skills, agents };
+  // A pack the hub marks `public: false` is hub-only: it is never exported, needs no manifest entry, and no
+  // committed file names it. Its entry, stubs and agents still belong to it, not to the core.
+  const packs = allPacks.filter((p) => !p.hubOnly).map(({ hubOnly, ...p }) => p);
+  const hiddenPacks = allPacks.filter((p) => p.hubOnly).map(({ hubOnly, ...p }) => p);
+  const packOwned = new Set(allPacks.flatMap((p) => [p.id, ...p.standalone]));
+  const packAgents = new Set(allPacks.flatMap((p) => p.agents));
+  const skills = existsSync(sdir) ? readdirSync(sdir, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && existsSync(path.join(sdir, d.name, 'SKILL.md')) && !existsSync(path.join(sdir, d.name, '.pack.json')) && !packOwned.has(d.name))
+    .map((d) => d.name).sort() : [];
+  const agents = existsSync(adir)
+    ? readdirSync(adir).filter((f) => f.endsWith('.md') && !['AGENTS.md', 'README.md', 'CLAUDE.md'].includes(f)).map((f) => f.slice(0, -3)).filter((a) => !packAgents.has(a)).sort()
+    : [];
+  return { skills, agents, packs, hiddenPacks };
 }
 
 export function classify(inventory, manifest) {
-  const listed = new Set(manifest.items.map((it) => `${it.kind}:${it.id}`));
-  const present = new Set([...inventory.skills.map((s) => `skill:${s}`), ...inventory.agents.map((a) => `agent:${a}`)]);
+  const key = (kind, id) => `${kind}:${id}`;
+  const listed = new Set(manifest.items.map((it) => key(it.kind, it.id)));
+  const present = new Set([...inventory.skills.map((s) => key('skill', s)), ...inventory.agents.map((x) => key('agent', x)), ...(inventory.packs || []).map((p) => key('pack', p.id))]);
   const unclassified = [...present].filter((k) => !listed.has(k)).sort();
-  const missing = manifest.items.filter((it) => (it.kind === 'skill' || it.kind === 'agent') && !present.has(`${it.kind}:${it.id}`))
-    .map((it) => `${it.kind}:${it.id}`).sort();
+  const missing = manifest.items.filter((it) => ['skill', 'agent', 'pack'].includes(it.kind) && !(it.kind === 'pack' && it.status === 'private') && !present.has(key(it.kind, it.id)))
+    .map((it) => key(it.kind, it.id)).sort();
   return { unclassified, missing };
 }
 

@@ -1,37 +1,45 @@
 #!/usr/bin/env python3
-"""Repair truncated IEND chunk in draw.io -e PNG exports (issue #8).
+# -*- coding: utf-8 -*-
+"""Fix the cut-off end of PNG files exported by the draw.io CLI with -e.
 
-draw.io's CLI emits -e PNGs with the 4-byte IEND length field but missing
-the 8 bytes of "IEND" type + CRC. Strict PNG decoders and vision APIs
-(Anthropic included) reject the file with 400 "Could not process image".
-SVG/PDF are unaffected.
+With embedded XML, the CLI writes the 4-byte length of the final IEND chunk and
+then stops, leaving out the chunk name and checksum. Strict decoders, including
+image APIs, refuse such a file. SVG and PDF exports are fine.
 
-Usage: uv run python repair_png.py <path/to/diagram.drawio.png>
+  repair_png.py <file.drawio.png>
 
-Idempotent: the endswith(IEND) guard makes this a no-op once draw.io
-fixes the bug upstream, so it's safe to run unconditionally after every
--e PNG export.
+The script prints "repaired <path>" when it changed the file and nothing when
+the file was already whole, so running it after every -e export is safe.
+Exit codes: 0 on success, 2 on a wrong argument count.
 """
 import sys
 
-IEND = b"\x00\x00\x00\x00IEND\xaeB`\x82"
+# Length 0, the name IEND, and its fixed CRC.
+IEND_CHUNK = bytes(4) + b"IEND" + bytes.fromhex("ae426082")
+STUB = IEND_CHUNK[:4]
 
 
-def repair(path: str) -> bool:
-    with open(path, "rb") as f:
-        data = f.read()
-    if data.endswith(IEND):
+def repair(path):
+    """Complete the IEND chunk in place. Return True when the file changed."""
+    with open(path, "rb") as handle:
+        body = handle.read()
+    if body.endswith(IEND_CHUNK):
         return False
-    if data.endswith(b"\x00\x00\x00\x00"):
-        data = data[:-4]
-    with open(path, "wb") as f:
-        f.write(data + IEND)
+    if body.endswith(STUB):
+        body = body[: -len(STUB)]
+    with open(path, "wb") as handle:
+        handle.write(body + IEND_CHUNK)
     return True
 
 
+def main(argv):
+    if len(argv) != 1:
+        sys.stderr.write("usage: repair_png.py <path>\n")
+        return 2
+    if repair(argv[0]):
+        print(f"repaired {argv[0]}")
+    return 0
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("usage: repair_png.py <path>", file=sys.stderr)
-        sys.exit(2)
-    if repair(sys.argv[1]):
-        print(f"repaired {sys.argv[1]}")
+    sys.exit(main(sys.argv[1:]))

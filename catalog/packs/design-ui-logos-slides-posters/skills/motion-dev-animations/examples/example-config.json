@@ -1,0 +1,22 @@
+{
+  "type": "gesture",
+  "component": "motion.button",
+  "props": {
+    "transition": { "stiffness": 420, "damping": 24, "mass": 0.8, "type": "spring" },
+    "whileHover": { "scale": 1.08 },
+    "whileTap": { "scale": 0.92 }
+  },
+  "performance": {
+    "bundleSize": 31000,
+    "gpuAccelerated": true,
+    "fps": 90
+  },
+  "accessibility": {
+    "screenReaderFriendly": true,
+    "focusVisible": true,
+    "keyboardNav": true,
+    "reducedMotion": true
+  },
+  "framework": "nextjs",
+  "description": "Pill button that swells on hover and presses in on tap"
+}

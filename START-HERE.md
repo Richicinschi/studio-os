@@ -155,7 +155,7 @@ The kit folder is only for the adoption, its updates, and taking one more item l
 
 ## Install steps that come later
 
-Your plan hands you each of these at its row, on your yes, so you do not need them to start. They are on their own page, [docs/install-reference.md](docs/install-reference.md), so you can read them first or run them by hand: [Install task 1: the scanner](docs/install-reference.md#install-task-1-the-scanner), [Tools some items need](docs/install-reference.md#tools-some-items-need) (Node.js and gitleaks), and [Optional: the upstream superpowers plugin](docs/install-reference.md#optional-the-upstream-superpowers-plugin).
+Your plan hands you each of these at its row, on your yes, so you do not need them to start. They are on their own page, [docs/install-reference.md](docs/install-reference.md), so you can read them first or run them by hand: [Install task 1: the scanner](docs/install-reference.md#install-task-1-the-scanner), [Tools some items need](docs/install-reference.md#tools-some-items-need) (Node.js and gitleaks).
 
 ## If you only use claude.ai
 
@@ -164,6 +164,16 @@ What carries over: modules 01, 02, 03 and 07 as practices, a Project's instructi
 What does not: the git hooks, subagents (agents Claude Code starts for one task) and the scanner need Claude Code or a terminal on your own computer. So does vetting a skill: a skill you upload on claude.ai has not been scanned unless someone ran the scanner on it first.
 
 To run the drill without Claude Code, you still need the kit's files: clone it as in step 1 on any computer with Git, or download it from its GitHub page. Then make a Project, add `ADOPT.md`, `catalog/FEATURES.md`, `catalog/INDEX.md`, every `modules/*/README.md` page, the cards you are interested in from `cards/`, and the `SKILL.md` files from `.claude/skills/` to its knowledge, and ask Claude to follow `drill-to-adopt`. It writes the spec and the plan as text for you to keep in the Project.
+
+### Domains on claude.ai
+
+A domain is a set of skills for one kind of job, such as audio and video or a panel for big decisions; the [feature menu](catalog/FEATURES.md) lists the ones this kit ships, with what each costs. To use one on claude.ai:
+
+1. Pick the domains that fit your work. `drill-to-adopt` asks which ones fit; "none of these" is a valid answer.
+2. In the kit folder, on a computer with Node.js, build each one's zip: `node tools/upload-bundle.mjs <domain-id> --out <a folder of your choice>`. It writes `<domain-id>.zip` with the domain's entry and its skills, and no agents, because agents need Claude Code.
+3. Upload each zip as a skill, as in [docs/facts.md](docs/facts.md), "claude.ai: custom skills and the built-in document skills": Customize > Skills > "+" > "+ Create skill" > "Upload a skill". Custom skills need code execution turned on.
+
+A skill that needs a program on your computer (`ffmpeg` for video, for example) says so, and its "Without local tools" section says what it does on claude.ai instead. A zip you built from the kit has not been scanned on your machine: scan it first if you can ([SkillSpector](cards/skillspector.md)).
 
 ## When the kit changes
 
@@ -185,7 +195,7 @@ Pull the kit (`git pull` in its folder), read the top of `CHANGELOG.md`, open Cl
 | `docs/` | `facts.md` (dated facts with their sources), `install-reference.md` (the install steps that come later), the adoption-sequence diagram, the third-party notices. |
 | `CHANGELOG.md` | What changed in each version. |
 | `LICENSE` | MIT, for the whole kit except the third-party skills in `catalog/skills/`, which keep their own licences ([docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)). |
-| `tools/` | How the kit is built from the studio, and the diagram's generator. Maintainers only. |
+| `tools/` | How the kit is built from the studio, and the diagram's generator (maintainers only), plus `upload-bundle.mjs`, which builds a domain's zip for claude.ai. |
 
 ## Words used in this kit
 

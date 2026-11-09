@@ -2,6 +2,9 @@
 id: bob-builder
 module: 08-agents-and-council
 checked: 2026-11-02
+tokens:
+  description: 55
+  body: 302
 ---
 
 # The builder

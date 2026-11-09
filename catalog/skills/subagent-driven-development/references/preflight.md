@@ -1,26 +1,18 @@
-# The Pre-flight Scan
+# Pre-flight scan
 
-Part of subagent-driven-development. Run it once, before
-dispatching Task 1.
+Companion to subagent-driven-development. Do it one time, before Task 1 goes out.
 
-Before dispatching Task 1, scan the plan once for conflicts, writing down
-what you checked as you check it:
+The aim is to catch conflicts in the plan while they are cheap. Go through the plan once and record each check as you make it. Look for:
+- tasks that contradict each other, or contradict the Global Constraints section of the plan;
+- anything the plan orders that the review rubric counts as a defect, for example a test that asserts nothing or a block of logic pasted twice.
 
-- tasks that contradict each other or the plan's Global Constraints
-- anything the plan explicitly mandates that the review rubric treats as a
-  defect (a test that asserts nothing, verbatim duplication of a logic block)
+The scan produces a table. A bare verdict does not count. The rows:
 
-The scan's output is a table, not a verdict. One row for every pair of tasks
-that share a file or an interface: the two tasks, what one produces against
-what the other consumes, and what you found. One row for every task: whether
-its own text agrees with itself — the tests it specifies against the code it
-specifies, the files it creates against the files it later touches. "The scan
-is clean" without those rows is not a scan you ran.
+| Row for | Contents |
+|---|---|
+| Each pair of tasks that touch the same file or interface | the two task numbers, what the first produces, what the second consumes, and your finding |
+| Each task | whether its text is self-consistent: tests it specifies against code it specifies, files it creates against files it modifies later |
 
-Write the table to the ledger. Rule on everything you find before execution
-begins — each finding against the plan text that mandates it — and record
-each ruling in the ledger. If the scan is clean, proceed without comment.
-Rule on each conflict it surfaces — the spec is the binding authority, the
-plan is its argument — record the ruling beside its row, and dispatch
-Task 1. The review loop remains the net for conflicts that only emerge from
-implementation.
+If you write "the scan is clean" with no rows behind it, you did not do the scan.
+
+Put the table in the ledger. Resolve every finding before execution begins: set it against the plan wording that demands it, treat the spec as the final authority, and write the ruling beside the row. If nothing turns up, carry on without comment and dispatch Task 1. Conflicts that only emerge once code exists are left to the review loop as the safety net.

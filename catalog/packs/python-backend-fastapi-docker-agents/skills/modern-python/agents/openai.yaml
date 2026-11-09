@@ -1,0 +1,3 @@
+interface:
+  display_name: "Modern Python"
+  short_description: "uv, ruff, ty, pytest and prek project setup"

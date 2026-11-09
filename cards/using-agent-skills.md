@@ -1,7 +1,10 @@
 ---
 id: using-agent-skills
 module: 05-skills
-checked: 2026-11-02
+checked: 2026-11-09
+tokens:
+  description: 56
+  body: 1207
 ---
 
 # A router for your skills
@@ -31,7 +34,7 @@ The menu marks the item **have** when a router exists and every skill it names e
    - ADAPT: write your own map, keeping the kit copy's shape, a tree from task to skill plus a few rules. Recommended when Detect counts more skills than you can name from memory and finds no router.
    - FOLD: add the missing lines to the router or list you already have. Recommended when Detect found one.
    - No: you have only a handful of skills. Recommended when Detect counts only a few.
-   - (There is no ADOPT option: the kit copy's map routes to the studio's own skills, many of them not in this kit.)
+   - (There is no ADOPT option: the kit copy is the studio's router, cut at export to the skills the kit ships, but its text still names the studio's own files and rules (`SKILLS.md`, `library/`, `tools/sync-skills.mjs`, the hard rules), which you do not have.)
    - Not sure: the option recommended above for what Detect found: FOLD when it found a router or list, ADAPT when it counts more skills than you can name from memory, otherwise no.
    - Skip for now: leave it open; nothing is set, and it comes back in a later wave.
    - Default when skipped: no router.
@@ -53,18 +56,17 @@ Nothing beyond Claude Code.
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on `catalog/skills/using-agent-skills/`: scans it with SkillSpector, triages, and recommends against what Detect found. The kit's scan of the copy that now ships, with the build of SkillSpector that reports 2.2.3, rated it `CAUTION` at 25/100 from three findings, all false positives: two in `session-start.md`, whose source line and first rule name where skills live, read as snooping on your skills, and the licence's "not limited to" ([the kit's scan triage](../tools/export/scan-triage.md), the release build). A newer SkillSpector may score it differently ([docs/facts.md](../docs/facts.md), "Installing SkillSpector").
+1. **Claude:** runs `vet-and-adopt` on `catalog/skills/using-agent-skills/`: scans it with SkillSpector, triages, and recommends against what Detect found. The kit's maintainers' latest scan result is in `catalog/skills/using-agent-skills/SOURCE.md`; your own scan is the one that decides, and a newer SkillSpector may score it differently ([docs/facts.md](../docs/facts.md), "Installing SkillSpector").
 2. **Claude:** lists every skill you have at both levels, by name and description, and flags near-duplicates. For each pair you choose the copy to keep; on your yes, Claude folds the other copy's good lines into it and moves the dropped copy, never deletes it, to a folder outside the skill folders, such as `<your setup>/archive/skills/`, so it no longer loads.
 3. **Claude:** writes the router in your words:
-   - the tree names only skills you have; every line of the kit copy for a studio skill, a studio script or a command you do not have is dropped;
+   - the tree names only skills you have; the export has already cut the kit copy's rows to skills the kit ships, and every row for a skill you did not take, and every line about a studio file (`SKILLS.md`, `library/`, `tools/sync-skills.mjs`), the hard rules or a command you do not have, is dropped;
    - the rules keep two ideas: look for a matching skill before non-trivial work, and the chains your own skills form;
    - the description says, in your words, when to use it;
    - `references/claude-code-tools.md`, notes on running a whole plan through one orchestrator subagent, is kept only if you take [subagent-driven-development](subagent-driven-development.md), with its pointer in the rules; otherwise both go. Its claim that subagents can start subagents of their own, three layers deep by default, matches [docs/facts.md](../docs/facts.md) ("Claude Code: where skills, agents and instruction files load from"); the setting it names for that depth is not documented there as of 2026-11-02, and its studio rule on which model the orchestrator runs becomes your own rule or goes;
-   - the `LICENSE` (MIT), which now names both upstreams, agent-skills and superpowers, stays beside it.
    It shows you the file before saving it.
 4. **Claude:** acts on your answer to question 3, and shows each change before saving it:
    - No: `session-start.md` and the router's line about it are left out.
-   - A start-up hook: writes your `session-start.md` beside the router, in your words. The studio's source line, the name of its own injector script, the studio's skill names you do not have, and "the owner" are replaced by your skills and by you. Then it merges a `SessionStart` entry into the settings file at the router's level (`.claude/settings.json` or `~/.claude/settings.json`), keeping every other setting, with one matcher group each for `startup`, `clear` and `compact` and a command that prints the file by its full path, for example `cat "$HOME/.claude/skills/using-agent-skills/session-start.md"`.
+   - A start-up hook: writes your `session-start.md` beside the router, in your words. The studio's skill names you do not have, its `AGENTS.md` and studio rules, and "the owner" are replaced by your skills, your own instruction files and you. Then it merges a `SessionStart` entry into the settings file at the router's level (`.claude/settings.json` or `~/.claude/settings.json`), keeping every other setting, with one matcher group each for `startup`, `clear` and `compact` and a command that prints the file by its full path, for example `cat "$HOME/.claude/skills/using-agent-skills/session-start.md"`.
    - FOLD: the same rules, in your words, as a short section of your front door.
 5. **Claude:** records the decision, the place, the answer to question 3 and the undo in `adoption/decisions.md`, with a note: add a line to the router whenever a skill lands or leaves.
 
@@ -86,7 +88,7 @@ A name with no folder, or an answer that names another skill or none, means the 
 
 - **A router goes stale.** It names what existed on the day it was written; a line for a skill you removed sends Claude after nothing. Change the router whenever a skill lands or leaves.
 - **The kit copy names commands you may not have,** such as `/code-review`, `/verify` and `/run`. Whether a command exists in your Claude Code is not documented in docs/facts.md as of 2026-11-02, so keep a command in your router only after you have seen it work.
-- **Several lines route to studio skills this kit does not ship.** Drop them; do not go looking for them. The lines for the skills the studio took from superpowers (brainstorming, writing-plans, executing-plans and the rest) name skills the kit does ship; keep a line only for the ones you take.
+- **Some rows may point at skills you did not take.** The kit copy's rows name only skills the kit ships (brainstorming, writing-plans, executing-plans and the rest); keep a row only for the ones you take, and do not go looking for the others.
 - **One router, one copy.** If the same router sits at project and user level, the user copy wins ([docs/facts.md](../docs/facts.md)), and the two drift apart.
-- **Token cost:** the kit copy's description is about 86 tokens (estimate) every session, and its body about 1,000 tokens (estimate) when used. `session-start.md`, wired as a hook, adds about 479 tokens (estimate) at each session start, and again after each `/clear` and compaction; `references/claude-code-tools.md`, about 450 tokens (estimate), loads only when Claude opens it. Your own router costs what its description and map weigh; Claude tells you the estimate when it writes it.
+- **Token cost:** the kit copy's description is about 56 tokens (estimate) every session, and its body about 1,000 tokens (estimate) when used. `session-start.md`, wired as a hook, adds about 479 tokens (estimate) at each session start, and again after each `/clear` and compaction; `references/claude-code-tools.md`, about 450 tokens (estimate), loads only when Claude opens it. Your own router costs what its description and map weigh; Claude tells you the estimate when it writes it.
 - **A start-up hook runs for every session at its level.** At user level it prints the rules into every project, including ones whose skills differ; put the hook at the same level as the router it points to.

@@ -2,7 +2,6 @@
 title: Hooks on a canary first
 sources:
   - .studio/memory/project_runtime_neutral_studio.md
-  - docs/superpowers/plans/2026-10-28-runtime-neutral-handoff.md
   - .studio/guardrails/git-hooks/README.md
 ---
 

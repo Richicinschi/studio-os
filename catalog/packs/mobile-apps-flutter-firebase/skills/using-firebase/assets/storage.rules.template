@@ -1,0 +1,66 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn()  { return request.auth != null; }
+    function me(uid)     { return signedIn() && request.auth.uid == uid; }
+    function isAdmin()   { return signedIn() && request.auth.token.admin == true; }
+    function isImage()   { return request.resource.contentType.matches('image/.*'); }
+    function isOfficeDoc() {
+      return request.resource.contentType in [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain'
+      ];
+    }
+    // the size caps below are example values, a starting point, not measured values
+    function smallerThanMB(n) { return request.resource.size < n * 1024 * 1024; }
+
+    // per-user folder: any signed-in user reads, only the owner writes
+    match /users/{uid}/{rest=**} {
+      allow read: if signedIn();
+      // a delete request carries no incoming file, so size and type checks sit on create and update only
+      allow create, update: if me(uid) && smallerThanMB(10);
+      allow delete: if me(uid);
+    }
+
+    // avatars: public to read, owner uploads an image under 5 MB
+    match /profiles/{uid}/avatar.{ext} {
+      allow read: if true;
+      allow create, update: if me(uid) && isImage() && smallerThanMB(5)
+                            && ext.matches('jpg|jpeg|png|gif|webp');
+      allow delete: if me(uid);
+    }
+
+    // shared public files
+    match /public/{rest=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && smallerThanMB(10);
+      allow delete: if isAdmin();
+    }
+
+    // private documents
+    match /documents/{uid}/{docId} {
+      allow read, delete: if me(uid);
+      allow create, update: if me(uid) && isOfficeDoc() && smallerThanMB(25);
+    }
+
+    // staging area: uploader tags the file, only that user reads it, only a backend deletes
+    match /uploads/{uploadId} {
+      allow create: if signedIn() && smallerThanMB(50)
+                    && request.resource.metadata.uploadedBy == request.auth.uid;
+      allow read: if signedIn() && resource.metadata.uploadedBy == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /admin/{rest=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // closed by default
+    match /{rest=**} {
+      allow read, write: if false;
+    }
+  }
+}

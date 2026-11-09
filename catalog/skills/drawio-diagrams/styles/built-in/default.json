@@ -1,10 +1,7 @@
 {
-  "$schema": "../schema.json",
   "name": "default",
-  "version": 1,
+  "$schema": "./../schema.json",
   "default": false,
-  "source": { "type": "built-in" },
-  "confidence": "high",
   "palette": {
     "primary":   { "fillColor": "#dae8fc", "strokeColor": "#6c8ebf" },
     "success":   { "fillColor": "#d5e8d4", "strokeColor": "#82b366" },
@@ -15,35 +12,38 @@
     "secondary": { "fillColor": "#e1d5e7", "strokeColor": "#9673a6" }
   },
   "roles": {
-    "service":  "primary",
-    "database": "success",
     "queue":    "warning",
-    "gateway":  "accent",
-    "error":    "danger",
+    "security": "secondary",
+    "database": "success",
+    "service":  "primary",
     "external": "neutral",
-    "security": "secondary"
+    "error":    "danger",
+    "gateway":  "accent"
   },
   "shapes": {
-    "service":   "rounded=1",
     "database":  "shape=cylinder3",
-    "queue":     "rounded=1",
+    "container": "startSize=30;swimlane",
     "decision":  "rhombus",
-    "external":  "rounded=1;dashed=1",
-    "container": "swimlane;startSize=30"
+    "service":   "rounded=1",
+    "external":  "dashed=1;rounded=1",
+    "queue":     "rounded=1"
   },
   "font": {
-    "fontFamily": "Helvetica",
     "fontSize": 12,
-    "titleFontSize": 14,
-    "titleBold": true
+    "fontFamily": "Helvetica",
+    "titleBold": true,
+    "titleFontSize": 14
   },
   "edges": {
-    "style": "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1",
-    "arrow": "endArrow=classic;endFill=1",
-    "dashedFor": []
+    "dashedFor": [],
+    "arrow": "endFill=1;endArrow=classic",
+    "style": "html=1;rounded=1;jettySize=auto;orthogonalLoop=1;edgeStyle=orthogonalEdgeStyle"
   },
   "extras": {
-    "sketch": false,
-    "globalStrokeWidth": 1
-  }
+    "globalStrokeWidth": 1,
+    "sketch": false
+  },
+  "confidence": "high",
+  "version": 1,
+  "source": { "path": "styles/built-in/default.json", "type": "built-in" }
 }

@@ -92,6 +92,46 @@ The judge also recorded that row 1 could never be ticked before the front-door r
 
 **Fixed after run 4, in v2.0.1:** Decide tailors only the first wave (before run 5); the menu shows modules first (before run 6); every question has a recommendation and the spec is asked for once; a card offers Skip for now only where it leaves the question open. The last two came after run 4's judgement and were not re-run. v2.0.2 changed the README and added the banner and the maintainers' publishing routine; nothing in the adoption flow.
 
+## Runs 7 to 9: domains (2026-11-09)
+
+The kit gained domains (packs of skills installed together) and a domain question in the drill. These runs tried that path only, on the kit as built that day, with Claude Code 2.1.319. Each ran in a throwaway folder outside every repository: a fresh clone of the kit, and an empty folder for the adopter's setup. The session loaded project settings only, so none of the author's own skills, agents or memory could reach it. The reply to each question was written by the person running the trial, from a short persona, so this is a script read by a person, not a second agent. Nothing was judged by a separate agent.
+
+| Run | Persona | Answers fitted | How far it ran |
+|---|---|---|---|
+| 7 | a weekly podcaster who cuts clips for social media | the audio and video domain | 34 turns, to the handover, then three fresh sessions |
+| 8 | a short-story writer | no domain | 17 turns, to the approved plan and the first install row |
+| 9 | the same writer, same answers, on the kit after the fixes below | no domain | 18 turns, to the approved plan |
+
+**Run 7 result.**
+
+- The domain question offered only the domain that fits the work, with its every-session cost (about 69 tokens, an estimate) and "None of these fit" as a choice.
+- The pack was scanned by SkillSpector before anything was copied: 20 out of 100, LOW, SAFE. The drill read the two medium findings, found both to be false alarms, and said what it had not read.
+- It landed as 18 files, byte-identical to the kit copy, plus the reviewer agent. This pack has no stubs; the stub copy was not tried.
+- A fresh session listed the pack and the agent. Asked to clean up a recording, it opened the pack, read the matching skill, and applied the adopter's style rules from the style page. It stopped at a plan, as asked.
+- Three further fresh questions were answered from the adopter's own files, each with its source file named.
+- `node tools/upload-bundle.mjs audio-video-media --out <folder>` wrote a zip of 18 files; `tar -tf` listed them, with no agents or stubs in it.
+- Nothing was written into the kit's folder. The only studio-looking text in the adopter's files was a first name, taken from the machine and put in the spec's header unasked. The drill now never writes a person's name unless it is given and asked for; run 9 shows it.
+
+**Run 8 result.** The adopter's work fitted no domain. The drill recorded "none: no domain fits" in `adoption/features.md`, the plan has five rows and none is a pack, and the setup folder has no `.claude` folder. Nothing installed.
+
+**Run 9 result.** The three fixes below were tried against run 8's script, on a fresh clone of the fixed kit.
+
+- **No domain named.** When nothing fit, the question had two choices, "None of these fit" and "Not sure", and named no domain. Run 8 had named both.
+- **Plan answers from the facts file.** The persona again said Free plan. The drill quoted "The free claude.ai plan does not include Claude Code" from `docs/facts.md`, with its section, pointed out that the persona was running Claude Code, and asked which account it was. Run 8 had said nothing was documented. The persona then said it was a slip and named Pro.
+- **No name in any file.** The spec's header said "Adopter: the adopter", and a search of every file in the setup folder found neither the machine user's name nor the author's.
+- **Counts.** The drill said the plan had 6 rows, and a count of the rows in the file gave 6. It did not quote the command it used, which the skill now asks for. One earlier message said "5 items" and the spec said 4 menu items plus the folder step, so the wording still mixes menu items and plan rows.
+- Nothing installed: no `.claude` folder, four files in the setup folder.
+
+**What still broke:**
+
+- **Writes under `.claude/` were refused**, as in runs 1 to 6. A permission-bypassing run was refused by the machine's classifier, and was not worked around. The drill handed over a copy line for each file, and the person running the trial typed it. So the install was the adopter's copy, checked by the drill with a byte comparison, not the drill's own write.
+- **Run 8 named the domains it had just said do not fit.** Fixed; run 9 shows it.
+- **The kit version in the spec was wrong.** Run 7's spec said v2.0.0, taken from a manifest that a release never updated; run 8 caught it from the changelog, and run 9's spec still said v2.0.0. A release now writes its version into the manifest. Tested, not re-run, because no release has been made since.
+- **A file count was off by one.** The drill reported 17 files copied; there were 18. The skill now says counts come from a listing run in the same sitting and are quoted with the command; run 9 reached no install, so this is only partly shown.
+- **Run 8's plan answer.** Fixed; run 9 shows it.
+
+**Not tried:** the advisor council domain and its `council` stub; installing a domain on claude.ai (the zip was built and listed, not uploaded); a second operating system; any run past the first handover.
+
 ## Other reviews
 
 Agents also read the kit cold, as a newcomer, and checked it for private detail, unsourced claims, and the user's point of view. Their findings were fixed before release. Those reviews are in the private development history; they are agent reads, not adopter trials.
@@ -101,7 +141,7 @@ Agents also read the kit cold, as a newcomer, and checked it for private detail,
 - **Agents are not people.** A model answering from a script does not get bored, confused or interrupted. Real adopters will fail in ways no log here shows.
 - **One plan, one model.** Every run used the same plan and one Claude model. Another model, or a later version of the same one, may follow the skills differently.
 - **Scripted answers made some steps easier than real ones.** The persona always had an answer ready, never asked what a term meant, and deferred every command the drill handed over.
-- **Runs 4 to 6 reached only the early phases.** Install and Verify were reached in no re-run. The last two fixes were never re-run at all.
+- **Runs 4 to 6 reached only the early phases.** Install and Verify were reached in no re-run of those. Run 7 reached them, for one domain only. The last two fixes of that pass were never re-run at all.
 - **Two personas, one operating system for the full trial.** The data persona and the ml persona do not cover the software or general profiles.
 - **Judged by an agent.** The judge worked from logs and files, and the pass counts above are its marks.
 

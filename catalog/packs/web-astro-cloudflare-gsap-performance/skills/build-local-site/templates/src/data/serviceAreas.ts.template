@@ -1,0 +1,96 @@
+// ============================================================
+// Service areas
+// ============================================================
+// One entry per town, city or district served. Each entry yields:
+//   /areas/<slug>/                 the area landing page
+//   /services/<slug>/<service>/    one combo page per service
+//   links, breadcrumbs and schema that mention the area
+//
+// Slugs are lowercase, hyphenated, URL safe.
+// ============================================================
+
+export interface ServiceArea {
+  /** e.g. "east-fairmont" */
+  slug: string;
+  /** e.g. "East Fairmont" */
+  name: string;
+  /** County or wider region, used for grouping */
+  county: string;
+  /** Two-letter code, e.g. "TX" */
+  state: string;
+  zipCodes: string[];
+  /** Rough head count for copy; 0 when unknown */
+  population: number;
+  /** Centre point of the area */
+  lat: number;
+  lng: number;
+  /** One or two sentences about the area and what people there usually need */
+  description: string;
+  /** Importance tier: sets the badge on the areas index */
+  priority: 'primary' | 'secondary' | 'tertiary';
+  /** Typical arrival time shown to visitors, e.g. "30 minutes" */
+  responseTime: string;
+  /** Show on the homepage? */
+  featured: boolean;
+  /** Slugs of neighbouring entries, used for cross-links */
+  nearby: string[];
+}
+
+// Template for one entry (copy, uncomment, fill in):
+//
+// {
+//   slug: 'east-fairmont',
+//   name: 'East Fairmont',
+//   county: 'Harlan County',
+//   state: 'TX',
+//   zipCodes: ['43015', '43016', '43017'],
+//   population: 48000,
+//   lat: 40.112,
+//   lng: -83.021,
+//   description: 'Plumbing help in East Fairmont, TX, including 43015 and 43016.',
+//   priority: 'primary',
+//   responseTime: '30 minutes',
+//   featured: true,
+//   nearby: ['pine-hollow', 'lake-view', 'old-town'],
+// },
+
+export const serviceAreas: ServiceArea[] = [
+  // 8 to 15 entries work well
+];
+
+/** Look an area up by slug; undefined when nothing matches. */
+export function getAreaBySlug(slug: string): ServiceArea | undefined {
+  return serviceAreas.find((a) => a.slug === slug);
+}
+
+/**
+ * Neighbouring areas as full objects. Accepts an area or a slug, because
+ * page templates pass the object while older callers pass the slug.
+ */
+export function getNearbyAreas(areaOrSlug: ServiceArea | string): ServiceArea[] {
+  const area = typeof areaOrSlug === 'string' ? getAreaBySlug(areaOrSlug) : areaOrSlug;
+  if (!area) return [];
+  return area.nearby
+    .map((s) => getAreaBySlug(s))
+    .filter((a): a is ServiceArea => a !== undefined);
+}
+
+/** Display name for a slug; falls back to a title-cased slug. */
+export function getAreaName(slug: string): string {
+  const found = getAreaBySlug(slug);
+  if (found) return found.name;
+  return slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+/** Areas flagged for the homepage. */
+export function getFeaturedAreas(): ServiceArea[] {
+  return serviceAreas.filter((a) => a.featured);
+}
+
+/** Distinct county names, in first-seen order. */
+export function getCounties(): string[] {
+  return [...new Set(serviceAreas.map((a) => a.county))];
+}

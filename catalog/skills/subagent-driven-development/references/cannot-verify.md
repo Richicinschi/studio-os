@@ -1,10 +1,7 @@
-# "Cannot Verify From Diff" Items
+# Items the reviewer could not verify
 
-Part of subagent-driven-development.
+Companion to subagent-driven-development.
 
-The task reviewer may report "⚠️ Cannot verify from diff" items — requirements
-that live in unchanged code or span tasks. These do not block the rest of the
-review, but you must resolve each one yourself before marking the task
-complete: you hold the plan and cross-task context the reviewer
-lacks. If you confirm an item is a real gap, treat it as a failed spec
-review — it enters the fix loop with the other findings.
+A task reviewer works from the diff alone. A requirement that lives in code the diff leaves out, or that stretches over several tasks, comes back marked "⚠️ Cannot verify from diff". These marks do not stop the rest of the review. You must resolve each one before the task is complete, because you hold the whole plan and the neighbouring tasks, and the reviewer does not.
+
+Resolve each item yourself. A confirmed gap is handled like any spec failure: add it to the findings that go into the fix loop.

@@ -5,7 +5,7 @@ description: >-
 metadata:
   category: engineering
   author: Richicinschi
-  version: 1.3.0
+  version: 1.4.0
   domain: git safety hook for Claude Code
 ---
 # Git guardrails
@@ -50,7 +50,8 @@ destructive pushes are stopped.
 | `update-ref` | `-d` |
 | `commit-tree`, `filter-repo`, `filter-branch` | all uses |
 | `config` | giving `core.hooksPath` a value or removing it: `config core.hooksPath <folder>`, `set`, `--unset`, `unset`, `--replace-all`, `--add` |
-| any git call | `--no-verify` and every prefix of it from `--no-ver` on, since git takes a unique prefix (this also refuses the rare `--no-verbose`); `-c core.hooksPath=`; `--config-env=core.hooksPath=` |
+| any git call | `--no-verify` and every prefix of it from `--no-v` on, since git takes a unique prefix (`git am --no-v` skips the hooks; this also refuses the rare `--no-verbose` and its prefixes); `-c core.hooksPath=`; `--config-env=core.hooksPath=` |
+| any command | `GIT_CONFIG_KEY_<n>=core.hooksPath`, the variable git reads with `GIT_CONFIG_COUNT` and `GIT_CONFIG_VALUE_<n>`, in shell form (alone, after `env` or `export`) or PowerShell form (`$env:GIT_CONFIG_KEY_0 = '...'`) |
 
 git reads a config key in any case, so the `core.hooksPath` rules match `core.hookspath`,
 `CORE.HOOKSPATH` and every other mix. Turning hooks on with `git config core.hooksPath <folder>`
@@ -64,6 +65,18 @@ setting (`git config --get core.hooksPath`, alone or with a redirect).
 
 A refused command prints a `BLOCKED` message on stderr that says the agent has no authority to
 run it, and the script exits with code 2.
+
+## Known gaps
+
+- It matches the command's text, not what git will do, so a spelling not on the list passes.
+  `reset --merge` and `reset --keep` pass.
+- Config that reaches git from outside the command's text passes: a `GIT_CONFIG_PARAMETERS`
+  value, a config file edited directly, named by `GIT_CONFIG_GLOBAL`, found through a changed
+  `HOME` or pulled in by an `include`, and `GIT_CONFIG_*` variables set before the command or
+  through a call such as PowerShell's `[Environment]::SetEnvironmentVariable`. Each of these can
+  move the hooks folder.
+- It runs only inside Claude Code, and only for the tools its matcher names.
+- It has no way through for an approved act: you run that yourself.
 
 ## Install
 

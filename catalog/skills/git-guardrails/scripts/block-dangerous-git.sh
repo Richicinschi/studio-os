@@ -35,9 +35,11 @@ rules=(
   "$GIT gc${ARGS} --prune"
   "$GIT worktree +remove${ARGS} (-f|--force)$END"
   "$GIT commit${ARGS} --amend"
-  # git takes a unique prefix of a long option, so --no-veri skips the hooks too.
-  # Blocks --no-verbose as well, a rare spelling.
-  "$GIT --no-ver[a-z]*"
+  # git takes a unique prefix of a long option, so --no-veri skips the hooks too, and so do
+  # --no-v and --no-ve wherever the command has no --verbose (git am reads them as --no-verify;
+  # commit and push call them ambiguous today). Blocks --no-verbose and its prefixes as well,
+  # a rare spelling: --no-v, --no-ve and --no-ver start both.
+  "$GIT --no-v(er[a-z]*|e?$END)"
   "$GIT commit${ARGS} -[[:alpha:]]*n[[:alpha:]]*$END"
 )
 
@@ -50,6 +52,10 @@ rules_any_case=(
   "git${ARGS} --config-env[= ]+${KEY}"
   "$GIT config${ARGS} (--unset|--unset-all|--replace-all|--add|unset|set) ${ARGS}${KEY}"
   "$GIT config${ARGS} ${KEY} +([^ ;&|<>0-9]|[0-9]+[^0-9>])"
+  # Config given through the environment: GIT_CONFIG_COUNT with GIT_CONFIG_KEY_<n> naming the
+  # key, in shell (`GIT_CONFIG_KEY_0=...`, after env or export) or PowerShell (`$env:... = '...'`)
+  # form. The quote and backslash cover the raw JSON input.
+  "GIT_CONFIG_KEY_[0-9]+[[:space:]]*=[[:space:]\"'\\]*${KEY}"
 )
 
 refuse() {

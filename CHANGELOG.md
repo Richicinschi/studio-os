@@ -2,6 +2,15 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.1.1 (2026-11-10)
+
+- Deny rules for secret files: checked headless on macOS as well as Windows. On both, grep -r through the shell printed every denied file, on macOS the hidden .env included, while the Grep tool left them out, so the card and SECURITY.md no longer call that gap Windows-only.
+- The legal domain quotes Apple's and Google's store rules only in short extracts, each with the rule or Help article number and the URL, and paraphrases the rest (12 of 70 quotes kept); it no longer calls those rules freely citable or asks Claude to re-fetch their pages, it calls Exodus AGPL-3.0, and it says your own Terms need no MIT notice for its two MIT-derived clauses.
+- Practices: changed sensitive-file-deny-rules (the card above) and git-guardrails 1.4.0, which refuses two more ways to skip the hooks (the shortest prefixes of the skip flag, and the environment variables that set the hooks folder for one command) and lists the gaps it keeps; the lists below do not count practices yet (issue #34).
+- Maintainers: tools/export/scans.json and scan-triage.md hold the 2026-11-10 rescan of all 45 items; only git-guardrails (now 100/100, 4 findings) and the legal domain (17 findings) changed, and each new finding is triaged as a false positive.
+
+**Changed:** `pack:app-legal-privacy-terms-store-review`, `skill:git-guardrails`
+
 ## v3.1.0 (2026-11-10)
 
 - Fixes and trust: the issues the November 2026 outside reviews and the maintainer review raised for this release (public issues #2, #6, #7, #8, #10, #24, #25, #33).

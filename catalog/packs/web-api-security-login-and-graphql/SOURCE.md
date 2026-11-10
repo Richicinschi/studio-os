@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-web-api-security-login-and-graphql.md](../../../cards/pack-web-api-security-login-and-graphql.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 60/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 3 findings, all read: 3 false positives ([triage](../../../tools/export/scan-triage.md#packweb-api-security-login-and-graphql-do_not_install-60100-3-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 60/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 3 findings, all read: 3 false positives ([triage](../../../tools/export/scan-triage.md#packweb-api-security-login-and-graphql-do_not_install-60100-3-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

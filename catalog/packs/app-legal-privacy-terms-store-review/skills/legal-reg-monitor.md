@@ -91,7 +91,7 @@ Re-validate the KB anchors against their `verified <date>` and the standing fact
 | **EU-US Data Privacy Framework** | **In force** — adequacy Decision 2023/1795 (adopted 2023-07-10); survived its first CJEU/General Court challenge in 2025. DPF-certified US importers ride adequacy. | re-check each US sub-processor's certification at dataprivacyframework.gov; further challenges pending |
 | **Cookiewet / analytics consent** | **AP position stands**: GA4 / default Firebase Analytics fails the Tw 11.7a exemption → **opt-IN required** in NL; legitimate interest does **not** cure Art. 5(3). | the **ACM→AP** single-authority transfer for Tw 11.7a is a **proposal** (2025-03-26), not yet law — do NOT assert it as done |
 | **NL digital-consent age** | **16** (UAVG, max under GDPR Art. 8). | stable |
-| **Apple ASRG / App Privacy + Google Play policies** | account-deletion (Apple 5.1.1(v) / Play 13327111), Data Safety, health-content, subscription-disclosure rules current. | platform policies revise frequently — re-fetch the named Help/Guideline page and compare |
+| **Apple ASRG / App Privacy + Google Play policies** | account-deletion (Apple 5.1.1(v) / Play 13327111), Data Safety, health-content, subscription-disclosure rules current. | platform policies revise frequently — have the person open the named Help/Guideline page and compare |
 
 ## Output format
 1. **Header** — `# Reg delta: <change or "freshness re-check"> vs <app name> legal docs v<version> — <date>`; one-line scope verdict.

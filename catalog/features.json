@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -375,7 +375,7 @@
           "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
           "loads": "every-session",
           "everySessionTokens": 75,
-          "onDemandTokens": 1078,
+          "onDemandTokens": 1323,
           "heavy": false,
           "card": "cards/git-guardrails.md"
         },

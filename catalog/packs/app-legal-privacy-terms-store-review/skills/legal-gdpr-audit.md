@@ -115,8 +115,8 @@ Walk **Art. 35(3)(a)/(b)/(c)** (the DPIA-Sentinel routing, re-authored — see S
   posture → **fails (b)**.
 - (c) **systematic monitoring of a publicly accessible area** → N/A → **fails (c)**.
 
-Also apply the **EDPB WP248 nine-criteria presumption**: meeting **2+** → strong presumption a
-DPIA is needed. A single-dev wellness app with no profiling/no Art. 9/no public monitoring → **no
+Also apply the **EDPB WP248 nine-criteria presumption**: **two or more** criteria → a DPIA is
+required by default. A single-dev wellness app with no profiling/no Art. 9/no public monitoring → **no
 mandatory trigger likely** `[low-confidence — fact-specific]`. **Output a screening / threshold
 MEMO** (Art. 35(7) skeleton: description → necessity & proportionality → risk → measures), not a
 skip. If Step 2 ever flips, **35(3)(b) can mandate a full DPIA** + possible Art. 36 prior

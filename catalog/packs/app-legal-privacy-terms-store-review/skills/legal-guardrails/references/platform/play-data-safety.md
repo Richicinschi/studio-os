@@ -9,7 +9,7 @@ paid tier = Firestore sync). Build the declaration for the app under review from
 sheet and data-surface scan; the §5 matrix is a worked pattern, not its answer.
 
 **Primary sources (fetched & verified this run unless noted):**
-- Play Console Help 10787469 — *Provide information for Google Play's Data safety section*
+- Google, Play Console Help 10787469 — *Provide information for Google Play's Data safety section*
   `https://support.google.com/googleplay/android-developer/answer/10787469`
 - Android Publisher API v3 — `applications.dataSafety`
   `https://developers.google.com/android-publisher/api-ref/rest/v3/applications/dataSafety`
@@ -25,15 +25,17 @@ as the public "Data safety" card on the store listing. [settled — Help 1078746
 | Term | Definition | Consequence |
 |---|---|---|
 | **Collection** | "Transmitting data from your app off a user's device." Includes data sent by any **third-party library/SDK** in the app, and data from app-controlled webviews — *irrespective of whether it goes to you or to a third-party server*. | If a byte leaves the device, it is **collected** and must be declared. [settled — Help 10787469, verified 2026-06-06] |
-| **Sharing** | "Transferring user data collected from your app to a **third party**." Includes server-to-server transfers, on-device transfers to other apps, and transfers via SDKs/webviews. | A separate, narrower axis than collection. **Service providers acting on your instructions are NOT "sharing."** [settled — Help 10787469, verified 2026-06-06] |
+| **Sharing** | "Transferring user data collected from your app to a third party." Includes server-to-server transfers, on-device transfers to other apps, and transfers via SDKs/webviews. | A separate, narrower axis than collection. **Service providers acting on your instructions are NOT "sharing."** [settled — Help 10787469, verified 2026-06-06] |
+
+The two quoted definitions are Google's (Play Console Help 10787469, https://support.google.com/googleplay/android-developer/answer/10787469); the rest of the table is this suite's summary.
 
 ### Exceptions to "collection" (do NOT declare as collected)
 - **On-device only** — accessed/processed but never transmitted off device. [settled — Help 10787469, verified 2026-06-06]
-- **End-to-end encrypted** — data "unreadable by you or anyone other than the sender and recipient." [settled — Help 10787469, verified 2026-06-06]
+- **End-to-end encrypted** — data that only the sender and the recipient can read, not the developer and not anyone else. [settled — Help 10787469, verified 2026-06-06]
 - **Ephemeral processing** — see §6. [settled — Help 10787469, verified 2026-06-06]
 
 ### Exceptions to "sharing" (do NOT declare as shared)
-- **Service providers** — a third party processing "on behalf of the developer and based on the developer's instructions" (i.e. a GDPR Art. 28 processor). [settled — Help 10787469, verified 2026-06-06]
+- **Service providers** — a third party that processes data for the developer, on the developer's instructions (i.e. a GDPR Art. 28 processor). [settled — Help 10787469, verified 2026-06-06]
 - **Legal purposes** — transfer for legal/regulatory compliance, or to law enforcement. [settled — Help 10787469, verified 2026-06-06]
 - **User-initiated action or prominent disclosure + user consent** at the moment of transfer. [settled — Help 10787469, verified 2026-06-06]
 - **Fully anonymized data** — not linkable to a user/device. [settled — Help 10787469, verified 2026-06-06]
@@ -83,7 +85,7 @@ For **each data type** you declare as collected/shared, the form asks: [settled 
 
 1. **Collected / Shared / Both?** — Is this data type collected, shared, or both?
 2. **Processed ephemerally?** — Is the data only ever held in memory and retained no longer than needed to service the request in real time? (See §6.)
-3. **Required or optional?** — "Is this data required for your app, or can users choose whether it's collected?" (Required vs. user-can-choose / optional.)
+3. **Required or optional?** — must every user provide the data, or can users choose whether it is collected? (Required vs. user-can-choose / optional.)
 4. **Collection purposes** — Why is it collected? *Select all that apply* from the closed list in §3.
 5. **Sharing purposes** — Why is it shared? *Select all that apply* from the closed list in §3 (only if shared).
 
@@ -113,10 +115,10 @@ Identical list for **collection** and **sharing** purposes. Multi-select. [settl
 
 Asked once for the whole app, not per type. [settled — Help 10787469, verified 2026-06-06]
 
-| Declaration | Form question | Answer (worked: example app) |
+| Declaration | What the form asks (summary) | Answer (worked: example app) |
 |---|---|---|
-| **Encryption in transit** | "Is all of the user data collected by your app encrypted in transit?" (yes/no) | **YES** — all Firebase/RevenueCat traffic is HTTPS/TLS. [verify — confirm no plaintext egress via traffic capture] |
-| **Deletion mechanism** | "Does your app provide a way for users to request that their data be deleted?" (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day scheduled purge) **and** a public web deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). [worked example — the example app's state; confirm the app's own] |
+| **Encryption in transit** | Whether all user data the app collects is encrypted in transit (yes/no) | **YES** — all Firebase/RevenueCat traffic is HTTPS/TLS. [verify — confirm no plaintext egress via traffic capture] |
+| **Deletion mechanism** | Whether users have a way to ask for their data to be deleted (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day scheduled purge) **and** a public web deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). [worked example — the example app's state; confirm the app's own] |
 
 **Optional security badges** (not required; do not claim unless true): [settled — Help 10787469, verified 2026-06-06]
 - **Independent security review** — third-party validation against **OWASP MASVS** via the **MASA** (App Defense Alliance) program. **Do not claim** it unless the app has passed one (the example app has not).
@@ -173,13 +175,14 @@ shown** in the public Data safety card as "collected." [settled — Help 1078746
 
 - **Definition:** "accessing and using it while the data is only stored in memory and
   retained for no longer than necessary to service the specific request in real-time."
+  (Google, Play Console Help 10787469, https://support.google.com/googleplay/android-developer/answer/10787469)
   [settled — Help 10787469, verified 2026-06-06]
 - **Qualifying example (Google's):** a weather app transmits location off-device to
   fetch current weather, uses it only in memory, and discards it once the request is
   served → transient use of location may be treated as ephemeral. [settled — Help 10787469, verified 2026-06-06]
-- **Disqualifying example (Google's):** "Using data to build advertising profiles or
-  other user profiles **cannot** be treated as ephemeral and must be declared as
-  collection or sharing." [settled — Help 10787469, verified 2026-06-06]
+- **Disqualifying example (Google's):** data used to build advertising or other user
+  profiles **cannot** count as ephemeral; declare it as collected or shared.
+  [settled — Help 10787469, verified 2026-06-06]
 
 > **Worked (example app):** persisted Firestore sessions, Analytics events, and Crashlytics reports
 > are **stored** beyond the request → **NOT ephemeral**. Mark ephemeral = No across the
@@ -202,7 +205,7 @@ programmatically (see §8). [settled — API doc + harvested notes (rel=high), v
 | **Response ID (machine readable)** | Stable machine ID for a specific answer choice within that question | Google-assigned opaque IDs (from the exported template) |
 | **Response value** | Whether this choice is selected | `TRUE` / `FALSE` (or blank) |
 | **Answer requirement** | Cardinality/required-ness of the question | `OPTIONAL` · `REQUIRED` · `MULTIPLE_CHOICE` |
-| **Human-friendly question label** | Display text (for humans; not parsed) | Free text — e.g. "Does your app collect or share any of the required user data types?" |
+| **Human-friendly question label** | Display text (for humans; not parsed) | Free text — the question as the form words it |
 
 **Operating rules:**
 - One row per response choice; set **Response value = TRUE** for selected choices,

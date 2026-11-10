@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone who wants an audit turned into small plans a cheaper model can execute.
 - **Pack / module:** way-of-working / 04-delegation
-- **Last scan:** DO_NOT_INSTALL (risk 60/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 3 findings, all read: 3 false positives ([triage](../../../tools/export/scan-triage.md#improve-do_not_install-60100-3-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 60/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 3 findings, all read: 3 false positives ([triage](../../../tools/export/scan-triage.md#improve-do_not_install-60100-3-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

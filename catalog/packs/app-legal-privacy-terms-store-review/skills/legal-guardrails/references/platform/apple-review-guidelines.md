@@ -12,7 +12,8 @@ no HealthKit). Adjudicate the app under review from its fact sheet and its actua
 **Last verified against primary source:** 2026-06-06.
 
 > Apple ships the Guidelines as a living document with no version numbers; section numbers are
-> stable but wording is edited without notice. Re-fetch the primary URL before a hard sign-off.
+> stable but wording is edited without notice. Before a hard sign-off, have the person open the
+> live page and compare.
 
 ---
 
@@ -58,17 +59,16 @@ Guideline 5.1.1 is under **5. Privacy**. It is the primary reviewer hook for the
 
 > "All apps must include a link to their privacy policy in the App Store Connect metadata field
 > and within the app in an easily accessible manner."
+> (Apple, App Store Review Guidelines 5.1.1(i), https://developer.apple.com/app-store/review/guidelines/)
 
-The privacy policy must **clearly and explicitly**:
+In this suite's words, the privacy policy must state clearly:
 
-1. **Identify what data, if any, the app/service collects, how it collects that data, and all
-   uses of that data.**
-2. **Confirm that any third party** with whom the app shares user data — *analytics tools,
-   advertising networks, third-party SDKs, and any parent/subsidiary/related entities with
-   access* — **will provide the same or equal protection** of user data as stated in the PP and
-   required by the Guidelines.
-3. **Explain data retention/deletion policies and describe how a user can revoke consent and/or
-   request deletion** of the user's data.
+1. **What data the app collects, if any, how it collects it, and every use** it makes of it.
+2. **That every third party that receives user data** (analytics, ad networks, SDKs, and any
+   parent, subsidiary or related company with access) **protects it at least as well** as the PP
+   promises and the Guidelines require.
+3. **How long data is kept and how it is deleted, and how a user withdraws consent or asks for
+   deletion.**
 
 **Application (worked: example app):**
 - **Placement (two links):** verify the ASC "Privacy Policy URL" metadata field is set
@@ -92,7 +92,8 @@ The privacy policy must **clearly and explicitly**:
 - Apps that collect user/usage data must **secure consent**, even for data anonymous at/after
   collection.
 - **"Paid functionality must not be dependent on or require a user to grant access to this
-  data."** → For an app with a paid tier (the example app: Firestore sync), the paid features must **not** be gated on granting analytics consent.
+  data."** (Apple, App Store Review Guidelines 5.1.1(ii),
+  https://developer.apple.com/app-store/review/guidelines/) → For an app with a paid tier (the example app: Firestore sync), the paid features must **not** be gated on granting analytics consent.
 - Must provide an **easily accessible, understandable way to withdraw consent**.
 - Purpose strings must clearly/completely describe data use.
 - Apps relying on **GDPR legitimate interest** without consent must comply with **all** terms of
@@ -119,6 +120,7 @@ app that asks for almost no permissions (the example app), but the "no dark-patt
 `[settled — App Store Review Guidelines 5.1.1(v), verified 2026-06-06]`
 
 > "If your app supports account creation, you must also offer account deletion within the app."
+> (Apple, App Store Review Guidelines 5.1.1(v), https://developer.apple.com/app-store/review/guidelines/)
 
 - Apps without significant account features should let people use them **without a login**.
 - May not require personal info to function **except** when directly relevant to core
@@ -150,9 +152,9 @@ deletion-request mechanism. `[verify]`
 | (vi) | Data from HomeKit, **HealthKit**, Clinical Health Records, MovementDisorder, ClassKit, depth/facial-mapping APIs **may not be used for marketing, advertising, or use-based data mining**, including by third parties. | N/A for an app that uses none of these APIs (the example app). |
 | (vii) | Apple Pay data sharing limited to delivery/service improvement. | N/A. |
 
-**Sanction language (quote-worthy for risk framing):** "Apps that share user data without user
-consent or otherwise complying with data privacy laws may be removed from sale and may result in
-your removal from the Apple Developer Program." `[settled — 5.1.2(i), verified 2026-06-06]`
+**Sanction (for risk framing):** an app that shares user data without consent, or otherwise
+breaks data-privacy law, can be removed from sale, and the developer can be removed from the
+Apple Developer Program. `[settled — 5.1.2(i), verified 2026-06-06]`
 
 ---
 
@@ -179,10 +181,11 @@ data). The 5.1.3 restrictions mostly don't bite; the operative health gate for s
 `[settled — App Store Review Guidelines 3.1.1, verified 2026-06-06]`
 
 > "If you want to unlock features or functionality within your app … you must use in-app
-> purchase. Apps may not use their own mechanisms to unlock content or functionality, such as
-> license keys, augmented reality markers, QR codes, cryptocurrencies and cryptocurrency
-> wallets, etc."
+> purchase."
+> (Apple, App Store Review Guidelines 3.1.1, https://developer.apple.com/app-store/review/guidelines/)
 
+- No unlock mechanism of the app's own: licence keys, AR markers, QR codes, crypto and the like
+  are out.
 - All Pro-feature unlocking must go through **Apple IAP** (StoreKit); RevenueCat is permitted
   middleware *on top of* StoreKit, not a bypass. `[verify]`
 - Purchased credits/currencies may not expire; restorable purchases need a **restore mechanism**
@@ -233,16 +236,16 @@ governs *disclosure*, the CRD governs the *14-day withdrawal waiver*. `[verify]`
 ## 1.4.1 — Medical / Physical Harm (the health-claim gate)
 `[settled — App Store Review Guidelines 1.4.1, verified 2026-06-06]`
 
-> "Medical apps that could provide inaccurate data or information, or that could be used for
-> diagnosing or treating patients may be reviewed with greater scrutiny."
+Apple reviews medical apps harder when they could give inaccurate data or be used to diagnose or
+treat patients. In this suite's words, the rule's three prongs:
 
-- Apps must **clearly disclose data and methodology** to support accuracy claims relating to
-  health measurements; if accuracy/methodology **cannot be validated, Apple will reject** the app.
-  (Example: claiming to take x-rays or measure blood pressure / body temperature / blood glucose /
-  blood oxygen using only device sensors is **not permitted**.)
-- Apps should **remind users to check with a doctor** in addition to using the app and before
-  making medical decisions.
-- If the app has **regulatory clearance**, submit a link to that documentation.
+- **Accuracy claims about health measurements must show their data and methodology**; if Apple
+  cannot validate them, it **rejects** the app. (Claiming to take x-rays, or to measure blood
+  pressure, body temperature, blood glucose or blood oxygen, with the device's sensors alone is
+  **not permitted**.)
+- **A reminder to consult a doctor** before any medical decision, rather than rely on the app
+  alone.
+- An app with **regulatory clearance** submits a link to that documentation.
 
 **Application (worked: example app) — PASS (firewall to maintain):**
 - The example app makes **no health measurements** and **no diagnostic/treatment claims**, so the

@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** see the module page
 - **Pack / module:** way-of-working / 06-git-and-guardrails
-- **Last scan:** CAUTION (risk 25/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 1 finding, read: 1 by design ([triage](../../../tools/export/scan-triage.md#finishing-a-development-branch-caution-25100-1-finding))
+- **Last scan:** CAUTION (risk 25/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 1 finding, read: 1 by design ([triage](../../../tools/export/scan-triage.md#finishing-a-development-branch-caution-25100-1-finding))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

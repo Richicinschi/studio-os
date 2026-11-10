@@ -9,13 +9,13 @@ Adjudication reference for the Apple App Store **App Privacy** disclosure (the "
 
 ## 0. The core compliance proposition
 
-The App Privacy label is **self-declared** by the developer in App Store Connect, and it MUST be consistent with three things simultaneously [settled — Apple "keep your responses accurate and up to date"; "follow the App Review Guidelines and all applicable laws", verified 2026-06-06]:
+The App Privacy label is **self-declared** by the developer in App Store Connect, and it MUST be consistent with three things simultaneously [settled — Apple, App Privacy Details: the answers must stay accurate and current, and the practices must comply with the App Review Guidelines and the law, verified 2026-06-06]:
 
 1. the **actual data behaviour** of the app and every third-party SDK it bundles;
 2. the app's **Privacy Policy** (linked per Review Guideline 5.1.1(i)); and
 3. (structurally) the merged **`PrivacyInfo.xcprivacy`** privacy manifest `NSPrivacyCollectedDataTypes`.
 
-A mismatch is an enforcement/rejection risk. Apple can reject at review or pull the app post-publication for an inaccurate label. The label can be edited at any time **without** shipping a new build [settled — Apple: "you do not need to submit an app update in order to change your answers", verified 2026-06-06].
+A mismatch is an enforcement/rejection risk. Apple can reject at review or pull the app post-publication for an inaccurate label. The label can be edited at any time **without** shipping a new build [settled — Apple, App Privacy Details: changing the answers needs no app update, verified 2026-06-06].
 
 > **Adjudication rubric:** for every (data-type, recipient-entity) flow that the app actually performs, there must be (a) a matching declared data type on the label with correct linked/tracking/purpose flags, AND (b) a covering disclosure in the Privacy Policy that names the recipient entity. Use the PoliCheck 5-category grade per flow: **clear / vague / omitted / incorrect / ambiguous**. `omitted` and `incorrect` are FAIL.
 
@@ -26,11 +26,12 @@ A mismatch is an enforcement/rejection risk. Apple can reject at review or pull 
 Disclosure is required only for data the app **collects**, per Apple's narrow definition [settled — Apple, verified 2026-06-06]:
 
 > "'Collect' refers to transmitting data off the device in a way that allows you and/or your third-party partners to access it for a period longer than what is necessary to service the transmitted request in real time."
+> (Apple, App Privacy Details on the App Store, definition of "collect", https://developer.apple.com/app-store/app-privacy-details/)
 
 Key consequences:
-- **On-device-only data is NOT "collected"** and need not be disclosed. [settled — "Data that is processed only on device is not 'collected' and does not need to be disclosed", verified 2026-06-06]
+- **On-device-only data is NOT "collected"** and need not be disclosed. [settled — Apple, App Privacy Details, verified 2026-06-06]
 - **Transient transmissions are NOT "collected"**: an auth token or IP address sent on a server call and not retained, or data sent then immediately discarded after servicing the request, is not disclosable. [settled — Apple, verified 2026-06-06]
-- **Ongoing collection after an initial permission grant IS "collected"** and must be disclosed. [settled — "data collected on an ongoing basis after an initial request for permission must be disclosed", verified 2026-06-06]
+- **Ongoing collection after an initial permission grant IS "collected"** and must be disclosed. [settled — Apple, App Privacy Details, verified 2026-06-06]
 
 > **Application (worked: example app):** Free-tier breathing/session history is stored **on-device only** (SharedPreferences / local) → NOT "collected" → not disclosable for free users. Pro-tier history is **synced to Firestore** (off-device, retained) → IS "collected" → must be declared (as User Content / Usage Data per §6 mapping). The label must reflect the Pro behaviour because the same binary worldwide app build can collect it; do not under-declare on the theory that "most users are free."
 
@@ -56,21 +57,21 @@ These resolve into the three public label buckets:
 
 ## 3. The data-type taxonomy (15 categories + sub-types)
 
-Verbatim category and sub-type definitions from the primary source [settled — Apple App Privacy Details, verified 2026-06-06]:
+Category and sub-type names as Apple's questionnaire shows them, needed exactly to fill it in; the descriptions are this suite's short summaries, not Apple's text [settled — Apple App Privacy Details, verified 2026-06-06]:
 
-| # | Category | Sub-types (Apple's wording) |
+| # | Category | Sub-types (Apple's names; this suite's summaries) |
 |---|---|---|
 | 1 | **Contact Info** | Name; Email Address (incl. hashed); Phone Number (incl. hashed); Physical Address; Other User Contact Info |
 | 2 | **Health & Fitness** | Health (HealthKit / Clinical Health Records / Movement Disorder API / health-related human-subject research); Fitness (Motion and Fitness API) |
 | 3 | **Financial Info** | Payment Info (form of payment, card/bank account number); Credit Info (credit score); Other Financial Info (salary, income, assets, debts) |
 | 4 | **Location** | Precise Location (lat/long ≥ 3 decimal places); Coarse Location (< 3 decimals; Approximate Location) |
 | 5 | **Sensitive Info** | Racial/ethnic data, sexual orientation, pregnancy/childbirth, disability, religious/philosophical beliefs, trade-union membership, political opinion, genetic info, biometric data |
-| 6 | **Contacts** | List of contacts in phone, address book, or social graph |
+| 6 | **Contacts** | The user's contact lists (phone, address book, social graph) |
 | 7 | **User Content** | Emails or Text Messages; Photos or Videos; Audio Data; Gameplay Content; Customer Support; Other User Content |
-| 8 | **Browsing History** | Content the user viewed that is not part of the app (websites) |
-| 9 | **Search History** | Searches performed in the app |
+| 8 | **Browsing History** | Websites and other content viewed outside the app |
+| 9 | **Search History** | In-app searches |
 | 10 | **Identifiers** | User ID (screen name, handle, account ID, assigned user ID, customer number); Device ID (advertising identifier or other device-level ID) |
-| 11 | **Purchases** | Purchase History (the account's/individual's purchases or purchase tendencies) |
+| 11 | **Purchases** | Purchase History (what the account or person bought, or tends to buy) |
 | 12 | **Usage Data** | Product Interaction (app launches, taps, clicks, scrolling, views, saved place); Advertising Data (ads seen); Other Usage Data |
 | 13 | **Diagnostics** | Crash Data (crash logs); Performance Data (launch time, hang rate, energy use); Other Diagnostic Data |
 | 14 | **Surroundings** | Environment Scanning (mesh, planes, scene classification, image detection of surroundings — visionOS) |
@@ -85,9 +86,10 @@ Verbatim category and sub-type definitions from the primary source [settled — 
 
 ### 4.1 "Tracking" (Q3)
 
-> "'Tracking' refers to linking data collected from your app about a particular end-user or device, such as a user ID, device ID, or profile, with **Third-Party Data** for targeted advertising or advertising measurement purposes, or **sharing** data collected from your app about a particular end-user or device **with a data broker**." [settled — Apple, verified 2026-06-06]
+> "'Tracking' refers to linking data collected from your app about a particular end-user or device, such as a user ID, device ID, or profile, with Third-Party Data for targeted advertising or advertising measurement purposes, or sharing data collected from your app about a particular end-user or device with a data broker." [settled — Apple, verified 2026-06-06]
+> (Apple, App Privacy Details on the App Store, definition of "tracking", https://developer.apple.com/app-store/app-privacy-details/)
 
-> "'Third-Party Data' refers to any data about a particular end-user or device collected from apps, websites, or offline properties not owned by you." [settled — Apple, verified 2026-06-06]
+**Third-Party Data**, in Apple's sense, is data about a user or device that came from apps, websites or offline properties the developer does not own. [settled — Apple, verified 2026-06-06]
 
 **Counts as tracking** (even if the developer doesn't personally use it that way): placing a third-party SDK (e.g. a login SDK) that combines your app's user data with data from other developers' apps to target/measure advertising. [settled — Apple, verified 2026-06-06]
 
@@ -114,14 +116,14 @@ The inverse of §4.2 — data properly de-identified/anonymized per the criteria
 
 ## 5. The six data-use purposes (Q4)
 
-| Purpose | Apple's definition |
+| Purpose (Apple's name) | What it covers (this suite's summary) |
 |---|---|
-| **Third-Party Advertising** | Displaying third-party ads, or sharing data with entities who display third-party ads |
-| **Developer's Advertising or Marketing** | Displaying first-party ads, sending marketing comms directly to users, or sharing data with entities who display the developer's ads |
-| **Analytics** | Evaluating user behaviour — effectiveness of features, planning new features, measuring audience size/characteristics |
-| **Product Personalization** | Customizing what the user sees (recommendations, posts, suggestions) |
-| **App Functionality** | Authenticating the user, enabling features, preventing fraud, security, server up-time, minimizing crashes, scalability/performance, customer support |
-| **Other Purposes** | Any other purposes not listed |
+| **Third-Party Advertising** | Other companies' ads in the app, or data passed to whoever shows them |
+| **Developer's Advertising or Marketing** | The developer's own ads or marketing messages, or data passed to whoever shows the developer's ads |
+| **Analytics** | Studying how people use the app: which features work, what to build next, how big the audience is |
+| **Product Personalization** | Tailoring what each user sees, such as recommendations |
+| **App Functionality** | Running the app: sign-in, features, fraud and security, uptime, crash reduction, performance, support |
+| **Other Purposes** | Anything not covered above |
 
 [settled — Apple App Privacy Details, verified 2026-06-06]
 
@@ -180,7 +182,7 @@ Apple's example: optional feedback forms or customer-service requests unrelated 
 
 ## 8. Third-party SDK / partner collection counts as YOURS
 
-> "'Third-party partners' refers to analytics tools, advertising networks, third-party SDKs, or other external vendors whose code you've added to your app." The developer must "identify all of the data **you or your third-party partners** collect." [settled — Apple, verified 2026-06-06]
+Apple's **third-party partners** are the analytics tools, ad networks, SDKs and other outside vendors whose code the developer added to the app, and the label must cover the data the developer **and** those partners collect. [settled — Apple, verified 2026-06-06]
 
 Critical rule: an SDK that combines your app's user data with other apps' data for targeted advertising / ad measurement counts as **tracking by you, even if you don't use the SDK for that purpose**. [settled — Apple, verified 2026-06-06]
 
@@ -190,8 +192,8 @@ Critical rule: an SDK that combines your app's user data with other apps' data f
 
 ## 9. Label ↔ Policy ↔ Behaviour alignment (the enforcement gate)
 
-- The developer is responsible for keeping responses **accurate and up to date**; update on practice change (no build needed). [settled — Apple, verified 2026-06-06]
-- Practices must follow the **App Review Guidelines and all applicable laws**. [settled — Apple, verified 2026-06-06]
+- The developer is responsible for keeping the answers **accurate and current**; update on practice change (no build needed). [settled — Apple, verified 2026-06-06]
+- Practices must comply with the **App Review Guidelines and the law**. [settled — Apple, verified 2026-06-06]
 - The label being inconsistent with the Privacy Policy or with observed SDK behaviour is the most common rejection/enforcement trigger for this section. [verify — Apple does not publish a single quotable "label must equal PP" sentence; the requirement is the conjunction of "accurate" + Guideline 5.1.1(i) which requires the PP to enumerate all data collected and all third parties]
 
 > **Three-way cross-check (mandatory for sign-off):**
@@ -243,5 +245,5 @@ APP PRIVACY LABEL — SIGN-OFF
 - **[verify-pinpoint]** Whether stored **email** belongs to "Contact Info → Email Address" only, or also counts as an "Identifiers → User ID" when used as the account key (avoid double-counting; declare under Contact Info, declare the UID under Identifiers).
 - **[verify]** Whether the app ships Firebase **Performance Monitoring** (drives the "Diagnostics → Performance Data" Yes/No). Confirm against `pubspec.lock` / pods.
 - **[verify]** Whether **display name** from Google Sign-In is persisted off-device (drives "Contact Info → Name").
-- **[verify]** The exact phrasing of Apple's "label must match the Privacy Policy" requirement — it is the conjunction of "keep responses accurate" + Review Guideline 5.1.1(i), not a single verbatim sentence on the App Privacy Details page.
+- **[verify]** The exact phrasing of Apple's requirement that the label match the Privacy Policy — it is the conjunction of the duty to keep the answers accurate + Review Guideline 5.1.1(i), not a single verbatim sentence on the App Privacy Details page.
 - **[settled]** Everything tagged `[settled — Apple, verified 2026-06-06]` is quoted/derived directly from https://developer.apple.com/app-store/app-privacy-details/ fetched this run.

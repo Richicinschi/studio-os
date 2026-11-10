@@ -55,7 +55,9 @@ Ideas and patterns were re-expressed in the suite's own words; **no file or temp
 
 ## Primary law / official docs
 
-Freely citable; quoted per the attribution tiering with last-verified dates: GDPR/AVG, Dutch BW 6:233/236/237, CRD 2011/83, Dir. 93/13, ePrivacy 2002/58 + Telecommunicatiewet 11.7a, MDR 2017/745 + MDCG 2019-11, FTC HBNR, EU-US DPF decision 2023/1795, AP guidance, Apple App Store Review Guidelines, Google Play developer policies.
+Freely citable; quoted per the attribution tiering with last-verified dates: GDPR/AVG, Dutch BW 6:233/236/237, CRD 2011/83, Dir. 93/13, ePrivacy 2002/58 + Telecommunicatiewet 11.7a, MDR 2017/745 + MDCG 2019-11, FTC HBNR, EU-US DPF decision 2023/1795, AP guidance.
+
+Apple's and Google's store rules (the App Store Review Guidelines, App Privacy Details, the minimum EULA terms, App Store Connect Help, Google Play policies and Play Console Help) are copyright of Apple Inc. and Google LLC. Quotations from them are short extracts used to review an app against the rule, each with the owner, the rule or article number and the URL; elsewhere the suite paraphrases them. It holds no copy of their pages and no script fetches them. Check the live pages for the current text. App Store, Apple, Google Play and Google are trademarks of their owners, used here only to name them.
 
 ## Corrections on 2026-11-10
 

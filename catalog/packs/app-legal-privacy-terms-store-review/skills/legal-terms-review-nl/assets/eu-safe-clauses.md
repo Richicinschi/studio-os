@@ -100,6 +100,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+**Using §2 and §2a in your own Terms.** You do not need to copy this MIT notice into your Terms of
+Service. Two stock contract clauses are unlikely to be "substantial portions of the Software", or
+protected expression at all. A credit line is optional.
+
 ---
 
 ## 3. Dispute-resolution / ADR clause (replaces forum 6:236(m), arbitration 6:236(n), dead EU-ODR)

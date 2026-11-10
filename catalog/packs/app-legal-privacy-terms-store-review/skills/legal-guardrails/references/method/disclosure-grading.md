@@ -22,7 +22,7 @@ A flow is a tuple: **(data-type, recipient-entity, on/off-device)**. Produced by
 
 ## Entity-awareness (the key lesson)
 
-"We share data with third parties" does **not** clear a flow to a *named* processor. Each recipient must be named (Apple, Google/Firebase, RevenueCat, Cloudflare). A policy that lists "service providers" generically grades **vague**, not **clear**, for every specific SDK the scanner finds. This mirrors GDPR Art. 13(1)(e) (recipients/categories) and the Play User Data policy ("the parties with which data is shared").
+"We share data with third parties" does **not** clear a flow to a *named* processor. Each recipient must be named (Apple, Google/Firebase, RevenueCat, Cloudflare). A policy that lists "service providers" generically grades **vague**, not **clear**, for every specific SDK the scanner finds. This mirrors GDPR Art. 13(1)(e) (recipients/categories) and the Play User Data policy, which asks who the data is shared with (Play Console Help 10144311).
 
 ## Direction matters
 

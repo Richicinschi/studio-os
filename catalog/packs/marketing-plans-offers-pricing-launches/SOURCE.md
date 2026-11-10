@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-marketing-plans-offers-pricing-launches.md](../../../cards/pack-marketing-plans-offers-pricing-launches.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 60/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 5 findings, all read: 4 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#packmarketing-plans-offers-pricing-launches-do_not_install-60100-5-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 60/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 5 findings, all read: 4 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#packmarketing-plans-offers-pricing-launches-do_not_install-60100-5-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-audio-video-media.md](../../../cards/pack-audio-video-media.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** SAFE (risk 20/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09
+- **Last scan:** SAFE (risk 20/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

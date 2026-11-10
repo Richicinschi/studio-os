@@ -1,7 +1,7 @@
 {
-  "version": "3.1.0",
+  "version": "3.1.1",
   "date": "2026-11-10",
-  "hubCommit": "03247053f3c90a97b2ba18f50e7be5760a465827",
+  "hubCommit": "c3d57b56d0e7cecdfe7734fec4e952aa91532811",
   "items": {
     "agent:bob-builder": "54f3dcc2d5803c8d",
     "skill:brainstorming": "a9eb1cf268d2bbed",
@@ -13,7 +13,7 @@
     "skill:executing-plans": "f1a36f26493f9175",
     "skill:finishing-a-development-branch": "8264bcaad449a084",
     "skill:git-cleanup": "24b4d780f76f79ac",
-    "skill:git-guardrails": "2e0b653d0bd43b3a",
+    "skill:git-guardrails": "2853cc4f82c8a7bf",
     "skill:handoff": "958d6c3df79cfbac",
     "skill:improve": "08fb75d07a69f560",
     "agent:linus-reviewer": "9848095cb958422d",
@@ -29,7 +29,7 @@
     "skill:writing-plans": "3a95253d6bdf28f3",
     "pack:advisor-council-for-big-decisions": "eb566e38ba0bda76",
     "pack:android-swiftui-react-native-app-building": "0b3fc0c23fcfafcc",
-    "pack:app-legal-privacy-terms-store-review": "3c18c75aa1c8bb11",
+    "pack:app-legal-privacy-terms-store-review": "4be704613a0e47b3",
     "pack:audio-video-media": "e6215f7e73c67712",
     "pack:dependency-supply-chain-risk-checks": "82473cda4ff1fc8a",
     "pack:design-ui-logos-slides-posters": "fc0a14344e8a7477",

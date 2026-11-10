@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-stock-research-backtests-trading-safety.md](../../../cards/pack-stock-research-backtests-trading-safety.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** CAUTION (risk 32/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 1 finding, read: 1 false positive ([triage](../../../tools/export/scan-triage.md#packstock-research-backtests-trading-safety-caution-32100-1-finding))
+- **Last scan:** CAUTION (risk 32/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 1 finding, read: 1 false positive ([triage](../../../tools/export/scan-triage.md#packstock-research-backtests-trading-safety-caution-32100-1-finding))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

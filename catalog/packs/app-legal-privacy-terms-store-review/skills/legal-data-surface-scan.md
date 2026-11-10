@@ -71,7 +71,7 @@ gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never cra
 - **Degrades:** `manifestCount ≤ 1` → note "only the app manifest found — pod manifests appear after `pod install` / a macOS build; re-run on the Mac for full third-party coverage." Treat partial coverage as **partial**, not clean.
 
 ### 4. `run_exodus.mjs` — Android tracker/permission scan on a built APK (OPTIONAL)
-- **Why:** Exodus statically matches APK bytecode against a tracker-signature DB (advertising/analytics/crash incl. Google Firebase Analytics, Crashlytics, RevenueCat) — off-device truth the source scan can miss. Exodus is **GPL: invoked as an external CLI via Docker, never linked.**
+- **Why:** Exodus statically matches APK bytecode against a tracker-signature DB (advertising/analytics/crash incl. Google Firebase Analytics, Crashlytics, RevenueCat) — off-device truth the source scan can miss. Exodus (`exodus-standalone`) is **AGPL-3.0: invoked as an external CLI via Docker, never linked.**
 - **Command:** `node legal-data-surface-scan/scripts/run_exodus.mjs --apk <path.apk>`
 - **Requires:** Docker + image `exodusprivacy/exodus-standalone` (auto-pulled). **Output:** `trackers[]`, `permissions[]`, `report`.
 - **Degrades:** no Docker → `skipped` + install hint; no/invalid `--apk` → `skipped` + the `flutter build apk --release --dart-define-from-file=.env` instruction.

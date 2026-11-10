@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-godot-camera-shaders-particles-export.md](../../../cards/pack-godot-camera-shaders-particles-export.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** CAUTION (risk 40/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 4 findings, all read: 4 false positives ([triage](../../../tools/export/scan-triage.md#packgodot-camera-shaders-particles-export-caution-40100-4-findings))
+- **Last scan:** CAUTION (risk 40/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 4 findings, all read: 4 false positives ([triage](../../../tools/export/scan-triage.md#packgodot-camera-shaders-particles-export-caution-40100-4-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

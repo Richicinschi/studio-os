@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-mobile-apps-flutter-firebase.md](../../../cards/pack-mobile-apps-flutter-firebase.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 30 findings, all read: 28 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#packmobile-apps-flutter-firebase-do_not_install-100100-30-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 30 findings, all read: 28 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#packmobile-apps-flutter-firebase-do_not_install-100100-30-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

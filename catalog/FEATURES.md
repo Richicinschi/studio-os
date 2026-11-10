@@ -74,7 +74,7 @@ Every session for this module: about 130 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 1,078) | 75 |
+| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 1,323) | 75 |
 | git-hooks | practice: The git hook templates | recommended | Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands. | none | 0 |
 | sensitive-file-deny-rules | practice: Deny rules for secret files | recommended | A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files. | none | 0 |
 | commit-and-pr-writing | practice: Commit messages and PR bodies that say why | optional; recommended for software, ml, data | A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does. | every session | 69 |

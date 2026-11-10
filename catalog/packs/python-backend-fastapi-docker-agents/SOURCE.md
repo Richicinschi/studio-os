@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-python-backend-fastapi-docker-agents.md](../../../cards/pack-python-backend-fastapi-docker-agents.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 21 findings, all read: 19 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#packpython-backend-fastapi-docker-agents-do_not_install-100100-21-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 21 findings, all read: 19 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#packpython-backend-fastapi-docker-agents-do_not_install-100100-21-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-web-search-and-scraping-into-files.md](../../../cards/pack-web-search-and-scraping-into-files.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** CAUTION (risk 45/100), SkillSpector v2.2.3 with --no-llm, 2026-11-09; 2 findings, all read: 1 false positive, 1 by design ([triage](../../../tools/export/scan-triage.md#packweb-search-and-scraping-into-files-caution-45100-2-findings))
+- **Last scan:** CAUTION (risk 45/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 2 findings, all read: 1 false positive, 1 by design ([triage](../../../tools/export/scan-triage.md#packweb-search-and-scraping-into-files-caution-45100-2-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import { writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { rewriteText, findSecrets, findDenied, findPaths, loadDenyList, loadOwnerName, loadLocalRewrites, fileKind } from '../rules.mjs';
 import { gatePrivacy } from '../gates.mjs';
 
@@ -37,6 +38,15 @@ test('the owner name becomes "the owner", capitalized only where a sentence, ite
   assert.equal(r(`para one\r\n\r\n${OWNER} merges`), 'para one\r\n\r\nThe owner merges');
   assert.equal(r(`${OWNER}ian stays`), `${OWNER}ian stays`);
   assert.equal(rewriteText(`Ask ${OWNER}.`).text, `Ask ${OWNER}.`, 'with no owner given the name is left for the privacy gate');
+});
+
+test('the owner rewrite stays fast on a long run of asterisks before the name', () => {
+  // A child process, so a regex that backtracks for minutes is killed instead of hanging the suite.
+  const rules = pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'rules.mjs')).href;
+  const text = `${'*'.repeat(60)}x ${OWNER}`;
+  const code = `import { rewriteText } from ${JSON.stringify(rules)};\nrewriteText(${JSON.stringify(text)}, { owner: ${JSON.stringify(OWNER)} });`;
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', code], { timeout: 5000 });
+  assert.equal(run.status, 0, `rewriteText did not finish within 5 s (signal ${run.signal})`);
 });
 
 test('generic secrets are found; the fake token is built at runtime so scanners ignore this file', () => {

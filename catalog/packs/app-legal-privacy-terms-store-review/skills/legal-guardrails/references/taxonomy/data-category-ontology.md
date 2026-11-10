@@ -1,6 +1,6 @@
 # Data-Category Ontology — Apple ⇄ Google Play ⇄ GDPR Crosswalk
 
-**Role of this file.** This is the canonical crosswalk that `legal-cross-store` uses to keep the three "labels" in lockstep: the **Apple App Privacy** ("nutrition label"), the **Google Play Data Safety** form/CSV, and the **Privacy Policy** data-inventory / recipients (subprocessor) section. One change to what Breathe actually collects must propagate to all three artefacts from this single source of truth.
+**Role of this file.** This is the canonical crosswalk that `legal-cross-store` uses to keep the three "labels" in lockstep: the **Apple App Privacy** ("nutrition label"), the **Google Play Data Safety** form/CSV, and the **Privacy Policy** data-inventory / recipients (subprocessor) section. One change to what the app actually collects must propagate to all three artefacts from this single source of truth. The last column of the §1 table is a worked example for the example app (`legal-guardrails.md` §8); fill it for the app under review from its fact sheet and data-surface scan.
 
 **Core warning — no clean 1:1 mapping exists.** Apple, Google, and the GDPR each invented their own ontology. The category *names* do **not** align across all three:
 
@@ -17,11 +17,11 @@ A category-by-category copy between stores is therefore **wrong by construction*
 
 ## Section 1 — Master crosswalk table
 
-Columns: **Canonical category** · **Apple App Privacy label** (verbatim category → type) · **Google Play Data Safety** (verbatim category → type) · **GDPR category** (Art. 4 / Art. 9) · **Sensitivity** · **Breathe: collected? SDK? on/off-device**.
+Columns: **Canonical category** · **Apple App Privacy label** (verbatim category → type) · **Google Play Data Safety** (verbatim category → type) · **GDPR category** (Art. 4 / Art. 9) · **Sensitivity** · **Example app: collected? SDK? on/off-device** (the worked column; derive the app's own).
 
 > Apple verbatim taxonomy confirmed at [settled — developer.apple.com/app-store/app-privacy-details, verified 2026-06-06]. Google verbatim taxonomy confirmed at [settled — support.google.com/googleplay/android-developer/answer/10787469, verified 2026-06-06].
 
-| Canonical category | Apple App Privacy label | Google Play Data Safety | GDPR category | Sensitivity | Breathe: collected? / SDK / on-off-device |
+| Canonical category | Apple App Privacy label | Google Play Data Safety | GDPR category | Sensitivity | Example app: collected? / SDK / on-off-device |
 |---|---|---|---|---|---|
 | **Account email** | Contact Info → **Email Address** | Personal info → **Email address** | Art. 4(1) personal data (contact/identifier) | normal | **YES** · Firebase Auth (email/password + Google Sign-In) · OFF-device (Firebase Auth, EU region) |
 | **Account / user ID (app account)** | Identifiers → **User ID** | Personal info → **User IDs** | Art. 4(1) personal data (online identifier) | normal | **YES** · Firebase Auth UID; mirrored as RevenueCat `app_user_id` (= Firebase UID) · OFF-device |
@@ -31,7 +31,7 @@ Columns: **Canonical category** · **Apple App Privacy label** (verbatim categor
 | **Crash data** | Diagnostics → **Crash Data** | App info and performance → **Crash logs** | Art. 4(1) personal data (telemetry, may be linkable) | normal | **YES (opt-in NL — see §4)** · Firebase Crashlytics · OFF-device |
 | **Performance / diagnostics** | Diagnostics → **Performance Data** (+ Other Diagnostic Data) | App info and performance → **Diagnostics** (+ Other app performance data) | Art. 4(1) personal data | normal | **YES (opt-in NL)** · Firebase Crashlytics / Performance · OFF-device |
 | **Analytics / usage / app interactions** | Usage Data → **Product Interaction** | App activity → **App interactions** | Art. 4(1) personal data | normal | **YES (opt-in NL)** · Firebase Analytics (GA4) · OFF-device |
-| **In-app search history** | Search History → **Search History** | App activity → **In-app search history** | Art. 4(1) personal data | normal | **NO** · Breathe has no in-app search → **Not Collected** |
+| **In-app search history** | Search History → **Search History** | App activity → **In-app search history** | Art. 4(1) personal data | normal | **NO** · the example app has no in-app search → **Not Collected** |
 | **Session metadata (breathing logs)** | Usage Data → **Product Interaction** (NOT Health & Fitness) | App activity → **App interactions** (or **Other actions**) — NOT Health and fitness | Art. 4(1) personal data (ordinary, see §3) | **normal — NOT special category** | **Pro: YES** (Firestore sync `users/{uid}/sessions`, OFF-device); **Free: ON-device only** (SharedPreferences, not "collected") |
 | **Device identifier** | Identifiers → **Device ID** | **Device or other IDs → Device or other IDs** | Art. 4(1) personal data (online identifier) | normal | **MINIMAL** · Firebase instance/installation IDs ride analytics/crash SDKs; **no Android Advertising ID** (AD_ID permission stripped via `tools:node="remove"`). Declare under Device IDs only if analytics/crash are enabled. OFF-device |
 | **Advertising ID (GAID/IDFA)** | Usage Data → **Advertising Data** | (declared as Device or other IDs if collected) | Art. 4(1) personal data | normal | **NO** · AD_ID permission removed; no ads SDK → **Not Collected**; supports the "no advertising ID" PP claim |
@@ -46,10 +46,10 @@ Columns: **Canonical category** · **Apple App Privacy label** (verbatim categor
 | **Web browsing history** | Browsing History → **Browsing History** | **Web browsing** → Web browsing history | Art. 4(1) personal data | normal | **NO** → **Not Collected** |
 | **Phone number** | Contact Info → **Phone Number** | Personal info → **Phone number** | Art. 4(1) personal data | normal | **NO** → **Not Collected** |
 | **Physical address** | Contact Info → **Physical Address** | Personal info → **Address** | Art. 4(1) personal data | normal | **NO** (customer-side; the *publisher's* registered address is a controller-identity field, not collected user data) → **Not Collected** |
-| **Customer support correspondence** | User Content → **Customer Support** | App activity → Other UGC (or n/a) | Art. 4(1) personal data | normal | **CONDITIONAL** · only if a support email (`hi@richicinschi.com`) is used; the message body is then User Content / Customer Support. Declare if a support channel is offered. OFF-device (email) |
+| **Customer support correspondence** | User Content → **Customer Support** | App activity → Other UGC (or n/a) | Art. 4(1) personal data | normal | **CONDITIONAL** · only if a support email (`<contact email>`) is used; the message body is then User Content / Customer Support. Declare if a support channel is offered. OFF-device (email) |
 
 ### Affirmative "Data Not Collected" list (assert on BOTH labels)
-Health & Fitness · Sensitive Info · Location (coarse+precise) · Contacts · Messages · Photos/Videos · Audio recordings · Files & docs · Calendar · Browsing/Search history · Phone number · Advertising ID. Apple lets you declare **"Data Not Collected"** for the whole app only if *nothing* is collected — Breathe collects account + purchase + (opt-in) telemetry, so it must enumerate those and leave the rest off.
+Health & Fitness · Sensitive Info · Location (coarse+precise) · Contacts · Messages · Photos/Videos · Audio recordings · Files & docs · Calendar · Browsing/Search history · Phone number · Advertising ID. Apple lets you declare **"Data Not Collected"** for the whole app only if *nothing* is collected — an app that collects account + purchase + (opt-in) telemetry (the example app), so it must enumerate those and leave the rest off.
 
 ---
 
@@ -61,9 +61,9 @@ These extra axes are where the two stores' artefacts diverge even when the canon
 [settled — developer.apple.com/app-store/app-privacy-details, verified 2026-06-06]
 
 1. **Collected?** "Collect" = transmitted off the device in a way that lets you/your third parties access it beyond servicing the user's immediate request.
-2. **Linked to the user?** Two linkage states: **Linked to the User** vs **Not Linked to the User** (data must be de-identified, not re-linkable, and not joined to identifying data). For Breathe, account email/UID, purchases, and (opt-in) telemetry tied to the signed-in UID are **Linked to the User**.
-3. **Used to Track You?** *Tracking* = linking your app's data with **Third-Party Data** for targeted advertising / ad measurement, OR sharing with a **data broker**. Breathe does **none** of this → **Not used for tracking** for every type. (No ATT prompt required.)
-4. **Purpose(s)?** Closed list of 6: **Third-Party Advertising · Developer's Advertising or Marketing · Analytics · Product Personalization · App Functionality · Other Purposes**. Breathe purposes: App Functionality (account, purchases) and Analytics (telemetry); never the two advertising purposes.
+2. **Linked to the user?** Two linkage states: **Linked to the User** vs **Not Linked to the User** (data must be de-identified, not re-linkable, and not joined to identifying data). For the example app, account email/UID, purchases, and (opt-in) telemetry tied to the signed-in UID are **Linked to the User**.
+3. **Used to Track You?** *Tracking* = linking your app's data with **Third-Party Data** for targeted advertising / ad measurement, OR sharing with a **data broker**. An app that does **none** of this (the example app) → **Not used for tracking** for every type. (No ATT prompt required.)
+4. **Purpose(s)?** Closed list of 6: **Third-Party Advertising · Developer's Advertising or Marketing · Analytics · Product Personalization · App Functionality · Other Purposes**. Example-app purposes: App Functionality (account, purchases) and Analytics (telemetry); never the two advertising purposes (an app without ads never selects them).
 
 **Apple data-type categories (verbatim, full set):** Contact Info · Health & Fitness · Financial Info · Location · Sensitive Info · Contacts · User Content · Browsing History · Search History · Identifiers · Purchases · Usage Data · Diagnostics · Surroundings (Environment Scanning) · Body (Hands, Head) · Other Data. [settled — same source]
 
@@ -73,7 +73,7 @@ These extra axes are where the two stores' artefacts diverge even when the canon
 [settled — support.google.com/googleplay/android-developer/answer/10787469, verified 2026-06-06]
 
 1. **Collected and/or Shared?** *Collection* = data leaving the device. *Sharing* = transfer to a third party. Every third-party SDK (Firebase, Crashlytics, RevenueCat, Google Sign-In) counts as collection — and as **sharing** when the recipient is a separate controller/broker. [verify-pinpoint — first-party-processor "Firebase = collection not necessarily sharing" nuance: confirm against Play "sharing" definition exclusions for service providers]
-2. **Processed ephemerally?** Data held only in memory and no longer than necessary may be disclosed but **excluded from the public listing**. Breathe's persisted data is not ephemeral.
+2. **Processed ephemerally?** Data held only in memory and no longer than necessary may be disclosed but **excluded from the public listing**. Persisted data (all of the example app's) is not ephemeral.
 3. **Required vs optional (user can choose)?** Account/purchase = required for that functionality; analytics/crash = **optional** (user can opt out → mark *optional* / users can choose).
 4. **Purpose(s)?** Closed 7-item list: **App functionality · Analytics · Developer communications · Advertising or marketing · Fraud prevention, security, and compliance · Personalization · Account management**. [settled — harvested official spec, line 7]
 5. **App-level security declarations (2):** *All data encrypted in transit?* → **Yes** (Firebase/HTTPS). *Users can request data deletion?* → **Yes** (in-app delete + web URL).
@@ -87,14 +87,14 @@ These extra axes are where the two stores' artefacts diverge even when the canon
 | Off-device test | "Collect" | "Collected" | Same threshold (data leaves device). |
 | Third-party transfer | folded into "Used to Track You" + purposes | explicit **Shared** flag | Google asks *sharing* separately; Apple only flags *tracking*. |
 | Linkability | **Linked / Not Linked to the User** | not asked as such | Apple-only axis. |
-| Required vs optional | not asked | **Required / Optional** | Google-only axis; Breathe analytics/crash = optional. |
+| Required vs optional | not asked | **Required / Optional** | Google-only axis; consent-gated analytics/crash = optional (as in the example app). |
 | Encryption-in-transit | not asked | app-level **Yes/No** | Google-only. |
 | Deletability | not asked (covered by 5.1.1(v) account-deletion rule elsewhere) | app-level **Yes/No** + web URL | Google requires a public web deletion URL **in addition** to in-app deletion. [settled — harvested official spec, line 436] |
 | Ephemeral | not a public axis | **excluded from public listing** | Google-only. |
 
 ---
 
-## Section 3 — Why Breathe's breathing logs are NOT special-category health data
+## Section 3 — Why a wellness app's session logs (the example app's breathing logs) are NOT special-category health data
 
 This is a load-bearing determination; the skill must defend it.
 

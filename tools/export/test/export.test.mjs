@@ -1,10 +1,10 @@
 // tools/export/test/export.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { makeFixtureHub, FIXTURE_OWNER, cardText } from './fixture-hub.mjs';
+import { makeFixtureHub, makePackHub, FIXTURE_OWNER, cardText } from './fixture-hub.mjs';
 import { CHANGELOG_HEAD } from '../changelog.mjs';
 import { runExport } from '../export.mjs';
 
@@ -32,6 +32,9 @@ function setup() {
   w('tools/export/owner.local.txt', `${FIXTURE_OWNER}\n`);
   w('tools/export/private.local.txt', '# nothing private in the fixture\n');
   w('tools/export/rewrites.local.json', '[]\n');
+  // A release ships only scanned items.
+  const safe = { score: 0, recommendation: 'SAFE', findings: 0, version: 'v2.2.3', date: '2026-11-02' };
+  w('tools/export/scans.json', JSON.stringify({ alpha: safe, beta: safe }));
   for (const it of manifest.items) w(`cards/${it.id}.md`, cardText(it.id, it.module));
   const lines = [];
   const run = (o = {}) => runExport({ root, hub, noGitleaks: true, today: '2026-11-02', log: (l) => lines.push(String(l)), rewrites: [], ...o });
@@ -114,6 +117,68 @@ test('the export writes the feature menu into the catalog', () => {
   } finally { s.done(); }
 });
 
+test('a shipped item whose last scan is not SAFE fails the export until scan-triage.md has its section', () => {
+  const s = setup();
+  try {
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: { score: 25, recommendation: 'CAUTION', findings: 1, version: 'v2.2.3', date: '2026-11-09' } }));
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /triage: FAIL \(1\)/);
+    assert.match(out, /alpha: last scan CAUTION \(25\/100\), and tools\/export\/scan-triage\.md has no section for it/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+    s.lines.length = 0;
+    s.w('tools/export/scan-triage.md', '# Scan triage\n\n### alpha: CAUTION, 25/100, 1 finding\n\n| Finding | File:line | Verdict | Why |\n|---|---|---|---|\n| TM1 tool parameter abuse | `SKILL.md:3` | FP | A warning, not a command. |\n');
+    assert.equal(s.run(), 0, s.lines.join('\n'));
+    assert.match(s.lines.join('\n'), /triage: pass/);
+    assert.match(readFileSync(path.join(s.root, 'catalog/skills/alpha/SOURCE.md'), 'utf8'),
+      /CAUTION \(risk 25\/100\), SkillSpector v2\.2\.3 with --no-llm, 2026-11-09; 1 finding, read: 1 false positive \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#alpha-caution-25100-1-finding\)\)/);
+  } finally { s.done(); }
+});
+
+test('a shipped domain gets its SOURCE.md, which accounting accepts, and a scan of it that is not SAFE needs its triage', () => {
+  const s = setup();
+  try {
+    const packHub = makePackHub();
+    const items = [...manifest.items,
+      { id: 'pack-one-two-three', kind: 'pack', status: 'public', importance: 'optional', why: 'A domain.' },
+      { id: 'pack-with-licence-inside', kind: 'pack', status: 'public', importance: 'optional', why: 'Withheld.' },
+      { id: 'private-pack-for-me', kind: 'pack', status: 'private' }];
+    s.w('export.manifest.json', JSON.stringify({ ...manifest, items }));
+    s.w('cards/pack-pack-one-two-three.md', cardText('pack-pack-one-two-three', 'domains'));
+    s.w('tools/export/scans.json', JSON.stringify({ 'pack:pack-one-two-three': { score: 25, recommendation: 'CAUTION', findings: 1, version: 'v2.2.3', date: '2026-11-09' } }));
+    const run = () => runExport({ root: s.root, hub: packHub, noGitleaks: true, today: '2026-11-02', log: (l) => s.lines.push(String(l)), rewrites: [] });
+    try {
+      assert.equal(run(), 1);
+      assert.match(s.lines.join('\n'), /pack:pack-one-two-three: last scan CAUTION \(25\/100\), and tools\/export\/scan-triage\.md has no section for it/);
+      s.lines.length = 0;
+      s.w('tools/export/scan-triage.md', '# Scan triage\n\n### pack:pack-one-two-three: CAUTION, 25/100, 1 finding\n\n| Finding | File:line | Verdict | Why |\n|---|---|---|---|\n| TM1 tool parameter abuse | `skills/one-job.md:3` | FP | A warning, not a command. |\n');
+      assert.equal(run(), 0, s.lines.join('\n'));
+      assert.match(s.lines.join('\n'), /accounting: pass[\s\S]*links: pass[\s\S]*triage: pass/);
+      assert.match(readFileSync(path.join(s.root, 'catalog/packs/pack-one-two-three/SOURCE.md'), 'utf8'),
+        /2026-11-09; 1 finding, read: 1 false positive \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#packpack-one-two-three-caution-25100-1-finding\)\)/);
+    } finally { rmSync(packHub, { recursive: true, force: true }); }
+  } finally { s.done(); }
+});
+
+test('a domain\'s credit file the build cannot read fails the export with the file and the reason, and the kit is unchanged', () => {
+  const s = setup();
+  try {
+    const packHub = makePackHub();
+    const items = [...manifest.items,
+      { id: 'pack-one-two-three', kind: 'pack', status: 'public', importance: 'optional', why: 'A domain.' },
+      { id: 'pack-with-licence-inside', kind: 'pack', status: 'public', importance: 'optional', why: 'Withheld.' },
+      { id: 'private-pack-for-me', kind: 'pack', status: 'private' }];
+    s.w('export.manifest.json', JSON.stringify({ ...manifest, items }));
+    s.w('cards/pack-pack-one-two-three.md', cardText('pack-pack-one-two-three', 'domains'));
+    writeFileSync(path.join(packHub, 'library/pack-one-two-three/skills/NOTICE.md'), '# Notice\n\nSome of this comes from elsewhere.\n');
+    try {
+      assert.equal(runExport({ root: s.root, hub: packHub, noGitleaks: true, today: '2026-11-02', log: (l) => s.lines.push(String(l)), rewrites: [] }), 1);
+      assert.match(s.lines.join('\n'), /export: catalog\/packs\/pack-one-two-three\/skills\/NOTICE\.md: a credit file with no table that has a Licence column/);
+      assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+    } finally { rmSync(packHub, { recursive: true, force: true }); }
+  } finally { s.done(); }
+});
+
 test('a --note that fails a gate stops the export before anything is built, without echoing the term', () => {
   const s = setup();
   try {
@@ -134,6 +199,17 @@ test('a failing gate leaves the kit exactly as it was', () => {
     assert.equal(existsSync(path.join(s.root, 'catalog/skills/alpha/notes.md')), false);
     assert.match(s.lines.join('\n'), /catalog\/skills\/alpha\/notes\.md:1 denied term #2/);
     assert.equal(s.lines.join('\n').includes('Quenlin'), false);
+  } finally { s.done(); }
+});
+
+test('a release fails the triage gate for a shipped item with no scan; a dry run lets it through', () => {
+  const s = setup();
+  try {
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: { score: 0, recommendation: 'SAFE', findings: 0, version: 'v2.2.3', date: '2026-11-02' } }));
+    assert.equal(s.run(), 0, s.lines.join('\n'));
+    s.lines.length = 0;
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1);
+    assert.match(s.lines.join('\n'), /triage: FAIL \(1\)\n {2}beta: no scan in scans\.json; a release ships only scanned items/);
   } finally { s.done(); }
 });
 
@@ -198,22 +274,76 @@ test('a release stamps its version into the manifest and the feature menu, and n
   } finally { s.done(); }
 });
 
-// ---- the kit names no outside workflow collection anywhere
-test('the kit holds the outside workflow collection\'s name in no file', async () => {
-  const { readdirSync, statSync } = await import('node:fs');
-  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..', '..', '..');
-  const needle = new RegExp(['super', 'powers'].join(''), 'i');
+// ---- the kit names no outside workflow collection anywhere, except in credit a licence requires
+// The one stated exception: the credit files (ATTRIBUTION.md, NOTICE*) of a domain whose build detected
+// them, which is what its SOURCE.md shows by linking them from its Origin line. Any other file, the rest of
+// that domain included, still fails.
+import { isCreditFile } from '../credits.mjs';
+const kitRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..', '..', '..');
+
+function creditedFiles(root) {
+  const packs = path.join(root, 'catalog', 'packs');
+  if (!existsSync(packs)) return new Set();
+  const files = new Set();
+  for (const id of readdirSync(packs)) {
+    const source = path.join(packs, id, 'SOURCE.md');
+    if (!existsSync(source)) continue;
+    const origin = (readFileSync(source, 'utf8').match(/^- \*\*Origin:\*\* Adapts outside work: .*$/m) || [''])[0];
+    for (const m of origin.matchAll(/\]\(([^)\s]+)\)/g)) if (isCreditFile(m[1])) files.add(`catalog/packs/${id}/${m[1]}`);
+  }
+  return files;
+}
+
+function filesNaming(root, needle) {
+  const allowed = creditedFiles(root);
   const hits = [];
   const walk = (dir) => {
     for (const ent of readdirSync(dir, { withFileTypes: true })) {
       if (['.git', 'node_modules'].includes(ent.name) || /\.local\.(txt|json)$/.test(ent.name)) continue;
       const p = path.join(dir, ent.name);
-      if (ent.isDirectory()) walk(p);
-      else if (statSync(p).size < 2_000_000 && needle.test(path.relative(root, p)) || (statSync(p).size < 2_000_000 && !/\.(png|gz|zip|svg|webp)$/.test(ent.name) && needle.test(readFileSync(p, 'utf8')))) hits.push(path.relative(root, p).split(path.sep).join('/'));
+      const rel = path.relative(root, p).split(path.sep).join('/');
+      if (ent.isDirectory()) { walk(p); continue; }
+      if (allowed.has(rel) || statSync(p).size >= 2_000_000) continue;
+      if (needle.test(rel) || (!/\.(png|gz|zip|svg|webp)$/.test(ent.name) && needle.test(readFileSync(p, 'utf8')))) hits.push(rel);
     }
   };
   walk(root);
-  assert.deepEqual(hits, []);
+  return hits.sort();
+}
+
+test('the kit holds the outside workflow collection\'s name in no file', () => {
+  assert.deepEqual(filesNaming(kitRoot, new RegExp(['super', 'powers'].join(''), 'i')), []);
+});
+
+test('the one exception is a credit file its domain\'s SOURCE.md links from an "Adapts outside work" Origin line', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'kit-names-'));
+  try {
+    const w = (rel, t) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), t); };
+    const credit = '- **Origin:** Adapts outside work: some text follows sources under MIT, credited in [ATTRIBUTION.md](skills/x/ATTRIBUTION.md); the rest is the studio\'s own.\n';
+    w('catalog/packs/credited/SOURCE.md', `# credited: source\n\n${credit}`);
+    w('catalog/packs/credited/skills/x/ATTRIBUTION.md', '| Source | Licence |\n|---|---|\n| Quenlinworks | MIT |\n');
+    w('catalog/packs/credited/skills/x.md', 'Adapted from Quenlinworks.\n');
+    w('catalog/packs/own/SOURCE.md', '# own: source\n\n- **Origin:** Written in the studio\'s own words.\n');
+    w('catalog/packs/own/skills/y/ATTRIBUTION.md', '| Source | Licence |\n|---|---|\n| Quenlinworks | MIT |\n');
+    w('cards/a.md', 'Quenlinworks.\n');
+    assert.deepEqual(filesNaming(root, /quenlinworks/i), ['cards/a.md', 'catalog/packs/credited/skills/x.md', 'catalog/packs/own/skills/y/ATTRIBUTION.md']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('every credit file a shipped domain carries is linked from its SOURCE.md Origin line and listed in the notices', () => {
+  const packs = path.join(kitRoot, 'catalog', 'packs');
+  const found = [];
+  const walk = (dir, rel) => {
+    for (const ent of readdirSync(dir, { withFileTypes: true })) {
+      const r = `${rel}/${ent.name}`;
+      if (ent.isDirectory()) walk(path.join(dir, ent.name), r); else if (isCreditFile(ent.name)) found.push(r);
+    }
+  };
+  for (const id of readdirSync(packs)) walk(path.join(packs, id), `catalog/packs/${id}`);
+  assert.ok(found.length > 0, 'no credit file found, so this test checks nothing; if the last one left the kit on purpose, remove this line');
+  assert.deepEqual(found.filter((f) => !creditedFiles(kitRoot).has(f)), []);
+  const notices = readFileSync(path.join(kitRoot, 'docs/THIRD_PARTY_NOTICES.md'), 'utf8');
+  assert.deepEqual(found.filter((f) => !notices.includes(`](../${f})`)), []);
 });
 
 test('a shipped file that cites an item the private list keeps out of the kit fails the privacy gate, by position only', () => {

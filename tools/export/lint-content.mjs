@@ -15,7 +15,7 @@ export function lintModulePage(rel, text) {
   if (!data) return [`${rel}: no front matter`];
   const errors = [];
   for (const k of ['title', 'pack']) if (!data[k]) errors.push(`${rel}: front matter needs "${k}"`);
-  for (const k of ['sources', 'questions']) if (!Array.isArray(data[k]) || !data[k].length) errors.push(`${rel}: front matter needs a non-empty "${k}" list`);
+  for (const k of ['studio_sources', 'questions']) if (!Array.isArray(data[k]) || !data[k].length) errors.push(`${rel}: front matter needs a non-empty "${k}" list`);
   const hay = `\n${body.replace(/\r\n/g, '\n')}\n`;
   let last = -1;
   for (const h of MODULE_HEADINGS) {

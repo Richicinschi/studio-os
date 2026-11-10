@@ -1,7 +1,7 @@
 ---
 id: pack-app-legal-privacy-terms-store-review
 module: domains
-checked: 2026-11-09
+checked: 2026-11-10
 tokens:
   light: 53
   standard: 53
@@ -59,8 +59,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 1. **Claude:** runs `vet-and-adopt` on `catalog/packs/app-legal-privacy-terms-store-review/`: scans it with SkillSpector (`skillspector scan catalog/packs/app-legal-privacy-terms-store-review --no-llm`), triages the findings, and recommends the decision.
 2. **Claude and you:** read the scripts the pack ships together before anything is copied. Six files hold code, all `.mjs`: five in `skills/legal-data-surface-scan/scripts/` (`scan_pubspec`, `scan_android_manifest`, `scan_ios_privacy`, `run_exodus`, `run_mobsf`) and one in `skills/legal-play-gate/scripts/` (`emit_play_csv`). `run_exodus` starts Docker and `run_mobsf` calls a server address; `vet-and-adopt` reads those lines with you.
 3. **Claude:** copies the entry `SKILL.md` and the `skills/` folder to `<where>/skills/app-legal-privacy-terms-store-review/`, and, on a yes to question 3, `catalog/packs/app-legal-privacy-terms-store-review/stubs/legal-signoff-orchestrator/SKILL.md` to `<where>/skills/legal-signoff-orchestrator/SKILL.md`. The pack has no agents. It shows the list first and saves on your yes.
-4. **you:** after the copy, open the skills' example paths and replace the sample app's paths and answers with your own app's (see Watch out).
-5. **Claude:** records the decision, the scope, the tools found and the undo in `adoption/decisions.md`.
+4. **Claude:** records the decision, the scope, the tools found and the undo in `adoption/decisions.md`.
 
 ## Check
 
@@ -77,6 +76,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 ## Watch out
 
 - **This is an automated review, not legal advice.** The pack's own description says so: a lawyer signs off. The suite reserves some items for a qualified lawyer (company registration fills, native-language legal wording, anything it marks low-confidence). It is written with Dutch and EU law first, plus the Apple and Google rules; for another country, treat its verdicts as a checklist, not a ruling.
-- **The example paths name a sample app.** Several skills use paths such as `apps/my-app/app/assets/legal/` and one holds a sample app's store answers. Replace them with your own app's, or Claude will look for files you do not have.
+- **Your app is an input; the example app is not yours.** Before any review, the sign-off skill builds an app fact sheet from your project (name, publisher, platforms, markets, audience, data collected, SDKs and hosting region, money) and asks only for what the project cannot tell it, marking the rest unknown. A skill run on its own gathers what it needs the same way. The worked verdicts in the references apply the law to one example app, described in `skills/legal-guardrails.md` section 8: they show the reasoning, and Claude re-runs it on your fact sheet, where a different SDK or legal form can flip the outcome. For the Play data-safety form, `legal-play-gate` reads your own answers file, modelled on `skills/legal-play-gate/assets/data-safety-answers.example.json`; without one it emits the example's answers and warns that they are not your app's.
+- **Credited text keeps its notices.** Some of the domain's text follows outside work under the MIT licence. Two files carry the copyright line and permission notice beside the passage they took over (`skills/legal-apple-gate/assets/app-privacy-label-template.md` and `skills/legal-terms-review-nl/assets/eu-safe-clauses.md`), and `skills/legal-guardrails/ATTRIBUTION.md` lists the credits ([the domain's SOURCE.md](../catalog/packs/app-legal-privacy-terms-store-review/SOURCE.md)). The licence asks that copies keep those notices, so leave them in place when you fill a template with your app's facts.
 - **The entry is the one cost every session:** about 53 tokens (estimate). Its index, about 1,217 tokens (estimate), loads when an app-legal task comes up, and each skill only when it is used. Figures are bytes divided by 4.
 - **Your policy and code are session content.** What Claude reads goes over the network like any other session content ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"). The optional Docker scan pulls an image from the internet on first use. Check your company's data rules before you give Claude a client's app.

@@ -1,7 +1,7 @@
 ---
 title: Start here
 checked: 2026-11-02
-sources:
+studio_sources:
   - .claude/skills/drill-to-plan/SKILL.md
   - .claude/skills/vet-external-skill/SKILL.md
 ---
@@ -194,7 +194,7 @@ Pull the kit (`git pull` in its folder), read the top of `CHANGELOG.md`, open Cl
 | `examples/` | Stories from the studio, with the names taken out. |
 | `docs/` | `facts.md` (dated facts with their sources), `install-reference.md` (the install steps that come later), the adoption-sequence diagram, the third-party notices. |
 | `CHANGELOG.md` | What changed in each version. |
-| `LICENSE` | MIT, for the whole kit except the third-party skills in `catalog/skills/`, which keep their own licences ([docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)). |
+| `LICENSE` | MIT, for the whole kit except the third-party skills in `catalog/skills/` and the parts of a domain that its credit file names, which keep their own licences ([docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)). |
 | `tools/` | How the kit is built from the studio, and the diagram's generator (maintainers only), plus `upload-bundle.mjs`, which builds a domain's zip for claude.ai. |
 
 ## Words used in this kit

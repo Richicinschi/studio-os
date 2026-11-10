@@ -15,7 +15,7 @@
 
 <br>
 
-**Studio OS** is how one solo studio works with Claude, written down so you can take the parts that fit your own work.
+**Studio OS** is an adoption kit for Claude Code: how one solo studio works with Claude, written down so you can take the parts that fit your own work.
 
 It is not an installer. Your own Claude interviews you, proposes the smallest set that answers the problem you name, and changes your setup only on your yes.
 
@@ -75,7 +75,8 @@ Then say **"Start the adoption."** Installing Claude Code and git, and where you
 | [examples/](examples/) | Stories from the studio, with the names taken out |
 | [templates/](templates/) | Blank files to start from |
 | [ADOPT.md](ADOPT.md) | The protocol your Claude follows during the adoption |
-| [docs/trials.md](docs/trials.md) | How the adoption was tested, by agents playing adopters, and what that does not prove |
+| [docs/trials.md](docs/trials.md) | How the adoption was tested, by invented personas rather than real adopters, and what that does not prove |
+| [CHANGELOG.md](CHANGELOG.md) | What each release added, changed and removed |
 
 ## Problems and changes
 
@@ -83,4 +84,4 @@ A bug or a step that confused you: open an issue ([CONTRIBUTING.md](CONTRIBUTING
 
 ## Licence
 
-MIT, see [LICENSE](LICENSE). The third-party skills in `catalog/skills/` keep their own licences ([notices](docs/THIRD_PARTY_NOTICES.md)). Maintainers: [docs/MAINTAINING.md](docs/MAINTAINING.md).
+MIT, see [LICENSE](LICENSE). The third-party skills in `catalog/skills/`, and the parts of a domain that its credit file names, keep their own licences ([notices](docs/THIRD_PARTY_NOTICES.md)). Maintainers: [docs/MAINTAINING.md](docs/MAINTAINING.md).

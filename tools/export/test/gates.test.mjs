@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { deflateRawSync } from 'node:zlib';
-import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls } from '../gates.mjs';
+import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage } from '../gates.mjs';
 
 function kit(files) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-gates-'));
@@ -91,6 +91,46 @@ test('links: relative links must resolve with the exact case, inside the kit; we
 test('notes: a --note is checked for denied terms, paths and secrets before anything is built', () => {
   assert.deepEqual(gateNotes(['A fine note.', `Thanks to Zorblat, see ${WIN_HUB}`, token], ['acme', 'Zorblat']), [
     '--note 2: denied term #2', '--note 2: hub-path', '--note 3: github-token',
+  ]);
+});
+
+const scanOf = (recommendation, score, findings) => ({ recommendation, score, ...(findings === undefined ? {} : { findings }), version: 'v2.2.3', date: '2026-11-09' });
+const readOf = (recommendation, score, findings, fp, byDesign, other = 0) => ({ recommendation, score, findings, fp, byDesign, other, anchor: 'a' });
+
+test('triage: every item whose last scan is not SAFE needs a triage section for that scan, every finding read, none judged real', () => {
+  const scans = {
+    safe: scanOf('SAFE', 10, 1), ok: scanOf('DO_NOT_INSTALL', 100, 3), none: scanOf('CAUTION', 25, 1), rescanned: scanOf('CAUTION', 35, 1),
+    partial: scanOf('CAUTION', 25, 3), real: scanOf('DO_NOT_INSTALL', 60, 2), 'not-shipped': scanOf('DO_NOT_INSTALL', 100, 9),
+  };
+  const triage = {
+    ok: readOf('DO_NOT_INSTALL', 100, 3, 2, 1), rescanned: readOf('CAUTION', 25, 1, 1, 0),
+    partial: readOf('CAUTION', 25, 3, 1, 0), real: readOf('DO_NOT_INSTALL', 60, 2, 1, 0, 1),
+  };
+  assert.deepEqual(gateTriage({ keys: ['safe', 'ok', 'none', 'rescanned', 'partial', 'real'], scans, triage }), [
+    'none: last scan CAUTION (25/100), and tools/export/scan-triage.md has no section for it; read every finding and add one',
+    'rescanned: last scan CAUTION (35/100), but its triage section is for CAUTION (25/100); triage the new scan',
+    'partial: the triage reads 1 of its 3 findings',
+    'real: 1 finding judged neither FP nor BY DESIGN; a real finding is fixed or the item is withheld, never shipped',
+  ]);
+});
+
+test('triage: a rescan with the same verdict and score but another number of findings fails, and so does a scan with no count', () => {
+  const scans = { capped: scanOf('DO_NOT_INSTALL', 100, 35), uncounted: scanOf('CAUTION', 25) };
+  const triage = { capped: readOf('DO_NOT_INSTALL', 100, 36, 28, 8), uncounted: readOf('CAUTION', 25, 1, 1, 0) };
+  assert.deepEqual(gateTriage({ keys: ['capped', 'uncounted'], scans, triage }), [
+    'capped: the last scan has 35 findings, but its triage section is for 36; triage the new scan',
+    'uncounted: scans.json records no number of findings for its last scan; run node tools/export/scan.mjs again',
+  ]);
+});
+
+test('triage: two sections for one item fail; an item with no scan fails only at a release', () => {
+  const scans = { twice: scanOf('CAUTION', 25, 1) };
+  const triage = { twice: { ...readOf('CAUTION', 25, 1, 1, 0), duplicate: true } };
+  assert.deepEqual(gateTriage({ keys: ['twice', 'unscanned'], scans, triage }), [
+    'twice: tools/export/scan-triage.md has more than one section for it; keep one',
+  ]);
+  assert.deepEqual(gateTriage({ keys: ['unscanned'], scans, triage, release: true }), [
+    'unscanned: no scan in scans.json; a release ships only scanned items (node tools/export/scan.mjs)',
   ]);
 });
 

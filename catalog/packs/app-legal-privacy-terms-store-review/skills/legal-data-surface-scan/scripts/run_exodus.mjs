@@ -10,7 +10,7 @@
 //         (no --apk: prints how to produce one + skips)
 // Requires: Docker with image `exodusprivacy/exodus-standalone` (auto-pulled on first run).
 
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
 
@@ -46,8 +46,10 @@ try {
   // exodus-standalone reads the APK mounted into the container and prints a report.
   const dir = dirname(apk).replace(/\\/g, '/');
   const file = basename(apk);
-  const raw = execSync(
-    `docker run --rm -v "${dir}":/data exodusprivacy/exodus-standalone -j /data/${file}`,
+  // No shell: the APK path travels as one argument, so a path holding & or $( ) cannot become a command.
+  const raw = execFileSync(
+    'docker',
+    ['run', '--rm', '-v', `${dir}:/data`, 'exodusprivacy/exodus-standalone', '-j', `/data/${file}`],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }
   );
   let report;

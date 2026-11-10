@@ -85,6 +85,6 @@ If any check fails, the item is not done: the plan row stays unticked.
 - **You control the length.** `skip` takes its default for one branch, `draft` writes the spec now with the rest marked open, and `stop` or "I'm done" ends the drill and still writes a draft, so the answers are not lost.
 - **"Sounds good" is not a yes.** It keeps asking about the parts you hesitate on until you approve the restated design.
 - **One question per turn** makes a long drill many turns. Plan time for it, or use `draft` early.
-- **Cost:** its name and description are the longest of the planning skills, about 169 tokens in every session (an estimate, bytes divided by 4); the full skill, about 2,100 tokens (estimate), loads only when it is used. Past the budget for skill descriptions, the least-used ones are dropped first (docs/facts.md).
+- **Cost:** its name and description are the longest of the planning skills, about 72 tokens in every session (an estimate, bytes divided by 4); the full skill, about 2,100 tokens (estimate), loads only when it is used. Past the budget for skill descriptions, the least-used ones are dropped first (docs/facts.md).
 - **Someone else's ask** may carry internal detail. Save the spec where your company's rules allow, not in a personal repository.
 - **claude.ai:** it works there as an uploaded custom skill, after `vet-and-adopt` (docs/facts.md, "claude.ai: custom skills and the built-in document skills").

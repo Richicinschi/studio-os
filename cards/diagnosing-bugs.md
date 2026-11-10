@@ -54,7 +54,7 @@ The menu marks the item **have** when a `diagnosing-bugs` skill at `1.1.0` is in
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on the kit copy, `catalog/skills/diagnosing-bugs/`: `skillspector scan catalog/skills/diagnosing-bugs --no-llm` (on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows). Expect a verdict other than SAFE: the maintainers' latest scan result, in the skill's `SOURCE.md` ("Last scan"), is `DO_NOT_INSTALL`. Claude shows each finding with its reading of it, and continues only when you have read them and say so (Watch out has what to check). It reads the copy's `version:` line too: `1.1.0` is the kit's copy, with `references/` and its five files.
+1. **Claude:** runs `vet-and-adopt` on the kit copy, `catalog/skills/diagnosing-bugs/`: `skillspector scan catalog/skills/diagnosing-bugs --no-llm` (on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows). The maintainers' latest scan result, in the skill's `SOURCE.md` ("Last scan"), is `SAFE` (risk 0/100); a newer SkillSpector can score it differently. If your scan says anything other than SAFE, Claude shows each finding with its reading of it, and continues only when you have read them and say so (Watch out has what to check). It reads the copy's `version:` line too: `1.1.0` is the kit's copy, with `references/` and its five files.
 2. **Claude:** on your yes, writes the copy for your setup and shows you the change before it saves it:
    - the description's triggers in your words;
    - the pointer to `AGENTS.md`, `CONTEXT.md` and `DECISIONS.md` changed to your own instruction file and decision log, or dropped;
@@ -79,7 +79,7 @@ If Claude proposes or makes a fix before it has shown a red run, the item is not
 
 ## Watch out
 
-- **The scan does not say SAFE.** The maintainers' latest scan result is in the skill's `SOURCE.md` ("Last scan"), and it is `DO_NOT_INSTALL`. Read each finding against the file and line it names before you continue: the skill is prose, one template script and a few reference files, and the usual readings to check are a debugging example that logs a working folder or stack trace locally, a phrase in a template read as a prompt leak, and a line about loops with no deadline read as unbounded work. Your own scan of the copy you take is the one that decides.
+- **If your scan does not say SAFE.** The maintainers' latest scan result, in the skill's `SOURCE.md` ("Last scan"), is `SAFE`, but a newer SkillSpector can flag it. Read each finding against the file and line it names before you continue: the skill is prose, one template script and a few reference files, and the usual readings to check are a debugging example that logs a working folder or stack trace locally, a phrase in a template read as a prompt leak, and a line about loops with no deadline read as unbounded work. Your own scan of the copy you take is the one that decides.
 - **`references/find-polluter.sh` runs your tests.** It lists your test files, runs your test command on each one, and reports the one that leaves a file behind. Read it before you run it.
 - **Windows:** both scripts are bash. Claude Code uses Git Bash when Git for Windows is installed, and PowerShell otherwise ([docs/facts.md](../docs/facts.md)), and PowerShell does not run them.
 - **Context cost:** the description loads every session, about 60 tokens; the body, about 2,760 tokens, loads when the skill runs, and each file in `references/` only when Claude opens it. Estimates (bytes divided by 4).

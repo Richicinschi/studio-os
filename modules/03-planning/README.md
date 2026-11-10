@@ -1,7 +1,7 @@
 ---
 title: Planning
 pack: way-of-working
-sources:
+studio_sources:
   - .studio/memory/feedback_green_can_be_a_lie.md
   - .studio/memory/project_wiki_chronicle.md
   - .claude/skills/drill-to-plan/SKILL.md

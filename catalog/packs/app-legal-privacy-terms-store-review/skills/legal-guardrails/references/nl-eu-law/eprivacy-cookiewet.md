@@ -2,7 +2,7 @@
 
 **Scope of this reference.** This is the decisive substantive resolution for whether device-side telemetry (Firebase Analytics, Crashlytics, any SDK that reads/writes the device) may run on an **opt-out** basis or must be gated behind **prior opt-in consent** in the Netherlands / EU. It governs the *device read/write* layer, which sits **on top of** (and is logically prior to) the GDPR/AVG lawful-basis question for the downstream processing.
 
-**Headline rule (Breathe).** Firebase Analytics + Crashlytics in default configuration **do NOT qualify** for the Dutch analytics exemption and therefore require **prior opt-in consent** in NL. Shipping them opt-OUT (collection on by default, user toggles off) is **non-compliant**. The defensible design is a **first-run consent gate**: `setAnalyticsCollectionEnabled(false)` / `setCrashlyticsCollectionEnabled(false)` until the user affirmatively consents. `Art. 6(1)(f)` legitimate interest does **NOT** cure this — see §5.
+**Headline rule (for an app with Firebase telemetry, such as the example app in `legal-guardrails.md` §8).** Firebase Analytics + Crashlytics in default configuration **do NOT qualify** for the Dutch analytics exemption and therefore require **prior opt-in consent** in NL. Shipping them opt-OUT (collection on by default, user toggles off) is **non-compliant**. The defensible design is a **first-run consent gate**: `setAnalyticsCollectionEnabled(false)` / `setCrashlyticsCollectionEnabled(false)` until the user affirmatively consents. `Art. 6(1)(f)` legitimate interest does **NOT** cure this — see §5.
 
 ---
 
@@ -46,7 +46,7 @@ EDPB **Guidelines 2/2023 on the technical scope of Art. 5(3)** (adopted Oct 2023
 
 Key EDPB criteria (the guidelines articulate these as the test): there must be (a) **"information"** (need not be personal data); (b) a **"terminal equipment"** of the subscriber/user; (c) an **"electronic communications network"** in use; and (d) an act of **"storing"** or **"gaining access to information already stored."** Where all are present, Art. 5(3) applies. [settled in substance — EDPB Guidelines 2/2023; PDF fetch failed this run so the exact paragraph numbers are **verify-pinpoint**; substance corroborated by harvested primary-source notes]
 
-**Breathe application.** Firebase SDKs write/read app-instance identifiers, persistent installation IDs, and cached config on-device; Crashlytics writes session/install state. These are device-storage/access operations squarely inside Art. 5(3). The fact that the app is native (not web) is **irrelevant** — there is no browser-cookie carve-out. [low-confidence on which *specific* Firebase writes count as strictly necessary — see §6]
+**Application to a Firebase app (the example app).** Firebase SDKs write/read app-instance identifiers, persistent installation IDs, and cached config on-device; Crashlytics writes session/install state. These are device-storage/access operations squarely inside Art. 5(3). The fact that the app is native (not web) is **irrelevant** — there is no browser-cookie carve-out. [low-confidence on which *specific* Firebase writes count as strictly necessary — see §6]
 
 ---
 
@@ -66,7 +66,7 @@ The Netherlands transposes Art. 5(3) in **Telecommunicatiewet (Tw) Art. 11.7a** 
 
 The AP reads the "geen of geringe gevolgen voor de persoonlijke levenssfeer" exemption as satisfied **only if ALL FIVE** conditions hold. Failing **any one** removes the exemption → **prior consent required**.
 
-| # | Condition | Plain meaning | Breathe / Firebase status |
+| # | Condition | Plain meaning | Firebase default status (the example app) |
 |---|---|---|---|
 | 1 | **First-party only** | Analytics serve only *your own* measurement; not a shared/third-party analytics service | **FAILS** — Firebase Analytics is a Google service |
 | 2 | **IP anonymised / masked** | IP addresses are truncated/anonymised before processing | Not guaranteed in default GA4/Firebase config |
@@ -125,22 +125,22 @@ Can crash reporting ride the **strictly-necessary** exemption (Art. 5(3) / Tw 11
 - **Argument against (stronger in NL):** Crashlytics (a) is a **third-party** Google SDK, (b) sends device/session data to Google, (c) is **not strictly necessary** in the narrow EDPB sense — the app *functions* without it; it benefits the *developer's* diagnostics, not the *user's* requested service. EDPB Guidelines 05/2020 read "strictly necessary" narrowly: necessary for the service the *user* asked for, judged from the user's perspective — not "useful to the operator." [verify-pinpoint — EDPB consent guidelines §§ on strictly-necessary]
 - **AP exposure:** because Crashlytics shares with Google for Google's purposes, it likely fails the same condition-4 logic as Analytics, pushing it toward consent. [low-confidence — no AP statement specifically on Crashlytics located this run]
 
-**Recommended posture for Breathe:** treat **Crashlytics as consent-required (opt-in), same gate as Analytics.** Do **not** rely on "strictly necessary" without a documented, defensible necessity assessment and ideally NL legal sign-off. Bundle both behind one telemetry consent toggle, default OFF. [low-confidence → conservative recommendation, flag for jurist]
+**Recommended posture for an app that ships Crashlytics:** treat **Crashlytics as consent-required (opt-in), same gate as Analytics.** Do **not** rely on "strictly necessary" without a documented, defensible necessity assessment and ideally NL legal sign-off. Bundle both behind one telemetry consent toggle, default OFF. [low-confidence → conservative recommendation, flag for jurist]
 
-What *can* sit outside consent (genuinely strictly necessary / Breathe's own service): on-device session history for the free tier (no device-access *sharing* concern beyond the user's own device), Firebase **Auth** session tokens, and Firestore sync **for a Pro user who explicitly requested cloud sync** (the sync IS the requested service → Art. 11.7a lid 3(b) strictly-necessary, and Art. 6(1)(b) contract downstream). [verify — strictly-necessary framing for Auth/requested-sync is defensible but fact-specific]
+What *can* sit outside consent (genuinely strictly necessary / the app's own service; worked for the example app): on-device session history for the free tier (no device-access *sharing* concern beyond the user's own device), Firebase **Auth** session tokens, and Firestore sync **for a paid-tier user who explicitly requested cloud sync** (the sync IS the requested service → Art. 11.7a lid 3(b) strictly-necessary, and Art. 6(1)(b) contract downstream). [verify — strictly-necessary framing for Auth/requested-sync is defensible but fact-specific]
 
 ---
 
-## 7. Practical consequence — what Breathe must change
+## 7. Practical consequence — what an opt-out app must change
 
-Current state per repo: analytics ships **opt-OUT** (collection enabled by default, Settings → Data & privacy toggle to disable; flips `setAnalyticsCollectionEnabled` / `setCrashlyticsCollectionEnabled`). **This is the non-compliant pattern for NL.**
+Read the app's telemetry init code first. The common state (the example app's): analytics ships **opt-OUT** (collection enabled by default, Settings → Data & privacy toggle to disable; flips `setAnalyticsCollectionEnabled` / `setCrashlyticsCollectionEnabled`). **This is the non-compliant pattern for NL.**
 
 Required change — **opt-IN consent gate**:
 
-1. **Boot with telemetry OFF.** Call `setAnalyticsCollectionEnabled(false)` and `setCrashlyticsCollectionEnabled(false)` at startup, *before* any Firebase telemetry initialises and before logging any boot event. (The repo already applies the persisted toggle at boot before the Crashlytics handlers — extend this so the *default* when unset is OFF, not ON.)
+1. **Boot with telemetry OFF.** Call `setAnalyticsCollectionEnabled(false)` and `setCrashlyticsCollectionEnabled(false)` at startup, *before* any Firebase telemetry initialises and before logging any boot event. (If the app already applies a persisted toggle at boot before the Crashlytics handlers, as the example app does, extend it so the *default* when unset is OFF, not ON.)
 2. **First-run consent prompt** — granular, plain-language, with equal accept/decline weight, no cookie wall (declining must not block using the app). Separate from the 16+ age checkbox and the paywall withdrawal checkbox.
 3. **On consent** → enable collection + record `analyticsConsentAt` (timestamp, wording version) for Art. 7(1) accountability.
-4. **Persistent withdrawal control** in Settings, as easy to use as the grant; withdrawal flips collection back off (already present — keep).
+4. **Persistent withdrawal control** in Settings, as easy to use as the grant; withdrawal flips collection back off (keep it if the app already has one; add it if not).
 5. **Privacy policy** must state analytics/crash telemetry is **consent-based (opt-in)**, name **Google/Firebase** as recipient, and not claim legitimate interest.
 6. **Store declarations** (Apple App Privacy label, Google Play Data Safety) must reflect that telemetry is **collected only with consent / user can opt out**, consistently with the policy.
 

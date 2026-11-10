@@ -2,7 +2,7 @@
 
 Install and refresh recipes per agent. Two cross-cutting rules:
 
-- Every skill, plugin, extension or MCP server here comes from outside. Scan and vet it first (studio hard rule 14), name what it will install, and get a yes before running the install.
+- Every skill, plugin, extension or MCP server here comes from outside. Scan and vet it first (`vet-and-adopt`), name what it will install, and get a yes before running the install.
 - After any change, ask the user to restart the app, then stop and wait for their reply before you check that the connection shows up.
 
 ## The skills CLI pattern (Cursor, Copilot, Antigravity, others)

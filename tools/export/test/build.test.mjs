@@ -41,7 +41,8 @@ test('SOURCE.md, INDEX.md and the notices say where each item comes from', () =>
   try {
     buildKit({ hub, out, manifest, owner, scans: { alpha: { score: 0, recommendation: 'SAFE', version: '1.0', date: '2026-11-02' } } });
     const a =readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8');
-    assert.match(a, /Studio-original/);
+    assert.match(a, /- \*\*Origin:\*\* Written in the studio's own words\. The kit counts it as the studio's own only because its folder holds no licence file, and its author line names no outside author and does not say "adapted by"\.\n/);
+    assert.doesNotMatch(a, /Studio-original|not adapted from an outside skill/);
     assert.match(a, /SAFE \(risk 0\/100\)/);
     const b = readFileSync(path.join(out, 'catalog/skills/beta/SOURCE.md'), 'utf8');
     assert.match(b, /Third-party, adapted by the studio\. Upstream: https:\/\/github\.com\/someone\/upstream-repo/);
@@ -50,6 +51,38 @@ test('SOURCE.md, INDEX.md and the notices say where each item comes from', () =>
     assert.match(index, /\| alpha \| skill \| way-of-working \| 01-continuity \| shipped \| \[skills\/alpha\]\(skills\/alpha\/SOURCE\.md\) \|/);
     assert.match(index, /\| tool \| external \| foundation \| 05-skills \| link-only \| \[upstream\]\(https:\/\/example\.invalid\/tool\) \|/);
     assert.match(readFileSync(path.join(out, 'docs/THIRD_PARTY_NOTICES.md'), 'utf8'), /\| beta \| https:\/\/github\.com\/someone\/upstream-repo \| Copyright \(c\) 2026 Someone \|/);
+  } finally { done(); }
+});
+
+test('a scan that is not SAFE is shown with its findings, the triage result and a link to the triage', () => {
+  const { hub, out, done } = setup();
+  try {
+    const scans = {
+      alpha: { score: 100, recommendation: 'DO_NOT_INSTALL', version: 'v2.2.3', date: '2026-11-09' },
+      beta: { score: 25, recommendation: 'CAUTION', version: 'v2.2.3', date: '2026-11-09' },
+    };
+    const triage = {
+      alpha: { recommendation: 'DO_NOT_INSTALL', score: 100, findings: 12, fp: 7, byDesign: 5, other: 0, anchor: 'alpha-do_not_install-100100-12-findings' },
+      beta: { recommendation: 'CAUTION', score: 25, findings: 1, fp: 1, byDesign: 0, other: 0, anchor: 'beta-caution-25100-1-finding' },
+    };
+    const r = buildKit({ hub, out, manifest, owner, scans, triage });
+    const a = readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8');
+    assert.match(a, /- \*\*Last scan:\*\* DO_NOT_INSTALL \(risk 100\/100\), SkillSpector v2\.2\.3 with --no-llm, 2026-11-09; 12 findings, all read: 7 false positives, 5 by design \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#alpha-do_not_install-100100-12-findings\)\)\n/);
+    const b = readFileSync(path.join(out, 'catalog/skills/beta/SOURCE.md'), 'utf8');
+    assert.match(b, /2026-11-09; 1 finding, read: 1 false positive \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#beta-caution-25100-1-finding\)\)\n/);
+    assert.deepEqual(r.scanKeys.sort(), ['alpha', 'beta']);
+  } finally { done(); }
+});
+
+test('a SAFE scan carries no triage, and a scan with no triage section says so', () => {
+  const { hub, out, done } = setup();
+  try {
+    buildKit({ hub, out, manifest, owner, scans: {
+      alpha: { score: 5, recommendation: 'SAFE', version: 'v2.2.3', date: '2026-11-09' },
+      beta: { score: 60, recommendation: 'DO_NOT_INSTALL', version: 'v2.2.3', date: '2026-11-09' },
+    } });
+    assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8'), /SAFE \(risk 5\/100\), SkillSpector v2\.2\.3 with --no-llm, 2026-11-09\n/);
+    assert.match(readFileSync(path.join(out, 'catalog/skills/beta/SOURCE.md'), 'utf8'), /2026-11-09; not triaged yet\n/);
   } finally { done(); }
 });
 

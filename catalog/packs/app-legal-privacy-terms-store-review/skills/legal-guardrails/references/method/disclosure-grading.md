@@ -27,7 +27,7 @@ A flow is a tuple: **(data-type, recipient-entity, on/off-device)**. Produced by
 ## Direction matters
 
 - **Over-disclosure** (policy claims a flow the app doesn't do) → 🟡/🟠: harmless to users but erodes accuracy and can mislead the store label. Flag for tightening.
-- **Under-disclosure** (app does a flow the policy hides) → 🟠/🔴: the dangerous direction; the dominant finding-type in the project's own v6 audit.
+- **Under-disclosure** (app does a flow the policy hides) → 🟠/🔴: the dangerous direction, and in practice the most common finding-type.
 
 ## Output
 
@@ -37,4 +37,4 @@ A flow table feeding `legal-privacy-review` and `legal-cross-store`:
 | data-type | entity | on/off | policy grade | store-label match | severity |
 ```
 
-EN/NL parity: the same grading must hold for `privacy.nl.md`; a flow disclosed in EN but not NL grades **omitted** for the NL doc ("a translation gap is a compliance gap").
+EN/NL parity: the same grading must hold for `privacy.nl.md`; a flow disclosed in EN but not NL grades **omitted** for the NL doc, because an NL reader relies on the NL text alone.

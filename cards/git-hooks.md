@@ -84,10 +84,10 @@ Which steps each size takes: **light** and **standard** every step but 3 and 4, 
 4. **Claude:** (full) writes `never-share.local.txt` beside the scripts, one term per line from the terms you name, and shows it to you; then adds `never-share.local.txt` to your setup's `.gitignore`, so the list stays on your machine.
 5. **Claude:** on macOS and Linux, makes the hooks executable: `chmod +x "<your setup>/git-hooks/pre-commit" "<your setup>/git-hooks/commit-msg"`. Windows needs nothing.
 6. **Claude:** runs the canary (Check, step 1). Nothing goes further until every line reads PASS or SKIP.
-7. **Claude:** turns them on in the first repository, on your yes:
-   - no existing hooks: `git -C <repo> config core.hooksPath <full path to the folder>` ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"), written with forward slashes on Windows, as the canary writes it;
-   - existing hooks: one line in the repository's existing pre-commit hook that runs `node "<your setup>/git-hooks/check-staged.mjs"`, shown to you first. Where that hook file is committed and shared, as a `.husky/` file usually is, Claude asks you before touching it (Watch out).
-8. **you:** after a week without surprises, tell Claude which other repositories get them; Claude repeats step 7 there.
+7. On your yes, the hooks go on in the first repository:
+   - no existing hooks: **Claude** gives you the line with both paths filled in, and **you** run it in a terminal of your own: `git -C <repo> config core.hooksPath <full path to the folder>` ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"), with the folder written with forward slashes on Windows, as the canary writes it. It is your command because the setting that turns the hooks on can as well point git at an empty folder and turn every hook off: [git-guardrails](git-guardrails.md) refuses it from Claude for that reason (version 1.3.0), and the kit leaves it with you whether that guard is installed or not;
+   - existing hooks: **Claude** adds one line in the repository's existing pre-commit hook that runs `node "<your setup>/git-hooks/check-staged.mjs"`, shown to you first. Where that hook file is committed and shared, as a `.husky/` file usually is, Claude asks you before touching it (Watch out).
+8. **you:** after a week without surprises, tell Claude which other repositories get them; step 7 is repeated there, the setting by you and the hook line by Claude.
 9. **Claude:** records the decision, the size (which says whether `commit-msg` was kept), the repositories, and the undo in `adoption/decisions.md`. It never records the terms of your never-share list.
 
 ## Check
@@ -106,13 +106,13 @@ Which steps each size takes: **light** and **standard** every step but 3 and 4, 
    Without gitleaks, the last line reads `SKIP  the secret scan (gitleaks is not installed)`; at light, the trailer line is not there.
 2. **Claude:** for each repository turned on through the setting, `git -C <repo> config --get core.hooksPath` prints the folder from step 7.
 3. For the existing-hook route: in that repository, with nothing else staged, Claude stages a new file holding one conflict-marker line (`<<<<<<< check`) and tries `git commit -m "hooks check"`. Expected: `pre-commit refused this commit:` and a line naming the conflict marker. Then it unstages and deletes the file.
-4. At full, for the never-share list: in a throwaway repository in a temporary folder, Claude sets `core.hooksPath` to your folder, stages a file holding one term from your list and tries `git commit -m "list check"`. Expected: `pre-commit refused this commit:` and a line ending `a term from your never-share list (line <n> of the list)`, which names the line of the list, never the term. Then it deletes the folder.
+4. At full, for the never-share list: Claude makes a throwaway repository in a temporary folder and gives you the line that points its `core.hooksPath` at your folder, which you run as in step 7. Claude then stages a file holding one term from your list and tries `git commit -m "list check"`. Expected: `pre-commit refused this commit:` and a line ending `a term from your never-share list (line <n> of the list)`, which names the line of the list, never the term. Then it deletes the folder.
 
 A `FAIL` line, or a commit that goes through in step 3 or 4, means the item is not done: the plan row stays unticked, and the failing line's message is the next thing to look at. A commit that went through in step 3 is removed only on your yes. If the canary stops with "a plain commit fails here", git cannot commit even in a throwaway repository, often because signing cannot ask for its passphrase; fix that first.
 
 ## Undo
 
-- **Claude:** in each repository turned on through the setting: `git -C <repo> config --unset core.hooksPath` (newer git also accepts `git -C <repo> config unset core.hooksPath`).
+- **you:** in each repository turned on through the setting, in a terminal of your own: `git -C <repo> config --unset core.hooksPath` (newer git also accepts `git -C <repo> config unset core.hooksPath`). git-guardrails refuses removing the setting from Claude, as it refuses setting it. **Claude:** then `git -C <repo> config --get core.hooksPath` prints nothing.
 - **Claude:** for the existing-hook route, removes the line it added to that hook.
 - **Claude:** deletes `<your setup>/git-hooks/` once no repository uses it (your never-share list inside it only on your yes; it is yours to keep or move), removes the list's line from your setup's `.gitignore`, and marks the row in `adoption/decisions.md` as undone.
 - **you:** Node.js and gitleaks stay installed; removing them is your decision, and their uninstall commands are not documented in docs/facts.md as of 2026-11-02.

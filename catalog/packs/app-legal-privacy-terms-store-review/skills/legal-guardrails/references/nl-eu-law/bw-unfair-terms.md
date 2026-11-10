@@ -1,6 +1,6 @@
 # Dutch Unfair Terms in Consumer ToS — BW 6:233 / 6:236 (zwarte lijst) / 6:237 (grijze lijst)
 
-**Scope.** The flagship Terms-of-Service reference for adjudicating an app's general terms (`algemene voorwaarden`) against a **Dutch consumer** (`natuurlijk persoon, die niet handelt in de uitoefening van een beroep of bedrijf`). This regime is **mandatory consumer-protection law** — it cannot be contracted away, and a court must apply it **of its own motion** (`ambtshalve toetsing`) under EU Directive 93/13/EEC as interpreted by the CJEU. For "Breathe" (a Dutch eenmanszaak selling auto-renewing wellness subscriptions to EU/NL-first consumers via Apple/Google), every standard-form clause in the ToS is in scope.
+**Scope.** The flagship Terms-of-Service reference for adjudicating an app's general terms (`algemene voorwaarden`) against a **Dutch consumer** (`natuurlijk persoon, die niet handelt in de uitoefening van een beroep of bedrijf`). This regime is **mandatory consumer-protection law** — it cannot be contracted away, and a court must apply it **of its own motion** (`ambtshalve toetsing`) under EU Directive 93/13/EEC as interpreted by the CJEU. For an app sold to consumers — such as the example app in `legal-guardrails.md` §8, a Dutch eenmanszaak selling auto-renewing wellness subscriptions to EU/NL-first consumers via Apple/Google — every standard-form clause in the ToS is in scope. Apply the worked examples below to the app under review from its fact sheet.
 
 **Primary sources (this run).**
 - `wetten.overheid.nl` BWBR0005289 (Burgerlijk Wetboek Boek 6, Afdeling 3 — Algemene voorwaarden): the official text. The full-document fetch repeatedly **timed out / truncated before art. 236–237** this run, so the canonical wetten.overheid.nl wording was **not** rendered directly. [verify]
@@ -18,11 +18,11 @@ A clause in general terms is **vernietigbaar** (voidable — the consumer can an
 | Ground | Rule | Cite |
 |---|---|---|
 | **6:233(a)** | The clause is **`onredelijk bezwarend`** (unreasonably onerous) to the counterparty, **considering all the circumstances** (nature/content of the contract, the way the terms came about, the mutually apparent interests of the parties). | [settled — BW 6:233(a), wetboekplus/maxius cross-check, verified 2026-06-06] |
-| **6:233(b)** | The user (here: Breathe) gave the consumer **no reasonable opportunity to take note** (`redelijke mogelijkheid om kennis te nemen`) of the terms. | [settled — BW 6:233(b), verified 2026-06-06] |
+| **6:233(b)** | The user (here: the app's publisher) gave the consumer **no reasonable opportunity to take note** (`redelijke mogelijkheid om kennis te nemen`) of the terms. | [settled — BW 6:233(b), verified 2026-06-06] |
 
 **6:234 — how to satisfy the "opportunity to take note" duty.** The terms must be **handed over** before/at contract conclusion, or — for electronic contracts — **made available electronically** so the consumer can **store and reproduce** them (e.g. a downloadable/scrollable ToS shown *before* the purchase confirmation, not a buried link). A mere link can suffice for online contracts **if** it is genuinely accessible and the consumer can save it. [verify-pinpoint — BW 6:234, exact electronic-availability wording]
 
-**6:235 — the lists do NOT apply to "large" parties.** Art. 6:236/6:237 protect **consumers** (and, via 6:235, exclude large companies that publish annual accounts or employ >50). Breathe's users are consumers → both lists apply in full. [verify]
+**6:235 — the lists do NOT apply to "large" parties.** Art. 6:236/6:237 protect **consumers** (and, via 6:235, exclude large companies that publish annual accounts or employ >50). A consumer app's users are consumers → both lists apply in full. [verify]
 
 **6:240/6:241 — abstract review.** Consumer organisations can have terms declared unfair in the abstract before the Gerechtshof Den Haag; irrelevant to a single ToS sign-off but explains why the lists are policed aggressively. [verify]
 
@@ -118,16 +118,16 @@ For each clause type in an app ToS: which list it hits, the **verdict**, and wha
 
 ---
 
-## 5. Auto-renewal — the post-"Wet van Dam" regime (applied to Breathe)
+## 5. Auto-renewal — the post-"Wet van Dam" regime (applied to an app sold through the stores)
 
 The **Wet van Dam** (in force **1 Dec 2011**) overhauled the auto-renewal rules and added letters to both lists. Core consumer entitlements, all of which a ToS must respect: [verify-pinpoint — Wet van Dam, exact letter mapping for SaaS]
 
 1. After an initial fixed term, a subscription that **tacitly renews** must become **terminable at any time** with a notice period of **no more than one month** (6:236(j)-line). A clause forcing a fixed renewed term or >1-month notice is **void**.
 2. **Cancellation must be as easy as subscribing** (6:236(o)) — the "cancel button is as findable as the buy button" principle; demanding registered post is void.
-3. A **trial subscription** must **not auto-convert** into an ongoing paid contract without a clean, easy opt-out (6:236(r/s)). For Breathe's **free trial → auto-charged Pro**, the consumer must be able to cancel the trial before charge through the normal store flow.
+3. A **trial subscription** must **not auto-convert** into an ongoing paid contract without a clean, easy opt-out (6:236(r/s)). For a **free trial → auto-charged paid tier** (as in the example app), the consumer must be able to cancel the trial before charge through the normal store flow.
 
-**Breathe specifics.** Subscriptions are sold **through Apple/Google as merchants of record**; cancellation/auto-renew is **managed in the Apple/Google account**, which already meets the "easy cancellation" standard (store-native cancel). The ToS must therefore:
-- **Point the consumer to the store's manage-subscription flow** for cancellation (do not impose an additional/harder Breathe-side step — that would re-introduce a 6:236(o) problem).
+**Store-sold specifics (the example app's case).** When subscriptions are sold **through Apple/Google as merchants of record**, cancellation/auto-renew is **managed in the Apple/Google account**, which already meets the "easy cancellation" standard (store-native cancel). The ToS must therefore:
+- **Point the consumer to the store's manage-subscription flow** for cancellation (do not impose an additional/harder publisher-side step — that would re-introduce a 6:236(o) problem).
 - **Not** claim any term-lock, renewal penalty, or non-refund of the unused period that the law or the store policy overrides.
 - Note that the **Apple/Google receipt** is the consumer's record; this also feeds the CRD withdrawal-waiver durable-medium question (see §8 / cross-ref the CRD-withdrawal reference).
 
@@ -151,10 +151,10 @@ A bare "we exclude all liability to the maximum extent permitted by law" against
 
 ---
 
-## 7. Health-claim / wellness firewall interaction (Breathe)
+## 7. Health-claim / wellness firewall interaction (wellness apps)
 
-The ToS's disclaimer should state the app is for **general wellbeing / relaxation support** and is **not medical advice, diagnosis, or treatment** — phrased to **support / may help relax**, never **treat/cure/diagnose/prevent**. This disclaimer is **legitimate** and does **not** hit 6:237(b)/(c): it scopes the *purpose*, it does not disclaim the **core paid feature** (the breathing programs). Keep the two separate:
-- ✅ "Breathe supports relaxation and general wellbeing; it is not a medical device and does not treat any condition." (allowed; also the MDR out-of-scope firewall)
+The ToS's disclaimer should state the app is for **general wellbeing / relaxation support** and is **not medical advice, diagnosis, or treatment** — phrased to **support / may help relax**, never **treat/cure/diagnose/prevent**. This disclaimer is **legitimate** and does **not** hit 6:237(b)/(c): it scopes the *purpose*, it does not disclaim the **core paid feature** (e.g. the example app's breathing programs). Keep the two separate:
+- ✅ "`<app name>` supports relaxation and general wellbeing; it is not a medical device and does not treat any condition." (allowed; also the MDR out-of-scope firewall)
 - 🟠 "We do not guarantee the app will function / Pro features may be removed at our sole discretion." (6:237(b)/(c) — soften per §4)
 
 [settled — wellness vs core-obligation distinction follows from 6:237(b)/(c) + MDR wellness carve-out, harvest cross-check, verified 2026-06-06]
@@ -175,7 +175,7 @@ The ToS's disclaimer should state the app is for **general wellbeing / relaxatio
 - [ ] No clause matching a **6:236** letter (indemnity **h**, forum **m**, arbitration **n**, <1yr window **g**, burden-shift **k**, auto-renewal trap **j/o/r/s**, price-rise-no-exit **i**, ontbinding/suspension limits **b/c**). → any hit = **remove/rewrite**.
 - [ ] Each **6:237** clause (liability cap **f**, unilateral change **b/c**, termination penalty **i**, set-off **g**, asymmetric notice **l**, stricter form **m**, >1yr term **k**) is either removed or **softened + justified** to discharge the rebuttal burden.
 - [ ] Liability cap carves out intent/gross negligence + death/personal injury + DCD conformity (§6).
-- [ ] Auto-renew/cancellation routes the consumer to the **store-native** cancel; no harder Breathe-side step (§5).
+- [ ] Auto-renew/cancellation routes the consumer to the **store-native** cancel (when the stores sell it); no harder publisher-side step (§5).
 - [ ] ToS is in **Dutch** (plain language) for the NL consumer base.
 - [ ] Terms are presented **before** purchase confirmation, storable/reproducible (6:233(b)/6:234).
 - [ ] **Re-pull `wetten.overheid.nl/BWBR0005289` art. 236 + 237** and verify literal wording of every flagged `[verify-pinpoint]` letter before final sign-off.

@@ -1,193 +1,316 @@
 {
-  "building-pydantic-ai-agents": {
-    "score": 5,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
-  },
   "claim-auditor": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
-  },
-  "claude-md-curator": {
-    "score": 0,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
-  },
-  "codebase-design": {
-    "score": 5,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
-  },
-  "council": {
-    "score": 0,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
   },
   "diagnosing-bugs": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "drawio-diagrams": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
+    "findings": 8,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "drill-to-plan": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "git-cleanup": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "git-guardrails": {
-    "score": 100,
+    "score": 97,
     "recommendation": "DO_NOT_INSTALL",
+    "findings": 3,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "handoff": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "improve": {
     "score": 60,
     "recommendation": "DO_NOT_INSTALL",
+    "findings": 3,
     "version": "v2.2.3",
     "date": "2026-11-09"
-  },
-  "modern-python": {
-    "score": 100,
-    "recommendation": "DO_NOT_INSTALL",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
-  },
-  "production-fastapi": {
-    "score": 100,
-    "recommendation": "DO_NOT_INSTALL",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
-  },
-  "supply-chain-risk-auditor": {
-    "score": 0,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
   },
   "tdd": {
     "score": 25,
     "recommendation": "CAUTION",
+    "findings": 1,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "using-agent-skills": {
     "score": 35,
     "recommendation": "CAUTION",
+    "findings": 2,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "writing-great-skills": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "drill-to-adopt": {
     "score": 10,
     "recommendation": "SAFE",
+    "findings": 1,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "setup-workspace": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "vet-and-adopt": {
     "score": 20,
     "recommendation": "SAFE",
+    "findings": 2,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "brainstorming": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
+    "findings": 11,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "dispatching-parallel-agents": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "executing-plans": {
     "score": 25,
     "recommendation": "CAUTION",
+    "findings": 1,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "finishing-a-development-branch": {
     "score": 25,
     "recommendation": "CAUTION",
+    "findings": 1,
     "version": "v2.2.3",
     "date": "2026-11-09"
-  },
-  "frontend-design": {
-    "score": 20,
-    "recommendation": "SAFE",
-    "version": "v2.2.3",
-    "date": "2026-11-02"
   },
   "receiving-code-review": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "requesting-code-review": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "subagent-driven-development": {
     "score": 25,
     "recommendation": "CAUTION",
+    "findings": 1,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "using-git-worktrees": {
     "score": 10,
     "recommendation": "SAFE",
+    "findings": 1,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "verification-before-completion": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
     "version": "v2.2.3",
     "date": "2026-11-09"
   },
   "writing-plans": {
     "score": 0,
     "recommendation": "SAFE",
+    "findings": 0,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:advisor-council-for-big-decisions": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "findings": 0,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:android-swiftui-react-native-app-building": {
+    "score": 10,
+    "recommendation": "SAFE",
+    "findings": 1,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:app-legal-privacy-terms-store-review": {
+    "score": 100,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 16,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:audio-video-media": {
+    "score": 20,
+    "recommendation": "SAFE",
+    "findings": 2,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:dependency-supply-chain-risk-checks": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "findings": 0,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:design-ui-logos-slides-posters": {
+    "score": 100,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 6,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:django-flask-laravel-shops-and-chat": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "findings": 0,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:engineering-testing-performance-code-design": {
+    "score": 25,
+    "recommendation": "CAUTION",
+    "findings": 1,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:games-design-prototype-playtest-assets": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "findings": 0,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:godot-camera-shaders-particles-export": {
+    "score": 40,
+    "recommendation": "CAUTION",
+    "findings": 4,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:learning-lessons-explanations-practice": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "findings": 0,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:marketing-copy-emails-seo-signups": {
+    "score": 100,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 6,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:marketing-plans-offers-pricing-launches": {
+    "score": 60,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 5,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:mobile-apps-flutter-firebase": {
+    "score": 100,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 30,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:phone-app-testing-release-and-agents": {
+    "score": 30,
+    "recommendation": "CAUTION",
+    "findings": 3,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:python-backend-fastapi-docker-agents": {
+    "score": 100,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 21,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:stock-research-backtests-trading-safety": {
+    "score": 32,
+    "recommendation": "CAUTION",
+    "findings": 1,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:unity-editor-scripts-prefabs-builds": {
+    "score": 10,
+    "recommendation": "SAFE",
+    "findings": 1,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:web-api-security-login-and-graphql": {
+    "score": 60,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 3,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:web-astro-cloudflare-gsap-performance": {
+    "score": 100,
+    "recommendation": "DO_NOT_INSTALL",
+    "findings": 35,
+    "version": "v2.2.3",
+    "date": "2026-11-09"
+  },
+  "pack:web-search-and-scraping-into-files": {
+    "score": 45,
+    "recommendation": "CAUTION",
+    "findings": 2,
     "version": "v2.2.3",
     "date": "2026-11-09"
   }

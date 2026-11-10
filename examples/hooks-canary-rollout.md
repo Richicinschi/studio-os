@@ -1,6 +1,6 @@
 ---
 title: Hooks on a canary first
-sources:
+studio_sources:
   - .studio/memory/project_runtime_neutral_studio.md
   - .studio/guardrails/git-hooks/README.md
 ---

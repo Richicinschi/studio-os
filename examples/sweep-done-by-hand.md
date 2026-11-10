@@ -1,6 +1,6 @@
 ---
 title: The sweep done by hand
-sources:
+studio_sources:
   - .studio/memory/feedback_parallel_delegation.md
 ---
 

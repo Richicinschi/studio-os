@@ -11,7 +11,7 @@ description: >-
   "flow to policy", "disclosure grading", "does the policy match the code",
   "omitted disclosure", "over-disclosure", "under-disclosure", "policy vs SDK",
   "is this data flow disclosed", "entity-aware reconciliation", EN/NL
-  disclosure parity. App facts are inputs (reusable across the 3-app portfolio).
+  disclosure parity. App facts are inputs, so it works for any app.
 metadata:
   category: legal
   author: "Richicinschi (Claude-authored)"
@@ -31,13 +31,13 @@ code itself — the flow set is an INPUT from `legal-data-surface-scan`.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/finding-format.md` (the FLOW-n finding shape)
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/verdict-model.md` (severity floor/max, code-faithfulness dominance, grade bands)
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/attribution-tiering.md` (tag every legal proposition)
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/sdk-data-map.md` (per-SDK recipient/location/basis — the authoritative flow facts for Breathe)
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/sdk-data-map.md` (per-SDK recipient/location/basis — the authoritative flow facts for each SDK it profiles)
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/data-category-ontology.md` (data-type naming + sensitivity → severity)
 
 ## Inputs
-1. **Canonical flow set** from `legal-data-surface-scan` — list of `(data-type, recipient-entity, on/off-device)` tuples found in the code + merged manifest. If not provided, fall back to the consolidated table in `sdk-data-map.md` §10 (and say so as a `[verify]` note — a stale map is not a scan).
-2. **Privacy Policy text** — `apps/my-app/app/assets/legal/privacy.md` AND `privacy.nl.md` (v6). Other apps: their PP path (an input).
-3. **App facts** (controller, free/Pro split, EU region) — from `sdk-data-map.md` app profile; overridable per app.
+1. **Canonical flow set** from `legal-data-surface-scan` — list of `(data-type, recipient-entity, on/off-device)` tuples found in the code + merged manifest. If not provided, fall back to the app's SDK list (fact sheet) looked up row by row in the consolidated table in `sdk-data-map.md` §10 (and say so as a `[verify]` note — a map is not a scan).
+2. **Privacy Policy text** — the app's Privacy Policy (path and version from the fact sheet), in every language it ships (e.g. `privacy.md` AND `privacy.nl.md`).
+3. **App facts** (controller, what each tier stores where, hosting region) — from the orchestrator's Step 0 fact sheet; run alone, read them from the project and ask for the rest.
 
 ## WORKFLOW
 1. **Load** the flow set + both PP language files. Confirm versions match (EN/NL same version number) — a version mismatch is itself a MINOR note.
@@ -51,13 +51,13 @@ code itself — the flow set is an INPUT from `legal-data-surface-scan`.
    - **ambiguous** 🟠 — PP self-contradicts, or two sections disagree on the flow.
 5. **Apply direction** (per `disclosure-grading.md`):
    - **Over-disclosure** (PP claims a flow the app does NOT do — e.g. declares "biometric data" off transitive `USE_BIOMETRIC` perms that carry no data, or a never-fired event) → 🟡 MINOR / 🟠 MATERIAL. Flag for tightening; over-claims mislead the store label.
-   - **Under-disclosure** (app does a flow the PP hides) → 🟠 MATERIAL / 🔴 BLOCKER (BLOCKER when the data is sensitive or the silence makes the store-label false). This is the dangerous direction and the dominant v6 finding-type.
-6. **EN/NL parity:** grade `privacy.nl.md` independently. A flow disclosed in EN but absent/weaker in NL grades **omitted** for the NL doc ("a translation gap is a compliance gap"). Native-NL legal-idiom quality is OUT OF SCOPE → reserve as a `[low-confidence]` note for a Dutch advocaat.
+   - **Under-disclosure** (app does a flow the PP hides) → 🟠 MATERIAL / 🔴 BLOCKER (BLOCKER when the data is sensitive or the silence makes the store-label false). This is the dangerous direction and, in practice, the most common finding-type.
+6. **EN/NL parity:** grade `privacy.nl.md` independently. A flow disclosed in EN but absent/weaker in NL grades **omitted** for the NL doc, because an NL reader relies on the NL text alone. Native-NL legal-idiom quality is OUT OF SCOPE → reserve as a `[low-confidence]` note for a Dutch advocaat.
 7. **Tag every legal proposition** with an attribution tier; cite the forcing provision at pinpoint where a grade rests on law (Art. 13(1)(e), Play User Data, ePrivacy 5(3)). Prefer the primary-source facts in `sdk-data-map.md` over paraphrase.
 8. **Emit** the flow-to-policy table + FLOW-n findings for every non-🟢 row, then a one-paragraph code-faithfulness summary. Surface anything outside this checklist as a MINOR "no silent supplement" note.
 
-## Entity-aware grading checklist (Breathe stack — facts in `sdk-data-map.md`)
-Grade each, EN + NL. Severity floor = the higher when this overlaps another skill.
+## Entity-aware grading checklist (a Firebase + RevenueCat stack, the example app's in `legal-guardrails.md` §8 — facts in `sdk-data-map.md`)
+Grade each SDK the app actually ships, in every language the PP ships; for an SDK not listed here, build the same row from `sdk-data-map.md` or the SDK's own privacy docs. Severity floor = the higher when this overlaps another skill.
 - **Firebase Auth** (Google) — email, UID, tokens, **IP**; **US-only by architecture** → a blanket "EU region" PP line is **incorrect** 🔴 for this flow; needs US transfer + DPF/SCC named.
 - **Cloud Firestore** (Google) — profile, consent timestamps, **Pro** session history (off-device), **subscription mirror**. **FREE tier = on-device only** → a PP implying server-side history for all users is **incorrect** 🔴 for free users. EU `europe-west`.
 - **Firebase Analytics** (Google) — usage events + **app-instance ID**, **no AD_ID** (stripped). PP "no advertising ID" is only **clear** if the merged manifest shows AD_ID absent; consent basis is the COOK skill's call (note, don't relitigate).
@@ -66,7 +66,7 @@ Grade each, EN + NL. Severity floor = the higher when this overlaps another skil
 - **Firebase Hosting** (Google) — request **IPs** (often **omitted** 🟠 — it logs IPs even for static legal pages).
 - **RevenueCat Inc.** — **App User ID (= Firebase UID)**, purchase tokens/receipts, sub status, IP/device; **US (AWS)**. Must be **named** as a US processor + transfer safeguard (DPA→SCC, `[verify]`). A bare "service providers" line grades **vague** 🟠 here.
 - **Google Sign-In** → feeds Firebase Auth; email/profile/OAuth token. Transitive `USE_BIOMETRIC`/`USE_FINGERPRINT` perms carry **no biometric data** → if the PP declares "biometric data", grade **over-disclosure** 🟠; if a scan flags the perm, it's a false-positive permission, not an omitted flow.
-- **Apple / Google Play billing** — merchants of record; Breathe receives **no payment-card data**, only post-purchase token/receipt. PP must say so; do not over-claim card collection.
+- **Apple / Google Play billing** — merchants of record; an app that sells through store billing receives **no payment-card data**, only post-purchase token/receipt. PP must say so; do not over-claim card collection.
 - **Deliberate non-collection** (AD_ID/GAID stripped) — verify the PP/Data-Safety "no advertising ID" answer is consistent; an over-claim of ad-ID collection is 🟡.
 
 ## OUTPUT

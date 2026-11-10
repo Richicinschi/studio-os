@@ -1,6 +1,6 @@
 ---
 title: Auditing the studio's own rules
-sources:
+studio_sources:
   - .studio/memory/project_studio_rules_audit.md
 ---
 

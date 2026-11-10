@@ -39,22 +39,25 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/disclosure-grading.md` — letter grade.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/crd-withdrawal.md` — **primary authority.** §4
   (Art. 16(m) three conditions), §4a (16(m) vs 16(a) classification), §5 (Art. 8(7) durable medium),
-  §6 (Art. 14(4)(b) invalid-waiver consequence), §7 (Annex I(B) form), §8 (Breathe application),
+  §6 (Art. 14(4)(b) invalid-waiver consequence), §7 (Annex I(B) form), §8 (worked application: example app),
   §9 (sign-off checklist), §10 (jurist open items). Cite article numbers from here; never paraphrase
   the statute from memory.
 
-## App-profile inputs (caller supplies; defaults are Breathe)
+## App-profile inputs (the caller or the orchestrator's Step 0 fact sheet supplies them; else read the project and ask)
 
-- Trader = Dutch *eenmanszaak*; subscriptions sold THROUGH Apple/Google (merchants of record) +
-  RevenueCat + Firebase (EU). Live docs: `apps/my-app/app/assets/legal/{terms,terms.nl}.md` §6
-  + the paywall consent screen (`recordWithdrawalConsent` / `withdrawalConsentAt`). Reusable across
-  the 3-app portfolio — the only per-app facts are: ToS withdrawal section path, paywall consent
-  copy/location, and whether a trader-controlled durable-medium artefact is actually sent.
+- The per-app facts this check needs: the trader (publisher) and how the subscription is sold
+  (stores as merchants of record, or the publisher's own checkout); the ToS withdrawal section path
+  (each language); the paywall consent copy and where the consent is recorded in code; and whether
+  a trader-controlled durable-medium artefact is actually sent.
+- Worked case (the example app, `legal-guardrails.md` §8): trader = Dutch *eenmanszaak*;
+  subscriptions sold THROUGH Apple/Google (merchants of record) + RevenueCat + Firebase (EU); ToS
+  §6 in `terms.md` + `terms.nl.md`; the paywall consent screen records a `withdrawalConsentAt`
+  timestamp (e.g. via a `recordWithdrawalConsent` call).
 
 ## WORKFLOW
 
 1. **Locate.** Find (a) the paywall consent UI (the affirmative checkbox + its copy) and (b) the ToS
-   withdrawal section (Breathe = §6, incl. `.nl.md`). If either is absent, that absence is itself a
+   withdrawal section (in every language it ships; §6 in the example app). If either is absent, that absence is itself a
    finding (consent UI missing ⇒ 🔴; ToS disclosure missing ⇒ 🟠, re-opens Art. 10 12-month window).
 2. **Condition (i) — prior express consent.** Verify the consent is an **affirmative, UNTICKED-by-default**
    control, **separate from** blanket ToS acceptance, whose copy states consent to **begin immediate

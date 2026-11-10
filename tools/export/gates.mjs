@@ -124,6 +124,30 @@ export function gateLinks(root) {
   return findings;
 }
 
+// Every item that ships a SOURCE.md and whose last scan is not SAFE has exactly one section in scan-triage.md
+// whose verdict, score and number of findings match that scan in scans.json, and whose rows add up to that
+// number, each one FP or BY DESIGN. What it cannot see: a rescan whose findings change while their number,
+// the verdict and the score stay the same. At a release, every such item must also have a scan.
+export function gateTriage({ keys, scans, triage, release = false }) {
+  const findings = [];
+  for (const key of keys) {
+    const s = scans[key];
+    if (!s) { if (release) findings.push(`${key}: no scan in scans.json; a release ships only scanned items (node tools/export/scan.mjs)`); continue; }
+    if (s.recommendation === 'SAFE') continue;
+    const t = triage[key];
+    const last = `last scan ${s.recommendation} (${s.score}/100)`;
+    if (!t) { findings.push(`${key}: ${last}, and tools/export/scan-triage.md has no section for it; read every finding and add one`); continue; }
+    if (t.duplicate) { findings.push(`${key}: tools/export/scan-triage.md has more than one section for it; keep one`); continue; }
+    if (t.recommendation !== s.recommendation || t.score !== s.score) { findings.push(`${key}: ${last}, but its triage section is for ${t.recommendation} (${t.score}/100); triage the new scan`); continue; }
+    if (s.findings === undefined) { findings.push(`${key}: scans.json records no number of findings for its last scan; run node tools/export/scan.mjs again`); continue; }
+    if (s.findings !== t.findings) { findings.push(`${key}: the last scan has ${s.findings} findings, but its triage section is for ${t.findings}; triage the new scan`); continue; }
+    const read = t.fp + t.byDesign + t.other;
+    if (read !== t.findings) findings.push(`${key}: the triage reads ${read} of its ${t.findings} findings`);
+    if (t.other) findings.push(`${key}: ${t.other} finding${t.other === 1 ? '' : 's'} judged neither FP nor BY DESIGN; a real finding is fixed or the item is withheld, never shipped`);
+  }
+  return findings;
+}
+
 // A diagrams.net link carries the diagram compressed in its #R fragment, out of reach of every text
 // gate; it passes only if it decodes to exactly the gated .drawio beside it.
 // Every menu item has its hand-written adoption card, and every card belongs to a menu item.

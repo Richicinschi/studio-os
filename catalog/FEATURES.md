@@ -74,8 +74,9 @@ Every session for this module: about 130 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 910) | 75 |
+| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 1,078) | 75 |
 | git-hooks | practice: The git hook templates | recommended | Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands. | none | 0 |
+| sensitive-file-deny-rules | practice: Deny rules for secret files | recommended | A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files. | none | 0 |
 | commit-and-pr-writing | practice: Commit messages and PR bodies that say why | optional; recommended for software, ml, data | A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does. | every session | 69 |
 | finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 1,932) | 33 |
 | git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | description every session, body on demand (about 2,344) | 46 |
@@ -159,27 +160,27 @@ A domain is a set of skills for one kind of job, installed together as a pack. E
 
 | Domain | What it is | Skills | Agents | Tokens every session | Index, on demand |
 |---|---|---|---|---|---|
-| advisor-council-for-big-decisions | Advisor council for big decisions: A panel of eight viewpoints (founder, skeptic, designer, architect, counsel, treasurer, user advocate, operator) for a real fork. | 1 | 8 | 49 | about 194 |
-| android-swiftui-react-native-app-building | Building phone apps: Android, SwiftUI and React Native: Build or review an Android, iPhone or React Native app, and fix a store rejection. | 3 | 0 | 57 | about 322 |
-| app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,217 |
-| audio-video-media | Audio, video and media: Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos. | 13 | 1 | 69 | about 1,135 |
-| dependency-supply-chain-risk-checks | Dependency supply-chain risk checks: The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities. | 1 | 0 | 43 | about 199 |
-| design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 18 | 1 | 74 | about 1,366 |
-| django-flask-laravel-shops-and-chat | Web back ends: Django, Flask, Laravel, shops, chat and jobs: Django, Flask and Laravel projects: shops, content back ends, live chat and updates, retrying background jobs. | 3 | 0 | 45 | about 297 |
-| engineering-testing-performance-code-design | Engineering: browser testing, performance and code design: Test a web page in a real browser, speed up slow code or pages, and shape the structure of a codebase. | 3 | 0 | 34 | about 342 |
-| games-design-prototype-playtest-assets | Games: design, prototype, playtest, art and ports: Make a game in any engine: the idea, a first playable, playtesting, art, screens and balancing numbers. | 8 | 0 | 56 | about 680 |
-| godot-camera-shaders-particles-export | Godot games: camera, shaders, particles, export and audit: Godot games: cameras, shaders, particle effects, tweening and animation, exporting builds, and a project audit. | 10 | 0 | 58 | about 888 |
-| learning-lessons-explanations-practice | Learning: lessons and explanations from zero: Learn something from zero: lesson by lesson, with spaced rechecks and practice before any test. | 1 | 0 | 37 | about 154 |
-| marketing-copy-emails-seo-signups | Marketing: copy, emails, search, signups and tests: Web and sales copy, emails and cold outreach, search optimisation, signup and onboarding, paywalls, A/B tests and analytics. | 16 | 0 | 57 | about 1,096 |
-| marketing-plans-offers-pricing-launches | Marketing: plans, offers, pricing and launches: A marketing plan, an offer and its pricing, a product launch, referrals, ads, competitor and customer studies, social posts. | 16 | 0 | 50 | about 1,033 |
-| mobile-apps-flutter-firebase | Mobile apps: Flutter and Firebase: Flutter apps and Firebase: screens, tests, routing, translations, sign-in, databases, crash reports, hosting and security rules. | 18 | 0 | 49 | about 1,275 |
-| phone-app-testing-release-and-agents | Phone apps: testing, release checks, crash reports, agents and adb: Try an app on a phone, read crash reports, prepare a store release, and let an AI agent use a phone. | 8 | 0 | 57 | about 672 |
-| python-backend-fastapi-docker-agents | Python back ends: FastAPI, Docker and AI agents: Set up a Python project, build a FastAPI service, harden a Docker image, or build an AI agent in Python. | 4 | 0 | 36 | about 458 |
-| stock-research-backtests-trading-safety | Stocks, backtests, trading safety and budgets: Research a company, test a trading rule without fooling yourself, and set trading limits. No buy or sell advice. | 10 | 0 | 58 | about 803 |
-| unity-editor-scripts-prefabs-builds | Unity games: editor, scripts, prefabs, tests and builds: Unity games: C# scripts, scenes and prefabs, testing in the editor, profiling and builds for PC and phones. | 6 | 0 | 48 | about 490 |
-| web-api-security-login-and-graphql | Web back ends: API design, security, sign-in and GraphQL: Design or review a web API, check a server's security headers, add sign-in and roles, build GraphQL. | 4 | 0 | 45 | about 332 |
-| web-astro-cloudflare-gsap-performance | Websites: Astro, Cloudflare, animation and speed: Astro sites, Cloudflare Workers, GSAP animation, site structure, structured data, speed and local business sites. | 10 | 0 | 59 | about 762 |
-| web-search-and-scraping-into-files | Searching the web and pulling page data into files, lawfully: Pull data from web pages or search results into a file or spreadsheet, and check whether a site allows it. | 1 | 0 | 52 | about 188 |
+| advisor-council-for-big-decisions | Advisor council for big decisions: A panel of eight viewpoints (founder, skeptic, designer, architect, counsel, treasurer, user advocate, operator) for a real fork. | 1 | 8 | 49 | about 171 |
+| android-swiftui-react-native-app-building | Building phone apps: Android, SwiftUI and React Native: Build or review an Android, iPhone or React Native app, and fix a store rejection. | 3 | 0 | 57 | about 299 |
+| app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,194 |
+| audio-video-media | Audio, video and media: Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos. | 13 | 1 | 69 | about 1,112 |
+| dependency-supply-chain-risk-checks | Dependency supply-chain risk checks: The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities. | 1 | 0 | 43 | about 176 |
+| design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 18 | 1 | 74 | about 1,343 |
+| django-flask-laravel-shops-and-chat | Web back ends: Django, Flask, Laravel, shops, chat and jobs: Django, Flask and Laravel projects: shops, content back ends, live chat and updates, retrying background jobs. | 3 | 0 | 45 | about 273 |
+| engineering-testing-performance-code-design | Engineering: browser testing, performance and code design: Test a web page in a real browser, speed up slow code or pages, and shape the structure of a codebase. | 3 | 0 | 34 | about 319 |
+| games-design-prototype-playtest-assets | Games: design, prototype, playtest, art and ports: Make a game in any engine: the idea, a first playable, playtesting, art, screens and balancing numbers. | 8 | 0 | 56 | about 657 |
+| godot-camera-shaders-particles-export | Godot games: camera, shaders, particles, export and audit: Godot games: cameras, shaders, particle effects, tweening and animation, exporting builds, and a project audit. | 10 | 0 | 58 | about 865 |
+| learning-lessons-explanations-practice | Learning: lessons and explanations from zero: Learn something from zero: lesson by lesson, with spaced rechecks and practice before any test. | 1 | 0 | 37 | about 131 |
+| marketing-copy-emails-seo-signups | Marketing: copy, emails, search, signups and tests: Web and sales copy, emails and cold outreach, search optimisation, signup and onboarding, paywalls, A/B tests and analytics. | 16 | 0 | 57 | about 1,073 |
+| marketing-plans-offers-pricing-launches | Marketing: plans, offers, pricing and launches: A marketing plan, an offer and its pricing, a product launch, referrals, ads, competitor and customer studies, social posts. | 16 | 0 | 50 | about 1,010 |
+| mobile-apps-flutter-firebase | Mobile apps: Flutter and Firebase: Flutter apps and Firebase: screens, tests, routing, translations, sign-in, databases, crash reports, hosting and security rules. | 18 | 0 | 49 | about 1,252 |
+| phone-app-testing-release-and-agents | Phone apps: testing, release checks, crash reports, agents and adb: Try an app on a phone, read crash reports, prepare a store release, and let an AI agent use a phone. | 8 | 0 | 57 | about 649 |
+| python-backend-fastapi-docker-agents | Python back ends: FastAPI, Docker and AI agents: Set up a Python project, build a FastAPI service, harden a Docker image, or build an AI agent in Python. | 4 | 0 | 36 | about 435 |
+| stock-research-backtests-trading-safety | Stocks, backtests, trading safety and budgets: Research a company, test a trading rule without fooling yourself, and set trading limits. No buy or sell advice. | 10 | 0 | 58 | about 779 |
+| unity-editor-scripts-prefabs-builds | Unity games: editor, scripts, prefabs, tests and builds: Unity games: C# scripts, scenes and prefabs, testing in the editor, profiling and builds for PC and phones. | 6 | 0 | 48 | about 466 |
+| web-api-security-login-and-graphql | Web back ends: API design, security, sign-in and GraphQL: Design or review a web API, check a server's security headers, add sign-in and roles, build GraphQL. | 4 | 0 | 45 | about 309 |
+| web-astro-cloudflare-gsap-performance | Websites: Astro, Cloudflare, animation and speed: Astro sites, Cloudflare Workers, GSAP animation, site structure, structured data, speed and local business sites. | 10 | 0 | 59 | about 739 |
+| web-search-and-scraping-into-files | Searching the web and pulling page data into files, lawfully: Pull data from web pages or search results into a file or spreadsheet, and check whether a site allows it. | 1 | 0 | 52 | about 165 |
 
 ## Not in this version
 

@@ -1,6 +1,6 @@
 ---
 title: Adoption protocol
-sources:
+studio_sources:
   - .claude/skills/vet-external-skill/SKILL.md
   - .studio/memory/feedback_skill_adoption_disposition.md
 ---
@@ -44,7 +44,7 @@ The adoption has five phases. Prepare comes before them and is theirs; update ru
 | What each pack and item is | `catalog/INDEX.md` |
 | What they chose, and the plan | `adoption/features.md`, `adoption/plan.md`, in their setup |
 | Why a practice exists, and how to apply it in Claude Code or claude.ai | `modules/NN-*/README.md` |
-| An item's origin, licence and last scan | `catalog/skills/<id>/SOURCE.md` |
+| An item's origin, licence and last scan | `catalog/skills/<id>/SOURCE.md`, or `catalog/packs/<id>/SOURCE.md` for a domain |
 | The install lines for the scanner and for the tools some items need | `docs/install-reference.md` |
 | Blank files to start from | `templates/` |
 | What changed since their last run | `CHANGELOG.md` |

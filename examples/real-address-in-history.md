@@ -1,6 +1,6 @@
 ---
 title: A real address in history
-sources:
+studio_sources:
   - .studio/memory/feedback_no_network_info_in_commits.md
 ---
 

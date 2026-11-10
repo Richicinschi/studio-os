@@ -28,19 +28,22 @@ This is the **Apple half** of the platform gate (its sibling `legal-play-gate` i
 half; `legal-cross-store` reconciles the two). It adjudicates the legal-document + privacy-label
 gates Apple reviewers enforce, against the **shipped app state** — never against assumptions.
 
-App facts are **inputs** (defaults are Breathe; override for portfolio apps #2/#3). Breathe:
-Flutter breathing/mindfulness app · Dutch eenmanszaak (sole controller, no DPO) · EU/NL-first ·
-auto-renewing subscriptions sold **through Apple as merchant of record** via RevenueCat + Firebase
-(`europe-west`) · **no HealthKit, no ads, no tracking** · "supports / may help relax" (no medical
-claims) · free tier = on-device only, Pro = Firestore sync. Live docs:
-`apps/my-app/app/assets/legal/{terms,privacy}.md` (+ `.nl.md`), version 6. Manifest:
-`apps/my-app/app/ios/Runner/PrivacyInfo.xcprivacy`.
+App facts are **inputs**, from the orchestrator's Step 0 fact sheet; run alone, read them from the
+project and ask only for the rest. This gate needs: the app name; the publisher (legal form,
+controller, DPO or none); how purchases are sold (Apple IAP as merchant of record, any middleware
+such as RevenueCat); the backend and its region; HealthKit, ads and tracking (yes/no each); the
+health claims; what each tier stores where; the live Terms + Privacy Policy (paths, languages,
+version); and the iOS privacy manifest (for a Flutter app, `ios/Runner/PrivacyInfo.xcprivacy`).
+The worked verdicts in the references use the example app (`legal-guardrails.md` §8): a Flutter
+breathing/mindfulness app, Dutch eenmanszaak, subscriptions through Apple as merchant of record via
+RevenueCat + Firebase (`europe-west`), **no HealthKit, no ads, no tracking**, no medical claims,
+free tier on-device only, paid tier Firestore sync.
 
 ## Load these references (by path, on demand — do NOT inline them)
 
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/{attribution-tiering,finding-format,disclosure-grading,verdict-model}.md` — tiering, finding shape, flow-grading, verdict bands.
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-review-guidelines.md` — 5.1.1 / 5.1.2 / 5.1.3 / 3.1.1 / 3.1.2 / 1.4.1 gate text + Breathe verdicts.
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-app-privacy.md` — the 15-category label taxonomy, 4-questions-per-type, the §6 Breathe answer table, §11 verdict template.
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-review-guidelines.md` — 5.1.1 / 5.1.2 / 5.1.3 / 3.1.1 / 3.1.2 / 1.4.1 gate text + worked verdicts (example app).
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-app-privacy.md` — the 15-category label taxonomy, 4-questions-per-type, the §6 worked answer table (example app), §11 verdict template.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-min-eula.md` — the 10 Minimum Licensed-Application EULA terms + §2 verbatim anchors + §4 rubric.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/data-category-ontology.md` — Apple⇄Play⇄GDPR crosswalk (map by *meaning*, never by category name).
 
@@ -72,7 +75,7 @@ on the label, `legal-health-claims` on 1.4.1), take the higher severity.
 
 ## The eight atomic checks
 
-| ID | Guideline / gate | What must hold | Default verdict | Fail severity |
+| ID | Guideline / gate | What must hold | Worked verdict (example app; re-derive for the person's app) | Fail severity |
 |---|---|---|---|---|
 | **A1** | 5.1.1(i) — PP link & content | PP link in **ASC metadata field** AND in-app, **both reachable**; PP enumerates *all* data collected, uses, retention/deletion, consent-revocation, and **names** every processor (Firebase/Google, RevenueCat, Apple) with the **equal-protection** assurance (5.1.1(i)(2)). | PASS if PP code-faithful + ASC field set | 🔴 missing link / false inventory · 🟠 generic "third parties" |
 | **A2** | 5.1.1(v) — account deletion | **In-app** account deletion exists (deactivation/suspension ≠ deletion). | PASS — type-`DELETE` soft-delete → 30-day grace → `purgeExpiredDeletions` hard purge | 🔴 if missing or deactivation-only |
@@ -83,19 +86,19 @@ on the label, `legal-health-claims` on 1.4.1), take the higher severity.
 | **A7** | PrivacyInfo.xcprivacy | Manifest present + every bundled SDK ships a signed manifest (no ITMS-91053 missing-declaration / ITMS-91061 missing-signature); `NSPrivacyTracking=false` matches "no tracking"; `NSPrivacyAccessedAPITypes` declares each required-reason API with a code (e.g. `UserDefaults → CA92.1`); each `NSPrivacyCollectedDataTypes` entry's Linked/Tracking flags are **correct** vs the scan. | VERIFY against merged manifest | 🔴 submission-blocking missing/unsigned manifest · 🟠 wrong Linked/Tracking flag (see watch-list below) |
 | **A8** | App Privacy label ⇄ PP ⇄ manifest ⇄ Play | Every actually-collected `(data-type, entity)` flow → matching label type (correct Linked/Tracking/purpose); affirmatively mark Health & Fitness / Sensitive Info / Location / Contacts / Device-Advertising-ID = **Not Collected**; **empty "Data Used to Track You"** + no ATT; purposes limited to **App Functionality / Analytics** (never advertising); label reconciles 3-/4-way with PP, the manifest, and Play Data Safety. | VERIFY — derive via the template + §6 table | 🔴 incorrect (false) declaration · 🟠 omitted flow or cross-artefact drift |
 
-### A7/A8 Breathe watch-list (known discrepancies to check first)
-- **Crashlytics `Linked` flag.** The shipped `PrivacyInfo.xcprivacy` declares `NSPrivacyCollectedDataTypeCrashData` with **`Linked=false`**, but the App Privacy reference (apple-app-privacy.md §6 + §10) treats Crashlytics crash data as **identity-synced = Linked** (Crashlytics UID identity sync). Reconcile: either confirm crash logs carry **no** account identifier (then Not-Linked is defensible) or flip the manifest + label to **Linked**. Grade `ambiguous`/`incorrect` until resolved. `[verify]`
+### A7/A8 watch-list (discrepancies to check first; seen in the example app's Firebase stack)
+- **Crashlytics `Linked` flag.** A `PrivacyInfo.xcprivacy` that declares `NSPrivacyCollectedDataTypeCrashData` with **`Linked=false`** clashes with the App Privacy reference (apple-app-privacy.md §6 + §10), which treats Crashlytics crash data as **identity-synced = Linked** (Crashlytics UID identity sync). Reconcile: either confirm crash logs carry **no** account identifier (then Not-Linked is defensible) or flip the manifest + label to **Linked**. Grade `ambiguous`/`incorrect` until resolved. `[verify]`
 - **Performance Data.** Declare `Diagnostics → Performance Data` only if Firebase Performance Monitoring actually ships (`pubspec.lock`/pods). Don't declare a flow the app doesn't perform.
 - **Email vs UserID double-count.** Declare email under **Contact Info → Email Address** and the account key under **Identifiers → User ID** — not the same data twice.
 - **Name.** Declare `Contact Info → Name` only if a Google-Sign-In display name is **persisted off-device**.
-- **Session logs.** Pro Firestore-synced breathing logs map to **Usage Data → Product Interaction** (or User Content → Other), **never** Health & Fitness; keep PP + label + the GDPR-Art.9 section consistent (no over-declaration of health data).
-- **Device/Advertising ID.** Android `AD_ID` is stripped; declare Device ID / Advertising Data = **Not Collected** to keep the "no advertising ID" claim honest.
+- **Session logs.** Cloud-synced session logs of a wellness app with no health data (e.g. a paid tier's Firestore-synced breathing logs) map to **Usage Data → Product Interaction** (or User Content → Other), **never** Health & Fitness; keep PP + label + the GDPR-Art.9 section consistent (no over-declaration of health data).
+- **Device/Advertising ID.** If the Android `AD_ID` is stripped (as in the example app), declare Device ID / Advertising Data = **Not Collected** to keep the "no advertising ID" claim honest.
 
 ## Common indie failure modes (adjudicator quick-scan)
-- Over-declaring **Health & Fitness** because the app is "wellness" → PP↔label drift + false Art. 9 signal. Breathe = **Not Collected**.
+- Over-declaring **Health & Fitness** because the app is "wellness" → PP↔label drift + false Art. 9 signal. A wellness app with no HealthKit and no health records = **Not Collected**.
 - Forgetting **Purchases → Purchase History** (RevenueCat subscription state) or **Diagnostics → Crash** (Crashlytics).
 - Marking account-bound analytics **Not Linked** when a UID ties it back → declare **Linked**.
-- Declaring **Tracking** without an ATT prompt (Breathe = no tracking, no ATT — correct).
+- Declaring **Tracking** without an ATT prompt (an app with no tracking needs no ATT — correct, as in the example app).
 - PP says "third parties" generically → 5.1.1(i)(2) needs **named** entities + equal-protection.
 - ToS §25 omits **#1** (not-a-party-with-Apple) or **#10** (Apple third-party beneficiary) — the two most-missed EULA clauses.
 - #8 left as `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` → **HARD BLOCKER** (reserved for the human; cannot sign off).

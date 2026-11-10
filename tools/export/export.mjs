@@ -15,7 +15,8 @@ import { loadManifest, hubInventory } from './manifest.mjs';
 import { loadDenyList, loadOwnerName, loadLocalRewrites, STUDIO_REWRITES } from './rules.mjs';
 import { buildKit } from './build.mjs';
 import { resolvePacks } from './packs.mjs';
-import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, isLocalOnly } from './gates.mjs';
+import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, isLocalOnly } from './gates.mjs';
+import { parseTriage } from './scan.mjs';
 import { itemHashes, diffItems, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
 import { lintKit } from './lint-content.mjs';
 
@@ -71,6 +72,8 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
 
   const scansPath = local('scans.json');
   const scans = existsSync(scansPath) ? JSON.parse(readFileSync(scansPath, 'utf8')) : {};
+  const triagePath = local('scan-triage.md');
+  const triage = existsSync(triagePath) ? parseTriage(readFileSync(triagePath, 'utf8')) : {};
   const stage = mkdtempSync(path.join(os.tmpdir(), 'kit-stage-'));
   try {
     cpSync(root, stage, { recursive: true, filter: (src) => {
@@ -87,7 +90,7 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
     }
     for (const it of manifest.items.filter((i) => i.kind === 'pack' && i.status === 'shipped')) log(`pack ${it.id}: ships`);
     let built;
-    try { built = buildKit({ hub, out: stage, manifest, scans, owner, rewrites: [...localRewrites, ...rewrites] }); } catch (e) { log(`export: ${e.message}`); return 1; }
+    try { built = buildKit({ hub, out: stage, manifest, scans, triage, owner, rewrites: [...localRewrites, ...rewrites] }); } catch (e) { log(`export: ${e.message}`); return 1; }
 
     const checks = {
       secrets: [...gateSecrets(stage), ...(noGitleaks ? [] : gitleaks(stage))],
@@ -96,6 +99,7 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       accounting: [...gateAccounting(stage, { written: built.written, notices: built.notices, manifest }), ...gateDiagramUrls(stage)],
       links: gateLinks(stage),
       cards: gateCards(stage, manifest),
+      triage: gateTriage({ keys: built.scanKeys, scans, triage, release: Boolean(release) }),
       ...(release ? { lint: lintKit(stage) } : {}),
     };
     let failed = 0;

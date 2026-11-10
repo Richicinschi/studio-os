@@ -1,7 +1,7 @@
 ---
 title: Continuity
 pack: way-of-working
-sources:
+studio_sources:
   - .studio/memory/feedback_memory_vault.md
   - .claude/skills/handoff/SKILL.md
   - .claude/skills/claude-md-curator/SKILL.md

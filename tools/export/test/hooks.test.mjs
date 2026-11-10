@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -204,4 +204,12 @@ test('the never-share list refuses a staged file holding one of its terms, as a 
     assert.doesNotMatch(refused.err, /quenlin/i);
     assert.equal(tryCommit('The zorbals are fine.\n').status, 0);
   } finally { s.done(); }
+});
+
+test('every gitleaks command the pre-commit check tells the person to run redacts the secret', () => {
+  // Run inside a Claude session, an unredacted command would print the secret into the session.
+  const src = readFileSync(path.join(KIT, 'templates/git-hooks/check-staged.mjs'), 'utf8');
+  const shown = [...src.matchAll(/`(gitleaks [^`]+)`/g)].map((m) => m[1]);
+  assert.ok(shown.length > 0, 'check-staged.mjs shows no gitleaks command');
+  for (const cmd of shown) assert.match(cmd, /--redact\b/, cmd);
 });

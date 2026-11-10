@@ -1,7 +1,7 @@
 ---
 title: Tools and MCP servers
 pack: way-of-working
-sources:
+studio_sources:
   - .claude/skills/vet-external-skill/SKILL.md
   - .studio/rules/hard-rules.md
   - .studio/memory/feedback_no_network_info_in_commits.md

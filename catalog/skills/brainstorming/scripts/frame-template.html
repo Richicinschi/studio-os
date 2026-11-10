@@ -6,8 +6,7 @@
   <style>
     /*
      * Frame for fragment screens.
-     * The server swaps two comment markers: the branding one inside the top bar, and the content one inside
-     * #frame-content. Colours follow the system light or dark setting through a prefers-color-scheme media query. Everything from
+     * The server puts the screen where the content comment marker sits, inside #frame-content. Colours follow the system light or dark setting through a prefers-color-scheme media query. Everything from
      * "text styles" down is what a fragment may use; visual-companion.md shows the markup for each.
      */
 
@@ -259,7 +258,7 @@
 </head>
 <body>
   <header class="top-bar">
-    <!-- BRANDING -->
+    <div class="brand"><span class="brand-text">Studio brainstorm companion, local only</span></div>
     <span class="status">Connecting…</span>
   </header>
 

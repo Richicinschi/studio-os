@@ -7,7 +7,7 @@ import path from 'node:path';
 import { lintModulePage, lintKit, lintStartHere, lintCard, lintBanned } from '../lint-content.mjs';
 import { cardText } from './fixture-hub.mjs';
 
-const good = ['---', 'title: Continuity', 'pack: way-of-working', 'sources:', '  - .studio/memory/a.md', 'questions:', '  - Where should memory live?', '---',
+const good = ['---', 'title: Continuity', 'pack: way-of-working', 'studio_sources:', '  - .studio/memory/a.md', 'questions:', '  - Where should memory live?', '---',
   '# 01 Continuity', '', '## The problem', 'x', '## The mechanism', 'x', '## Evidence', 'x', '## Apply it in Claude Code', 'x', '## Apply it in claude.ai', 'x', ''].join('\n');
 
 test('a complete module page passes', () => {
@@ -22,6 +22,11 @@ test('missing front matter keys, missing and out-of-order headings are reported'
   const swapped = good.replace('## The problem', '## TMP').replace('## The mechanism', '## The problem').replace('## TMP', '## The mechanism');
   assert.ok(lintModulePage('m.md', swapped).some((e) => e.includes('out of order')));
   assert.deepEqual(lintModulePage('m.md', '# no front matter'), ['m.md: no front matter']);
+});
+
+test('the studio files a page was written from are listed under studio_sources; the old sources key no longer counts', () => {
+  const oldKey = good.replace('studio_sources:', 'sources:');
+  assert.deepEqual(lintModulePage('m.md', oldKey), ['m.md: front matter needs a non-empty "studio_sources" list']);
 });
 
 test('lintKit checks module folders, skill folders, SOURCE.md and the entry files', () => {

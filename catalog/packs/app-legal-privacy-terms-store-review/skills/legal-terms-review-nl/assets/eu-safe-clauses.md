@@ -1,15 +1,17 @@
 # EU-safe clause library — drop-in replacements for an NL/EU consumer app ToS
 
 Re-authored from primary law (BW 6:233/6:236/6:237, Dir. 93/13/EEC, CRD 2011/83, DCD 2019/770,
-BW 6:248) plus two donor patterns: the **miketromba** savings clauses (MIT — lifted, attribution
-below) and the **nisrulz** enforceable-cap *retain-list* structure (AGPL — pattern re-authored,
+BW 6:248) plus two donor patterns: the **miketromba** savings clauses (MIT — adapted and changed;
+licence notice after §2a) and the **nisrulz** enforceable-cap *retain-list* structure (AGPL — pattern re-authored,
 no text copied). The aggressive US liability/indemnity/arbitration shapes in **ai-legal-claude**
 (no licence) and miketromba's protective-clauses were used **only as a red-flag list of what to
 strip**, never as donor text.
 
 **How to use.** When the ToS-scan emits a 🔴/🟠 on a clause, paste the matching replacement below
-into the Redline (entity-named, tailored to Breathe: Apple/Google as merchants of record,
-RevenueCat middleware, Firebase EU backend). Each replacement carries its basis + tier. The
+into the Redline, entity-named and tailored to the app's facts (the fact sheet). The wording below
+is written for the example app in `legal-guardrails.md` §8 — Apple/Google as merchants of record,
+RevenueCat middleware, Firebase EU backend — so swap in the app's own sellers and processors, and
+`<app name>` / `<publisher>` for the names. Each replacement carries its basis + tier. The
 **liability-cap reasonableness is `[low-confidence]`** — propose it, but reserve the final
 "is this cap reasonable" call for a Dutch advocaat.
 
@@ -37,16 +39,16 @@ Annex).
   + DCD 2019/770 conformity non-waiver `[verify-pinpoint]`. Reasonableness of the 12-month figure
   for a low-priced app: **`[low-confidence]` — jurist to confirm.**
 - Carve-out retain-list shape re-authored from the nisrulz `tnc` pattern (AGPL — not copied).
-- Note the merchant-of-record nuance: the consumer pays **Apple/Google**, not Breathe directly;
-  phrase the cap by reference to "fees you paid (via Apple or Google)" rather than implying Breathe
-  is the payment counterparty.
+- Note the merchant-of-record nuance: when the app sells through the stores, the consumer pays
+  **Apple/Google**, not the publisher directly; phrase the cap by reference to "fees you paid (via
+  Apple or Google)" rather than implying the publisher is the payment counterparty.
 
 ---
 
 ## 2. Mandatory-consumer-law savings clause (always include; cures over-broad disclaimers)
 
 The single most useful EU hedge. Insert near the disclaimer/limitation block and again in the
-governing-law clause. **Lifted from miketromba (MIT)** — attribution at the foot of this file.
+governing-law clause. **Adapted from miketromba/skills (MIT) and changed** — licence notice after §2a.
 
 > **Your statutory rights.** Nothing in these Terms shall limit or exclude any rights you may have
 > under applicable consumer-protection law that cannot lawfully be limited or excluded. Where any
@@ -62,7 +64,41 @@ governing-law clause. **Lifted from miketromba (MIT)** — attribution at the fo
 > provision will be limited or removed to the minimum extent necessary, and the remaining Terms
 > stay in full force and effect.
 
-- Basis: standard; BW 6:233 voidability is per-clause, not whole-contract. Donor: miketromba (MIT).
+- Basis: standard; BW 6:233 voidability is per-clause, not whole-contract. Adapted from
+  miketromba/skills (MIT) and changed — licence notice below.
+
+### Licence notice for §2 and §2a
+
+The clauses in §2 and §2a are adapted from the "Consumer Rights Acknowledgment" and "Severability
+with Reformation" clauses in `skills/legal-tos-privacy/references/compliance-checklist.md` of
+[miketromba/skills](https://github.com/miketromba/skills), under the MIT licence, and changed: both
+were reworded and given a heading, §2 gained a sentence that lets a mandatory consumer right prevail,
+and §2a was shortened. The other clauses in this file are not taken from that source. Its copyright
+line and permission notice:
+
+```text
+MIT License
+
+Copyright (c) 2026 Michael Tromba
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ---
 
@@ -71,7 +107,8 @@ governing-law clause. **Lifted from miketromba (MIT)** — attribution at the fo
 Three hits this cures: a foreign/seat forum (6:236(m), void), mandatory arbitration or binding
 advice that ousts the court (6:236(n), void), and any link to the **dead EU ODR platform**
 (`ec.europa.eu/consumers/odr` — shut down 19/20 Jul 2025, must be removed). Do **not** name
-De Geschillencommissie as the route unless Breathe has actually affiliated (it has not). Describe
+De Geschillencommissie as the route unless the publisher has actually affiliated (ask; an
+unaffiliated sole trader, like the example app's publisher, has not). Describe
 ConsuWijzer as guidance, never as a body that decides disputes.
 
 > **Complaints and disputes.** If you have a complaint, contact us first at `[support email]`; we
@@ -112,9 +149,9 @@ consumers. The "you hold us harmless for all claims" pattern from US templates i
 
 The Wet van Dam regime: after the initial term a tacitly-renewing subscription must be terminable
 **at any time with notice ≤ 1 month**, cancellation **as easy as sign-up**, and a free trial must
-not trap the consumer into a rolling paid term without an easy opt-out. For Breathe the cancel
-route is **store-native** (Apple/Google manage subscription) — that already meets "easy cancel";
-the ToS must point there and **not** impose any harder Breathe-side step (a registered-letter or
+not trap the consumer into a rolling paid term without an easy opt-out. For an app sold through
+the stores the cancel route is **store-native** (Apple/Google manage subscription) — that already
+meets "easy cancel"; the ToS must point there and **not** impose any harder publisher-side step (a registered-letter or
 longer-notice requirement is void/presumed-unfair).
 
 > **Auto-renewal and cancellation.** Your subscription renews automatically at the end of each
@@ -144,8 +181,8 @@ longer-notice requirement is void/presumed-unfair).
 ## Donor attribution
 
 - **miketromba/skills — legal-tos-privacy** (MIT, © 2026 Michael Tromba): the savings clause (§2)
-  and severability clause (§2a) are adapted from its EU-safe savings clauses. MIT permits use with
-  attribution; this notice satisfies it.
+  and severability clause (§2a) are adapted from its consumer-rights and severability clauses and
+  changed; the copyright line and MIT permission notice are reproduced after §2a.
 - **nisrulz/app-privacy-policy-generator** (AGPLv3, © 2017 Nishant Srivastava): the §1
   carve-out **retain-list structure** was re-authored from its `tnc` pattern; **no text copied**.
 - **simota/agent-skills** (MIT): the EU enforceability table (liability-cap floor: cannot exclude

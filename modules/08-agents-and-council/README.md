@@ -1,7 +1,7 @@
 ---
 title: Agents and the council
 pack: way-of-working
-sources:
+studio_sources:
   - .studio/memory/project_studio_council.md
   - .claude/skills/council/SKILL.md
   - .claude/agents/karen-skeptic.md

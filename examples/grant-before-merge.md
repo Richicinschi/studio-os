@@ -1,6 +1,6 @@
 ---
 title: A recorded yes before a merge
-sources:
+studio_sources:
   - .studio/rules/hard-rules.md
   - .studio/memory/feedback_no_squash_merges.md
   - .studio/memory/project_studio_rules_audit.md

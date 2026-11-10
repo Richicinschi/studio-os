@@ -1,4 +1,4 @@
-# SDK → Data-Flow Map (Breathe stack)
+# SDK → Data-Flow Map (Firebase + RevenueCat stack, worked for the example app)
 
 Canonical SDK-to-data-flow reference for the **legal-data-surface-scan** and **legal-flow-grader**
 subskills. Each SDK is mapped to: data collected · recipient entity · on/off-device · processing
@@ -6,14 +6,20 @@ purpose · GDPR lawful basis · transfer mechanism. Use this to (a) build the `(
 recipient-entity, on/off-device)` flow set, then (b) grade each flow against the Privacy Policy /
 Terms using the PoliCheck 5-category taxonomy (clear / vague / omitted / incorrect / ambiguous).
 
-**App profile.** "Breathe" — Flutter breathing/mindfulness app. Publisher = Dutch **eenmanszaak**
+**How to use it for any app.** The per-SDK facts below (recipient, data, location, retention, basis,
+transfer) hold for any app that ships the SDK. The app-specific lines (region chosen, tier split,
+what the app's own functions do) are worked for the **example app** (`legal-guardrails.md` §8);
+replace them with the facts of the app under review (fact sheet + `legal-data-surface-scan`). An
+SDK the app ships that is not listed here needs its own row, built from the SDK's privacy docs.
+
+**Example-app profile.** Flutter breathing/mindfulness app. Publisher = Dutch **eenmanszaak**
 (sole proprietorship; owner is the **sole data controller**; no employees; **no DPO**). EU/NL-first,
 **GDPR/AVG** governed. Auto-renewing subscriptions sold **through Apple / Google** (merchants of
 record) via **RevenueCat** middleware + **Firebase** backend (Auth, Firestore, Analytics,
 Crashlytics, Cloud Functions, Hosting), Firebase resources provisioned in **EU region
 `europe-west`** where the service supports location selection. No medical claims (general wellness:
 "supports / may help relax"; never "treats / cures / diagnoses / prevents"). **Free tier = on-device
-data only; Pro = Firestore sync.**
+data only; paid tier ("Pro") = Firestore sync.**
 
 ---
 
@@ -59,7 +65,7 @@ iOS-side only returned).
 | Field | Value |
 |---|---|
 | **Recipient entity** | Google LLC / Google Ireland (Firebase) — **data processor** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
-| **Data collected** | Email address, password (credential), phone numbers (n/a for Breathe), user agents, **IP addresses**; Firebase **user ID (UID)**, auth tokens / ID tokens `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
+| **Data collected** | Email address, password (credential), phone numbers (n/a for an app without phone sign-in, such as the example app), user agents, **IP addresses**; Firebase **user ID (UID)**, auth tokens / ID tokens `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **On/off-device** | **Off-device** |
 | **Data location** | **US-only by architecture.** "Firebase Authentication service is run only from US data centers… processes data exclusively in the United States." Your `europe-west` selection does **not** apply to Auth. `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **Retention** | Logged **IP addresses kept "a few weeks"**; other auth info retained until the customer deletes the user, then removed from live + backup within **180 days** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
@@ -68,7 +74,7 @@ iOS-side only returned).
 | **Transfer mechanism** | EU→US transfer to Google: **EU-US Data Privacy Framework (DPF)** + Google's **SCCs** ("Firebase: Standard Contractual Clauses") under the **Firebase Data Processing and Security Terms** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 
 **Grader notes.** Because Auth is **US-only**, an EU-region claim in the PP is *incorrect* for this
-flow — the PP must disclose a US transfer + name DPF/SCC. The Breathe UID is the join key that links
+flow — the PP must disclose a US transfer + name DPF/SCC. In the example app the Firebase UID is the join key that links
 Firestore, RevenueCat (App User ID = UID) and Crashlytics; treat it as a pseudonymous identifier.
 
 ---
@@ -79,15 +85,15 @@ Firestore, RevenueCat (App User ID = UID) and Crashlytics; treat it as a pseudon
 |---|---|
 | **Recipient entity** | Google LLC / Google Ireland (Firebase) — **data processor** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **Data collected** | **Account profile** (`users/{uid}` doc: consent timestamps — `ageConfirmedAt`, `withdrawalConsentAt`, `termsVersion` — soft-delete flag); **Pro-tier session history** (`users/{uid}/sessions`); **subscription mirror** (`users/{uid}/private/subscription`, server-written). Customer-defined content; Firestore also processes Application IDs / package/bundle IDs. `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
-| **On/off-device** | **Pro = off-device** (synced to Google). **FREE tier = ON-DEVICE ONLY** — breathing history lives in local storage / local Firestore cache and is **not** synced to a recipient. `[settled — app profile / CLAUDE.md, verified 2026-06-06]` |
-| **Data location** | Firestore is a **global service with location selection** → Breathe provisions **`europe-west`**, so synced data is processed in the EU. `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
-| **Retention** | **Customer-controlled.** Breathe: live until user deletes; soft-delete → 30-day grace → `purgeExpiredDeletions` recursive delete. `[settled — Firebase Privacy & Security + app profile, verified 2026-06-06]` |
+| **On/off-device** | **Pro = off-device** (synced to Google). **FREE tier = ON-DEVICE ONLY** — breathing history lives in local storage / local Firestore cache and is **not** synced to a recipient. `[worked example — the example app's tier split; read the app's own from its code]` |
+| **Data location** | Firestore is a **global service with location selection** → read the app's chosen location from its config; the example app provisions **`europe-west`**, so synced data is processed in the EU. `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
+| **Retention** | **Customer-controlled.** Example app: live until user deletes; soft-delete → 30-day grace → a scheduled recursive-delete purge job. `[settled — Firebase Privacy & Security + app profile, verified 2026-06-06]` |
 | **Purpose** | Persist account state + consent records; sync session history for paying users; mirror entitlement state |
 | **GDPR lawful basis** | **Art. 6(1)(b) contract** (Pro sync is the paid feature; account record is necessary to provide the account); consent records evidence **Art. 7 / Art. 8 / Art. 16(m)** compliance, not a separate basis `[verify]` |
 | **Transfer mechanism** | **None required for EU region** — data stays in EU (`europe-west`). DPF/SCC remain Google's fallback umbrella. `[verify-pinpoint]` |
 
-**Grader notes.** The **free-vs-Pro split is the single most important PP-accuracy point** for
-Breathe: the PP must state that free-user breathing history is **on-device only** and **not held on
+**Grader notes.** For an app with a tier split, the **free-vs-paid split is the single most important PP-accuracy point**
+(as in the example app): the PP must state that free-user history is **on-device only** and **not held on
 our servers** (so "we cannot remotely purge it" is the honest retention answer for free users). Any
 PP sentence implying server-side history for all users is *incorrect* for the free tier.
 
@@ -98,11 +104,11 @@ PP sentence implying server-side history for all users is *incorrect* for the fr
 | Field | Value |
 |---|---|
 | **Recipient entity** | Google LLC (Google Analytics for Firebase) — **separate service under separate terms**; acts as **processor** for Firebase-linked data `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
-| **Data collected** | App usage / interaction **events** (taxonomy per `ANALYTICS.md`), **pseudonymous app-instance ID** (per-installation identifier), device/OS attributes, IP-derived coarse geo. **Advertising ID (AD_ID/GAID): NOT collected by Breathe — deliberately stripped** (see below). `[settled — Firebase Analytics config + app profile, verified 2026-06-06]` |
+| **Data collected** | App usage / interaction **events** (the app's own event taxonomy), **pseudonymous app-instance ID** (per-installation identifier), device/OS attributes, IP-derived coarse geo. **Advertising ID (AD_ID/GAID): NOT collected by the example app — deliberately stripped** (see below); an app that does not strip it collects it. `[settled — Firebase Analytics config + example-app profile, verified 2026-06-06]` |
 | **On/off-device** | **Off-device** (events transmitted to Google) |
 | **Data location** | Analytics is a **separate service subject to separate terms**; its processing is **not governed by your Firestore EU-region selection** — treat as global/US-capable. `[settled — Firebase Privacy & Security, verified 2026-06-06]` `[verify]` (exact region) |
 | **Retention** | Per Google Analytics terms (not on the Firebase Privacy & Security page) `[verify]` |
-| **Purpose** | Product analytics (feature usage, funnels, retention) — NOT advertising for Breathe |
+| **Purpose** | Product analytics (feature usage, funnels, retention) — NOT advertising for an app with no ads (the example app) |
 | **GDPR lawful basis** | **CONSENT — Art. 6(1)(a)** required, *and* **ePrivacy / NL `Telecommunicatiewet` art. 11.7a (cookiewet)** consent for the storing/reading of the app-instance identifier on the device. **FLAG:** analytics may **not** rely on legitimate interest in NL; opt-in is the conservative position. `[verify-pinpoint]` (cookiewet art. 11.7a) `[low-confidence]` (LI-vs-consent is the project's open jurist question) |
 | **Transfer mechanism** | Google **DPF + SCC** for any EU→US flow `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 
@@ -112,11 +118,11 @@ PP sentence implying server-side history for all users is *incorrect* for the fr
   **collects the Android Advertising ID (GAID)** on Android. `[settled — Firebase Analytics
   data-collection docs, verified 2026-06-06]` (the config page confirms "by default, on Android the
   SDK collects the Advertising ID").
-- Breathe **removes** the permission in the merged manifest via
+- An app that does not use the GAID (the example app) **removes** the permission in the merged manifest via
   `<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>`
-  (plus stripping AdServices), so **no Google Advertising ID is collected**. `[settled — app
-  profile / CLAUDE.md + memory `reference_firebase_analytics_adid`, verified 2026-06-06]`
-- The runtime opt-out toggle is `setAnalyticsCollectionEnabled(false)` (Breathe's
+  (plus stripping AdServices), so **no Google Advertising ID is collected**. `[settled — example-app
+  profile + Firebase Analytics config, verified 2026-06-06]`
+- The runtime opt-out toggle is `setAnalyticsCollectionEnabled(false)` (in the example app, behind an
   `analyticsEnabledProvider`); iOS uses `FIREBASE_ANALYTICS_COLLECTION_ENABLED` /
   `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED` in Info.plist and removes `AdSupport.framework` to
   suppress IDFA. `[settled — Firebase Analytics config (iOS), verified 2026-06-06]`
@@ -138,7 +144,7 @@ events must not be claimed in the PP if not actually fired. (3) Reminder time mu
 | **Data location** | **Global** — "could process data at any of the Google Cloud Platform locations" (NOT pinned to `europe-west`) `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **Retention** | Crash stack traces + minidump + associated identifiers kept **90 days** before removal `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **Purpose** | Stability / crash diagnostics |
-| **GDPR lawful basis** | Two defensible reads: **Art. 6(1)(f) legitimate interest** (security/stability — common for crash reporting) **OR** opt-in **consent** if treated as non-essential telemetry. Breathe ships an **opt-out** toggle, which fits LI; the conservative NL/cookiewet read may push it to consent. **FLAG.** `[low-confidence]` |
+| **GDPR lawful basis** | Two defensible reads: **Art. 6(1)(f) legitimate interest** (security/stability — common for crash reporting) **OR** opt-in **consent** if treated as non-essential telemetry. An app that ships an **opt-out** toggle (the example app) fits LI; the conservative NL/cookiewet read may push it to consent. **FLAG.** `[low-confidence]` |
 | **Transfer mechanism** | Google **DPF + SCC** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 
 **Grader notes.** Crashlytics processes from **any GCP location** → the PP cannot claim
@@ -151,14 +157,14 @@ installation UUIDs are personal data (online identifiers, Art. 4(1)).
 
 | Field | Value |
 |---|---|
-| **Recipient entity** | Google LLC (Cloud Functions) — **data processor** (runs Breathe's own server code) `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
-| **Data collected** | **IP addresses** for HTTP/event handling; whatever Breathe's functions touch: the **RevenueCat webhook** payload (App User ID, subscription event), soft-delete purge of Firestore + Auth + RC `[settled — Firebase Privacy & Security + app profile, verified 2026-06-06]` |
+| **Recipient entity** | Google LLC (Cloud Functions) — **data processor** (runs the app's own server code) `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
+| **Data collected** | **IP addresses** for HTTP/event handling; whatever the app's functions touch (example app: the **RevenueCat webhook** payload (App User ID, subscription event), soft-delete purge of Firestore + Auth + RC) `[settled — Firebase Privacy & Security + example-app profile, verified 2026-06-06]` |
 | **On/off-device** | **Off-device (server-side / backend)** |
-| **Data location** | Global service infrastructure; Breathe deploys functions to **`europe-west1`** (e.g. `revenueCatWebhook`) `[settled — Firebase Privacy & Security + app profile, verified 2026-06-06]` |
+| **Data location** | Global service infrastructure; read the app's function region from its config (the example app deploys to **`europe-west1`**, e.g. a `revenueCatWebhook`) `[settled — Firebase Privacy & Security + example-app profile, verified 2026-06-06]` |
 | **Retention** | IP/processing data held **"temporarily, to provide the service"** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **Purpose** | Mirror RevenueCat subscription state to Firestore; scheduled hard-delete of expired soft-deleted accounts (`purgeExpiredDeletions`) |
 | **GDPR lawful basis** | **Art. 6(1)(b) contract** (subscription mirror, account deletion) + **Art. 6(1)(c) / 17** for the erasure cron `[verify]` |
-| **Transfer mechanism** | EU region for Breathe's functions; Google **DPF + SCC** umbrella `[verify-pinpoint]` |
+| **Transfer mechanism** | EU region for the example app's functions; Google **DPF + SCC** umbrella `[verify-pinpoint]` |
 
 **Grader notes.** Functions are the *only* component that touches all three identity systems
 (Firebase UID, RC App User ID, store tokens) — its description anchors the "how subscription status
@@ -176,7 +182,7 @@ for the security section.
 | **On/off-device** | **Off-device** (web/server logs) |
 | **Data location** | Global service (CDN) `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
 | **Retention** | Retains IP data for **"a few months"** `[settled — Firebase Privacy & Security, verified 2026-06-06]` |
-| **Purpose** | Serve the public legal pages (`/breathe/privacy`, `/terms`, `/support`, `/delete-account`) on `richicinschi.com` |
+| **Purpose** | Serve the public legal pages (e.g. `/<app>/privacy`, `/terms`, `/support`, `/delete-account`) on the publisher's domain (`<your-domain>`) |
 | **GDPR lawful basis** | **Art. 6(1)(f) legitimate interest** (serving a public website + security logging) `[verify]` |
 | **Transfer mechanism** | Google **DPF + SCC** umbrella `[verify-pinpoint]` |
 
@@ -191,7 +197,7 @@ Safety requirement).
 | Field | Value |
 |---|---|
 | **Recipient entity** | **RevenueCat, Inc.** — 1032 E Brandon Blvd #3003, Brandon, FL 33511, **United States** — **data processor** for end-user info `[settled — RevenueCat Privacy Policy, verified 2026-06-06]` |
-| **Data collected** | **App User ID (= Firebase UID** for Breathe), **purchase tokens / receipts**, **subscription status / entitlements**, product identifiers, original + latest purchase dates, first-seen / install date, store/platform, original app version, **end-user technical info** (IP, OS, device), optional attribution metadata `[settled — RevenueCat Privacy Policy + CustomerInfo docs, verified 2026-06-06]` |
+| **Data collected** | **App User ID (= Firebase UID** in the example app), **purchase tokens / receipts**, **subscription status / entitlements**, product identifiers, original + latest purchase dates, first-seen / install date, store/platform, original app version, **end-user technical info** (IP, OS, device), optional attribution metadata `[settled — RevenueCat Privacy Policy + CustomerInfo docs, verified 2026-06-06]` |
 | **On/off-device** | **Off-device** (sent to RevenueCat servers; cached `CustomerInfo` locally) |
 | **Data location** | **United States** — stored/processed on **AWS in the US**; "Your personal data may be stored and processed in any country where we have facilities," with explicit US storage `[settled — RevenueCat Privacy Policy, verified 2026-06-06]` |
 | **Retention** | Per RevenueCat retention (not pinned this run); deleted on hard-delete via RC REST `DELETE` in `hardDeleteUser` `[verify]` |
@@ -201,7 +207,7 @@ Safety requirement).
 
 **Grader notes.**
 - **App User ID MUST equal the Firebase UID** (RevenueCat recommends a "stable known user
-  identifier," not `$RCAnonymousID`) — this is both a correctness invariant for Breathe and a
+  identifier," not `$RCAnonymousID`) — this is both a correctness invariant for a Firebase + RevenueCat app and a
   disclosure point (the UID is shared with a US processor). `[settled — RevenueCat CustomerInfo docs
   + app profile, verified 2026-06-06]`
 - RevenueCat is the **clearest US transfer in the stack** → the PP must (a) **name RevenueCat,
@@ -217,7 +223,7 @@ Safety requirement).
 
 | Field | Value |
 |---|---|
-| **Recipient entity** | Google LLC (Google Identity / OAuth) — for *Breathe's* purposes the credential feeds **Firebase Auth** (§1) `[verify]` |
+| **Recipient entity** | Google LLC (Google Identity / OAuth) — for a Firebase app's purposes (the example app's) the credential feeds **Firebase Auth** (§1) `[verify]` |
 | **Data collected** | Google **account email + basic profile** (name, profile picture URL), **OAuth ID token / access token**; exchanged for a Firebase credential `[verify]` |
 | **On/off-device** | **Off-device** (OAuth exchange with Google) |
 | **Data location** | Google global (then Firebase Auth US, §1) `[verify]` |
@@ -228,7 +234,7 @@ Safety requirement).
 
 **Biometric-permission note (important, low-disclosure-risk).** The GoogleSignIn Android SDK pulls
 in **`USE_BIOMETRIC` / `USE_FINGERPRINT`** permissions **transitively** (for credential/passkey
-flows). **Breathe collects, stores, and transmits NO biometric data** — these are platform
+flows). **An app that only signs in with Google (the example app) collects, stores, and transmits NO biometric data** — these are platform
 capability permissions, not a data flow. The PP should **not** declare a "biometric data" category;
 if an Exodus/MobSF scan surfaces these permissions, grade as a **false-positive permission**, not an
 omitted data flow. `[verify]` (transitive permission presence — confirm via APK manifest scan)
@@ -240,17 +246,17 @@ omitted data flow. `[verify]` (transitive permission presence — confirm via AP
 | Field | Value |
 |---|---|
 | **Recipient entity** | **Apple Distribution International Ltd.** (App Store) / **Google Commerce / Google Payment** (Play) — each is the **merchant of record (seller)** and an **independent controller** for the payment transaction `[verify]` |
-| **Data collected** | Payment instrument, billing data, store account ID, purchase/receipt — handled **entirely by the store**; Breathe and RevenueCat **never see the card/payment data** `[settled — app profile + merchant-of-record model, verified 2026-06-06]` `[verify-pinpoint]` (controller status) |
+| **Data collected** | Payment instrument, billing data, store account ID, purchase/receipt — handled **entirely by the store**; the app and RevenueCat **never see the card/payment data** `[settled — merchant-of-record model, verified 2026-06-06]` `[verify-pinpoint]` (controller status) |
 | **On/off-device** | **Off-device** (store-side) |
 | **Data location** | Apple / Google global infrastructure `[verify]` |
 | **Retention** | Store-controlled (tax/refund/fiscal retention by the store) `[verify]` |
 | **Purpose** | Process the auto-renewing subscription charge, refunds, renewals, family sharing |
-| **GDPR lawful basis** | The store's own basis (it is the seller); Breathe relies on **6(1)(b)** for *delivering* the entitlement once the store confirms purchase `[verify]` |
-| **Transfer mechanism** | Apple/Google's own DPF/SCC framework (out of Breathe's control) `[verify-pinpoint]` |
+| **GDPR lawful basis** | The store's own basis (it is the seller); the app's publisher relies on **6(1)(b)** for *delivering* the entitlement once the store confirms purchase `[verify]` |
+| **Transfer mechanism** | Apple/Google's own DPF/SCC framework (out of the publisher's control) `[verify-pinpoint]` |
 
-**Grader notes.** Because the **store is the merchant of record**, Breathe's Terms must reflect
+**Grader notes.** Because the **store is the merchant of record**, the app's Terms must reflect
 that **the contract of sale + the 14-day withdrawal/refund handling sit with Apple/Google**, while
-Breathe is the *app provider*. The PP should state Breathe receives **no payment-card data** — only
+the publisher is the *app provider*. The PP should state the publisher receives **no payment-card data** — only
 the post-purchase token/receipt via the store→RevenueCat path. This is also why Apple's **Licensed
 Application EULA** minimum terms apply (the EULA is between user ↔ developer, not Apple).
 
@@ -272,8 +278,8 @@ Application EULA** minimum terms apply (the EULA is between user ↔ developer, 
 
 **Deliberate non-collection:** Google **Advertising ID (AD_ID/GAID)** + AdServices permission are
 **stripped** (`tools:node="remove"`) → **no advertising ID is collected**, supporting the PP "no
-advertising identifier" and the Play Data Safety "no advertising ID" answers. `[settled — app
-profile / firebase_analytics AD_ID memory + Analytics config, verified 2026-06-06]`
+advertising identifier" and the Play Data Safety "no advertising ID" answers. `[settled — example-app
+profile + Analytics config, verified 2026-06-06]` Confirm the strip in the app's own merged manifest.
 
 ---
 
@@ -282,8 +288,8 @@ profile / firebase_analytics AD_ID memory + Analytics config, verified 2026-06-0
 1. **RevenueCat transfer safeguard** — RC's public privacy policy names **no DPF/SCC**; the actual
    basis lives in the **DPA at `revenuecat.com/dpa`** (SCC expected). Read/sign + confirm DPF
    certification status before the PP states the safeguard. `[verify]`
-2. **Analytics lawful basis under NL cookiewet** — opt-in consent vs. legitimate interest is the
-   project's open jurist question; conservative answer is **consent**. Pin `Telecommunicatiewet`
+2. **Analytics lawful basis under NL cookiewet** — opt-in consent vs. legitimate interest is an
+   open question for the jurist; conservative answer is **consent**. Pin `Telecommunicatiewet`
    art. 11.7a. `[verify-pinpoint]` / `[low-confidence]`
 3. **Crashlytics lawful basis** — LI (6(1)(f)) vs. consent for crash telemetry under ePrivacy.
    `[low-confidence]`

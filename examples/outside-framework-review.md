@@ -1,6 +1,6 @@
 ---
 title: "Adopting an outside framework: a review that took no files"
-sources:
+studio_sources:
   - .studio/memory/feedback_skill_adoption_disposition.md
   - .studio/memory/reference_skillspector.md
 ---

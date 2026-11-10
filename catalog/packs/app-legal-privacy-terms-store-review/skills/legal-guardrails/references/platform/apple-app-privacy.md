@@ -1,6 +1,6 @@
-# Apple "App Privacy" Nutrition Label — Reference (Breathe / Dutch eenmanszaak)
+# Apple "App Privacy" Nutrition Label — Reference (Dutch eenmanszaak publisher)
 
-Adjudication reference for the Apple App Store **App Privacy** disclosure (the "privacy nutrition label") configured in the App Store Connect privacy questionnaire. Use this to grade whether an app's declared label is (a) complete, (b) internally consistent, and (c) aligned with the Privacy Policy and actual SDK behaviour.
+Adjudication reference for the Apple App Store **App Privacy** disclosure (the "privacy nutrition label") configured in the App Store Connect privacy questionnaire. Use this to grade whether an app's declared label is (a) complete, (b) internally consistent, and (c) aligned with the Privacy Policy and actual SDK behaviour. Worked applications use the example app (`legal-guardrails.md` §8); build the same answers for the app under review from its fact sheet and data-surface scan.
 
 **Primary source:** Apple, *App Privacy Details on the App Store* — https://developer.apple.com/app-store/app-privacy-details/ [settled — Apple Developer, verified 2026-06-06]
 **Closely-coupled sources** (separate reference files): App Store Review Guidelines 5.1.1 (privacy policy + account deletion), 3.1.2 (subscriptions), 1.4.1 (health claims); `PrivacyInfo.xcprivacy` privacy manifest + Required-Reason API regime; Google Play Data Safety (the Android counterpart). Cross-check the label against the manifest and the Play form for three-way divergence.
@@ -32,7 +32,7 @@ Key consequences:
 - **Transient transmissions are NOT "collected"**: an auth token or IP address sent on a server call and not retained, or data sent then immediately discarded after servicing the request, is not disclosable. [settled — Apple, verified 2026-06-06]
 - **Ongoing collection after an initial permission grant IS "collected"** and must be disclosed. [settled — "data collected on an ongoing basis after an initial request for permission must be disclosed", verified 2026-06-06]
 
-> **Breathe application:** Free-tier breathing/session history is stored **on-device only** (SharedPreferences / local) → NOT "collected" → not disclosable for free users. Pro-tier history is **synced to Firestore** (off-device, retained) → IS "collected" → must be declared (as User Content / Usage Data per §6 mapping). The label must reflect the Pro behaviour because the same binary worldwide app build can collect it; do not under-declare on the theory that "most users are free."
+> **Application (worked: example app):** Free-tier breathing/session history is stored **on-device only** (SharedPreferences / local) → NOT "collected" → not disclosable for free users. Pro-tier history is **synced to Firestore** (off-device, retained) → IS "collected" → must be declared (as User Content / Usage Data per §6 mapping). The label must reflect the Pro behaviour because the same binary worldwide app build can collect it; do not under-declare on the theory that "most users are free."
 
 ---
 
@@ -104,7 +104,7 @@ Data is **Linked** if it is associated with the user's identity (account, device
 
 To declare **Not Linked**, the de-identification must be done **before collection** (strip direct identifiers, or break linkage so it cannot be re-linked) **and** the developer must not afterwards attempt to re-link or tie it to other datasets that enable linkage. [settled — Apple, verified 2026-06-06]
 
-> **Breathe application:** Firebase Analytics / Crashlytics events tied to a Firebase UID and a signed-in account are **Linked** for Pro users. For free users, if analytics events are sent without an account-level identifier they may be **Not Linked** — but only if no persistent identifier ties them back; verify against the manifest/SDK config rather than assuming. The default safe answer for account-bound telemetry is **Linked**.
+> **Application (worked: example app):** Firebase Analytics / Crashlytics events tied to a Firebase UID and a signed-in account are **Linked** for Pro users. For free users, if analytics events are sent without an account-level identifier they may be **Not Linked** — but only if no persistent identifier ties them back; verify against the manifest/SDK config rather than assuming. The default safe answer for account-bound telemetry is **Linked**.
 
 ### 4.3 "Not Linked"
 
@@ -127,13 +127,13 @@ The inverse of §4.2 — data properly de-identified/anonymized per the criteria
 
 Multiple purposes may apply to one data type. Example from Apple: an email used to authenticate and personalize → **App Functionality** + **Product Personalization**. [settled — Apple, verified 2026-06-06]
 
-> **Breathe application:** Breathe has **no advertising** (and strips the Android `AD_ID`). It must NOT select Third-Party Advertising or Developer's Advertising/Marketing for any type. Valid purposes are limited to **App Functionality** (auth, crash-min, subscriptions), **Analytics** (Firebase Analytics), and arguably **Product Personalization** only if it personalizes content (breathing app likely does not → leave unchecked unless a real feature uses it).
+> **Application (worked: example app):** for an app with **no advertising** (the example app, which also strips the Android `AD_ID`), it must NOT select Third-Party Advertising or Developer's Advertising/Marketing for any type. Valid purposes are limited to **App Functionality** (auth, crash-min, subscriptions), **Analytics** (Firebase Analytics), and arguably **Product Personalization** only if it personalizes content (breathing app likely does not → leave unchecked unless a real feature uses it).
 
 ---
 
-## 6. Per-category mapping for Breathe (the authoritative answer table)
+## 6. Per-category mapping (the worked answer table for the example app; derive the app's own the same way)
 
-Profile: no HealthKit, no ads, no location, no Sensitive Info, no Contacts. Auth = Firebase (email + Google sign-in → UID); subscriptions = Apple as merchant of record + RevenueCat middleware; telemetry = Firebase Analytics + Crashlytics; Pro sync = Firestore. Free = on-device only.
+Profile: no HealthKit, no ads, no location, no Sensitive Info, no Contacts. Auth = Firebase (email + Google sign-in → UID); subscriptions = Apple as merchant of record + RevenueCat middleware; telemetry = Firebase Analytics + Crashlytics; paid-tier sync = Firestore. Free = on-device only.
 
 | Apple category / sub-type | Collected? | Source | Linked? | Track? | Purpose(s) | Notes |
 |---|---|---|---|---|---|---|
@@ -157,13 +157,13 @@ Profile: no HealthKit, no ads, no location, no Sensitive Info, no Contacts. Auth
 | Surroundings / Body | **No** | — | — | — | — | Not visionOS. |
 | Other Data | **No** | — | — | — | — | |
 
-> **Tracking column is uniformly "No"** for Breathe: no data is combined with Third-Party Data for ads, and nothing is shared with a data broker. Therefore Breathe should have an **empty "Data Used to Track You"** section and **no ATT prompt**. If any SDK is later added that does cross-app ad attribution, this flips and ATT becomes mandatory. [settled — tracking definition, verified 2026-06-06]
+> **Tracking column is uniformly "No"** for the example app: no data is combined with Third-Party Data for ads, and nothing is shared with a data broker. An app in that position should have an **empty "Data Used to Track You"** section and **no ATT prompt**. If any SDK is later added that does cross-app ad attribution, this flips and ATT becomes mandatory. [settled — tracking definition, verified 2026-06-06]
 
-> **Analytics opt-out interaction:** Breathe lets users disable Analytics/Crashlytics in-app. The label reflects the *default* / maximal collection state, not the opted-out state. Declaring these types is correct even though users can turn them off; the PP must describe the opt-out.
+> **Analytics opt-out interaction:** when an app lets users disable Analytics/Crashlytics in-app (the example app does), the label reflects the *default* / maximal collection state, not the opted-out state. Declaring these types is correct even though users can turn them off; the PP must describe the opt-out.
 
 ---
 
-## 7. Optional-disclosure exemption (narrow — rarely applies to Breathe)
+## 7. Optional-disclosure exemption (narrow — rarely applies to a consumer app)
 
 A data type need NOT be disclosed only if it meets **ALL** of the general criteria [settled — Apple, verified 2026-06-06]:
 
@@ -172,9 +172,9 @@ A data type need NOT be disclosed only if it meets **ALL** of the general criter
 3. **Infrequent & optional** — collected only in cases NOT part of the app's primary functionality, and optional for the user; AND
 4. **User-initiated & transparent** — provided by the user via the app UI, with clear visibility of what is collected, the user's name/account name prominently displayed alongside the data, and the user affirmatively chooses to provide it **each time**.
 
-Apple's example: optional feedback forms or customer-service requests unrelated to the app's primary purpose. There are two further all-criteria exemptions for **regulated financial services** and **health research (ICF + IRB/ethics-board approved)** — neither applies to Breathe. [settled — Apple, verified 2026-06-06]
+Apple's example: optional feedback forms or customer-service requests unrelated to the app's primary purpose. There are two further all-criteria exemptions for **regulated financial services** and **health research (ICF + IRB/ethics-board approved)** — neither applies to a consumer wellness app like the example app. [settled — Apple, verified 2026-06-06]
 
-> **Breathe application:** Routine analytics/crash/subscription/auth data is part of primary functionality and ongoing → **does not qualify** for the exemption. Only something like a one-off in-app feedback form (if added) might qualify — and only if all four criteria hold. Do not rely on this exemption to drop core telemetry from the label.
+> **Application (worked: example app):** Routine analytics/crash/subscription/auth data is part of primary functionality and ongoing → **does not qualify** for the exemption. Only something like a one-off in-app feedback form (if added) might qualify — and only if all four criteria hold. Do not rely on this exemption to drop core telemetry from the label.
 
 ---
 
@@ -184,7 +184,7 @@ Apple's example: optional feedback forms or customer-service requests unrelated 
 
 Critical rule: an SDK that combines your app's user data with other apps' data for targeted advertising / ad measurement counts as **tracking by you, even if you don't use the SDK for that purpose**. [settled — Apple, verified 2026-06-06]
 
-> **Breathe application:** Firebase (Auth, Firestore, Analytics, Crashlytics, Cloud Functions, Hosting) and RevenueCat are all third-party partners whose collection must appear on Breathe's label and be named (entity-specifically) in the PP. Verify each against: (a) the merged `PrivacyInfo.xcprivacy` `NSPrivacyCollectedDataTypes` from the iOS pods, and (b) the named-subprocessor register / PP. A flow present in a pod manifest but absent from the label/PP is an **omitted disclosure** (FAIL). Firebase Analytics ships with `AD_ID` by default on Android — Breathe strips it; confirm no Device-ID/advertising flow sneaks back via an SDK update.
+> **Application (worked: example app):** Firebase (Auth, Firestore, Analytics, Crashlytics, Cloud Functions, Hosting) and RevenueCat are all third-party partners whose collection must appear on the app's label and be named (entity-specifically) in the PP. Verify each against: (a) the merged `PrivacyInfo.xcprivacy` `NSPrivacyCollectedDataTypes` from the iOS pods, and (b) the named-subprocessor register / PP. A flow present in a pod manifest but absent from the label/PP is an **omitted disclosure** (FAIL). Firebase Analytics ships with `AD_ID` by default on Android — an app that strips it (as the example app does) must confirm no Device-ID/advertising flow sneaks back via an SDK update.
 
 ---
 
@@ -204,13 +204,13 @@ Critical rule: an SDK that combines your app's user data with other apps' data f
 
 ## 10. Common indie failure modes (adjudicator checklist)
 
-| Failure | Why it fails | Breathe status |
+| Failure | Why it fails | Status (worked: example app) |
 |---|---|---|
 | Declaring **Health & Fitness** because the app is "wellness" | Only HealthKit/Motion/clinical sources count; over-declaring still creates PP↔label drift and a false Art. 9 (GDPR) signal | Must declare **NOT collected** |
 | Forgetting **Purchases → Purchase History** for subscriptions | Subscription/entitlement state is collected via RC | Declare Yes / Linked / App Functionality |
 | Forgetting **Diagnostics** (Crashlytics) | Crash logs are off-device + retained = collected | Declare Crash (+ Performance if shipped) |
 | Marking analytics **Not Linked** when it is account-bound | UID/identity-synced telemetry is Linked | Declare Usage Data as **Linked** |
-| Declaring **Tracking** without an ATT prompt | Tracking requires ATT implementation | Breathe = no tracking, no ATT (correct) |
+| Declaring **Tracking** without an ATT prompt | Tracking requires ATT implementation | No tracking, no ATT (correct for an app with no tracking) |
 | Omitting a third-party SDK's collection | Partner collection = developer collection | Enumerate Firebase + RevenueCat |
 | Leaving an **advertising identifier / Device ID** declared | Contradicts "no advertising ID" / AD_ID strip | Declare Device ID = **No** |
 | Label not updated after adding an SDK | Must keep accurate/up to date | Re-run cross-check on each dependency bump |
@@ -241,7 +241,7 @@ APP PRIVACY LABEL — SIGN-OFF
 
 - **[verify-pinpoint]** Classification of synced **breathing session logs** under the Apple taxonomy — "User Content → Other User Content" vs "Usage Data → Other Usage Data". Apple's taxonomy is recipient-agnostic; either may be defensible. Pin to whichever the PP names and keep both consistent.
 - **[verify-pinpoint]** Whether stored **email** belongs to "Contact Info → Email Address" only, or also counts as an "Identifiers → User ID" when used as the account key (avoid double-counting; declare under Contact Info, declare the UID under Identifiers).
-- **[verify]** Whether Breathe ships Firebase **Performance Monitoring** (drives the "Diagnostics → Performance Data" Yes/No). Confirm against `pubspec.lock` / pods.
+- **[verify]** Whether the app ships Firebase **Performance Monitoring** (drives the "Diagnostics → Performance Data" Yes/No). Confirm against `pubspec.lock` / pods.
 - **[verify]** Whether **display name** from Google Sign-In is persisted off-device (drives "Contact Info → Name").
 - **[verify]** The exact phrasing of Apple's "label must match the Privacy Policy" requirement — it is the conjunction of "keep responses accurate" + Review Guideline 5.1.1(i), not a single verbatim sentence on the App Privacy Details page.
 - **[settled]** Everything tagged `[settled — Apple, verified 2026-06-06]` is quoted/derived directly from https://developer.apple.com/app-store/app-privacy-details/ fetched this run.

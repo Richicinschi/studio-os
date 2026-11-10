@@ -8,8 +8,8 @@
 // export template — fills the importable 5-column CSV.
 //
 // Usage:
-//   node emit_play_csv.mjs                         # bundled Breathe answers -> readable CSV
-//   node emit_play_csv.mjs --answers answers.json  # custom answers
+//   node emit_play_csv.mjs --answers answers.json  # the app's own answers -> readable CSV
+//   node emit_play_csv.mjs                         # bundled EXAMPLE answers (not your app's)
 //   node emit_play_csv.mjs --template play_export.csv   # fill importable 5-col CSV
 //   add  --out file.csv  to write to a file.
 // No external dependencies.
@@ -17,16 +17,18 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// ---- Bundled default answers for Breathe (edit or pass --answers) ----
-// Derived from the Data Safety taxonomy (14 categories / 7 purposes / 2 security
-// declarations) and Breathe's actual data surface. NOT "Health & fitness".
-const BREATHE = {
-  app: 'Breathe',
+// ---- Bundled EXAMPLE answers (pass --answers with the app's own file) ----
+// The example app of legal-guardrails.md section 8: a Firebase + RevenueCat
+// wellness app with no health data. Derived from the Data Safety taxonomy
+// (14 categories / 7 purposes / 2 security declarations) and that app's data
+// surface. NOT "Health & fitness". Mirrors assets/data-safety-answers.example.json.
+const EXAMPLE_ANSWERS = {
+  app: '<app name>',
   security: { encryptedInTransit: true, userCanRequestDeletion: true },
   // Each entry: category > type, collected/shared, ephemeral, optional, purposes[].
-  // shared=false on every row: Firebase/RevenueCat/stores are PROCESSORS on our
-  // documented instructions, which Play excludes from "sharing". Matches
-  // store-privacy-declarations.md "Shared: No" + Privacy §6.
+  // shared=false on every row: Firebase/RevenueCat/stores are PROCESSORS on the
+  // publisher's documented instructions, which Play excludes from "sharing".
+  // The Privacy Policy's recipients section must say the same.
   data: [
     { category: 'Personal info', type: 'Email address', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['Account management', 'App functionality'], recipient: 'Google/Firebase (processor)' },
     { category: 'Personal info', type: 'User IDs', collected: true, shared: false, ephemeral: false, optional: false, purposes: ['Account management', 'App functionality', 'Analytics'], recipient: 'Google/Firebase, RevenueCat (processors)' },
@@ -46,7 +48,8 @@ const answersPath = opt('--answers');
 const templatePath = opt('--template');
 const outPath = opt('--out');
 
-const answers = answersPath ? JSON.parse(readFileSync(resolve(answersPath), 'utf8')) : BREATHE;
+if (!answersPath) console.error('Note: no --answers file given; emitting the bundled EXAMPLE answers, not your app\'s. Copy assets/data-safety-answers.example.json, set every row for your app, and pass it with --answers.');
+const answers = answersPath ? JSON.parse(readFileSync(resolve(answersPath), 'utf8')) : EXAMPLE_ANSWERS;
 
 function csvEscape(v) {
   const s = String(v ?? '');

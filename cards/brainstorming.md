@@ -59,7 +59,7 @@ The menu marks the item **have** when a `brainstorming` skill exists at either l
 2. **Claude:** on your yes, writes the copy into the scope you chose and rewrites for your setup:
    - the author line in the front matter, which names the studio, to yours;
    - "Where it goes": the copy saves designs as `docs/specs/YYYY-MM-DD-<topic>-design.md`; Claude puts your folder there, or keeps that one;
-   - the brand text in `scripts/server.cjs`, which says it is the studio's copy, to your own words;
+   - the brand text, which says it is the studio's copy, to your own words, in both places it sits: `scripts/server.cjs` and the top bar of `scripts/frame-template.html`;
    - the hand-over: after approval the copy invokes `writing-plans`. If you skipped writing-plans, Claude points it at the planner you use, or tells it to stop and hand the approved design back to you.
 
    Claude shows the result before it saves it.

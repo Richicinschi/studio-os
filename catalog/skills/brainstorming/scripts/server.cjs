@@ -10,7 +10,7 @@
 // start-server.sh sets these environment variables:
 //   BRAINSTORM_DIR, BRAINSTORM_HOST, BRAINSTORM_URL_HOST, BRAINSTORM_PORT, BRAINSTORM_PORT_FILE,
 //   BRAINSTORM_TOKEN, BRAINSTORM_TOKEN_FILE, BRAINSTORM_OWNER_PID, BRAINSTORM_IDLE_TIMEOUT_MS,
-//   BRAINSTORM_LIFECYCLE_CHECK_MS, BRAINSTORM_OPEN, BRAINSTORM_OPEN_CMD
+//   BRAINSTORM_LIFECYCLE_CHECK_MS, BRAINSTORM_OPEN
 
 const { createHash, randomBytes, randomInt, timingSafeEqual } = require('node:crypto');
 const http = require('node:http');
@@ -156,14 +156,14 @@ function readSettings(env) {
     idleMs: positiveOr(env.BRAINSTORM_IDLE_TIMEOUT_MS, 4 * 60 * 60 * 1000),
     // How often the watchdog looks at the owner process and the idle clock (tests make it short).
     watchdogMs: positiveOr(env.BRAINSTORM_LIFECYCLE_CHECK_MS, 60 * 1000),
-    wantsBrowser: Boolean(env.BRAINSTORM_OPEN),
-    openCommand: env.BRAINSTORM_OPEN_CMD || null
+    wantsBrowser: Boolean(env.BRAINSTORM_OPEN)
   };
 }
 
 const cfg = readSettings(process.env);
 
-// The text in the page header. Plain local text: no image, no link, nothing is fetched for it.
+// The text in the page header. Plain local text: no image, no link, nothing is fetched for it. The frame
+// template's top bar carries the same line.
 const BRAND_TEXT = 'Studio brainstorm companion, local only';
 
 const CONTENT_TYPES = new Map([
@@ -189,8 +189,6 @@ const FRAME_HTML = readHere('frame-template.html');
 const HELPER_TAG = `<script>\n${readHere('helper.js')}\n</script>`;
 const BRAND_HTML = `<div class="brand"><span class="brand-text">${BRAND_TEXT}</span></div>`;
 
-const brand = (html) => html.replaceAll('<!-- BRANDING -->', () => BRAND_HTML);
-
 // A minimal standalone page for the notices the server writes itself.
 function plainPage(title, css, body) {
   return [
@@ -213,11 +211,11 @@ p { color: #6b6b6b; }
 code { padding: 0 0.3em; border-radius: 4px; background: #eee; }
 .brand { margin-bottom: 1.5rem; color: #6b6b6b; font-size: 0.9rem; }`;
 
-const EMPTY_PAGE = brand(plainPage(
+const EMPTY_PAGE = plainPage(
   'Brainstorm Companion',
   NOTICE_CSS,
-  '<!-- BRANDING --><main><h1>Brainstorm companion</h1>\n<p>Nothing to show yet. The agent will put a screen here.</p></main>'
-));
+  `${BRAND_HTML}<main><h1>Brainstorm companion</h1>\n<p>Nothing to show yet. The agent will put a screen here.</p></main>`
+);
 
 const KEY_MISSING_PAGE = plainPage(
   'Session key required',
@@ -355,7 +353,7 @@ function showCurrentScreen(res) {
   let html = EMPTY_PAGE;
   if (file) {
     const source = fs.readFileSync(file, 'utf-8');
-    html = isCompleteDocument(source) ? source : brand(FRAME_HTML).split('<!-- CONTENT -->').join(source);
+    html = isCompleteDocument(source) ? source : FRAME_HTML.split('<!-- CONTENT -->').join(source);
   }
   replyHtml(res, 200, insertHelper(html));
 }
@@ -535,11 +533,6 @@ function openBrowserOnce() {
 
   const url = sessionLink(); // it has to carry the key, or the first request is refused
   quietly(() => {
-    if (cfg.openCommand) {
-      // The operator wrote this command line, so it runs as written.
-      childProcess.exec(`${cfg.openCommand} ${JSON.stringify(url)}`, noop);
-      return;
-    }
     const launcher = browserLauncherForPlatform(url);
     // No shell here: the URL is one argument, so an odd host name cannot turn into a command.
     if (launcher) childProcess.execFile(launcher.bin, launcher.args, noop);
@@ -663,9 +656,15 @@ function run() {
     fs.writeFileSync(infoFile, `${infoText}\n`, { mode: 0o600 });
   }
 
+  // A busy port (EADDRINUSE) or one the system refuses (EACCES: Windows reserves ranges inside the random
+  // span) moves to another random port, up to MAX_FALLBACKS times.
+  const MAX_FALLBACKS = 10;
+  let fallbacks = 0;
   function onBindError(err) {
-    if (err.code !== 'EADDRINUSE' || usedFallbackPort) bail(`Cannot bind the server: ${err.message}`);
-    if (cfg.keySource === 'env') bail('Port is busy and BRAINSTORM_TOKEN fixes the key, so no other port is tried.');
+    const retryable = err.code === 'EADDRINUSE' || err.code === 'EACCES';
+    if (!retryable || fallbacks >= MAX_FALLBACKS) bail(`Cannot bind the server: ${err.message}`);
+    if (cfg.keySource === 'env') bail(`Port ${cfg.port} cannot be used (${err.code}) and BRAINSTORM_TOKEN fixes the key, so no other port is tried.`);
+    fallbacks += 1;
     usedFallbackPort = true;
     cfg.port = randomHighPort();
     if (cfg.keySource === 'file') {

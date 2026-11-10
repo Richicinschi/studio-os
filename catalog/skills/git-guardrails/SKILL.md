@@ -5,7 +5,7 @@ description: >-
 metadata:
   category: engineering
   author: Richicinschi
-  version: 1.2.0
+  version: 1.3.0
   domain: git safety hook for Claude Code
 ---
 # Git guardrails
@@ -37,7 +37,7 @@ destructive pushes are stopped.
 | `push` | `--mirror`, `--delete`, `-d`, `-f`, `--force`, `--force-with-lease`, a `+ref` such as `origin +main`, an empty-source `origin :branch` |
 | `reset` | `--hard` |
 | `rebase` | every use, except `--continue`, `--quit`, `--skip` and `--abort` on one already running |
-| `commit` | `--amend`, `-n`, `--no-verify` |
+| `commit` | `--amend`, `-n` |
 | `branch` | `-D`, `-f` |
 | `checkout` | `-f`, `-B`, `.`, `-- .` |
 | `switch` | `-C` |
@@ -49,12 +49,18 @@ destructive pushes are stopped.
 | `gc` | `--prune` |
 | `update-ref` | `-d` |
 | `commit-tree`, `filter-repo`, `filter-branch` | all uses |
-| any git call | `-c core.hooksPath=` |
+| `config` | giving `core.hooksPath` a value or removing it: `config core.hooksPath <folder>`, `set`, `--unset`, `unset`, `--replace-all`, `--add` |
+| any git call | `--no-verify` and every prefix of it from `--no-ver` on, since git takes a unique prefix (this also refuses the rare `--no-verbose`); `-c core.hooksPath=`; `--config-env=core.hooksPath=` |
+
+git reads a config key in any case, so the `core.hooksPath` rules match `core.hookspath`,
+`CORE.HOOKSPATH` and every other mix. Turning hooks on with `git config core.hooksPath <folder>`
+is refused too, because the same command can point the hooks at an empty folder: run it yourself.
 
 ## Still allowed
 
 Unforced `git push` (and `push -n`), lowercase `branch -d`, lowercase `switch -c`, `stash`
-with `stash pop`, `gc` without `--prune`, and `worktree remove` without force.
+with `stash pop`, `gc` without `--prune`, `worktree remove` without force, and reading the hooks
+setting (`git config --get core.hooksPath`, alone or with a redirect).
 
 A refused command prints a `BLOCKED` message on stderr that says the agent has no authority to
 run it, and the script exits with code 2.

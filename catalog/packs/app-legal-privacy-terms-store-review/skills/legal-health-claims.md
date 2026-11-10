@@ -38,9 +38,9 @@ This skill does two jobs at once: (1) a **marketing guardrail** — scan every c
 
 Do not reproduce their tables here — read them at runtime and cite by pinpoint.
 
-## App-profile inputs (THIS run = Breathe; treat as variables for the portfolio)
+## App-profile inputs (from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest)
 
-Supply per app: `{app_name}`, the **claim surfaces** (Play description, App Store description, in-app strings/ARB, About screen, PP/ToS health disclaimer, any marketing/landing copy), and the **health-integration inventory** (HealthKit? Google Fit / Health Connect? wearable? any external health API?). For Breathe: general-wellness breathing app, no medical claims, **no** HealthKit / Google Fit / Health Connect / wearable / external health import; free = on-device only, Pro = Firestore sync; live docs `apps/my-app/app/assets/legal/{privacy,terms}.md` (+ `.nl.md`) v6.
+Gather: `<app name>`, the **claim surfaces** (Play description, App Store description, in-app strings/ARB, About screen, PP/ToS health disclaimer, any marketing/landing copy), the **health-integration inventory** (HealthKit? Google Fit / Health Connect? wearable? any external health API? — read the dependency list and entitlements, then confirm with the person), what each tier stores **where**, and the live legal docs (paths, languages, version). Worked case in the references: the example app (`legal-guardrails.md` §8) — general-wellness breathing app, no medical claims, **no** HealthKit / Google Fit / Health Connect / wearable / external health import; free tier on-device only, paid tier Firestore sync.
 
 ---
 

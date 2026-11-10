@@ -79,7 +79,7 @@ test('prependChangelog keeps one header on a header-only file and on a CRLF chec
 
 test('staleness: changed hub sources, facts older than 90 days, and a warning when git fails', () => {
   const root = tree({
-    'modules/01-continuity/README.md': '---\ntitle: Continuity\nsources:\n  - .studio/memory/a.md\n  - .studio/memory/b.md\nchecked: 2026-07-01\n---\n# x\n',
+    'modules/01-continuity/README.md': '---\ntitle: Continuity\nstudio_sources:\n  - .studio/memory/a.md\n  - .studio/memory/b.md\nchecked: 2026-07-01\n---\n# x\n',
     'docs/facts.md': '---\ntitle: Facts\nchecked: 2026-10-30\n---\n',
   });
   try {
@@ -96,13 +96,23 @@ test('staleness: changed hub sources, facts older than 90 days, and a warning wh
 });
 
 test('staleness and the clean-hub check also follow private sources a page may not name', () => {
-  const root = tree({ 'modules/12-x/README.md': '---\ntitle: X\nsources:\n  - .studio/memory/a.md\n---\n# x\n' });
+  const root = tree({ 'modules/12-x/README.md': '---\ntitle: X\nstudio_sources:\n  - .studio/memory/a.md\n---\n# x\n' });
   try {
     const extra = { 'modules/12-x/README.md': ['.studio/memory/private-one.md'] };
     const gitLog = (hub, since, file) => (file.endsWith('private-one.md') ? 'abc123' : '');
     const r = staleness(root, { hub: 'H', sinceCommit: 'old', today: '2026-11-02', gitLog, extra });
     assert.deepEqual(r.changedSources, [{ page: 'modules/12-x/README.md', source: '.studio/memory/private-one.md' }]);
     assert.deepEqual(pageSources(root, extra), ['.studio/memory/a.md', '.studio/memory/private-one.md']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('PRINCIPLES.md is followed like the other hand-written pages: staleness and the clean-hub check read its studio_sources', () => {
+  const root = tree({ 'PRINCIPLES.md': '---\ntitle: How we work\nstudio_sources:\n  - .studio/identity/SOUL.md\n---\n# x\n' });
+  try {
+    const gitLog = (hub, since, file) => (file.endsWith('SOUL.md') ? 'abc123' : '');
+    const r = staleness(root, { hub: 'H', sinceCommit: 'old', today: '2026-11-02', gitLog });
+    assert.deepEqual(r.changedSources, [{ page: 'PRINCIPLES.md', source: '.studio/identity/SOUL.md' }]);
+    assert.deepEqual(pageSources(root), ['.studio/identity/SOUL.md']);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

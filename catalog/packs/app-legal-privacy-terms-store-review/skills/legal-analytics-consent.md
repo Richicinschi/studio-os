@@ -32,7 +32,7 @@ Operates under `legal-guardrails` — load its constitution + the references lis
 
 This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a), which is logically **prior to** the GDPR lawful-basis question. Clearing the Art. 6 basis does NOT clear Art. 5(3): consent is the only lawful basis for the device read/write where the exemption fails. (`eprivacy-cookiewet.md` §1.)
 
-**App inputs (portable across the 3-app portfolio — supply these per app):** the SDK list (default: Firebase Analytics, Crashlytics, Remote Config), default telemetry state at boot (on/off), the consent UI (none / opt-out toggle / first-run opt-in gate), the PP wording for the analytics basis, and the store-declaration answers (Apple App Privacy / Play Data Safety). Breathe defaults are encoded in the references above.
+**App inputs (from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest):** the SDK list (read it from the lockfile / `build.gradle`; e.g. Firebase Analytics, Crashlytics, Remote Config), default telemetry state at boot (on/off — read the init code), the consent UI (none / opt-out toggle / first-run opt-in gate), the PP wording for the analytics basis, and the store-declaration answers (Apple App Privacy / Play Data Safety). The references above work these through for the example app (`legal-guardrails.md` §8), a Firebase app that ships analytics opt-out.
 
 ---
 
@@ -49,9 +49,9 @@ This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a
 
 4. **Reject the legitimate-interest escape.** If the PP / DPIA / RoPA bases Firebase Analytics or Crashlytics on **Art. 6(1)(f) legitimate interest**, flag it: Art. 5(3) is lex specialis for the device read/write and lists only two exemptions — LI is not one. A perfect LIA cannot authorise the device-storage step. (`eprivacy-cookiewet.md` §5; `gdpr-articles.md` Art. 6.)
 
-5. **Check the implementation (the headline finding for the current Breathe build).** Determine which of these the app ships:
+5. **Check the implementation (often the headline finding).** Determine which of these the app ships:
    - ❌ **Telemetry initialises before any consent** (`setAnalyticsCollectionEnabled(true)` / Crashlytics handlers active at boot, or default-ON when the toggle is unset) → 🔴 **BLOCKER** (prior-consent violation, Art. 5(3)).
-   - ❌ **Opt-OUT only** (collection on by default; Settings toggle to disable) → 🟠 **MATERIAL** → must become opt-in. *This is the current Breathe pattern.*
+   - ❌ **Opt-OUT only** (collection on by default; Settings toggle to disable) → 🟠 **MATERIAL** → must become opt-in. *The most common pattern in indie apps, and the example app's.*
    - ❌ **"Legitimate interest" claimed** in PP for analytics → 🟠/🔴 (false/over-claimed basis).
    - ✅ **First-run opt-in gate** (boot OFF; affirmative, granular, no cookie wall; records `analyticsConsentAt`; easy withdrawal) → 🟢 OK.
 
@@ -108,7 +108,7 @@ Future<void> withdrawTelemetryConsent() async {
 }
 ```
 
-Note the Breathe repo already applies the persisted toggle at boot before the Crashlytics handlers — the fix is to make the **default-when-unset OFF** and add the **first-run gate**, not merely an opt-out toggle.
+If the app already applies a persisted toggle at boot before the Crashlytics handlers (as the example app does), the fix is to make the **default-when-unset OFF** and add the **first-run gate**, not merely an opt-out toggle.
 
 ---
 
@@ -140,4 +140,4 @@ Then a **per-document letter grade** (Privacy, and the implementation as a sub-g
 
 End with the `legal-guardrails` §5 authority footer. **Decide and sign** the ruling; reserve **only** for a Dutch advocaat: the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review of the consent copy, and any item marked `[low-confidence]` (notably the Crashlytics "strictly necessary" boundary and the exact Tw 11.7a lid/onderdeel + AP page citation — see `eprivacy-cookiewet.md` §9 open items).
 
-**Expected headline for the current Breathe build:** `[COOK-1] 🟠 Firebase Analytics/Crashlytics ship opt-OUT (default-ON, legitimate-interest framing) — NL requires prior opt-in` → **FIX-THEN-SIGN-OFF**.
+**Typical headline for an app that ships Firebase telemetry opt-out (the example app's case):** `[COOK-1] 🟠 Firebase Analytics/Crashlytics ship opt-OUT (default-ON, legitimate-interest framing) — NL requires prior opt-in` → **FIX-THEN-SIGN-OFF**.

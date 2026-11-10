@@ -1,7 +1,7 @@
 ---
 title: Skills
 pack: foundation
-sources:
+studio_sources:
   - .studio/memory/feedback_skill_adoption_disposition.md
   - .studio/memory/reference_skillspector.md
   - .claude/skills/writing-great-skills/SKILL.md

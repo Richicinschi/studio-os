@@ -9,8 +9,8 @@ description: >-
   Trigger on "review terms", "review the ToS", "terms of service", "unfair terms", "void clause",
   "algemene voorwaarden", "zwarte lijst", "grijze lijst", "liability cap", "indemnity / vrijwaring",
   "auto-renewal", "dispute resolution / arbitration", "governing law", "consumer terms",
-  "Apple EULA / Licensed Application", "withdrawal right". Covers Breathe and the 3-app portfolio
-  (app facts are inputs). Reserves only the [KVK]/[BTW]/[REGISTERED ADDRESS] fills, native-NL
+  "Apple EULA / Licensed Application", "withdrawal right". Works for any app (app facts are
+  inputs). Reserves only the [KVK]/[BTW]/[REGISTERED ADDRESS] fills, native-NL
   legal-idiom review, and [low-confidence] calls for a Dutch advocaat.
 metadata:
   category: legal
@@ -41,12 +41,13 @@ the §5 carve-outs for a Dutch advocaat.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-min-eula.md` — **cross-ref** for the iOS "Licensed Application EULA" section (the 10 minimum terms). Don't re-adjudicate Apple's 10 gates here; flag the section and hand to `legal-apple-gate`. Do confirm the section exists, is iOS-scoped, and that #8 name/address is not a `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` placeholder.
 - `legal-terms-review-nl/assets/eu-safe-clauses.md` (this skill) — the EU-safe replacement clause library for redlines.
 
-## App profile (inputs — defaults are Breathe; override per app)
+## App profile (inputs — from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest)
 
-- Trader: Dutch **eenmanszaak** (sole proprietor, no DPO); consumers = `natuurlijk persoon, niet handelend in beroep/bedrijf` → **both BW lists apply in full** (6:235 large-party exclusion N/A).
-- Subscriptions sold **through Apple/Google as merchants of record**; **RevenueCat** middleware; **Firebase** (Auth, Firestore, Analytics, Crashlytics, Functions, Hosting; EU `europe-west`) backend.
-- No medical claims ("supports / may help relax"). Free = on-device only; Pro = Firestore sync.
-- Live docs (Breathe): `apps/my-app/app/assets/legal/terms.md` (+ `terms.nl.md`), **version 6**. Known section map: §5 subscription, §6 withdrawal, §13 disclaimers/conformity, §14 liability, §15 indemnity, §17 termination, §22 changes, §23 governing law, §24 dispute resolution, §25 Apple EULA, §26 Google Play.
+Gather these for the person's app; the bracketed values are the example app's (`legal-guardrails.md` §8), the worked case the references use.
+- Trader: the publisher's legal form and size (example: Dutch **eenmanszaak**, sole proprietor, no DPO). Consumers = `natuurlijk persoon, niet handelend in beroep/bedrijf` → **both BW lists apply in full** (the 6:235 large-party exclusion concerns the counterparty, so it is N/A for consumers).
+- How it is sold (example: subscriptions **through Apple/Google as merchants of record**; **RevenueCat** middleware; **Firebase** backend — Auth, Firestore, Analytics, Crashlytics, Functions, Hosting; EU `europe-west`).
+- Health stance and tiers (example: no medical claims, "supports / may help relax"; free tier on-device only, paid tier Firestore sync).
+- Live docs: the Terms file(s), languages and version from the fact sheet (example: `terms.md` + `terms.nl.md`). Map the person's sections to this **example section map**, which the steps below cite: §5 subscription, §6 withdrawal, §13 disclaimers/conformity, §14 liability, §15 indemnity, §17 termination, §22 changes, §23 governing law, §24 dispute resolution, §25 Apple EULA, §26 Google Play.
 
 ## Workflow
 

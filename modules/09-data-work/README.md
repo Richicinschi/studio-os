@@ -1,7 +1,7 @@
 ---
 title: Data work
 pack: data-work
-sources:
+studio_sources:
   - .claude/skills/claim-auditor/SKILL.md
   - .claude/skills/modern-python/SKILL.md
   - .claude/skills/production-fastapi/SKILL.md

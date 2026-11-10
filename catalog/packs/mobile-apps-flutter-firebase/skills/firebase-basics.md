@@ -29,7 +29,7 @@ One rule governs every command: write the CLI as `npx -y firebase-tools@latest <
 6. **Initialize services.** Look for `firebase.json` first; if it exists, the folder is already set up. Otherwise, from the codebase root, run `npx -y firebase-tools@latest init` and answer its prompts (features, project, config files). Details in [cli-tour.md](firebase-basics/cli-tour.md).
 7. **Discover commands from the tool itself.** `--help` for the full list, `<command> --help` for one command. See [cli-tour.md](firebase-basics/cli-tour.md).
 8. **Add the SDK.** Use [flutterfire-walkthrough.md](firebase-basics/flutterfire-walkthrough.md) for Flutter, and [native-and-web-setup.md](firebase-basics/native-and-web-setup.md) for Android, iOS and web.
-9. **Genkit.** If the project uses Genkit, its skills install with `npx skills add genkit-ai/skills`. That is an outside install: scan and vet it first (studio hard rule 14) and ask before running it.
+9. **Genkit.** If the project uses Genkit, its skills install with `npx skills add genkit-ai/skills`. That is an outside install: scan and vet it first (`vet-and-adopt`) and ask before running it.
 
 ## Without local tools
 

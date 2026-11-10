@@ -2,9 +2,10 @@
 
 **Scope of this file.** The EU Consumer Rights Directive (CRD) 14-day withdrawal right, the 12-month
 extension, and the conditions for validly waiving the right when an app unlocks paid digital
-content/services immediately. Tailored to **Breathe** (Dutch *eenmanszaak*; auto-renewing subscriptions
-sold THROUGH Apple/Google as merchants of record, RevenueCat middleware, Firebase EU backend; general
-wellness, no medical claims). Reusable for any EU/NL distance-sold app subscription.
+content/services immediately. Worked examples use the **example app** (`legal-guardrails.md` §8:
+Dutch *eenmanszaak*; auto-renewing subscriptions sold THROUGH Apple/Google as merchants of record,
+RevenueCat middleware, Firebase EU backend; general wellness, no medical claims). The rules apply to
+any EU/NL distance-sold app subscription: apply them to the app under review from its fact sheet.
 
 **Primary source fetched this run:** Directive 2011/83/EU, consolidated text as amended to 2022-05-28
 (CELEX `02011L0083-20220528`), EUR-Lex.
@@ -29,7 +30,7 @@ novel / contested / fact-specific jurist call.
 | R4 | The right can be **lost** for digital content not on a tangible medium **only if THREE cumulative conditions** are met: (i) prior express consent, (ii) acknowledgement of loss, (iii) durable-medium confirmation. | [settled — Art 16(m), verified 2026-06-06] |
 | R5 | If any of the three fails, the consumer can still withdraw AND **owes nothing** for content already supplied (Art 14(4)(b)). The trader eats the cost. | [settled — Art 14(4)(b), verified 2026-06-06] |
 | R6 | The trader must publish the **model withdrawal form** (Annex I(B)) and inform of the right; otherwise R3 applies. | [settled — Annex I(B) + Art 6(1)(h)/(c), verified 2026-06-06] |
-| R7 | **Breathe gap to verify:** the unticked paywall checkbox satisfies (i)+(ii); whether the Apple/Google receipt or a Breathe-sent email satisfies (iii) durable-medium confirmation is the **open item**. | [low-confidence] |
+| R7 | **Common gap to verify (the example app's):** an unticked paywall checkbox satisfies (i)+(ii); whether the Apple/Google receipt or a publisher-sent email satisfies (iii) durable-medium confirmation is the **open item**. | [low-confidence] |
 
 ---
 
@@ -41,8 +42,8 @@ novel / contested / fact-specific jurist call.
 - **A subscription is a contract under the CRD even if "paid" only with personal data**, except where
   the data is processed solely to perform the contract or meet a legal duty. Art 3(1a) (added by
   2019/2161) extends the CRD to digital content/services supplied against personal data.
-  [settled — Art 3(1a), verified 2026-06-06] — *Breathe is a paid subscription, so this is moot for the
-  Pro tier; relevant only if a "free for data" tier were ever offered.*
+  [settled — Art 3(1a), verified 2026-06-06] — *for a paid subscription (as in the example app) this is moot
+  for the paid tier; relevant only if a "free for data" tier is offered.*
 - **Definitions (Art 2, as amended by 2019/2161):**
   - **'service contract'** = any contract other than a sales contract under which the trader supplies a
     service, **including a digital service**. [settled, verified 2026-06-06]
@@ -69,7 +70,7 @@ off-premises contract, **without giving any reason** […]." [settled, verified 
 | **Digital content NOT on a tangible medium** | the **day of conclusion of the contract** | [settled — Art 9(2)(c), verified 2026-06-06] |
 | Sales contract (goods) | the day the consumer acquires physical possession | [settled — Art 9(2)(b), verified 2026-06-06] |
 
-> **Breathe:** whether the Pro unlock is "digital service" or "digital content," **the clock starts at
+> **App subscriptions (the example app's case):** whether a paid-tier unlock is "digital service" or "digital content," **the clock starts at
 > purchase** — there is no delivery event. So absent a valid waiver, a subscriber could withdraw within
 > 14 days of buying and demand a refund.
 
@@ -89,7 +90,7 @@ organised excursions only. Not relevant to in-app purchases. [settled, verified 
 
 > **Adjudication hook:** if the Terms/paywall do not clearly state the withdrawal right (and the model
 > form), the practical refund-exposure window balloons to ~12 months. This is a strong reason to keep
-> Breathe's Terms §6 disclosure explicit even though the waiver is intended to extinguish the right.
+> the Terms' withdrawal-section disclosure explicit (§6 in the example app) even though the waiver is intended to extinguish the right.
 
 ---
 
@@ -129,7 +130,7 @@ The 2019/2161 modernisation introduced a distinction the CRD did not previously 
 >   ongoing subscription that is arguably never, mid-term; the cleaner reading is that the consumer can
 >   still withdraw but must **pay a pro-rata amount** for what was used (Art 14(3) mechanism), rather
 >   than the right being wholly extinguished.
-> Breathe's Terms should **draft to satisfy BOTH** Art 16(m) and Art 16(a) acknowledgement wording so
+> The app's Terms should **draft to satisfy BOTH** Art 16(m) and Art 16(a) acknowledgement wording so
 > the waiver holds however a Dutch court/jurist classifies the product.
 > [low-confidence — classification + consequence are fact-specific; pin against DCD 2019/770 Art 2(1)–(2)
 > and national case-law before relying]
@@ -201,9 +202,9 @@ rule + Art 6(1)(h) consequence chain]
 
 ---
 
-## 8. Breathe-specific application
+## 8. Worked application (the example app; re-run it on the app under review)
 
-### 8.1 The implemented mechanism
+### 8.1 The mechanism (as the example app implements it)
 - **Paywall checkbox, UNTICKED by default**, that the user must affirmatively tick to subscribe; the
   copy captures (i) **prior express consent** to begin immediate performance during the 14-day window
   **and** (ii) **acknowledgement** that doing so **forfeits the 14-day withdrawal right**.
@@ -219,35 +220,35 @@ rule + Art 6(1)(h) consequence chain]
 
 ### 8.2 THE OPEN ITEM — condition (iii) durable medium [low-confidence]
 
-The waiver is only valid if Breathe **provides the consumer** a durable-medium confirmation that
-includes the Art 6(1) info AND the recorded consent/acknowledgement, **at the latest before Pro
-unlocks**. Candidates and their problems:
+The waiver is only valid if the publisher (the trader) **provides the consumer** a durable-medium
+confirmation that includes the Art 6(1) info AND the recorded consent/acknowledgement, **at the
+latest before the paid tier unlocks**. Candidates and their problems:
 
 | Candidate artefact | Counts as durable-medium confirmation of consent+acknowledgement? | Note |
 |---|---|---|
-| **Apple App Store / Google Play receipt** (email/Wallet) | **Probably NOT, alone** — it confirms the *transaction* and is sent by the **store (merchant of record)**, not by Breathe, and does **not** record the consent + acknowledgement language. | [low-confidence — store is a different legal person; receipt content is outside Breathe's control] |
-| **Breathe-sent confirmation email** containing the Art 6(1) info + the consent/acknowledgement recap | **Most defensible.** Personally addressed, storable, unchanged-reproduction → meets Art 2(10); and Breathe controls its content to include 16(m)(i)+(ii). | [verify — requires Firebase/Cloud Functions to actually send such an email before the unlock] |
+| **Apple App Store / Google Play receipt** (email/Wallet) | **Probably NOT, alone** — it confirms the *transaction* and is sent by the **store (merchant of record)**, not by the publisher, and does **not** record the consent + acknowledgement language. | [low-confidence — store is a different legal person; receipt content is outside the publisher's control] |
+| **Publisher-sent confirmation email** containing the Art 6(1) info + the consent/acknowledgement recap | **Most defensible.** Personally addressed, storable, unchanged-reproduction → meets Art 2(10); and the publisher controls its content to include 16(m)(i)+(ii). | [verify — requires the backend (e.g. Firebase Cloud Functions) to actually send such an email before the unlock] |
 | In-app, server-mutable "purchase successful" screen | **Weak** — fails "unchanged reproduction"; trader can alter it. | [low-confidence] |
 
 **Recommended sign-off position:** treat the **store receipt as insufficient on its own** for condition
-(iii) and require a **Breathe-controlled durable artefact** (email, or an in-app **non-mutable**
+(iii) and require a **publisher-controlled durable artefact** (email, or an in-app **non-mutable**
 PDF/exportable record) that restates the consent + acknowledgement and the Art 6(1) terms, delivered
-**at the latest before Pro features unlock**. Until that exists, mark condition (iii) **UNMET** and the
+**at the latest before paid features unlock**. Until that exists, mark condition (iii) **UNMET** and the
 waiver **at risk**. [low-confidence — final call is a Dutch jurist's; flag for review]
 
 ### 8.3 Merchant-of-record wrinkle
 
 Apple/Google are **merchants of record** for the payment, but the **CRD trader for the underlying
-content/service is Breathe** (it supplies the digital product). The withdrawal regime (Art 9/16(m)) is
-**Breathe's obligation**, distinct from Apple/Google **refund** policies. The Terms must not imply the
-EU withdrawal right is "handled by the Store" — that is a separate consumer right Breathe owes directly.
+content/service is the app's publisher** (it supplies the digital product). The withdrawal regime (Art 9/16(m)) is
+**the publisher's obligation**, distinct from Apple/Google **refund** policies. The Terms must not imply the
+EU withdrawal right is "handled by the Store" — that is a separate consumer right the publisher owes directly.
 [verify — division of CRD-trader vs payment-MoR roles; confirm against DCD 2019/770 trader definition and
 Apple/Google paid-apps agreements]
 
 ### 8.4 Disclosure (don't drop it even with a waiver)
 Even when relying on the 16(m) waiver, **still disclose** the existence of the 14-day right, the
 conditions under which it is lost, and **make the Annex I(B) model form available** (Art 6(1)(h)).
-Omission re-opens the Art 10 12-month window. Keep this in Breathe **Terms §6**. [settled — Art 6(1)(h)
+Omission re-opens the Art 10 12-month window. Keep this in the Terms' withdrawal section (**§6** in the example app). [settled — Art 6(1)(h)
 + Art 10 chain, verified 2026-06-06]
 
 ---
@@ -262,11 +263,11 @@ Omission re-opens the Art 10 12-month window. Keep this in Breathe **Terms §6**
    window **and** (b) **acknowledgement of loss of the right**. [settled — Art 16(m)(i)+(ii)]
 4. [ ] A **durable-medium confirmation** (email / non-mutable record), **trader-sent**, reproducing the
    Art 6(1) info + the consent/acknowledgement, is delivered **before performance begins**.
-   **← the part to VERIFY for Breathe.** [low-confidence — Art 16(m)(iii)/Art 8(7)]
+   **← the part to VERIFY for an app sold through the stores.** [low-confidence — Art 16(m)(iii)/Art 8(7)]
 5. [ ] Terms draft acknowledgement wording to satisfy **both Art 16(m)** (digital content) **and
    Art 16(a)** (digital service, "fully performed") given the classification ambiguity. [low-confidence]
-6. [ ] Terms do **not** misattribute the EU withdrawal right to Apple/Google; the right is Breathe's
-   direct obligation. [verify]
+6. [ ] Terms do **not** misattribute the EU withdrawal right to Apple/Google; the right is the
+   publisher's direct obligation. [verify]
 7. [ ] Internal evidence (`withdrawalConsentAt`) is logged — note it is evidence, **not** the consumer's
    Art 8(7) confirmation. [settled]
 
@@ -274,15 +275,15 @@ Omission re-opens the Art 10 12-month window. Keep this in Breathe **Terms §6**
 
 ## 10. Open items for the human / Dutch jurist (verify_flags)
 
-- **[low-confidence] Classification:** is the Pro subscription "digital content" (Art 16(m)) or "digital
+- **[low-confidence] Classification:** is the paid subscription "digital content" (Art 16(m)) or "digital
   service" (Art 16(a)) — and does that change the validity/extent of the waiver and any pro-rata refund?
 - **[low-confidence] Condition (iii) durable medium:** does the Apple/Google receipt satisfy Art 8(7),
-  or must Breathe send its own durable-medium confirmation reproducing the consent + acknowledgement
-  before unlock? (Current implementation logs `withdrawalConsentAt` but may not deliver a consumer-facing
-  durable artefact.)
+  or must the publisher send its own durable-medium confirmation reproducing the consent + acknowledgement
+  before unlock? (An implementation that only logs a consent timestamp such as `withdrawalConsentAt`, as
+  the example app does, may not deliver a consumer-facing durable artefact.)
 - **[verify] Checkbox copy substance:** confirm the live paywall wording captures **both** consent-to-begin
   and loss-of-right (Art 16(m)(i) AND (ii)), not just one.
-- **[verify] MoR vs CRD-trader split:** confirm Breathe (not Apple/Google) is the CRD trader for the
+- **[verify] MoR vs CRD-trader split:** confirm the publisher (not Apple/Google) is the CRD trader for the
   underlying content and that Terms reflect this.
 - **[verify-pinpoint] Annex I(B) / model-form must-provide:** pin Art 11(1) (unambiguous-statement) and
   the exact Art 6(1)(h) → Art 10 consequence chain.

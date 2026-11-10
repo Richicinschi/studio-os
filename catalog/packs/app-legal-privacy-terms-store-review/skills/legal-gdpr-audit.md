@@ -33,19 +33,27 @@ processor + transfer mechanics hold. It is the *engine* check; the prose/notice-
 
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — the constitution (tiers, severity, finding/verdict format, authority footer).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/*` — attribution-tiering, finding-format, verdict-model, disclosure-grading.
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md` — **the backbone**: Art. 6/7/8/9/28/30/35 tables + the Breathe lawful-basis map + the adjudication cheat-sheet.
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md` — **the backbone**: Art. 6/7/8/9/28/30/35 tables + the worked lawful-basis map (example app) + the adjudication cheat-sheet.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/transfers-dpf-scc.md` — Chapter V, DPF adequacy, 2021 SCCs, TIA, per-recipient register.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/ap-guidance.md` — Autoriteit Persoonsgegevens positions (incl. the GA4 opt-in line, the AP DPIA blacklist).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/sdk-data-map.md` — which SDK egresses which data category (feeds the Art. 9 scan + the per-processor transfer check).
 
-## App-facts inputs (this run = "Breathe"; swap per app for the portfolio)
+## App-facts inputs (from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest)
 
-Controller = Dutch **eenmanszaak** (sole controller; **no employees, no DPO**). Stack = Firebase
-(Auth, Firestore, Analytics, Crashlytics, Cloud Functions, Hosting; `europe-west`) + RevenueCat +
-Apple/Google as merchants of record. **No medical claims** ("supports / may help relax"). Free tier
-= on-device data only; Pro = Firestore sync. Live docs:
-`apps/my-app/app/assets/legal/{privacy,terms}.md` (+ `.nl.md`), version 6. In-repo compliance
-pack: `docs/legal/compliance/{ropa,dpa-subprocessor-register,tia,dpf-verification-log,lia,retention-schedule,sdk-privacy-inventory,dpo-not-required}.md`.
+This audit needs: the **controller** (legal form, employees, DPO yes/no); the **stack** (every SDK
+and backend service, with its hosting region); who sells the product (store as merchant of record,
+or the publisher); the **health stance** (claims made, health integrations); what each tier
+stores **where** (on-device vs server); the **live docs** (paths, languages, version); and the
+project's **compliance pack**, if it keeps one: RoPA, DPA / sub-processor register, TIA, DPF
+verification log, LIA, retention schedule, SDK privacy inventory, DPO-not-required memo. Where a
+check below names one of these files (e.g. `ropa.md`), read the project's own equivalent; a
+missing record is itself a finding.
+
+The determinations below show the **example app** (`legal-guardrails.md` §8) as the worked case:
+Dutch eenmanszaak (sole controller, no employees, no DPO); Firebase (Auth, Firestore, Analytics,
+Crashlytics, Cloud Functions, Hosting; `europe-west`) + RevenueCat + Apple/Google as merchants of
+record; no medical claims; free tier on-device only, paid tier Firestore sync. Re-run each one on
+the person's facts.
 
 `skill-id` for findings = **`GDPR`** (per `method/finding-format.md`).
 
@@ -55,8 +63,9 @@ pack: `docs/legal/compliance/{ropa,dpa-subprocessor-register,tia,dpf-verificatio
 
 ### 1 — Lawful-basis selector (Art. 6) — ONE basis per purpose
 
-Build the purpose→basis table from the actual data model + Privacy §3, then check it against the
-**Breathe lawful-basis map** in `gdpr-articles.md` (Art. 6 section). The model answer:
+Build the purpose→basis table from the actual data model + the Privacy Policy's data section, then
+check it against the **worked lawful-basis map** in `gdpr-articles.md` (Art. 6 section). The model
+answer for the example app (add a row for every purpose the person's app has that it lacks):
 
 | Purpose | Correct basis |
 |---|---|
@@ -73,7 +82,7 @@ Build the purpose→basis table from the actual data model + Privacy §3, then c
   5(3) + Telecommunicatiewet 11.7a force prior consent. 6(1)(f) cannot launder the device-access
   gate. (This overlaps `analytics-consent`/`COOK`; take the higher severity.)
 - 🟠 **basis-stacking** (two bases hedged on one purpose) — pick one.
-- 🟢 confirm each 6(1)(f) use has an **LIA** (`docs/legal/compliance/lia.md`); flag absence 🟠.
+- 🟢 confirm each 6(1)(f) use has an **LIA** on file (the project's LIA record, e.g. `lia.md`); flag absence 🟠.
 
 Each finding cites the exact letter, e.g. `Art. 6(1)(a) + ePrivacy 5(3) [settled — verified 2026-06-06]`.
 
@@ -82,7 +91,7 @@ Each finding cites the exact letter, e.g. `Art. 6(1)(a) + ePrivacy 5(3) [settled
 Per `gdpr-articles.md` §Art. 9 + the **Privado adversarial test** (re-authored, see Sources):
 
 1. **Scan** the data model AND all user-facing copy (Privacy + Terms + in-app + store copy +
-   `docs/legal/health-disclaimer.md`) for any health/stress/mood **inference, score, label, or
+   any health-disclaimer document the project keeps) for any health/stress/mood **inference, score, label, or
    trend** — e.g. "calm score", "anxiety down 20%", mood graph, stress trend, wellbeing rating.
    The adversarial framing: *if no code field and no copy matches a health-inference pattern, that
    is positive evidence the app does NOT process Art. 9 data.*
@@ -101,7 +110,7 @@ Per `gdpr-articles.md` §Art. 9 + the **Privado adversarial test** (re-authored,
 
 Walk **Art. 35(3)(a)/(b)/(c)** (the DPIA-Sentinel routing, re-authored — see Sources):
 - (a) systematic + extensive **automated evaluation/profiling** with legal-or-similar effect →
-  Breathe makes **no** such decisions (Art. 22 N/A) → **fails (a)**.
+  an app that makes **no** such decisions (Art. 22 N/A, as for the example app) → **fails (a)**.
 - (b) **large-scale Art. 9** processing → only if Step 2 found inference; with the no-inference
   posture → **fails (b)**.
 - (c) **systematic monitoring of a publicly accessible area** → N/A → **fails (c)**.
@@ -122,15 +131,14 @@ occasional" defeats the exemption** → **RoPA is MANDATORY**. (If Step 2 found 
 carve-out (iii) independently requires it too.)
 
 - **Reject** any "small publisher, no RoPA needed" reasoning → 🟠 (cite carve-out (ii)).
-- **Cross-check `docs/legal/compliance/ropa.md` exists** and carries all Art. 30(1)(a)–(g) fields
+- **Cross-check the project's RoPA (e.g. `ropa.md`) exists** and carries all Art. 30(1)(a)–(g) fields
   (controller+contact / purposes / data-subject + data categories / recipients / transfers +
   safeguards / erasure time-limits / TOMs description). Missing file = 🟠; missing field(s) = 🟡
   each (or 🟠 if a load-bearing field like recipients/transfers is absent).
 
 ### 5 — Art. 28 DPA-coverage check (per processor)
 
-Per `gdpr-articles.md` §Art. 28 + the **compliance-anthropic 30-item DPA checklist** (Apache,
-lift-with-attribution — see Sources). For **each** sub-processor confirm a signed Art-28 DPA
+Per `gdpr-articles.md` §Art. 28. For **each** sub-processor confirm a signed Art-28 DPA
 covering all of **(a)–(h)** + onward-transfer terms:
 
 | Processor | Instrument | Check |
@@ -140,7 +148,7 @@ covering all of **(a)–(h)** + onward-transfer terms:
 | **Apple** | DPA where Apple is **processor**; **independent controller** for store/payment | name the role per stream; flag if treated solely as processor where it is a controller `[low-confidence — Apple's role is split]` |
 | **Cloudflare** | Cloudflare DPA | covers (a)–(h) (also a RevenueCat sub-processor) |
 
-- **Cross-check `docs/legal/compliance/dpa-subprocessor-register.md`**: every recipient listed with
+- **Cross-check the project's DPA / sub-processor register (e.g. `dpa-subprocessor-register.md`)**: every recipient listed with
   a DPA on file. Any recipient with **no DPA** = 🔴. A DPA missing the **(g) delete/return** or
   **(h) audit** clause = 🟠. Name the entity in every redline — never "third parties".
 
@@ -160,7 +168,7 @@ verified-active **DPF certification** **or** **2021 SCCs + a TIA**:
 - 🔴 any US recipient with **neither** active DPF **nor** SCC+TIA — unlawful transfer.
 - 🟠 SCCs cited but **no TIA** on file (Schrems II).
 - 🟠 names **Privacy Shield** (invalidated 2020) or the **old 2010/2004 SCCs** (repealed).
-- **Cross-check `docs/legal/compliance/{tia,dpf-verification-log}.md`**: every US recipient appears
+- **Cross-check the project's TIA and DPF verification log (e.g. `tia.md`, `dpf-verification-log.md`)**: every US recipient appears
   with a recorded mechanism. Each DPF entity must be marked `[verify]` against the live list at
   dataprivacyframework.gov (exact legal entity + **Active** + **EU-US** scope) before sign-off.
 
@@ -214,8 +222,6 @@ silently act on or drop it.
 ## Sources adapted (provenance)
 
 - **DPIA Sentinel** (lawve-ai, **AGPL-3.0 → RE-AUTHORED, no text copied**) — the Art. 35(3) routing
-  + nine-criteria presumption + risk-register schema were re-implemented as Step 3, not lifted.
-- **compliance-anthropic DPA checklist** (claude-for-legal, **Apache-2.0 → lift-with-attribution**)
-  — the 30-item Art. 28 processor checklist informs Step 5.
+  + nine-criteria presumption informed Step 3, re-expressed, not lifted.
 - **Privado `health_data` rules** (Commons-Clause overlay → **RE-AUTHORED**) — the adversarial
   "no matching field → not Art. 9" test was re-authored as Step 2, never copied.

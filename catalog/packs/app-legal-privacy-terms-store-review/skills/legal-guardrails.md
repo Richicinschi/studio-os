@@ -16,8 +16,10 @@ metadata:
   domain: legal / privacy / app-compliance
   jurisdiction: NL-primary, EU, with Apple/Google platform overlays
 license: >-
-  Suite-internal. Adapts methodology from anthropics/claude-for-legal (Apache-2.0,
-  attributed in legal-guardrails/ATTRIBUTION.md). Primary law quoted with last-verified dates.
+  MIT, published in the Studio OS kit since v3.0.0 (2026-11-09). Two asset files carry text
+  adapted from MIT sources, each with its MIT notice; method and structure taken from other
+  sources, among them anthropics/claude-for-legal (Apache-2.0), are credited in
+  legal-guardrails/ATTRIBUTION.md, re-reviewed 2026-11-10. Primary law quoted with last-verified dates.
 ---
 
 # legal-guardrails — the suite constitution
@@ -90,8 +92,8 @@ Verdict: <band> · Privacy <grade> · Terms <grade>.
 Reserved for a Dutch-qualified advocaat / registration (NOT legal judgments this suite makes):
   (1) the [KVK]/[BTW]/[REGISTERED ADDRESS] placeholder fills;
   (2) native-language legal-idiom review of any non-English version a product deliberately ships
-      (binding consumer text under 93/13 Art. 5) — the studio default is ENGLISH-ONLY
-      (DECISIONS.md 2026-07-11), so this item is usually N/A;
+      (binding consumer text under 93/13 Art. 5) — N/A when the fact sheet says the legal docs
+      ship in English only;
   (3) any item this report marks [low-confidence].
 ```
 
@@ -107,3 +109,19 @@ Anthropic SKILL.md spec: `name` ≤64 (lowercase-hyphen), `description` ≤1024 
 - `taxonomy/` — `data-category-ontology.md`, `sdk-data-map.md`
 
 Load only what the task needs. The orchestrator loads `method/*` once, then each review skill loads its own slice.
+
+## 8. App facts and the example app
+
+**The app under review is an input.** Its facts (name, publisher, platforms, markets, data collected, SDKs, money, health claims, doc paths) come from the app fact sheet in `legal-signoff-orchestrator.md` Step 0. A skill run on its own gathers the rows it needs the same way: read the person's project first, ask only for what the project cannot tell you, and mark the rest `[unknown — ask]`.
+
+**The references carry worked examples.** Many of them apply the law to one **example app**, so the reasoning is shown end to end. Wherever a reference says "the example app", it means this profile, and nothing else:
+
+- a subscription wellness app (guided breathing / relaxation), built in Flutter, on iOS and Android;
+- published by a Dutch sole trader (*eenmanszaak*): one person, sole controller, no employees, no DPO; EU/NL-first, though the stores make it reachable to US users too;
+- backend on Firebase (Auth, Firestore, Analytics, Crashlytics, Cloud Functions, Hosting), with the Firestore and Functions region set to the EU (`europe-west`);
+- subscriptions sold through Apple and Google as merchants of record, with RevenueCat as middleware; a free trial that converts to a paid tier;
+- free tier stores its history on the device only; the paid tier syncs session history to Firestore;
+- no medical claims ("supports / may help relax"), no HealthKit / Health Connect / wearables, no ads, no tracking, the Android `AD_ID` permission stripped;
+- legal docs: a Privacy Policy and Terms in the app's assets and on the publisher's website, with an in-app account-deletion flow and a public deletion URL.
+
+A worked example is a pattern, never a fact about the person's app. Re-run its reasoning on the fact sheet: where the person's app differs (another SDK, real health data, ads, another legal form, no EU region), the outcome can flip, and the rule that decides it is the one to apply. In templates, use plain placeholders such as `<app name>`, `<publisher>`, `<contact email>`, `<your-domain>`, never an invented name.

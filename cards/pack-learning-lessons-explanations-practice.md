@@ -74,7 +74,7 @@ The pack has no agents.
 
 ## Watch out
 
-- **The entry is the one cost every session:** about 37 tokens (estimate, bytes divided by 4). Its index, about 154 tokens (estimate), loads when a task reaches the pack, and the `teach` skill only when it is used.
+- **The entry is the one cost every session:** about 37 tokens (estimate, bytes divided by 4). Its index, about 131 tokens (estimate), loads when a task reaches the pack, and the `teach` skill only when it is used.
 - **It writes many files into your folder.** A course adds a mission file, a glossary, a source list, lessons and records. Start it in a folder meant for that subject, not inside a project you ship.
 - **Sources decide the quality.** The skill is told not to teach from memory; check the source list it builds before you trust the lessons, and expect it to go to the web.
 - **What you tell it is session content.** Your goals and answers go over the network like any other session content ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes").

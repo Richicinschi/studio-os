@@ -1,7 +1,7 @@
 ---
 title: Identity and contract
 pack: way-of-working
-sources:
+studio_sources:
   - .studio/identity/SOUL.md
   - .studio/identity/STYLE.md
   - .studio/identity/USER.md

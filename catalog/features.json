@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -375,7 +375,7 @@
           "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
           "loads": "every-session",
           "everySessionTokens": 75,
-          "onDemandTokens": 910,
+          "onDemandTokens": 1078,
           "heavy": false,
           "card": "cards/git-guardrails.md"
         },
@@ -392,6 +392,21 @@
           "card": "cards/git-hooks.md",
           "files": [
             "templates/git-hooks"
+          ]
+        },
+        {
+          "id": "sensitive-file-deny-rules",
+          "kind": "practice",
+          "title": "Deny rules for secret files",
+          "importance": "recommended",
+          "why": "A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files.",
+          "loads": "none",
+          "everySessionTokens": 0,
+          "onDemandTokens": 0,
+          "heavy": false,
+          "card": "cards/sensitive-file-deny-rules.md",
+          "files": [
+            "cards/sensitive-file-deny-rules.md"
           ]
         },
         {
@@ -985,7 +1000,7 @@
         "saul-counsel"
       ],
       "alwaysOnTokens": 49,
-      "indexTokens": 194,
+      "indexTokens": 171,
       "card": "cards/pack-advisor-council-for-big-decisions.md"
     },
     {
@@ -1000,7 +1015,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 57,
-      "indexTokens": 322,
+      "indexTokens": 299,
       "card": "cards/pack-android-swiftui-react-native-app-building.md"
     },
     {
@@ -1027,7 +1042,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 53,
-      "indexTokens": 1217,
+      "indexTokens": 1194,
       "card": "cards/pack-app-legal-privacy-terms-store-review.md"
     },
     {
@@ -1054,7 +1069,7 @@
         "media-critic"
       ],
       "alwaysOnTokens": 69,
-      "indexTokens": 1135,
+      "indexTokens": 1112,
       "card": "cards/pack-audio-video-media.md"
     },
     {
@@ -1067,7 +1082,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 43,
-      "indexTokens": 199,
+      "indexTokens": 176,
       "card": "cards/pack-dependency-supply-chain-risk-checks.md"
     },
     {
@@ -1099,7 +1114,7 @@
         "design-critic"
       ],
       "alwaysOnTokens": 74,
-      "indexTokens": 1366,
+      "indexTokens": 1343,
       "card": "cards/pack-design-ui-logos-slides-posters.md"
     },
     {
@@ -1114,7 +1129,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 45,
-      "indexTokens": 297,
+      "indexTokens": 273,
       "card": "cards/pack-django-flask-laravel-shops-and-chat.md"
     },
     {
@@ -1129,7 +1144,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 34,
-      "indexTokens": 342,
+      "indexTokens": 319,
       "card": "cards/pack-engineering-testing-performance-code-design.md"
     },
     {
@@ -1149,7 +1164,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 56,
-      "indexTokens": 680,
+      "indexTokens": 657,
       "card": "cards/pack-games-design-prototype-playtest-assets.md"
     },
     {
@@ -1171,7 +1186,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 58,
-      "indexTokens": 888,
+      "indexTokens": 865,
       "card": "cards/pack-godot-camera-shaders-particles-export.md"
     },
     {
@@ -1184,7 +1199,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 37,
-      "indexTokens": 154,
+      "indexTokens": 131,
       "card": "cards/pack-learning-lessons-explanations-practice.md"
     },
     {
@@ -1212,7 +1227,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 57,
-      "indexTokens": 1096,
+      "indexTokens": 1073,
       "card": "cards/pack-marketing-copy-emails-seo-signups.md"
     },
     {
@@ -1240,7 +1255,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 50,
-      "indexTokens": 1033,
+      "indexTokens": 1010,
       "card": "cards/pack-marketing-plans-offers-pricing-launches.md"
     },
     {
@@ -1270,7 +1285,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 49,
-      "indexTokens": 1275,
+      "indexTokens": 1252,
       "card": "cards/pack-mobile-apps-flutter-firebase.md"
     },
     {
@@ -1290,7 +1305,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 57,
-      "indexTokens": 672,
+      "indexTokens": 649,
       "card": "cards/pack-phone-app-testing-release-and-agents.md"
     },
     {
@@ -1306,7 +1321,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 36,
-      "indexTokens": 458,
+      "indexTokens": 435,
       "card": "cards/pack-python-backend-fastapi-docker-agents.md"
     },
     {
@@ -1328,7 +1343,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 58,
-      "indexTokens": 803,
+      "indexTokens": 779,
       "card": "cards/pack-stock-research-backtests-trading-safety.md"
     },
     {
@@ -1346,7 +1361,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 48,
-      "indexTokens": 490,
+      "indexTokens": 466,
       "card": "cards/pack-unity-editor-scripts-prefabs-builds.md"
     },
     {
@@ -1362,7 +1377,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 45,
-      "indexTokens": 332,
+      "indexTokens": 309,
       "card": "cards/pack-web-api-security-login-and-graphql.md"
     },
     {
@@ -1384,7 +1399,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 59,
-      "indexTokens": 762,
+      "indexTokens": 739,
       "card": "cards/pack-web-astro-cloudflare-gsap-performance.md"
     },
     {
@@ -1397,7 +1412,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 52,
-      "indexTokens": 188,
+      "indexTokens": 165,
       "card": "cards/pack-web-search-and-scraping-into-files.md"
     }
   ],

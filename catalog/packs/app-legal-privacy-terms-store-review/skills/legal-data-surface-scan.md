@@ -36,16 +36,16 @@ Policy, Terms, and the two store labels. Garbage-in here poisons every grader, s
 
 `skill-id` for findings = **SCAN**. Emoji severity: 🔴 BLOCKER / 🟠 MATERIAL / 🟡 MINOR / 🟢 OK; floor to the higher severity when overlapping another skill.
 
-## App-profile inputs (defaults for "Breathe"; override per app for the portfolio)
+## App-profile inputs (from the orchestrator's Step 0 fact sheet, or read from the project)
 
-| Input | Breathe default |
+| Input | Where it comes from |
 |---|---|
-| `appDir` | the current folder (run from the app root) |
-| Built APK | `build/app/outputs/flutter-apk/app-release.apk` (after `flutter build apk --release --dart-define-from-file=.env`) |
+| `appDir` | the root of the person's app (the scripts default to the current folder) |
+| Built APK | for a Flutter app, `build/app/outputs/flutter-apk/app-release.apk` (after `flutter build apk --release`, plus whatever build flags the project uses) |
 | Built IPA + pod manifests | **macOS only** (`flutter build ipa` / a Mac build after `pod install`) — Windows runs see only the app's own `Runner/PrivacyInfo.xcprivacy` |
-| Stack | Firebase (Auth, Firestore, Analytics, Crashlytics, Functions, Hosting; EU `europe-west`), RevenueCat, Apple/Google billing |
+| Stack | the SDKs and backend the scan finds, plus the hosting region from the project's backend config; ask about services configured outside the repo (example app stack: `legal-guardrails.md` §8) |
 
-The scripts default to Breathe; pass `appDir` as the first positional arg to retarget app #2/#3.
+Run from the app root, or pass `appDir` as the first positional arg to point the scripts at another folder.
 
 ## Scanners (AUTHORED + TESTED — invoke via `node`, never modify)
 
@@ -84,7 +84,7 @@ gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never cra
 
 ## WORKFLOW
 
-1. **Resolve inputs.** Confirm `appDir` (default Breathe). Note platform: on Windows expect iOS pod coverage to be partial; on macOS run after `pod install` for full pod manifests.
+1. **Resolve inputs.** Confirm `appDir` (the person's app root). Note platform: on Windows expect iOS pod coverage to be partial; on macOS run after `pod install` for full pod manifests.
 2. **Run the 3 source scanners** (always available): `scan_pubspec.mjs`, `scan_android_manifest.mjs`, `scan_ios_privacy.mjs`. Capture each JSON.
 3. **Run the 2 binary scanners if a build exists** (optional, best-effort): build the APK (`flutter build apk --release --dart-define-from-file=.env`) then `run_exodus.mjs --apk …`; if MobSF is up, `run_mobsf.mjs --file …` (APK on any host; IPA only from a macOS build). Record each as **ran** or **skipped** with its reason — never infer coverage you didn't get.
 4. **Normalize → one canonical flow set.** For every distinct flow, enrich/reconcile against `sdk-data-map.md` and assign a canonical data-category from `data-category-ontology.md`. Each flow record:

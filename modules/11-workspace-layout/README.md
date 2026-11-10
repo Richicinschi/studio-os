@@ -1,7 +1,7 @@
 ---
 title: Workspace layout and restructuring
 pack: way-of-working
-sources:
+studio_sources:
   - .studio/memory/feedback_moving_a_project.md
   - .studio/memory/reference_workspace_doc_structure.md
   - .studio/memory/feedback_multi_agent_isolation.md

@@ -2,6 +2,15 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.1.0 (2026-11-10)
+
+- Fixes and trust: the issues the November 2026 outside reviews and the maintainer review raised for this release (public issues #2, #6, #7, #8, #10, #24, #25, #33).
+- Practices: added sensitive-file-deny-rules (deny rules for secret files, enforced by Claude Code); changed git-hooks and never-share-list (you set the hooks folder yourself, in your own terminal) and git-guardrails 1.3.0 (refuses more ways to skip the hooks).
+- A domain whose text partly follows outside work now says so in its SOURCE.md, and THIRD_PARTY_NOTICES lists its credits.
+- Maintainers: scan records for domains and a triage gate that checks the scanner's finding count; the studio_sources front-matter key; a publish procedure through a release/vX.Y.Z branch and a green three-system CI run; credit-file detection in the build.
+
+**Changed:** `pack:advisor-council-for-big-decisions`, `pack:android-swiftui-react-native-app-building`, `pack:app-legal-privacy-terms-store-review`, `pack:audio-video-media`, `pack:dependency-supply-chain-risk-checks`, `pack:design-ui-logos-slides-posters`, `pack:django-flask-laravel-shops-and-chat`, `pack:engineering-testing-performance-code-design`, `pack:games-design-prototype-playtest-assets`, `pack:godot-camera-shaders-particles-export`, `pack:learning-lessons-explanations-practice`, `pack:marketing-copy-emails-seo-signups`, `pack:marketing-plans-offers-pricing-launches`, `pack:mobile-apps-flutter-firebase`, `pack:phone-app-testing-release-and-agents`, `pack:python-backend-fastapi-docker-agents`, `pack:stock-research-backtests-trading-safety`, `pack:unity-editor-scripts-prefabs-builds`, `pack:web-api-security-login-and-graphql`, `pack:web-astro-cloudflare-gsap-performance`, `pack:web-search-and-scraping-into-files`, `skill:brainstorming`, `skill:claim-auditor`, `skill:diagnosing-bugs`, `skill:dispatching-parallel-agents`, `skill:drawio-diagrams`, `skill:drill-to-plan`, `skill:executing-plans`, `skill:finishing-a-development-branch`, `skill:git-cleanup`, `skill:git-guardrails`, `skill:handoff`, `skill:improve`, `skill:receiving-code-review`, `skill:requesting-code-review`, `skill:subagent-driven-development`, `skill:tdd`, `skill:using-agent-skills`, `skill:using-git-worktrees`, `skill:verification-before-completion`, `skill:writing-great-skills`, `skill:writing-plans`
+
 ## v3.0.1 (2026-11-09)
 
 - The claude.ai bundle tests now check the zip with unzip on Linux, where tar cannot read zips.

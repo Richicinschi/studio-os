@@ -13,7 +13,8 @@ The Council is the studio's cast of persona-agents (`.claude/agents/`). Board:
 `lorn-founder` (Founder) · `midas-treasurer` (Treasurer) · `atlas-operator` (Operator) · `marie-architect` (Architect)
 · `jony-designer` (Designer) · `karen-skeptic` (Skeptic) · `fred-advocate` (User's Advocate) · `saul-counsel`
 (Counsel, on-call). Crew: `sherlock-researcher` (Researcher) · `bob-builder` (Builder) · `linus-reviewer`
-(Reviewer). Full roster + lenses: `.claude/agents/AGENTS.md`.
+(Reviewer). Each seat is one agent file in `.claude/agents/`, and its `description` names its lens.
+Convene only the seats that are installed; name any seat you skipped in the brief.
 
 There are two modes: **Quick council** (default — one round, fast) and **Debate** (multi-round, the seats argue it out). Use Quick for most decisions; Debate for the big forks.
 

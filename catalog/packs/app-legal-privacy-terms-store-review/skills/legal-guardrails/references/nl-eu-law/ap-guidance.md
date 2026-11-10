@@ -2,11 +2,12 @@
 
 > **Scope:** The Dutch supervisory authority for data protection and its concrete, app-specific
 > expectations. Use this to adjudicate a Privacy Policy / Terms of Service against the Dutch
-> (AVG/UAVG) layer that sits on top of the GDPR. Tailored to **"Breathe"** (Flutter
-> breathing/mindfulness app; publisher = NL eenmanszaak / sole proprietorship; owner is the sole
-> data controller; no employees; no DPO; EU/NL-first; auto-renewing subscriptions sold through
-> Apple/Google as merchants of record; RevenueCat + Firebase EU-region `europe-west`; general
-> wellness, no medical claims; free tier = on-device only, Pro = Firestore sync).
+> (AVG/UAVG) layer that sits on top of the GDPR. Worked examples use the **example app**
+> (`legal-guardrails.md` §8: Flutter breathing/mindfulness app; publisher = NL eenmanszaak / sole
+> proprietorship; owner is the sole data controller; no employees; no DPO; EU/NL-first;
+> auto-renewing subscriptions sold through Apple/Google as merchants of record; RevenueCat +
+> Firebase EU-region `europe-west`; general wellness, no medical claims; free tier = on-device
+> only, paid tier = Firestore sync). Apply each rule to the app under review from its fact sheet.
 
 **Reference date:** 2026-06-06 · **Primary authority:** Autoriteit Persoonsgegevens (AP),
 the Dutch *toezichthouder* for the AVG (the Dutch GDPR) and the UAVG (Uitvoeringswet AVG).
@@ -35,7 +36,7 @@ the Dutch *toezichthouder* for the AVG (the Dutch GDPR) and the UAVG (Uitvoering
 | Pending transfer (do not overstate) | On **26 March 2025** the AP proposed to the Minister of Economic Affairs to become the **sole** competent authority for Tw 11.7a, taking the placement/consent supervision **from the ACM**. As of 2026-06-06 this is a **proposal**, not completed law. **Do not assert "AP took over cookie enforcement from the ACM" as accomplished fact.** | [settled — AP proposal 2025-03-26, verified 2026-06-06] |
 | Practical consequence for review | Regardless of which authority polices Tw 11.7a, **both** legal layers apply to an app: (a) the **device-access consent rule** (Tw 11.7a / ePrivacy 5(3)) **and** (b) the **AVG** for the resulting personal-data processing. A PP/ToS sign-off must satisfy both. | [settled — Tw 11.7a + GDPR, verified 2026-06-06] |
 
-> **Drafting takeaway for Breathe's PP:** name **"Autoriteit Persoonsgegevens (AP)"** as the
+> **Drafting takeaway for the app's PP:** name **"Autoriteit Persoonsgegevens (AP)"** as the
 > supervisory authority. Do **not** claim the AP is the cookie-placement regulator outright;
 > if the PP describes device-storage/SDK enforcement, the accurate phrasing is that **the AP
 > supervises the data-protection (AVG) aspects and the ACM currently supervises the
@@ -48,21 +49,21 @@ the Dutch *toezichthouder* for the AVG (the Dutch GDPR) and the UAVG (Uitvoering
 These are AP's published expectations on its "Privacy and apps" page. They are written as
 user-facing rights but each maps to a **developer obligation** for the sign-off.
 
-| # | AP rule (developer obligation) | Verbatim / paraphrase from AP | Breathe application | Tier |
+| # | AP rule (developer obligation) | Verbatim / paraphrase from AP | Application (worked: example app) | Tier |
 |---|---|---|---|---|
 | G1 | **Consent before reading from / placing data on the device** | "Apps should ask you for consent to use your personal data **before retrieving data from or placing data on your device**." | The very act of writing to SharedPreferences / reading device identifiers / initialising an SDK that stores on-device triggers this. Strictly-necessary storage (for the service the user explicitly requested) is exempt; **non-essential telemetry is not** (see §3). | [settled — AP "Privacy and apps", verified 2026-06-06] |
 | G2 | **Separate consent per data type (unbundling)** | "Apps have to ask you for consent **for each type** of your data that they want to use" / "**separately ask for consent** for different types of personal data." | **Do not bundle** the age attestation, the analytics/crash-telemetry opt-in, and the withdrawal/immediate-delivery acknowledgement into one tick. Health-adjacent data, analytics, and account data each need their own basis/consent surface. | [settled — AP "Privacy and apps", verified 2026-06-06] |
 | G3 | **Clear, fixed purposes** | "Apps should indicate **clear and understandable purposes** for which the app uses your data and **should not change these purposes without your consent**." | The PP must state purposes per data category; a later purpose change (e.g. new analytics use) needs fresh consent, not a silent PP edit. | [settled — AP "Privacy and apps", verified 2026-06-06] |
-| G4 | **Withdrawal of consent must be possible and as easy as giving it** | "if you gave consent … but changed your mind, you can **withdraw your consent** again. The organization will no longer process your personal data from that time, unless there is another legal basis." | Breathe must provide an in-app **opt-out** that flips telemetry off (`setAnalyticsCollectionEnabled(false)` / `setCrashlyticsCollectionEnabled(false)`) and stops future processing. Maps to **GDPR Art. 7(3)**. | [settled — AP "Privacy and apps" + GDPR Art. 7(3), verified 2026-06-06] |
-| G5 | **Data minimisation — only what the app needs to function** | AP guidance: collect only data **necessary for the app to function**; users can restrict per-app access (location, contacts, etc.). | Free tier should remain **on-device only**; Firestore sync (Pro) is justified by the user-requested sync feature. Don't request permissions the breathing feature doesn't need. Maps to **GDPR Art. 5(1)(c)**. | [settled — AP "Privacy and apps" + GDPR Art. 5(1)(c), verified 2026-06-06] |
-| G6 | **Readable / accessible privacy statement** | AP expects a **privacy statement (privacyverklaring)** that is transparent and understandable; "information about cookies can be found in the privacy statement of the website or app." | Breathe's PP must be reachable **in-app and pre-install** (store listing), plain-language, and list every data category + SDK (Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions, RevenueCat). Maps to **GDPR Arts. 12–14**. | [settled — AP "Privacy and apps" + GDPR Arts. 12–14, verified 2026-06-06] |
-| G7 | **Don't change purposes / scope-creep** | (See G3.) AP treats undisclosed expansion as a breach of the transparency + consent rules. | Version the PP; trigger re-consent on material change (the app already bumps `kTermsVersion`). | [settled — AP "Privacy and apps", verified 2026-06-06] |
+| G4 | **Withdrawal of consent must be possible and as easy as giving it** | "if you gave consent … but changed your mind, you can **withdraw your consent** again. The organization will no longer process your personal data from that time, unless there is another legal basis." | The app must provide an in-app **opt-out** that flips telemetry off (for Firebase: `setAnalyticsCollectionEnabled(false)` / `setCrashlyticsCollectionEnabled(false)`) and stops future processing. Maps to **GDPR Art. 7(3)**. | [settled — AP "Privacy and apps" + GDPR Art. 7(3), verified 2026-06-06] |
+| G5 | **Data minimisation — only what the app needs to function** | AP guidance: collect only data **necessary for the app to function**; users can restrict per-app access (location, contacts, etc.). | Keep each tier's data where its feature needs it: in the example app the free tier stays **on-device only** and Firestore sync (paid tier) is justified by the user-requested sync feature. Don't request permissions the app's core feature doesn't need. Maps to **GDPR Art. 5(1)(c)**. | [settled — AP "Privacy and apps" + GDPR Art. 5(1)(c), verified 2026-06-06] |
+| G6 | **Readable / accessible privacy statement** | AP expects a **privacy statement (privacyverklaring)** that is transparent and understandable; "information about cookies can be found in the privacy statement of the website or app." | The app's PP must be reachable **in-app and pre-install** (store listing), plain-language, and list every data category + SDK (for the example app: Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions, RevenueCat). Maps to **GDPR Arts. 12–14**. | [settled — AP "Privacy and apps" + GDPR Arts. 12–14, verified 2026-06-06] |
+| G7 | **Don't change purposes / scope-creep** | (See G3.) AP treats undisclosed expansion as a breach of the transparency + consent rules. | Version the PP; trigger re-consent on material change (e.g. by bumping a terms-version constant such as `kTermsVersion`). | [settled — AP "Privacy and apps", verified 2026-06-06] |
 
 ---
 
 ## 3. Analytics & device telemetry — AP's opt-IN position (the load-bearing NL rule)
 
-This is the single highest-impact NL-specific finding for Breathe.
+For an app that ships third-party analytics or crash SDKs (the example app ships Firebase Analytics + Crashlytics), this is the single highest-impact NL-specific finding.
 
 | Item | Rule | Tier |
 |---|---|---|
@@ -70,16 +71,16 @@ This is the single highest-impact NL-specific finding for Breathe.
 | NL analytics exemption (narrow) | Tw 11.7a has a narrow **analytics exemption** (no prior consent) **only if ALL** of: (1) first-party only; (2) IP anonymised/masked; (3) **no** cross-site/cross-app tracking; (4) **no** data shared with third parties for their own purposes; (5) minimal privacy impact (solely measuring quality/performance). | [verify-pinpoint — Tw 11.7a conditions; pin exact Tw text + AP cookie page] |
 | **AP's GA4 / "cookie letter" position** | The AP has taken the position (its **"cookie letter"** on Google Analytics 4) that **standard GA4 — and by extension Firebase Analytics in default config — does NOT qualify** for the exemption, because data is shared with Google for Google's own purposes, **failing condition (4)**. Therefore such telemetry needs **prior opt-IN consent** in NL. | [settled — AP cookie-letter position, GA4; corroborated by turing.law analysis, verified 2026-06-06] |
 | Legitimate interest does NOT cure it | A **GDPR Art. 6(1)(f) legitimate-interest** basis for analytics does **not** override the **Art. 5(3) / Tw 11.7a device-access consent** requirement. The consent gate is a separate, prior obstacle. | [settled — ePrivacy 5(3) is lex specialis to GDPR Art. 6, EDPB Opinion 5/2019, verified 2026-06-06] |
-| **Verdict for Breathe** | Firebase **Analytics + Crashlytics** in default config are **not** strictly necessary and (per AP's GA4 stance) **do not** meet the 11.7a exemption → they require **prior opt-IN consent** before initialisation. An **opt-out** toggle (telemetry on by default) is **the non-defensible position in NL**. Any PP/ToS claiming "legitimate interest" or "opt-out" for Firebase Analytics should be **flagged as non-compliant**. | [settled — synthesis of AP GA4 position + Tw 11.7a, verified 2026-06-06] |
+| **Verdict for a Firebase app (the example app)** | Firebase **Analytics + Crashlytics** in default config are **not** strictly necessary and (per AP's GA4 stance) **do not** meet the 11.7a exemption → they require **prior opt-IN consent** before initialisation. An **opt-out** toggle (telemetry on by default) is **the non-defensible position in NL**. Any PP/ToS claiming "legitimate interest" or "opt-out" for Firebase Analytics should be **flagged as non-compliant**. | [settled — synthesis of AP GA4 position + Tw 11.7a, verified 2026-06-06] |
 
-> **Sign-off rule:** If Breathe initialises Firebase Analytics/Crashlytics before an affirmative
+> **Sign-off rule:** If the app initialises Firebase Analytics/Crashlytics (or any non-essential telemetry SDK) before an affirmative
 > consent gate, that is a **finding**. Acceptable remediation: gate telemetry behind a
 > pre-init opt-in; until consented, do not call `setAnalyticsCollectionEnabled(true)` /
 > `setCrashlyticsCollectionEnabled(true)`. The withdrawal path (G4 / Art. 7(3)) must also exist.
 >
 > **Strictly-necessary carve-out (still allowed without consent):** purchase/entitlement
 > processing via RevenueCat + the store, Firebase Auth session, and Firestore **sync that the
-> Pro user explicitly requested** are arguably "strictly necessary for a service explicitly
+> paid-tier user explicitly requested** are arguably "strictly necessary for a service explicitly
 > requested" — but **analytics/crash telemetry is not** and must stay behind the opt-in.
 > [verify — boundary is fact-specific; document the per-SDK necessity analysis]
 
@@ -90,14 +91,14 @@ This is the single highest-impact NL-specific finding for Breathe.
 NL sets the **digital-consent age at 16** (the maximum the GDPR Art. 8(1) allows). The UAVG
 fixes 16; below 16 the **holder of parental responsibility must consent**.
 
-| # | AP / NL rule | Breathe application | Tier |
+| # | AP / NL rule | Application (worked: example app) | Tier |
 |---|---|---|---|
-| C1 | **Age of valid consent = 16.** Children under 16 **cannot** give valid consent; a parent/guardian must consent for processing their data. | The shipped 16+ self-attestation checkbox (records `ageConfirmedAt`) is the right pattern: Breathe is **not** targeting under-16s and obtains an age statement. | [settled — GDPR Art. 8(1) + UAVG (NL = 16) + AP guidance, verified 2026-06-06] |
-| C2 | **No email (or any data) from an under-16 without parental consent.** AP: "An app is **not allowed**, for example, **to ask for an email address without having obtained consent from the parents**." | Because sign-up (email/Google) collects email, an app that **knowingly** serves under-16s would need verifiable parental consent. Breathe's mitigation = the 16+ gate; it must not market to children. | [settled — AP "Privacy and apps", verified 2026-06-06] |
-| C3 | **No advertising targeting under-16s using their data.** "Apps are not permitted to use data of children under the age of 16 for advertisements specifically targeting children." | Breathe shows no ads and collects no advertising ID (`AD_ID` stripped) — compliant by design. | [settled — AP "Privacy and apps", verified 2026-06-06] |
+| C1 | **Age of valid consent = 16.** Children under 16 **cannot** give valid consent; a parent/guardian must consent for processing their data. | A 16+ self-attestation checkbox (recording e.g. `ageConfirmedAt`) is the right pattern for an app that is **not** targeting under-16s and obtains an age statement (as the example app does). | [settled — GDPR Art. 8(1) + UAVG (NL = 16) + AP guidance, verified 2026-06-06] |
+| C2 | **No email (or any data) from an under-16 without parental consent.** AP: "An app is **not allowed**, for example, **to ask for an email address without having obtained consent from the parents**." | Because sign-up (email/Google) collects email, an app that **knowingly** serves under-16s would need verifiable parental consent. The mitigation for an adult-facing app = the 16+ gate; it must not market to children. | [settled — AP "Privacy and apps", verified 2026-06-06] |
+| C3 | **No advertising targeting under-16s using their data.** "Apps are not permitted to use data of children under the age of 16 for advertisements specifically targeting children." | An app that shows no ads and collects no advertising ID (`AD_ID` stripped, as in the example app) is compliant by design; an app with ads must keep under-16 data out of ad targeting. | [settled — AP "Privacy and apps", verified 2026-06-06] |
 | C4 | **Child-appropriate language.** Where an app targets children, "information about the app must be offered in a simple manner, with use of language that is in line with the age of the children." | Not directly triggered (16+ gate), but the readability standard (G6) still applies generally. | [settled — AP "Privacy and apps", verified 2026-06-06] |
 
-> **Sign-off rule:** If Breathe's store listing, age rating, or copy could be read as
+> **Sign-off rule:** If the app's store listing, age rating, or copy could be read as
 > **targeting under-16s**, the 16+ attestation is **insufficient** — verifiable parental
 > consent (Art. 8(2)) would be required. Confirm the IARC/age rating and marketing are 16+/adult
 > framed, and that no data is requested before the age gate.
@@ -117,19 +118,19 @@ fixes 16; below 16 the **holder of parental responsibility must consent**.
 | **Notifying data subjects (Art. 34)** | If the breach is likely to result in a **high risk** to individuals, the controller must also inform the **affected individuals without undue delay**, in plain language. | [settled — GDPR Art. 34(1)–(2), verified 2026-06-06] |
 | Records of all breaches (Art. 33(5)) | The controller must **document all breaches** (facts, effects, remedial action), reportable or not, so the AP can verify compliance. Keep an internal breach register. | [settled — GDPR Art. 33(5), verified 2026-06-06] |
 
-> **Eenmanszaak note:** Breathe's publisher has **no DPO** (not required — no large-scale or
+> **Eenmanszaak note:** a sole-trader publisher like the example app's has **no DPO** (not required — no large-scale or
 > special-category core processing under Art. 37). In the Art. 33(3) notification, give the
 > **owner/controller's contact** as the contact point, not a DPO.
 
 ---
 
-## 6. How this maps onto Breathe's actual stack
+## 6. How this maps onto an app's actual stack (worked: the example app; build the same table for the app under review)
 
-| Breathe element | AP/NL position | Required state for sign-off |
+| Stack element | AP/NL position | Required state for sign-off |
 |---|---|---|
 | Firebase **Analytics** (default) | Non-essential device telemetry → **opt-in** (AP GA4 stance, §3) | Gate before init; PP basis = **consent (Art. 6(1)(a))**, not legitimate interest |
 | Firebase **Crashlytics** | Same as Analytics → **opt-in** | Same gate; do not init pre-consent |
-| Firebase **Auth / Firestore (Pro sync)** | Arguably strictly-necessary for the user-requested sync/account service | Basis = **contract (Art. 6(1)(b))**; document necessity |
+| Firebase **Auth / Firestore (paid-tier sync)** | Arguably strictly-necessary for the user-requested sync/account service | Basis = **contract (Art. 6(1)(b))**; document necessity |
 | **RevenueCat + store billing** | Necessary to provide the purchased subscription | Basis = **contract (Art. 6(1)(b))**; name RevenueCat + Apple/Google as recipients/processors |
 | **Age attestation (16+)** | C1/C2 satisfied by the gate; **separate** consent (G2) | Own checkbox; records `ageConfirmedAt`; not bundled |
 | **Withdrawal/immediate-delivery ack** | Distinct consumer/consent surface (G2) | Own unticked checkbox; records `withdrawalConsentAt` |

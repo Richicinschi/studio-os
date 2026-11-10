@@ -1,6 +1,6 @@
 ---
 title: Scanning a plugin the studio already ran
-sources:
+studio_sources:
   - .claude/skills/vendored.json
   - .studio/rules/hard-rules.md
   - .studio/memory/reference_vendored_skills.md

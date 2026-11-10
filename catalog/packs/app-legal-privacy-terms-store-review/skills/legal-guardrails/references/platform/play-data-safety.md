@@ -1,10 +1,12 @@
 # Google Play Data Safety — Reference (form spec + CSV schema)
 
 Authoritative reference for encoding, verifying, and **emitting** the Google Play
-**Data safety** form for a Dutch/EU mobile app. Tailored to **Breathe** (Flutter
-breathing/mindfulness app; Dutch eenmanszaak; GDPR/AVG; subscriptions sold through
-Apple/Google as merchants of record via RevenueCat; Firebase backend in EU
-`europe-west`; no medical claims; free tier = on-device only, Pro = Firestore sync).
+**Data safety** form for a Dutch/EU mobile app. Worked applications use the **example
+app** (`legal-guardrails.md` §8: Flutter breathing/mindfulness app; Dutch eenmanszaak;
+GDPR/AVG; subscriptions sold through Apple/Google as merchants of record via RevenueCat;
+Firebase backend in EU `europe-west`; no medical claims; free tier = on-device only,
+paid tier = Firestore sync). Build the declaration for the app under review from its fact
+sheet and data-surface scan; the §5 matrix is a worked pattern, not its answer.
 
 **Primary sources (fetched & verified this run unless noted):**
 - Play Console Help 10787469 — *Provide information for Google Play's Data safety section*
@@ -36,7 +38,7 @@ as the public "Data safety" card on the store listing. [settled — Help 1078746
 - **User-initiated action or prominent disclosure + user consent** at the moment of transfer. [settled — Help 10787469, verified 2026-06-06]
 - **Fully anonymized data** — not linkable to a user/device. [settled — Help 10787469, verified 2026-06-06]
 
-> **Breathe application of the SDK rule:** Firebase Analytics, Crashlytics, Firebase
+> **Application of the SDK rule (worked: example app):** Firebase Analytics, Crashlytics, Firebase
 > Auth/Firestore, Cloud Functions, and RevenueCat all transmit off-device → all count
 > as **collection** and must be reflected in the form. Firebase/RevenueCat act as
 > **processors on instructions** → treated as **service providers**, so they are
@@ -45,7 +47,7 @@ as the public "Data safety" card on the store listing. [settled — Help 1078746
 > the subscription are a transfer to them as merchant, not as your processor; purchase
 > handling is a user-initiated store transaction. Do **not** silently omit any SDK:
 > an SDK present in the APK but absent from the form is an **omitted-disclosure**
-> violation. [verify — Breathe-specific characterization; confirm RevenueCat/Firebase processor framing against current DPAs]
+> violation. [verify — app-specific characterization; confirm RevenueCat/Firebase (or the app's own processors') processor framing against current DPAs]
 
 ---
 
@@ -91,19 +93,19 @@ For **each data type** you declare as collected/shared, the form asks: [settled 
 
 Identical list for **collection** and **sharing** purposes. Multi-select. [settled — Help 10787469, verified 2026-06-06]
 
-| Purpose | Typical Breathe trigger |
+| Purpose | Typical trigger (worked: example app) |
 |---|---|
-| **App functionality** | Auth (email/UID), Firestore sync (Pro), subscription entitlement, account management plumbing |
+| **App functionality** | Auth (email/UID), Firestore sync (paid tier), subscription entitlement, account management plumbing |
 | **Analytics** | Firebase Analytics — product-interaction / session events |
 | **Developer communications** | Transactional/verification email (Firebase Auth custom sender) |
-| **Advertising or marketing** | **Not used** — Breathe runs no ads, strips AD_ID |
+| **Advertising or marketing** | **Not used** — the example app runs no ads, strips AD_ID |
 | **Fraud prevention, security, and compliance** | Crashlytics diagnostics for stability/abuse; security logging |
-| **Personalization** | (Generally not used by Breathe) |
+| **Personalization** | (Generally not used by the example app) |
 | **Account management** | Account create / delete / restore; entitlement state |
 
-> **Breathe note:** never select **Advertising or marketing**. Selecting it
+> **Note for an app with no ads (the example app):** never select **Advertising or marketing**. Selecting it
 > contradicts the AD_ID strip (`tools:node="remove"`) and the "no advertising ID"
-> posture in the Privacy Policy. [verify — Breathe-specific]
+> posture in the Privacy Policy. [verify — app-specific]
 
 ---
 
@@ -111,13 +113,13 @@ Identical list for **collection** and **sharing** purposes. Multi-select. [settl
 
 Asked once for the whole app, not per type. [settled — Help 10787469, verified 2026-06-06]
 
-| Declaration | Form question | Breathe answer |
+| Declaration | Form question | Answer (worked: example app) |
 |---|---|---|
 | **Encryption in transit** | "Is all of the user data collected by your app encrypted in transit?" (yes/no) | **YES** — all Firebase/RevenueCat traffic is HTTPS/TLS. [verify — confirm no plaintext egress via traffic capture] |
-| **Deletion mechanism** | "Does your app provide a way for users to request that their data be deleted?" (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day `purgeExpiredDeletions`) **and** public web deletion URL `richicinschi.com/breathe/delete-account`. [settled — app state per CLAUDE.md, verified 2026-06-06] |
+| **Deletion mechanism** | "Does your app provide a way for users to request that their data be deleted?" (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day scheduled purge) **and** a public web deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). [worked example — the example app's state; confirm the app's own] |
 
 **Optional security badges** (not required; do not claim unless true): [settled — Help 10787469, verified 2026-06-06]
-- **Independent security review** — third-party validation against **OWASP MASVS** via the **MASA** (App Defense Alliance) program. Breathe: **do not claim**.
+- **Independent security review** — third-party validation against **OWASP MASVS** via the **MASA** (App Defense Alliance) program. **Do not claim** it unless the app has passed one (the example app has not).
 - **Families self-certified ads SDKs** badge — only for child-audience apps.
 - **UPI** badge — India Unified Payments Interface apps only.
 
@@ -126,11 +128,11 @@ Asked once for the whole app, not per type. [settled — Help 10787469, verified
 > needs BOTH an in-app deletion path AND a functional public web deletion URL, and
 > deleting an account must delete the associated user data across all declared
 > categories (retention only for security/fraud/legal, and only if disclosed in the
-> policy). Breathe satisfies both. [verify-pinpoint — Help 13327111 details from harvested notes, not re-fetched this run]
+> policy). The example app satisfies both; check the app under review for each. [verify-pinpoint — Help 13327111 details from harvested notes, not re-fetched this run]
 
 ---
 
-## 5. Breathe — the recommended declaration matrix
+## 5. The recommended declaration matrix (worked for the example app; derive the app's own the same way)
 
 Derive from actual data flows (Firebase Auth, Firestore, Analytics, Crashlytics,
 Cloud Functions, RevenueCat). Reconcile this 1:1 with Privacy §3/§4, the Apple App
@@ -147,20 +149,20 @@ Privacy label, and the SDK/subprocessor inventory.
 | Device or other IDs → **Device or other IDs** | YES | NO | Firebase (installation/instance IDs) | Analytics; Fraud prevention, security, and compliance | Optional | No |
 
 **Breathing-session data → declare under App activity, NOT Health & fitness.**
-- For **free** users, sessions are **on-device only** → **not collected** at all (no row). [settled — app state per CLAUDE.md, verified 2026-06-06]
-- For **Pro** users, sessions sync to Firestore. Map them to **App activity → Other actions** (or App interactions). [verify — exact App-activity sub-type is a judgment call]
+- For **free** users, sessions are **on-device only** → **not collected** at all (no row). [worked example — the example app's state; confirm the app's own]
+- For **paid-tier** users, sessions sync to Firestore. Map them to **App activity → Other actions** (or App interactions). [verify — exact App-activity sub-type is a judgment call]
 
-> **OVER-DECLARATION TRAP (the #1 Breathe pitfall):** Do **NOT** mark **Health and
-> fitness → Health info / Fitness info**. Breathe accesses **no Health Connect / no
-> fitness API**; breathing logs are user-generated app activity, not platform health
+> **OVER-DECLARATION TRAP (the #1 wellness-app pitfall):** Do **NOT** mark **Health and
+> fitness → Health info / Fitness info** for an app that accesses **no Health Connect / no
+> fitness API** (as the example app does not); breathing logs are user-generated app activity, not platform health
 > data. Marking Health & fitness would (a) misrepresent the data, (b) likely pull the
 > app into the **Health apps declaration** scrutiny, and (c) diverge from the Apple
 > label and the Art. 9 GDPR analysis (breathing logs are not special-category health
-> data absent a clinical/sensor source). [settled — Help 10787469 + Breathe profile, verified 2026-06-06]
+> data absent a clinical/sensor source). An app that does read health or fitness data declares it. [settled — Help 10787469 + example-app profile, verified 2026-06-06]
 >
 > **UNDER-DECLARATION TRAP:** Every off-device SDK counts. Forgetting Crashlytics
 > diagnostics or RevenueCat purchase history is an omitted disclosure. Cross-check the
-> merged manifest + the release APK (e.g. Exodus/MobSF) against this matrix. [verify — Breathe-specific]
+> merged manifest + the release APK (e.g. Exodus/MobSF) against this matrix. [verify — app-specific]
 
 ---
 
@@ -179,9 +181,9 @@ shown** in the public Data safety card as "collected." [settled — Help 1078746
   other user profiles **cannot** be treated as ephemeral and must be declared as
   collection or sharing." [settled — Help 10787469, verified 2026-06-06]
 
-> **Breathe:** persisted Firestore sessions, Analytics events, and Crashlytics reports
+> **Worked (example app):** persisted Firestore sessions, Analytics events, and Crashlytics reports
 > are **stored** beyond the request → **NOT ephemeral**. Mark ephemeral = No across the
-> matrix in §5. [verify — Breathe-specific]
+> matrix in §5. [verify — app-specific]
 
 ---
 
@@ -230,7 +232,7 @@ POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{p
 | Element | Value |
 |---|---|
 | **HTTP method** | `POST` |
-| **Path param** | `packageName` (string, required) — e.g. `com.richicinschi.breathe` |
+| **Path param** | `packageName` (string, required) — the app's package name, e.g. `com.example.app` |
 | **Request body** | `{ "safetyLabels": string }` — the **contents of the Data Safety CSV file** |
 | **Response** | Empty body on success |
 | **OAuth scope** | `https://www.googleapis.com/auth/androidpublisher` |
@@ -243,16 +245,16 @@ POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{p
 
 ## 9. Sign-off checklist (PASS/FAIL gates)
 
-Use to adjudicate Breathe's Data safety declaration. Severity: 🔴 blocker · 🟠 must-fix · 🟡 review.
+Use to adjudicate the app's Data safety declaration (the items name the example app's SDKs; substitute the app's own). Severity: 🔴 blocker · 🟠 must-fix · 🟡 review.
 
-1. 🔴 **No over-declaration of Health & fitness.** Confirm both Health info and Fitness
-   info are **NOT collected/shared** (no Health Connect / fitness API in the app). [settled, verified 2026-06-06]
+1. 🔴 **No over-declaration of Health & fitness.** For an app with no Health Connect / fitness API,
+   confirm both Health info and Fitness info are **NOT collected/shared**. [settled, verified 2026-06-06]
 2. 🔴 **Every off-device SDK is declared.** Scan merged manifest + release APK
    (Exodus/MobSF) and assert Firebase Auth/Firestore/Analytics, Crashlytics, Cloud
    Functions, RevenueCat each map to a declared category. No omitted disclosures. [verify]
 3. 🔴 **Encryption in transit = YES** and matches reality (no plaintext egress). [verify]
 4. 🔴 **Data deletion = YES**, with in-app path **and** a live public web deletion URL
-   (`/breathe/delete-account` loads, names Breathe/Richicinschi). [verify-pinpoint — Help 13327111]
+   (the delete-account page loads and names `<app name>` / `<publisher>`). [verify-pinpoint — Help 13327111]
 5. 🟠 **No "Advertising or marketing" purpose** anywhere (consistent with AD_ID strip
    and "no advertising ID" in Privacy §4). [verify]
 6. 🟠 **Form ↔ Privacy Policy parity.** Every declared category/type appears in Privacy
@@ -287,6 +289,6 @@ Use to adjudicate Breathe's Data safety declaration. Severity: 🔴 blocker · �
   import-overwrite** behavior come from harvested notes, not re-fetched against the live
   page this run. (`[verify-pinpoint]` / `[verify]`)
 - Exact Play Console **menu path** wording ("App content → Data safety → Export/Import to CSV").
-- All **Breathe-specific** mappings in §5 (esp. RevenueCat/Firebase **service-provider
+- All **app-specific** mappings in §5 (esp. RevenueCat/Firebase **service-provider
   vs sharing** framing, and the App-activity sub-type for synced sessions) need
   confirmation against the current DPAs and the actual code/data flows.

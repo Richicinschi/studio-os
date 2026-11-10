@@ -2,7 +2,7 @@
 
 This page records how the kit's adoption flow was tried before release, what broke, and what changed. It is a record, not a certificate.
 
-**Agents played the adopters, not real people.** A headless Claude Code ran the kit's skills as "the drill". A second agent answered its questions as an invented persona, from a written script. No real adopter has run the kit yet, as of this record (2026-11-03).
+**Invented personas played the adopters, not real people.** A headless Claude Code ran the kit's skills as "the drill". In runs 1 to 6 a second agent answered its questions as an invented persona, from a written script; in runs 7 to 9 the person running the trial wrote each answer from a short persona. No real adopter has run the kit yet, as of this record (2026-11-09).
 
 ## Setup
 

@@ -35,9 +35,21 @@ rules=(
   "$GIT gc${ARGS} --prune"
   "$GIT worktree +remove${ARGS} (-f|--force)$END"
   "$GIT commit${ARGS} --amend"
-  "$GIT --no-verify"
+  # git takes a unique prefix of a long option, so --no-veri skips the hooks too.
+  # Blocks --no-verbose as well, a rare spelling.
+  "$GIT --no-ver[a-z]*"
   "$GIT commit${ARGS} -[[:alpha:]]*n[[:alpha:]]*$END"
-  "git${ARGS} -c +core\.hooksPath"
+)
+
+# Moving the hooks folder skips the hooks. git reads a config key in any case, so these
+# match without regard to case. Reading the setting (`git config --get core.hooksPath`,
+# alone or followed by a redirect) stays allowed; giving it a value or removing it does not.
+KEY='core\.hookspath'
+rules_any_case=(
+  "git${ARGS} -c +${KEY}"
+  "git${ARGS} --config-env[= ]+${KEY}"
+  "$GIT config${ARGS} (--unset|--unset-all|--replace-all|--add|unset|set) ${ARGS}${KEY}"
+  "$GIT config${ARGS} ${KEY} +([^ ;&|<>0-9]|[0-9]+[^0-9>])"
 )
 
 refuse() {
@@ -47,6 +59,9 @@ refuse() {
 
 for rule in "${rules[@]}"; do
   grep -qE "$rule" <<<"$cmd" && refuse "$rule"
+done
+for rule in "${rules_any_case[@]}"; do
+  grep -qiE "$rule" <<<"$cmd" && refuse "$rule"
 done
 
 # Any rebase rewrites history, except steering one already under way.

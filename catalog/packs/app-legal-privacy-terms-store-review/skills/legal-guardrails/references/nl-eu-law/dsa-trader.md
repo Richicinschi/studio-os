@@ -1,6 +1,6 @@
 # DSA Trader Status — App-Store Traceability Obligation (Reference)
 
-**Scope of this file.** How the EU Digital Services Act (DSA) trader-traceability rules bind a commercial app publisher distributed through Apple's App Store and Google Play, and how a reviewer signs off that "Breathe" (Dutch *eenmanszaak*, EU/NL-first) satisfies them. The legal duty in the DSA falls on the *store* (the online platform), but its practical effect is a hard precondition on the *publisher*: register correct trader contact details in both consoles, and make them match the Privacy Policy / Terms "who we are / contact" block and the KvK record.
+**Scope of this file.** How the EU Digital Services Act (DSA) trader-traceability rules bind a commercial app publisher distributed through Apple's App Store and Google Play, and how a reviewer signs off that the app under review satisfies them (worked example: the example app in `legal-guardrails.md` §8, a Dutch *eenmanszaak*, EU/NL-first). The legal duty in the DSA falls on the *store* (the online platform), but its practical effect is a hard precondition on the *publisher*: register correct trader contact details in both consoles, and make them match the Privacy Policy / Terms "who we are / contact" block and the KvK record.
 
 **Citation tiers** (see suite convention):
 `[settled — <source>, verified 2026-06-06]` confirmed against a primary/quasi-primary source fetched this run · `[verify]` believed correct, unconfirmed this run · `[verify-pinpoint]` right substance, exact pin still to confirm · `[low-confidence]` novel/contested/fact-specific.
@@ -23,7 +23,7 @@ The DSA expressly lists **app stores** among covered online platforms (alongside
 
 ---
 
-## 2. Who is a "trader" — does Breathe's publisher qualify? (YES)
+## 2. Who is a "trader" — does the app's publisher qualify? (YES for any monetised app, including the example app)
 
 **Art. 3, point (f) — "trader"**: *"any natural person, or any legal person irrespective of whether it is privately or publicly owned, who is acting, including through any person acting in his or her name or on his or her behalf, for purposes relating to his or her trade, business, craft or profession."* `[settled — eu-digital-services-act.com Art.3 + search, verified 2026-06-06]`
 
@@ -33,12 +33,12 @@ The DSA expressly lists **app stores** among covered online platforms (alongside
 
 **Art. 3, point (l) — "distance contract"**: as defined in Art. 2(7) of Directive 2011/83/EU (Consumer Rights Directive). `[settled — eu-digital-services-act.com Art.3, verified 2026-06-06]`
 
-### Application to Breathe
+### Application to a monetised app sold through the stores (worked: the example app)
 A Dutch **eenmanszaak** is a *natural person acting for purposes relating to a trade/business* → squarely a **trader** under Art. 3(f). The app is commercial: it sells auto-renewing subscriptions (Pro) and is VAT-registerable. Apple's own self-assessment guidance treats exactly this profile as a trader: *"you're likely a trader if your app generates revenue (In-App Purchases, paid apps), you engage in commercial practices toward consumers, you're VAT-registered, or you develop the app in connection with your trade/business."* `[settled — developer.apple.com DSA trader help, verified 2026-06-06]`
 
-> **The "merchant of record" point does not save you.** Apple/Google are the merchants of record for the IAP transaction, but the DSA trader duty attaches to the *publisher distributing products/services to EU consumers through the store* — not to who collects the money. Breathe's publisher is the trader regardless of RevenueCat/Apple/Google billing intermediation. `[low-confidence]` (substance solid; no single fetched line states it this precisely)
+> **The "merchant of record" point does not save you.** Apple/Google are the merchants of record for the IAP transaction, but the DSA trader duty attaches to the *publisher distributing products/services to EU consumers through the store* — not to who collects the money. The app's publisher is the trader regardless of billing intermediation (RevenueCat/Apple/Google in the example app). `[low-confidence]` (substance solid; no single fetched line states it this precisely)
 
-**Hobbyist exception:** a non-commercial hobbyist with no monetization is *unlikely* to be a trader. Not available to Breathe. `[settled — developer.apple.com, verified 2026-06-06]`
+**Hobbyist exception:** a non-commercial hobbyist with no monetization is *unlikely* to be a trader. Not available to an app that sells subscriptions or otherwise monetises (the example app). `[settled — developer.apple.com, verified 2026-06-06]`
 
 ---
 
@@ -68,7 +68,7 @@ Providers of online platforms **allowing consumers to conclude distance contract
 *"Providers of online platforms allowing consumers to conclude distance contracts with traders shall ensure that its online interface is designed and organised in a way that enables traders to comply with their obligations regarding pre-contractual information, compliance and product safety information under applicable Union law."* `[settled — eu-digital-services-act.com Art.31, verified 2026-06-06]` This is why App Store Connect / Play Console expose the trader-info fields at all — it is the store discharging Art. 31.
 
 ### Art. 32 — Right to information
-Where a platform becomes aware that an **illegal product/service** was offered, it must inform affected consumers of the trader's identity and any means of redress. Title/substance confirmed by index; full text not fetched this run. `[verify-pinpoint]` Practical relevance to Breathe is low (no illegal product), but it underpins why accurate trader identity is mandatory.
+Where a platform becomes aware that an **illegal product/service** was offered, it must inform affected consumers of the trader's identity and any means of redress. Title/substance confirmed by index; full text not fetched this run. `[verify-pinpoint]` Practical relevance to a lawful consumer app is low (no illegal product), but it underpins why accurate trader identity is mandatory.
 
 ---
 
@@ -101,13 +101,13 @@ Real-world signal: the Commission fined **Temu €200 million** for a DSA breach
 
 ## 6. Sign-off rule for the legal review (the operative checklist)
 
-A reviewer adjudicating Breathe's PP/ToS sign-off should treat DSA trader status as a **prerequisite gate**, not a clause to draft. Confirm ALL of the following:
+A reviewer adjudicating the app's PP/ToS sign-off should treat DSA trader status as a **prerequisite gate**, not a clause to draft. Confirm ALL of the following:
 
 1. **Both consoles registered as TRADER.**
    - [ ] App Store Connect: trader status declared = *trader*; email, phone, address, payment account, EU self-certification submitted and **verified**.
    - [ ] Play Console: developer/account verified with trader-grade name, physical address, contact details.
 2. **Contact details are KvK-consistent.**
-   - [ ] Console name = registered KvK trade name (`Richicinschi` / `Richicinschi Studio`).
+   - [ ] Console name = registered KvK trade name (`<publisher>`, exactly as in the trade register).
    - [ ] Console address = the **registered KvK address** (`[REGISTERED ADDRESS]`).
    - [ ] Trade-register field (Art. 30(1)(d)) = **KvK** + the **KvK number** (`[KVK]`).
    - [ ] (VAT/`[BTW]` is not a DSA Art. 30 field, but consistency with the same identity is expected, and supports the Apple "VAT-registered ⇒ trader" self-assessment.)
@@ -118,10 +118,10 @@ A reviewer adjudicating Breathe's PP/ToS sign-off should treat DSA trader status
    - [ ] Play Console store-listing developer block.
    - [ ] (and the same identity used for the GDPR controller designation — the eenmanszaak owner is the sole data controller).
 4. **Phone + email are real and monitored** (Art. 30 requires them; they become public, and consumer-law / GDPR contactability piggy-backs on them).
-5. **No drift** between the displayed trader email and the legal-docs contact email (currently `hi@richicinschi.com` / `noreply@richicinschi.com` sending domain) — flag if the store shows a different address than the PP/ToS.
+5. **No drift** between the displayed trader email and the legal-docs contact email (`<contact email>`, and any sending address on the same domain) — flag if the store shows a different address than the PP/ToS.
 
 ### Dependency flag (BLOCKING)
-> Items 2–3 cannot be completed until the **KvK registration** lands, which is itself downstream of the gemeente birthplace correction. The placeholders **`[KVK]` / `[BTW]` / `[REGISTERED ADDRESS]`** in the Privacy Policy / Terms are the *same* values that must populate the App Store Connect + Play Console trader blocks. Therefore DSA trader sign-off is **gated on the KvK fill** and must be marked **OPEN / BLOCKED** until: (a) KvK number issued, (b) both consoles registered + verified as trader, (c) the four documents reconciled. Until then the correct sign-off verdict is **CANNOT PASS — admin prerequisite outstanding**, not a documentary defect to fix in the clause text.
+> Items 2–3 cannot be completed until the publisher's **KvK registration** (or its own trade-register entry) exists; ask whether it does. The placeholders **`[KVK]` / `[BTW]` / `[REGISTERED ADDRESS]`** in the Privacy Policy / Terms are the *same* values that must populate the App Store Connect + Play Console trader blocks. Therefore DSA trader sign-off is **gated on the KvK fill** and must be marked **OPEN / BLOCKED** until: (a) KvK number issued, (b) both consoles registered + verified as trader, (c) the four documents reconciled. Until then the correct sign-off verdict is **CANNOT PASS — admin prerequisite outstanding**, not a documentary defect to fix in the clause text.
 
 ---
 

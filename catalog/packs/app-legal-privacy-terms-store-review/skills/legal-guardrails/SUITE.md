@@ -1,6 +1,6 @@
 # legal-* sign-off skill suite — overview
 
-A user-level Claude Code skill suite (`~/.claude/skills/legal-*`) that acts as the **de-facto jurist who signs off** a mobile app's Privacy Policy + Terms of Service before App Store / Google Play submission. Built for a Dutch/EU app (GDPR/AVG, Dutch consumer law, Apple/Google platform rules) and reusable across a portfolio — app-specific facts (KvK, data model, SDK list, doc paths) are inputs.
+A user-level Claude Code skill suite (`~/.claude/skills/legal-*`) that acts as the **de-facto jurist who signs off** a mobile app's Privacy Policy + Terms of Service before App Store / Google Play submission. Built for a Dutch/EU app (GDPR/AVG, Dutch consumer law, Apple/Google platform rules) and works for any app — app-specific facts (publisher, registration number, data model, SDK list, doc paths) are inputs, gathered in the orchestrator's Step 0 fact sheet. Worked examples in the references use one example app profile (`legal-guardrails.md` §8).
 
 **Start here:** invoke **`legal-signoff-orchestrator`** ("sign off the privacy policy and terms"). It runs the whole suite and returns one verdict. For a narrow question, invoke the specific skill.
 

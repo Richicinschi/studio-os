@@ -60,7 +60,7 @@ The menu marks the item **have** when the list holds at least one term, is ignor
 ## Check
 
 1. **Claude:** when your setup folder is a git repository, `git -C "<your setup>" check-ignore -q git-hooks/never-share.local.txt && echo ignored`. Expected: `ignored`.
-2. **you:** add a made-up word as the last line of the list, such as `nevershare-canary-7`; it can stay there as a permanent canary. **Claude:** in a throwaway repository in a temporary folder, with `core.hooksPath` (the git setting that says where the hooks are) pointed at your hooks folder, stages a file `notes.txt` holding `NeverShare-Canary-7` (the canary in another case) and tries a commit. Expected:
+2. **you:** add a made-up word as the last line of the list, such as `nevershare-canary-7`; it can stay there as a permanent canary. **Claude:** makes a throwaway repository in a temporary folder and gives you the line that points its `core.hooksPath` (the git setting that says where the hooks are) at your hooks folder; **you** run it in a terminal of your own, as [git hooks](git-hooks.md) step 7 does and says why. **Claude:** stages a file `notes.txt` holding `NeverShare-Canary-7` (the canary in another case) and tries a commit. Expected:
    ```text
    pre-commit refused this commit:
    - notes.txt: a term from your never-share list (line <n> of the list)

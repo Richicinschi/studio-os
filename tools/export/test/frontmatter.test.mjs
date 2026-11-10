@@ -23,8 +23,8 @@ test('folded description and nested metadata with a list', () => {
 });
 
 test('a list at the key indent, CRLF input, a wrapped list item, and no front matter', () => {
-  const { data } = parseFrontmatter('---\r\nsources:\r\n- .studio/memory/a.md\r\n- .claude/skills/b/SKILL.md\r\nquestions:\r\n  - "Where should memory live:\r\n    a Project or a repo?"\r\nchecked: 2026-11-02\r\n---\r\n');
-  assert.deepEqual(data.sources, ['.studio/memory/a.md', '.claude/skills/b/SKILL.md']);
+  const { data } = parseFrontmatter('---\r\nstudio_sources:\r\n- .studio/memory/a.md\r\n- .claude/skills/b/SKILL.md\r\nquestions:\r\n  - "Where should memory live:\r\n    a Project or a repo?"\r\nchecked: 2026-11-02\r\n---\r\n');
+  assert.deepEqual(data.studio_sources, ['.studio/memory/a.md', '.claude/skills/b/SKILL.md']);
   assert.deepEqual(data.questions, ['Where should memory live: a Project or a repo?']);
   assert.equal(data.checked, '2026-11-02');
   assert.equal(parseFrontmatter('# no front matter').data, null);

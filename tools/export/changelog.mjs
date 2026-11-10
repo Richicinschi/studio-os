@@ -72,16 +72,16 @@ export function prependChangelog(file, section) {
 const defaultGitLog = (hub, since, file) =>
   execFileSync('git', ['-C', hub, 'log', '--format=%h', `${since}..HEAD`, '--', file], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
-const isHandPage = (r) => r.endsWith('.md') && (r.startsWith('modules/') || r.startsWith('examples/') || ['START-HERE.md', 'ADOPT.md', 'docs/facts.md'].includes(r));
+const isHandPage = (r) => r.endsWith('.md') && (r.startsWith('modules/') || r.startsWith('examples/') || ['START-HERE.md', 'ADOPT.md', 'PRINCIPLES.md', 'docs/facts.md'].includes(r));
 
 // `extra` maps a page to hub sources it may not name in its own front matter (from the gitignored
 // private.local.txt): they are tracked like the rest, but no committed file carries them.
 const handPages = (root, extra = {}) => walkFiles(root).filter(isHandPage)
   .map((r) => ({ page: r, data: parseFrontmatter(readFileSync(path.join(root, r), 'utf8')).data }))
   .filter((p) => p.data)
-  .map((p) => ({ ...p, sources: [...(Array.isArray(p.data.sources) ? p.data.sources : []), ...(extra[p.page] || [])] }));
+  .map((p) => ({ ...p, sources: [...(Array.isArray(p.data.studio_sources) ? p.data.studio_sources : []), ...(extra[p.page] || [])] }));
 
-// Every hub file a hand-written page summarizes (its `sources:`), for the release's clean-hub check.
+// Every hub file a hand-written page summarizes (its `studio_sources:`), for the release's clean-hub check.
 export const pageSources = (root, extra) => [...new Set(handPages(root, extra).flatMap((p) => p.sources))];
 
 export function staleness(root, { hub, sinceCommit, today, maxAgeDays = 90, gitLog = defaultGitLog, extra = {} }) {

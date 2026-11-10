@@ -1,6 +1,6 @@
 ---
 title: The green run that would have deleted 190 pages
-sources:
+studio_sources:
   - .studio/memory/project_wiki_chronicle.md
   - .studio/memory/feedback_green_can_be_a_lie.md
 ---

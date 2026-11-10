@@ -70,7 +70,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 
 ## Watch out
 
-- **The entry is the one cost every session:** about 52 tokens (estimate, bytes divided by 4). Its index, about 188 tokens (estimate), loads when a task reaches the pack, and the skill only when it is used.
+- **The entry is the one cost every session:** about 52 tokens (estimate, bytes divided by 4). Its index, about 165 tokens (estimate), loads when a task reaches the pack, and the skill only when it is used.
 - **The pack will say no, on purpose.** It refuses sites that refuse AI agents, whether the refusal is a robots token or a clause in the terms, and it does not go round a refusal through a cache or an archive. It also says no to log-in walls, paywalls, captchas, rate limits, hidden identity and personal data of private people. Do not edit those stops out. If you want a site's data and it says no, the skill offers the official data download, a free API or a message to the owner.
 - **A one-off web search does not need this pack.** This pack is for results you want saved in a file or a spreadsheet: lists of businesses, prices, text from pages. For a single answer, ask Claude directly and let it use its own web search; the pack's instructions do not cover that case.
 - **Fetching is an outside action.** The checker and every page fetch send requests to the sites you name, and the pages and results Claude reads go over the network as session content ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"). The skill asks you first before anything that sends or buys something (a form post, an order, a paid search plan or data download), and before it raises its page cap.

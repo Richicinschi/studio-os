@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "items": [
     {
       "id": "advisor-council-for-big-decisions",
@@ -763,6 +763,20 @@
       ],
       "everySessionTokens": 75,
       "tokensNote": "The rule line its card writes into the front door, at the standard size; bytes / 4, measured 2026-11-02."
+    },
+    {
+      "id": "sensitive-file-deny-rules",
+      "kind": "practice",
+      "status": "shipped",
+      "pack": "way-of-working",
+      "module": "06-git-and-guardrails",
+      "title": "Deny rules for secret files",
+      "importance": "recommended",
+      "why": "A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files.",
+      "loads": "none",
+      "files": [
+        "cards/sensitive-file-deny-rules.md"
+      ]
     },
     {
       "id": "session-end-check",

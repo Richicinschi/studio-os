@@ -1,6 +1,6 @@
 ---
 title: How we work, and why
-sources:
+studio_sources:
   - .studio/identity/SOUL.md
   - .studio/identity/RELATIONSHIP.md
   - .studio/rules/hard-rules.md

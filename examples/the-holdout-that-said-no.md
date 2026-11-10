@@ -1,6 +1,6 @@
 ---
 title: The holdout that said no
-sources:
+studio_sources:
   - .studio/identity/SOUL.md
 ---
 

@@ -58,6 +58,7 @@ import { FIXTURE_OWNER } from './fixture-hub.mjs';
 import { packShippable } from '../packs.mjs';
 import { buildKit } from '../build.mjs';
 import { gateLinks } from '../gates.mjs';
+import { STUDIO_REWRITES } from '../rules.mjs';
 
 const base = [
   { id: 'alpha', kind: 'skill', status: 'catalog-only', pack: 'catalog' }, { id: 'beta', kind: 'skill', status: 'catalog-only', pack: 'catalog' },
@@ -97,6 +98,120 @@ test('a shippable pack lands in catalog/packs, with its agents and stubs, and a 
   } finally { rmSync(out, { recursive: true, force: true }); }
 }));
 
+test('a shipped pack carries a SOURCE.md with the same fields as a skill, its scan and its triage', () => withHub((hub) => {
+  const out = stage();
+  try {
+    const scans = { 'pack:pack-one-two-three': { score: 25, recommendation: 'CAUTION', version: 'v2.2.3', date: '2026-11-09' } };
+    const triage = { 'pack:pack-one-two-three': { recommendation: 'CAUTION', score: 25, findings: 2, fp: 1, byDesign: 1, other: 0, anchor: 'packpack-one-two-three-caution-25100-2-findings' } };
+    const r = buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER, scans, triage });
+    const rel = 'catalog/packs/pack-one-two-three/SOURCE.md';
+    const src = readFileSync(path.join(out, rel), 'utf8');
+    assert.match(src, /^# pack-one-two-three: source\n/);
+    for (const field of ['Origin', 'Licence', 'What the studio changed', 'Who it suits', 'Pack / module', 'Last scan']) assert.match(src, new RegExp(`- \\*\\*${field}:\\*\\* `), field);
+    assert.match(src, /- \*\*Origin:\*\* Written in the studio's own words\. The kit ships it only because no file in it carries an outside licence, an upstream, or an 'adapted' author line\.\n/);
+    assert.doesNotMatch(src, /Studio-original|not adapted from an outside skill/);
+    assert.match(src, /\[LICENSE\]\(\.\.\/\.\.\/\.\.\/LICENSE\)/);
+    assert.match(src, /\[cards\/pack-pack-one-two-three\.md\]\(\.\.\/\.\.\/\.\.\/cards\/pack-pack-one-two-three\.md\)/);
+    assert.match(src, /- \*\*Last scan:\*\* CAUTION \(risk 25\/100\), SkillSpector v2\.2\.3 with --no-llm, 2026-11-09; 2 findings, all read: 1 false positive, 1 by design \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#packpack-one-two-three-caution-25100-2-findings\)\)\n/);
+    assert.ok(r.written.includes(rel));
+    assert.ok(r.itemFiles['pack:pack-one-two-three'].includes(rel));
+    assert.ok(r.scanKeys.includes('pack:pack-one-two-three'));
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
+// ---- a domain that adapts outside text says so, and the notices credit it
+const CREDIT_FILE = ['# ATTRIBUTION', '', '### Lifted with attribution', '', '| Source | Licence | What was adapted |', '|---|---|---|',
+  '| someone/checklists | MIT | The checklist. |', '| other/method | Apache-2.0 | The method. |', '',
+  '### Re-authored only, never copied', '', '| Source | Licence | Pattern re-authored (not copied) |', '|---|---|---|',
+  '| fifth/copyleft | AGPL-3.0 | An idea. |', ''].join('\n');
+const withCredit = (hub, text = CREDIT_FILE) => {
+  nodeFs.mkdirSync(path.join(hub, 'library/pack-one-two-three/skills/one-job/references'), { recursive: true });
+  nodeFs.writeFileSync(path.join(hub, 'library/pack-one-two-three/skills/one-job/ATTRIBUTION.md'), text);
+  // A file whose name only starts like a credit file is not one.
+  nodeFs.writeFileSync(path.join(hub, 'library/pack-one-two-three/skills/one-job/references/attribution-tiering.md'), '# Tiering\n\n| Tier | Licence |\n|---|---|\n| one | mixed |\n');
+};
+
+test('a domain with a credit file at any depth says it adapts outside work, with the licences its table names', () => withHub((hub) => {
+  const out = stage();
+  try {
+    withCredit(hub);
+    const r = buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER });
+    const src = readFileSync(path.join(out, 'catalog/packs/pack-one-two-three/SOURCE.md'), 'utf8');
+    const link = '[ATTRIBUTION.md](skills/one-job/ATTRIBUTION.md)';
+    assert.ok(src.includes(`- **Origin:** Adapts outside work: some text follows sources under Apache-2.0 and MIT, credited in ${link}; the rest is the studio's own.\n`), src);
+    assert.ok(src.includes(`- **Licence:** The studio's text is MIT, the kit's own [LICENSE](../../../LICENSE); the credited parts keep their own licences (Apache-2.0 and MIT), listed in ${link}.\n`), src);
+    assert.doesNotMatch(src, /Written in the studio's own words|AGPL/);
+    assert.deepEqual(r.credits, [{ id: 'pack-one-two-three', files: ['skills/one-job/ATTRIBUTION.md'], licences: ['Apache-2.0', 'MIT'] }]);
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
+test('the notices list a domain with a credit file: the domain, a link to the file, and each licence linked to its text', () => withHub((hub) => {
+  const out = stage();
+  try {
+    withCredit(hub);
+    nodeFs.writeFileSync(path.join(out, 'LICENSE'), 'MIT License\n');
+    nodeFs.mkdirSync(path.join(out, 'cards'));
+    nodeFs.writeFileSync(path.join(out, 'cards/pack-pack-one-two-three.md'), '# card\n');
+    buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER });
+    const notices = readFileSync(path.join(out, 'docs/THIRD_PARTY_NOTICES.md'), 'utf8');
+    assert.match(notices, /^## Domains that adapt outside text$/m);
+    assert.ok(notices.includes('| pack-one-two-three | [skills/one-job/ATTRIBUTION.md](../catalog/packs/pack-one-two-three/skills/one-job/ATTRIBUTION.md) | [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html), [MIT](https://spdx.org/licenses/MIT.html) |\n'), notices);
+    assert.doesNotMatch(notices, /AGPL/);
+    assert.deepEqual(gateLinks(out).filter((f) => /THIRD_PARTY|SOURCE\.md/.test(f)), []);
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
+test('a domain without a credit file keeps the own-words lines, and the notices have no domain section', () => withHub((hub) => {
+  const out = stage();
+  try {
+    nodeFs.writeFileSync(path.join(hub, 'library/pack-one-two-three/skills/one-job/attribution-tiering.md'), '# Tiering\n');
+    const r = buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER });
+    const src = readFileSync(path.join(out, 'catalog/packs/pack-one-two-three/SOURCE.md'), 'utf8');
+    assert.match(src, /- \*\*Origin:\*\* Written in the studio's own words\. The kit ships it only because no file in it carries an outside licence, an upstream, or an 'adapted' author line\.\n/);
+    assert.match(src, /- \*\*Licence:\*\* MIT, the kit's own \[LICENSE\]\(\.\.\/\.\.\/\.\.\/LICENSE\)\n/);
+    assert.deepEqual(r.credits, []);
+    assert.doesNotMatch(readFileSync(path.join(out, 'docs/THIRD_PARTY_NOTICES.md'), 'utf8'), /## Domains/);
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
+test('a credit file the build cannot read stops the build with the file and the reason', () => withHub((hub) => {
+  const out = stage();
+  try {
+    withCredit(hub, CREDIT_FILE.replace('| MIT | The checklist. |', '| see upstream | The checklist. |'));
+    assert.throws(() => buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER }),
+      /catalog\/packs\/pack-one-two-three\/skills\/one-job\/ATTRIBUTION\.md: the row for someone\/checklists names its licence as "see upstream"/);
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
+test('INDEX.md lists a shipped domain under the pack group "domains", never "undefined"', () => withHub((hub) => {
+  const out = stage();
+  try {
+    buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER });
+    const index = readFileSync(path.join(out, 'catalog/INDEX.md'), 'utf8');
+    assert.match(index, /\| pack-one-two-three \| pack \| domains \| - \| shipped \| \[packs\/pack-one-two-three\]\(packs\/pack-one-two-three\/SKILL\.md\) \|/);
+    assert.doesNotMatch(index, /undefined/);
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
+test('a shipped domain loses the hub generator comment, and the studio rule number becomes the kit\'s vetting skill', () => withHub((hub) => {
+  const out = stage();
+  try {
+    const gen = STUDIO_REWRITES.find((r) => r.file === '*' && r.pattern && r.pattern.includes('tools/library/build'));
+    const rule14 = STUDIO_REWRITES.find((r) => r.file === '*' && r.phrase === '(studio hard rule 14)');
+    assert.ok(gen && rule14, 'both entries are in STUDIO_REWRITES');
+    const lib = path.join(hub, 'library/pack-one-two-three');
+    const entry = nodeFs.readFileSync(path.join(lib, 'SKILL.md'), 'utf8').replace('---\n# ', '---\n<!-- Generated by tools/library/build.mjs from pack.json. Edit pack.json, not this file. -->\n\n# ');
+    nodeFs.writeFileSync(path.join(lib, 'SKILL.md'), entry);
+    nodeFs.writeFileSync(path.join(lib, 'skills/one-job.md'), '# one-job\n\nScan and vet it first (studio hard rule 14), then install.\n');
+    buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER, rewrites: [gen, rule14] });
+    const p = path.join(out, 'catalog/packs/pack-one-two-three');
+    const shipped = readFileSync(path.join(p, 'SKILL.md'), 'utf8');
+    assert.doesNotMatch(shipped, /tools\/library|Generated by/);
+    assert.match(shipped, /^---\n[\s\S]*?\n---\n\n# pack-one-two-three\n/);
+    assert.equal(readFileSync(path.join(p, 'skills/one-job.md'), 'utf8'), '# one-job\n\nScan and vet it first (`vet-and-adopt`), then install.\n');
+  } finally { rmSync(out, { recursive: true, force: true }); }
+}));
+
 test('provenance.json never ships', () => withHub((hub) => {
   const out = stage();
   try {
@@ -109,6 +224,10 @@ test('provenance.json never ships', () => withHub((hub) => {
 test('nested pack files pass the links gate', () => withHub((hub) => {
   const out = stage();
   try {
+    // SOURCE.md links the kit's LICENSE and the domain's card, as in a real kit.
+    nodeFs.writeFileSync(path.join(out, 'LICENSE'), 'MIT License\n');
+    nodeFs.mkdirSync(path.join(out, 'cards'));
+    nodeFs.writeFileSync(path.join(out, 'cards/pack-pack-one-two-three.md'), '# card\n');
     buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER });
     assert.ok(existsSync(path.join(out, 'catalog/packs/pack-one-two-three/skills/one-job/helper.md')));
     assert.deepEqual(gateLinks(out).filter((f) => f.startsWith('catalog/packs/')), []);

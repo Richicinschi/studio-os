@@ -1,7 +1,7 @@
 ---
 title: Delegation
 pack: way-of-working
-sources:
+studio_sources:
   - .studio/memory/feedback_parallel_delegation.md
   - .studio/memory/feedback_subagent_orchestration.md
   - .claude/skills/improve/SKILL.md

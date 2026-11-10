@@ -33,7 +33,7 @@ for (const line of diff.split('\n')) {
 }
 const gl = spawnSync('gitleaks', ['git', '--pre-commit', '--staged', '--no-banner', '--redact', '--exit-code', '1'], { encoding: 'utf8' });
 if (gl.error) console.error('pre-commit: gitleaks is not installed, so the secret scan was skipped');
-else if (gl.status !== 0) problems.push('gitleaks found a secret in the staged changes (run `gitleaks git --pre-commit --staged -v` to see it)');
+else if (gl.status !== 0) problems.push('gitleaks found a secret in the staged changes (run `gitleaks git --pre-commit --redact --staged -v` to see where; the secret itself stays hidden)');
 
 if (problems.length) {
   console.error(`pre-commit refused this commit:\n- ${[...new Set(problems)].join('\n- ')}`);

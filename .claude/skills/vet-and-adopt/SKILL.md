@@ -55,7 +55,8 @@ Without a plan (an item someone names directly), the steps below still apply in 
 
 - From the kit: `catalog/skills/<id>/`, `catalog/agents/<id>.md`, a file in `templates/`, or a
   practice from `modules/<nn>/README.md`. Read its card (`cards/<id>.md`), its `SOURCE.md` and its
-  module page.
+  module page. A domain is `catalog/packs/<id>/`, with its `SOURCE.md` in that folder and its card
+  at `cards/pack-<id>.md`.
 - From outside: a folder, a `SKILL.md`, a `.zip` or a git URL; or a plugin, an MCP server or a hook,
   which run inside a session too and are scanned from their source repository the same way.
 - Read the tailoring for it in their `adoption/spec.md`, if there is one.

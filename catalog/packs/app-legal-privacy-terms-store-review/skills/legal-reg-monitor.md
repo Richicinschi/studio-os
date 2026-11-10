@@ -11,8 +11,8 @@ description: >-
   severity. Also re-validates the knowledge-base verified-dates for staleness. Trigger on: "law
   change", "policy update", "regulatory delta", "does X affect our docs", "new AP guidance",
   "Apple/Play policy change", "is our privacy policy still current", "re-check the legal
-  references". For Breathe (Dutch eenmanszaak, GDPR/AVG, Apple/Google/RevenueCat/Firebase);
-  reusable portfolio-wide.
+  references". Built for a Dutch/EU publisher (GDPR/AVG, Apple/Google platform rules); the
+  app's own facts (publisher, processors, stack) are inputs, so it works for any app.
 metadata:
   category: legal
   author: Richicinschi (Claude-authored)
@@ -38,8 +38,8 @@ Adapts: claude-for-legal **reg-gap-analysis** (requirement-extraction table + pe
 
 ## Inputs
 - **The change** — one of: (a) a specific delta the user names (a ruling, guidance note, ASRG/Play-policy revision, a date), or (b) **no change named** → run **freshness mode**: re-validate every `[settled — … verified <date>]` anchor in the loaded references against its verified-date and flag stale ones.
-- **App fact sheet** (portable across the 3 apps; defaults are Breathe): publisher = NL eenmanszaak, sole controller, no DPO; processors = Apple, Google (Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions/Hosting, EU `europe-west`), RevenueCat, Cloudflare (DNS/email routing); subscriptions sold through Apple/Google as merchants of record; no medical claims; free tier on-device, Pro = Firestore sync.
-- **Current state to diff against**: shipped docs `apps/my-app/app/assets/legal/{privacy,terms}.md` (+ `.nl.md`), version 6; the compliance pack under `docs/legal/compliance/` (RoPA, LIA, TIA, DPA-register, DPF-log, retention-schedule, SDK-inventory, breach-runbook); store declarations in `apps/my-app/store-assets/store-privacy-declarations.md`. Grep these; never assume — quote what they actually say.
+- **App fact sheet** (the orchestrator's Step 0 sheet; run alone, read the project first and ask only for the rest): publisher (legal form, controller, DPO or none); processors, each named, with hosting region; who sells (stores as merchants of record or the publisher); health claims; what each tier stores where. Worked case: the example app in `legal-guardrails.md` §8 (NL eenmanszaak, sole controller, no DPO; Apple, Google Firebase in EU `europe-west`, RevenueCat, Cloudflare for DNS/email routing; stores as merchants of record; no medical claims; free tier on-device, paid tier Firestore sync).
+- **Current state to diff against**: the shipped Privacy Policy + Terms (paths, languages, version from the fact sheet); the project's compliance pack, if it keeps one (RoPA, LIA, TIA, DPA register, DPF log, retention schedule, SDK inventory, breach runbook); and any store-declaration notes it keeps. Grep these; never assume — quote what they actually say.
 
 ## Workflow
 1. **SCOPE the change.** Establish applicability before diffing — skip a non-applicable change with a one-line reasoned 🟢 note (no silent drop):
@@ -74,10 +74,10 @@ Categories: **Notice** (Arts 12–14) · **Rights** (Arts 15–22) · **Lawful-b
 ```
 
 ## Remediation effort taxonomy (Step 4)
-| Class | Means | Typical owner | Breathe example |
+| Class | Means | Typical owner | Example (example app, `legal-guardrails.md` §8) |
 |---|---|---|---|
-| **POLICY-ONLY** | edit the PP/ToS/pack wording; bump `kTermsVersion` if it triggers re-consent | owner (Claude drafts) | rename a supervisory authority, add an Art. 13 disclosure, drop a dead URL |
-| **PRODUCT-CHANGE** | code/UX change in the Flutter app or Firebase config; the doc edit alone would be a false statement | code | the **analytics opt-IN gate** (don't init Firebase Analytics/Crashlytics pre-consent); a new consent surface; a retention/cron change |
+| **POLICY-ONLY** | edit the PP/ToS/pack wording; bump the terms-version constant (e.g. `kTermsVersion`) if it triggers re-consent | owner (Claude drafts) | rename a supervisory authority, add an Art. 13 disclosure, drop a dead URL |
+| **PRODUCT-CHANGE** | code/UX change in the app or its backend config (e.g. a Flutter app's Firebase config); the doc edit alone would be a false statement | code | the **analytics opt-IN gate** (don't init Firebase Analytics/Crashlytics pre-consent); a new consent surface; a retention/cron change |
 | **VENDOR-RENEGOTIATION** | a processor DPA / sub-processor / transfer mechanism must change | owner + counterparty | re-paper a RevenueCat/Firebase Art. 28 term; add an SCC module / re-check a DPF certification for a US sub-processor |
 | **NEW-PROCESS** | a recurring operational duty (a register, a periodic review, a notification routine) | owner | a new logging/records obligation; a periodic re-verification |
 *Severity floor:* if the honest fix is PRODUCT-CHANGE or VENDOR-RENEGOTIATION, a POLICY-ONLY edit that papers over it is a 🔴 (false statement about data practices). Code-faithfulness dominates the doc.
@@ -94,7 +94,7 @@ Re-validate the KB anchors against their `verified <date>` and the standing fact
 | **Apple ASRG / App Privacy + Google Play policies** | account-deletion (Apple 5.1.1(v) / Play 13327111), Data Safety, health-content, subscription-disclosure rules current. | platform policies revise frequently — re-fetch the named Help/Guideline page and compare |
 
 ## Output format
-1. **Header** — `# Reg delta: <change or "freshness re-check"> vs Breathe legal docs v6 — <date>`; one-line scope verdict.
+1. **Header** — `# Reg delta: <change or "freshness re-check"> vs <app name> legal docs v<version> — <date>`; one-line scope verdict.
 2. **Applicability** — bound / not-bound, with the jurisdiction+threshold+date reasoning (🟢 if N/A).
 3. **Requirement-extraction table** (Step 2).
 4. **Findings** — per-requirement diff blocks, ranked 🔴 → 🟠 → 🟡.

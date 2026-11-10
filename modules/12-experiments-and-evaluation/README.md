@@ -1,7 +1,7 @@
 ---
 title: Experiments and evaluation
 pack: data-work
-sources:
+studio_sources:
   - .studio/memory/feedback_green_can_be_a_lie.md
   - .studio/memory/feedback_research_search_design.md
   - .studio/memory/feedback_docker_long_tasks.md

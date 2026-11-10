@@ -1,6 +1,6 @@
 ---
 title: Vault before you shorten
-sources:
+studio_sources:
   - .studio/memory/feedback_memory_vault.md
 ---
 

@@ -2,7 +2,7 @@
 
 **Scope:** Adjudicating the "dispute resolution / out-of-court complaints" clause of a consumer Terms of Service for a Dutch publisher (eenmanszaak / sole proprietorship), EU/NL-first, after the EU ODR platform shutdown.
 
-**App profile this is tailored to:** "Breathe" — Flutter breathing/mindfulness app; publisher is a Dutch sole proprietor (sole data controller, no DPO); subscriptions sold *through* Apple/Google as merchants of record (RevenueCat + Firebase backend, EU `europe-west`); general-wellness, no medical claims.
+**Worked example:** the applications below use the example app (`legal-guardrails.md` §8) — a Flutter breathing/mindfulness app; publisher is a Dutch sole proprietor (sole data controller, no DPO); subscriptions sold *through* Apple/Google as merchants of record (RevenueCat + Firebase backend, EU `europe-west`); general-wellness, no medical claims. Apply the rules to the app under review from its fact sheet (`legal-signoff-orchestrator.md` Step 0).
 
 **Citation tiers used below:**
 - `[settled — <source>, verified 2026-06-06]` confirmed against a primary source fetched this run
@@ -65,7 +65,7 @@
 | Membership | **Voluntary** ("Aansluiten" = opt-in joining); there is no automatic/universal commission for a generic app subscription | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
 | Filing fee (klachtengeld) | Per-commission fee set in each commission's reglement; commonly cited range **~EUR 27.50 – EUR 340** | `[verify]` — fee *exists* and is per-commission (`[settled, verified 2026-06-06]`), but the **specific EUR 27.50–340 range was NOT visible on the pages fetched this run**; confirm against the relevant commission's reglement |
 
-### 2.1 Application to Breathe
+### 2.1 Application to an app sold through the stores by an unaffiliated sole trader (worked example)
 
 - A digital subscription app (sold through Apple/Google) is **unlikely to fall under any existing sector geschillencommissie by default.** There is no obvious "app subscription" commission, and the publisher is an eenmanszaak that has almost certainly **not** affiliated.
 - Therefore: **do not name De Geschillencommissie as the dispute route** unless/until the publisher has formally affiliated with a matching scheme. Naming it without affiliation is misleading and creates an obligation the trader cannot honour.
@@ -102,7 +102,7 @@ Do **not** write "submit your dispute to ConsuWijzer" or imply it issues decisio
 
 ---
 
-## 5. Model dispute-resolution clause for an UNAFFILIATED eenmanszaak (Breathe default)
+## 5. Model dispute-resolution clause for an UNAFFILIATED eenmanszaak (the example app's case)
 
 Use this when the publisher has not joined any geschillencommissie (the expected default). EN + NL outline:
 
@@ -124,7 +124,7 @@ Use this when the publisher has not joined any geschillencommissie (the expected
 
 ## 6. Interaction with the Apple/Google merchant-of-record reality
 
-Breathe's subscriptions are sold through Apple/Google as merchants of record (RevenueCat is middleware; the *payment* contract for the subscription is with the store). Implications for the dispute clause:
+When an app's subscriptions are sold through Apple/Google as merchants of record (as in the example app, with RevenueCat as middleware), the *payment* contract for the subscription is with the store. Implications for the dispute clause:
 
 | Point | Guidance | Tier |
 |---|---|---|

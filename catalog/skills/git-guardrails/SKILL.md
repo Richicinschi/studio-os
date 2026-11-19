@@ -180,8 +180,8 @@ It also refuses some harmless commands, on purpose:
    }
    ```
 
-   On Windows the path looks like `<HOME>/.claude/hooks/git-guardrails/block-dangerous-git.mjs`;
-   on macOS, `<HOME>/.claude/hooks/git-guardrails/block-dangerous-git.mjs`.
+   On Windows the path looks like `C:/Users/<you>/.claude/hooks/git-guardrails/block-dangerous-git.mjs`;
+   on macOS, `/Users/<you>/.claude/hooks/git-guardrails/block-dangerous-git.mjs`.
 4. **Tune.** Ask whether any rule should be added or dropped, and edit `rules.mjs` in the copy.
    `cases.json` lists commands the guard must block (`block`) and let run (`allow`); check a
    changed rule against them with the line in step 5. The `allow` group exists because an

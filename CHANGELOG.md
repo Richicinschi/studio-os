@@ -2,6 +2,13 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.2.1 (2026-11-19)
+
+- The git guard's case table now runs in CI on Linux, Windows and macOS, as the v3.2.0 notes said: tools/export/test/guard-cases.test.mjs sends each of its 173 cases to the shipped guard.
+- git-guardrails: the Windows and macOS example paths show `<you>` for your user name, like the Linux one.
+
+**Changed:** `skill:git-guardrails`
+
 ## v3.2.0 (2026-11-19)
 
 - The safety release: the git guard reads commands the way git does and blocks when it cannot; the commit and session hooks stop what they promise and stop refusing ordinary work; unsafe catalog content fixed; the legal domain gives a verdict with its limits, its sources re-verified.

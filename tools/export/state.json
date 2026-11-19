@@ -1,7 +1,7 @@
 {
-  "version": "3.2.0",
+  "version": "3.2.1",
   "date": "2026-11-19",
-  "hubCommit": "ac10fab2329612345ddfd63951aaccd2aced39dc",
+  "hubCommit": "0fa61236e0003c32ce2566a0f990a98256ff5c81",
   "items": {
     "agent:bob-builder": "54f3dcc2d5803c8d",
     "skill:brainstorming": "a9eb1cf268d2bbed",
@@ -13,7 +13,7 @@
     "skill:executing-plans": "114bcd982bd7c5a3",
     "skill:finishing-a-development-branch": "eede212168ddd773",
     "skill:git-cleanup": "a54bf247a7a710e3",
-    "skill:git-guardrails": "ee301e1d26698312",
+    "skill:git-guardrails": "273fd5159c63cf88",
     "skill:handoff": "958d6c3df79cfbac",
     "skill:improve": "08fb75d07a69f560",
     "agent:linus-reviewer": "9848095cb958422d",

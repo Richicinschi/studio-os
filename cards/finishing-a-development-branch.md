@@ -4,7 +4,7 @@ module: 06-git-and-guardrails
 checked: 2026-11-09
 tokens:
   description: 33
-  body: 1932
+  body: 2225
 ---
 
 # finishing-a-development-branch
@@ -93,4 +93,4 @@ If the menu offers a merge you did not choose, or Claude acts before you answer,
 - **A refused worktree removal means unsaved files.** They exist nowhere else, and `--force` would destroy them; the skill shows them and asks what to do.
 - **A rejected push is not a reason to force-push.** It means the server moved. The skill investigates, and force-pushes only on your explicit ask for that push ([the grant ledger](grant-ledger.md)).
 - **Your company's merge rule comes first.** If your company squashes by policy, follow it, and record that as your decision.
-- **Token cost:** the description loads in every session, about 30 tokens; the body, about 2,300 tokens, loads only when the skill is used. Both are estimates (bytes divided by 4).
+- **Token cost:** the description loads in every session, about 30 tokens; the body, about 2,230 tokens, loads only when the skill is used. Both are estimates (bytes divided by 4).

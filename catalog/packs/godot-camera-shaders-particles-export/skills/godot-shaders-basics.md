@@ -1,7 +1,10 @@
 ---
 id: godot-shaders-basics
 title: Godot 4 shader basics
-description: Godot 4 shaders (shader language, GLSL-like): canvas_item, spatial, fog, vertex, fragment, uniform and uniforms, built-in variables (UV, COLOR, ALBEDO), post-processing, visual effects, material customization, custom effects, stylized rendering, performance.
+description: >-
+  Godot 4 shaders (shader language, GLSL-like): canvas_item, spatial, fog, vertex, fragment, uniform
+  and uniforms, built-in variables (UV, COLOR, ALBEDO), post-processing, visual effects, material
+  customization, custom effects, stylized rendering, performance.
 requires: [Godot]
 ---
 

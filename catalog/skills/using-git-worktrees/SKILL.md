@@ -88,9 +88,11 @@ path="$LOCATION/$BRANCH_NAME"
 
 # branch from origin/main, not from whatever the shared checkout holds
 git fetch origin
-git worktree add -b "$BRANCH_NAME" "$path" origin/main
+git worktree add --no-track -b "$BRANCH_NAME" "$path" origin/main
 cd "$path"
 ```
+
+Keep `--no-track`. Without it the new branch tracks `origin/main`, and a plain `git push` can land on main. The first push sets the branch's own upstream: `git push -u origin "$BRANCH_NAME"`.
 
 **If git refuses with a permission error**, the sandbox blocked it. Tell the user so, then do the setup and baseline run in the current directory. In the hub's shared checkout do not: stop and tell the user, because the shared root is never a place to work.
 

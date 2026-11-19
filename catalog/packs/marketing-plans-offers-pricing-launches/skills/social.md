@@ -1,7 +1,11 @@
 ---
 id: social
 title: Social media content and listening
-description: Social media content (LinkedIn, Twitter/X, Instagram, TikTok, Facebook): thread, tweet, carousel, scheduling, engagement, repurpose, Reels, Shorts, video hook script, short-form, listening, brand mentions, competitor monitoring, top posts to comment on;content-strategy, ad-creative, public-relations
+description: >-
+  Social media content (LinkedIn, Twitter/X, Instagram, TikTok, Facebook): thread, tweet, carousel,
+  scheduling, engagement, repurpose, Reels, Shorts, video hook script, short-form, listening, brand
+  mentions, competitor monitoring, top posts to comment on;content-strategy, ad-creative,
+  public-relations
 ---
 
 # Social media content and listening

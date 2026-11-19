@@ -1,7 +1,11 @@
 ---
 id: signup
 title: Signup flow optimisation
-description: Use when: signup conversions, too many steps to sign up, nobody completes registration, trial conversion rate, signup abandonment, people aren't signing up, account creation flow, reduce signup dropoff, free trial signup, signup form optimization, registration friction, simplify our signup.
+description: >-
+  Use when: signup conversions, too many steps to sign up, nobody completes registration, trial
+  conversion rate, signup abandonment, people aren't signing up, account creation flow, reduce
+  signup dropoff, free trial signup, signup form optimization, registration friction, simplify our
+  signup.
 ---
 
 # Signup flow optimisation

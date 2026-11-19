@@ -135,6 +135,6 @@ const out = {
   healthOrFitnessDeclared: [...new Set(healthDeclared)],
   collectedDataTypes: Object.entries(allTypes).map(([label, v]) => ({ label, linked: v.linkedAnywhere, purposes: [...v.purposes] })),
   manifests,
-  reconcile: 'Map collectedDataTypes -> Apple App Privacy label answers and -> Privacy Policy §3. healthOrFitnessDeclared MUST be empty for a no-HealthKit wellness app. anyTracking should be false (no ATT).',
+  reconcile: "Map collectedDataTypes -> Apple App Privacy label answers and -> Privacy Policy §3. healthOrFitnessDeclared non-empty is a condition to confirm, not a blocker: Apple's Health and Fitness types turn on the data, not on HealthKit. anyTracking should be false (no ATT).",
 };
 console.log(JSON.stringify(out, null, 2));

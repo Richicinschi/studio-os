@@ -1,12 +1,13 @@
 // tools/export/lint-content.mjs
 // Content lint: module pages carry their front matter and the five headings in order; adoption cards
 // their front matter and the eight headings in order; every skill folder's SKILL.md is named after its
-// folder; every catalog skill has a SOURCE.md.
+// folder; every catalog skill has a SOURCE.md; every front matter in a shipped Markdown file is YAML
+// that a real parser reads the way the kit's reader does.
 //   node tools/export/lint-content.mjs        # exit 1 on any error
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { parseFrontmatter } from './frontmatter.mjs';
+import { parseFrontmatter, plainValueProblems, splitFrontmatter } from './frontmatter.mjs';
 
 export const MODULE_HEADINGS = ['## The problem', '## The mechanism', '## Evidence', '## Apply it in Claude Code', '## Apply it in claude.ai'];
 
@@ -106,7 +107,31 @@ export function lintKit(root) {
     ...dirsIn(path.join(root, '.claude/skills')).map((d) => `.claude/skills/${d}/SKILL.md`),
     ...(existsSync(cards) ? readdirSync(cards).filter((n) => n.endsWith('.md')).sort().map((n) => `cards/${n}`) : [])];
   for (const rel of voice) if (existsSync(path.join(root, rel))) errors.push(...lintBanned(rel, readFileSync(path.join(root, rel), 'utf8')));
+  errors.push(...lintFrontmatterYaml(root));
   return errors;
+}
+
+// Every Markdown file in the kit that opens with front matter (catalog, kit skills, cards, modules and the
+// rest), sorted, as paths relative to the root with forward slashes. .git and node_modules are skipped.
+export function frontmatterFiles(root) {
+  const out = [];
+  const walk = (rel) => {
+    for (const e of readdirSync(path.join(root, rel), { withFileTypes: true })) {
+      if (e.name === '.git' || e.name === 'node_modules') continue;
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) walk(r);
+      else if (e.name.endsWith('.md') && splitFrontmatter(readFileSync(path.join(root, r), 'utf8')).raw !== null) out.push(r);
+    }
+  };
+  walk('');
+  return out.sort();
+}
+
+// The front matter of each of those files, held to plainValueProblems: a plain value that real YAML reads
+// as a mapping or a comment is an error, because Claude Code would read the key differently from the kit.
+export function lintFrontmatterYaml(root) {
+  return frontmatterFiles(root).flatMap((rel) =>
+    plainValueProblems(splitFrontmatter(readFileSync(path.join(root, rel), 'utf8')).raw).map((p) => `${rel}: front matter ${p}`));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

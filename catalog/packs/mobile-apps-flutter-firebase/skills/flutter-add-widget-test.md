@@ -1,7 +1,10 @@
 ---
 id: flutter-add-widget-test
 title: Flutter widget tests
-description: Use when writing a component-level test with WidgetTester: verify how the UI renders, plus user interactions such as tapping, scrolling or entering text. Also to validate a specific widget: it displays correct data, and responds to events as expected.
+description: >-
+  Use when writing a component-level test with WidgetTester: verify how the UI renders, plus user
+  interactions such as tapping, scrolling or entering text. Also to validate a specific widget: it
+  displays correct data, and responds to events as expected.
 ---
 
 ## When to use

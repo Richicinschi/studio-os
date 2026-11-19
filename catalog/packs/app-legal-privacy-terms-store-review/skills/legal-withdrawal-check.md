@@ -8,8 +8,8 @@ description: >-
   and a durable-medium confirmation (Art. 8(7)). Confirms an unticked affirmative
   consent checkbox (separate from blanket ToS acceptance), that the app records
   withdrawalConsentAt, that the Annex I(B) model withdrawal form is present, and
-  that the Terms do not misattribute the withdrawal right to Apple or Google (the
-  app — not the Store — is the CRD trader for the content). Flags the durable-medium
+  that the Terms point to the store's withdrawal route and say where the withdrawal
+  function is (for store-billed sales the store contracts in its own name). Flags the durable-medium
   step and the digital-content-vs-digital-service classification for jurist review.
   Trigger on "withdrawal right", "right of withdrawal", "14-day", "herroepingsrecht",
   "cooling off", "cooling-off", "Art 16(m)", "paywall consent", "immediate performance",
@@ -40,7 +40,7 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/crd-withdrawal.md` — **primary authority.** §4
   (Art. 16(m) three conditions), §4a (16(m) vs 16(a) classification), §5 (Art. 8(7) durable medium),
   §6 (Art. 14(4)(b) invalid-waiver consequence), §7 (Annex I(B) form), §8 (worked application: example app),
-  §9 (sign-off checklist), §10 (jurist open items). Cite article numbers from here; never paraphrase
+  §9 (review checklist), §10 (jurist open items). Cite article numbers from here; never paraphrase
   the statute from memory.
 
 ## App-profile inputs (the caller or the orchestrator's Step 0 fact sheet supplies them; else read the project and ask)
@@ -61,10 +61,10 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
    finding (consent UI missing ⇒ 🔴; ToS disclosure missing ⇒ 🟠, re-opens Art. 10 12-month window).
 2. **Condition (i) — prior express consent.** Verify the consent is an **affirmative, UNTICKED-by-default**
    control, **separate from** blanket ToS acceptance, whose copy states consent to **begin immediate
-   performance during the 14-day window**. Pre-ticked / bundled-into-ToS = invalid. [Art. 16(m)(i) — settled]
+   performance during the 14-day window**. Pre-ticked / bundled-into-ToS = invalid. [Art. 16(m)(i) — settled, verified 2026-11-18]
 3. **Condition (ii) — acknowledgement of loss.** Verify the SAME control's copy explicitly states the
    consumer **thereby loses the 14-day right of withdrawal**. Consent without the loss-of-right wording
-   fails (ii) even if (i) passes. Confirm BOTH limbs are present in the live copy (EN + NL). [Art. 16(m)(ii) — settled]
+   fails (ii) even if (i) passes. Confirm BOTH limbs are present in the live copy (EN + NL). [Art. 16(m)(ii) — settled, verified 2026-11-18]
 4. **Condition (iii) — durable-medium confirmation.** Verify a **trader-sent** durable-medium artefact
    (email or non-mutable exportable record — NOT a server-mutable in-app screen) reproducing the Art. 6(1)
    info + the recorded consent/acknowledgement is delivered **at the latest before the paid features unlock**.
@@ -80,10 +80,7 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
    16(m) and 16(a) acknowledgement wording, so the waiver holds either way.
 6. **Annex I(B) + disclosure.** Confirm the ToS **disclose** the 14-day right and **make the Annex I(B)
    model withdrawal form available** (Art. 6(1)(h)). Omission ⇒ 🟠 (Art. 10 extends exposure to ~12 months).
-7. **Merchant-of-record check.** Confirm the ToS do **NOT** misattribute the EU withdrawal right to
-   "the Store" / Apple / Google. The CRD trader for the underlying content is the app itself; the
-   withdrawal regime is its direct obligation, distinct from Apple/Google **refund** policies.
-   Misattribution ⇒ 🟠. (Name the specific store, not "the platform".)
+7. **Store-billed route check.** For store-billed sales, confirm the Terms point to the store's withdrawal route and say where the withdrawal function is; describing it as the store's withdrawal process is correct (the store contracts in its own name). Flag 🟠 if the Terms deny a withdrawal right, describe it as a discretionary "refund policy", or (for own-checkout sales) no publisher function exists. [settled — Apple Media Services Terms §B (14 Sep 2026); Google Play Terms; CRD Art 11a, verified 2026-11-19] (Name the specific store, not "the platform".) Limit: whether the publisher is also a CRD trader for store-billed contracts and answers if a store's route falls short of Art 11a or BW 6:230oa is `[low-confidence — LEGAL REVIEW REQUIRED]`; give no verdict on it (`crd-withdrawal.md` R8, §10).
 8. **Invalid-waiver consequence.** Where any condition is UNMET, state the Art. 14(4)(b) outcome in the
    finding: the consumer may still withdraw AND **owes nothing** for content already supplied — a defective
    waiver converts a withdrawal into a **full refund with no usage offset**. This is why (iii) is not a formality.
@@ -97,20 +94,25 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
 | No affirmative consent control, OR consent pre-ticked / bundled into ToS acceptance | 🔴 BLOCKER |
 | Consent copy missing limb (i) or (ii) (consent without loss-of-right, or vice-versa) | 🔴 BLOCKER (if confirmed; else hard condition) |
 | Condition (iii) durable-medium artefact not delivered before unlock | 🟠 MATERIAL (hard condition — [low-confidence] final call) |
-| ToS misattribute the withdrawal right to Apple/Google | 🟠 MATERIAL |
+| ToS deny a withdrawal right, call the store's route a discretionary "refund policy", or (own checkout) no publisher withdrawal function | 🟠 MATERIAL |
 | Annex I(B) model form / 14-day disclosure absent from ToS | 🟠 MATERIAL (Art. 10 exposure) |
 | Consent copy not mirrored in `.nl.md`, or limbs worded only for 16(m) not 16(a) | 🟡 MINOR |
 | Classification digital-content vs digital-service unresolved | 🟡 MINOR note → [low-confidence] jurist |
 | `withdrawalConsentAt` logged; all three conditions met with trader-sent durable artefact | 🟢 OK |
 
 A 🔴 resting only on [verify]/[low-confidence] is emitted as a **hard condition** ("confirm X; if confirmed,
-blocker"), per verdict-model — never an outright BLOCK on unconfirmed law, never waved through.
+blocker"), per verdict-model — never an outright BLOCKED verdict on unconfirmed law, never waved through.
 
-## Authority & reservations (de-facto counsel)
+## Verdict & reservations
 
-Decide and sign the mechanism's validity. Reserve to a **Dutch advocaat** ONLY: the digital-content-vs-service
+Give a firm ruling on the mechanism's validity, tied to the clause and the CRD article behind it. An
+automated review, not legal advice: a lawyer signs off. It gives no verdict on these; they need a lawyer or a registration first: the digital-content-vs-service
 **classification** and its refund consequence (§4a), the condition-(iii) durable-medium **sufficiency-of-store-receipt**
-question (§8.2), and the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills + native-NL legal-idiom review of §6.nl.
+question (§8.2), and the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values + native-NL legal-idiom review of §6.nl.
+
+**Jurisdiction (`legal-guardrails.md` §9):** the CRD is EU law. Outside the Netherlands and the EU this
+check does not run; in EU states other than the Netherlands it runs on the CRD as written, and any
+point resting only on Dutch national law is a 🟡 note.
 
 ## OUTPUT format
 
@@ -121,7 +123,7 @@ Verdict: PASS | CONDITION  ·  waiver mechanism: VALID | AT-RISK | INVALID
 ## Findings (🔴 → 🟠 → 🟡, finding-format shape; skill-id = WDL)
 [WDL-1] <emoji> <title>
   Location:   <terms.md §6 / paywall consent screen / .nl.md>
-  Basis:      CRD Art. 16(m)(i) [settled — verified 2026-06-06]   (cite from crd-withdrawal.md)
+  Basis:      CRD Art. 16(m)(i) [settled — verified 2026-11-18]   (cite from crd-withdrawal.md)
   Issue:      <defect vs the three cumulative conditions / disclosure / MoR>
   Redline:    <exact replacement copy in quotes; name Apple/Google/RevenueCat where relevant>
   Confidence: high | medium | low
@@ -134,10 +136,10 @@ Verdict: PASS | CONDITION  ·  waiver mechanism: VALID | AT-RISK | INVALID
 
 ## Conditions to clear (each 🟠 → row: Condition | Owner (owner/code/jurist) | Sev | Basis)
 ## Reserved for Dutch jurist  ([low-confidence] items only)
-— Basis: CRD 2011/83/EU (CELEX 02011L0083-20220528) via crd-withdrawal.md, verified 2026-06-06 —
+— Basis: CRD 2011/83/EU (CELEX 02011L0083-20260927) via crd-withdrawal.md, verified 2026-11-18 —
 ```
 
 **Verdict rule:** **PASS / waiver VALID** only when (i)+(ii) are confirmed in the live affirmative-unticked
 copy AND a trader-sent durable-medium artefact (iii) is delivered before unlock. If (iii) is unresolved →
-**CONDITION / AT-RISK**. If (i) or (ii) fails → **CONDITION / INVALID** (downgraded from BLOCK only while
+**CONDITION / AT-RISK**. If (i) or (ii) fails → **CONDITION / INVALID** (downgraded from BLOCKED only while
 unconfirmed). Always state the Art. 14(4)(b) full-refund exposure when the mechanism is not VALID.

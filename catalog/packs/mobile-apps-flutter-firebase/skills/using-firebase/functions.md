@@ -97,11 +97,11 @@ Create a secret with the CLI, declare it in code (`defineSecret("NAME")`), list 
 
 ## Logging
 
-Log objects, not concatenated strings: the logger from `firebase-functions/logger` (Node) or the standard `logging` module (Python) lands in Cloud Logging with fields you can filter on. Read them with `firebase functions:log` (add `--only name` for one function) or in Logs Explorer.
+Log objects, not concatenated strings: the logger from `firebase-functions/logger` (Node) or the standard `logging` module (Python) lands in Cloud Logging with fields you can filter on. Read them with `npx firebase-tools@15.36.0 functions:log` (add `--only name` for one function) or in Logs Explorer.
 
 ## Testing
 
-Start the emulators (or `firebase emulators:exec "npm test"`), point the Admin SDK at them, and call the functions through their trigger: write a document, hit the HTTP URL, call the callable through the client SDK on the emulator. Use unit tests with a mocked Admin SDK for pure logic.
+Start the emulators (or `npx firebase-tools@15.36.0 emulators:exec "npm test"`), point the Admin SDK at them, and call the functions through their trigger: write a document, hit the HTTP URL, call the callable through the client SDK on the emulator. Use unit tests with a mocked Admin SDK for pure logic.
 
 ## App Check
 

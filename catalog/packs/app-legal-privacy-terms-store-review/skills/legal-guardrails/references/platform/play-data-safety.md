@@ -8,15 +8,17 @@ Firebase backend in EU `europe-west`; no medical claims; free tier = on-device o
 paid tier = Firestore sync). Build the declaration for the app under review from its fact
 sheet and data-surface scan; the §5 matrix is a worked pattern, not its answer.
 
-**Primary sources (fetched & verified this run unless noted):**
+**Primary sources (fetched and checked 2026-11-18 unless noted):**
 - Google, Play Console Help 10787469 — *Provide information for Google Play's Data safety section*
-  `https://support.google.com/googleplay/android-developer/answer/10787469`
-- Android Publisher API v3 — `applications.dataSafety`
+  `https://support.google.com/googleplay/android-developer/answer/10787469` (with the sample CSV it links to)
+- Android Publisher API v3 — `applications.dataSafety` (page last updated 2025-05-21)
   `https://developers.google.com/android-publisher/api-ref/rest/v3/applications/dataSafety`
 
-**Scope note:** Every published app — *including apps that are only on test
-tracks* — must complete this form before release. The form output is shown to users
-as the public "Data safety" card on the store listing. [settled — Help 10787469, verified 2026-06-06]
+**Scope note:** Every app published on Google Play must complete this form, including
+apps on closed, open or production testing tracks. Apps active only on the **internal
+testing** track are exempt. Apps that collect no user data still complete it and link a
+privacy policy. The form output is shown to users as the public "Data safety" card on
+the store listing. [settled — Help 10787469, verified 2026-11-18]
 
 ---
 
@@ -24,21 +26,21 @@ as the public "Data safety" card on the store listing. [settled — Help 1078746
 
 | Term | Definition | Consequence |
 |---|---|---|
-| **Collection** | "Transmitting data from your app off a user's device." Includes data sent by any **third-party library/SDK** in the app, and data from app-controlled webviews — *irrespective of whether it goes to you or to a third-party server*. | If a byte leaves the device, it is **collected** and must be declared. [settled — Help 10787469, verified 2026-06-06] |
-| **Sharing** | "Transferring user data collected from your app to a third party." Includes server-to-server transfers, on-device transfers to other apps, and transfers via SDKs/webviews. | A separate, narrower axis than collection. **Service providers acting on your instructions are NOT "sharing."** [settled — Help 10787469, verified 2026-06-06] |
+| **Collection** | "Transmitting data from your app off a user's device." Includes data sent by any **third-party library/SDK** in the app, and data from app-controlled webviews — *irrespective of whether it goes to you or to a third-party server*. | If a byte leaves the device, it is **collected** and must be declared. [settled — Help 10787469, verified 2026-11-18] |
+| **Sharing** | "Transferring user data collected from your app to a third party." Includes server-to-server transfers, on-device transfers to other apps, and transfers via SDKs/webviews. | A separate, narrower axis than collection. **Service providers acting on your instructions are NOT "sharing."** [settled — Help 10787469, verified 2026-11-18] |
 
 The two quoted definitions are Google's (Play Console Help 10787469, https://support.google.com/googleplay/android-developer/answer/10787469); the rest of the table is this suite's summary.
 
 ### Exceptions to "collection" (do NOT declare as collected)
-- **On-device only** — accessed/processed but never transmitted off device. [settled — Help 10787469, verified 2026-06-06]
-- **End-to-end encrypted** — data that only the sender and the recipient can read, not the developer and not anyone else. [settled — Help 10787469, verified 2026-06-06]
-- **Ephemeral processing** — see §6. [settled — Help 10787469, verified 2026-06-06]
+- **On-device only** — accessed/processed but never transmitted off device. [settled — Help 10787469, verified 2026-11-18]
+- **End-to-end encrypted** — data that only the sender and the recipient can read, not the developer and not anyone else. [settled — Help 10787469, verified 2026-11-18]
+- **Ephemeral processing** — not an exception from the form: data processed ephemerally is still entered in the form response, but is not shown on the store listing; see §6. [settled — Help 10787469, verified 2026-11-18]
 
 ### Exceptions to "sharing" (do NOT declare as shared)
-- **Service providers** — a third party that processes data for the developer, on the developer's instructions (i.e. a GDPR Art. 28 processor). [settled — Help 10787469, verified 2026-06-06]
-- **Legal purposes** — transfer for legal/regulatory compliance, or to law enforcement. [settled — Help 10787469, verified 2026-06-06]
-- **User-initiated action or prominent disclosure + user consent** at the moment of transfer. [settled — Help 10787469, verified 2026-06-06]
-- **Fully anonymized data** — not linkable to a user/device. [settled — Help 10787469, verified 2026-06-06]
+- **Service providers** — a third party that processes data for the developer, on the developer's instructions (i.e. a GDPR Art. 28 processor). [settled — Help 10787469, verified 2026-11-18]
+- **Legal purposes** — transfer for specific legal purposes, such as in response to a legal obligation or government requests. [settled — Help 10787469, verified 2026-11-18]
+- **User-initiated action or prominent disclosure + user consent** — a transfer on a specific user-initiated action where the user reasonably expects the data to be shared, or on a prominent in-app disclosure and consent that meets the User Data policy. [settled — Help 10787469, verified 2026-11-18]
+- **Fully anonymized data** — not linkable to a user/device. [settled — Help 10787469, verified 2026-11-18]
 
 > **Application of the SDK rule (worked: example app):** Firebase Analytics, Crashlytics, Firebase
 > Auth/Firestore, Cloud Functions, and RevenueCat all transmit off-device → all count
@@ -55,7 +57,7 @@ The two quoted definitions are Google's (Play Console Help 10787469, https://sup
 
 ## 1. The 14 data categories and their data types (the full taxonomy)
 
-Encode this verbatim — it is the closed enumeration the form presents. [settled — Help 10787469, verified 2026-06-06]
+Encode this verbatim — it is the closed enumeration the form presents. [settled — Help 10787469, verified 2026-11-18]
 
 | # | Category | Data types (sub-types) |
 |---|---|---|
@@ -74,14 +76,18 @@ Encode this verbatim — it is the closed enumeration the form presents. [settle
 | 13 | **App info and performance** | Crash logs · Diagnostics · Other app performance data |
 | 14 | **Device or other IDs** | Device or other IDs |
 
-**April 2025 reclassification:** Android ID is now treated as a **device identifier**
-and must be declared under **Device or other IDs** (category 14). [verify-pinpoint — date/wording from harvested notes (Help 10787469), not re-confirmed against the page this run]
+**Android ID:** declare it under **Device or other IDs** (category 14) when it leaves the
+device. Google defines the type as "Identifiers that relate to an individual device, browser
+or app", with the examples IMEI number, MAC address, Widevine Device ID, Firebase
+installation ID and advertising identifier. [settled — Help 10787469, verified 2026-11-18]
+An "April 2025 reclassification" of Android ID is not on Help 10787469.
+[verify — source not found 2026-11-18: not on Help 10787469 or its change log (latest entry 5 Dec 2023); a web search found no Google notice]
 
 ---
 
 ## 2. The per-data-type questions
 
-For **each data type** you declare as collected/shared, the form asks: [settled — Help 10787469, verified 2026-06-06]
+For **each data type** you declare as collected/shared, the form asks: [settled — Help 10787469, verified 2026-11-18]
 
 1. **Collected / Shared / Both?** — Is this data type collected, shared, or both?
 2. **Processed ephemerally?** — Is the data only ever held in memory and retained no longer than needed to service the request in real time? (See §6.)
@@ -93,7 +99,7 @@ For **each data type** you declare as collected/shared, the form asks: [settled 
 
 ## 3. The closed list of 7 purposes
 
-Identical list for **collection** and **sharing** purposes. Multi-select. [settled — Help 10787469, verified 2026-06-06]
+Identical list for **collection** and **sharing** purposes. Multi-select. [settled — Help 10787469, verified 2026-11-18]
 
 | Purpose | Typical trigger (worked: example app) |
 |---|---|
@@ -113,24 +119,26 @@ Identical list for **collection** and **sharing** purposes. Multi-select. [settl
 
 ## 4. The two app-level security declarations (mandatory)
 
-Asked once for the whole app, not per type. [settled — Help 10787469, verified 2026-06-06]
+Asked once for the whole app, not per type. [settled — Help 10787469, verified 2026-11-18]
 
 | Declaration | What the form asks (summary) | Answer (worked: example app) |
 |---|---|---|
 | **Encryption in transit** | Whether all user data the app collects is encrypted in transit (yes/no) | **YES** — all Firebase/RevenueCat traffic is HTTPS/TLS. [verify — confirm no plaintext egress via traffic capture] |
 | **Deletion mechanism** | Whether users have a way to ask for their data to be deleted (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day scheduled purge) **and** a public web deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). [worked example — the example app's state; confirm the app's own] |
 
-**Optional security badges** (not required; do not claim unless true): [settled — Help 10787469, verified 2026-06-06]
+**Optional security badges** (not required; do not claim unless true): [settled — Help 10787469, verified 2026-11-18]
 - **Independent security review** — third-party validation against **OWASP MASVS** via the **MASA** (App Defense Alliance) program. **Do not claim** it unless the app has passed one (the example app has not).
-- **Families self-certified ads SDKs** badge — only for child-audience apps.
+- **"Committed to follow the Play Families Policy"** badge — only for apps with children as a target audience that have reviewed their compliance with the Families policy.
 - **UPI** badge — India Unified Payments Interface apps only.
 
 > **Account-deletion linkage:** answering deletion = YES interacts with the separate
 > **account & data deletion** requirement (Help 13327111): an account-creating app
-> needs BOTH an in-app deletion path AND a functional public web deletion URL, and
-> deleting an account must delete the associated user data across all declared
-> categories (retention only for security/fraud/legal, and only if disclosed in the
-> policy). The example app satisfies both; check the app under review for each. [verify-pinpoint — Help 13327111 details from harvested notes, not re-fetched this run]
+> needs BOTH an in-app path to delete the account (Google accepts, as an alternative,
+> a link inside the app to the web deletion resource) AND a functional web deletion link
+> that names the app or developer as on the store listing, and deleting an account must
+> delete the user data associated with it (some data may be kept for security, fraud
+> prevention or regulatory compliance, and users must be told, for example in the privacy
+> policy). The example app satisfies both; check the app under review for each. [settled — Help 13327111, verified 2026-11-18]
 
 ---
 
@@ -150,17 +158,21 @@ Privacy label, and the SDK/subprocessor inventory.
 | App info & performance → **Diagnostics** | YES | NO | Crashlytics / Analytics | Fraud prevention, security, and compliance; Analytics | Optional | No |
 | Device or other IDs → **Device or other IDs** | YES | NO | Firebase (installation/instance IDs) | Analytics; Fraud prevention, security, and compliance | Optional | No |
 
-**Breathing-session data → declare under App activity, NOT Health & fitness.**
+**Breathing-session data → declared under App activity, not Health & fitness, in this worked example.** [verify — see the trap note below: Google's Fitness info type covers "exercise or other physical activity", so whether synced breathing sessions belong there is for the reviewer]
 - For **free** users, sessions are **on-device only** → **not collected** at all (no row). [worked example — the example app's state; confirm the app's own]
 - For **paid-tier** users, sessions sync to Firestore. Map them to **App activity → Other actions** (or App interactions). [verify — exact App-activity sub-type is a judgment call]
 
-> **OVER-DECLARATION TRAP (the #1 wellness-app pitfall):** Do **NOT** mark **Health and
-> fitness → Health info / Fitness info** for an app that accesses **no Health Connect / no
-> fitness API** (as the example app does not); breathing logs are user-generated app activity, not platform health
-> data. Marking Health & fitness would (a) misrepresent the data, (b) likely pull the
-> app into the **Health apps declaration** scrutiny, and (c) diverge from the Apple
-> label and the Art. 9 GDPR analysis (breathing logs are not special-category health
-> data absent a clinical/sensor source). An app that does read health or fitness data declares it. [settled — Help 10787469 + example-app profile, verified 2026-06-06]
+> **OVER-DECLARATION TRAP (the #1 wellness-app pitfall):** Google defines the two types by
+> the data, not by the API it comes from: **Health info** is "Information about a user's
+> health, such as medical records or symptoms"; **Fitness info** is "Information about a
+> user's fitness, such as exercise or other physical activity". [settled — Help 10787469, verified 2026-11-18]
+> This suite's worked answer for the example app (no Health Connect, no fitness API):
+> breathing logs are user-generated app activity, so Health and fitness stays unmarked `[verify]`.
+> Marking it would (a) misrepresent the data, (b) likely pull the app into the **Health
+> apps declaration** scrutiny, and (c) diverge from the Apple label and the Art. 9 GDPR
+> analysis. An app that does read health or fitness data declares it. [verify — the Health
+> Connect / fitness-API test is the suite's reading, not Google's; check synced breathing
+> sessions against the Fitness info definition]
 >
 > **UNDER-DECLARATION TRAP:** Every off-device SDK counts. Forgetting Crashlytics
 > diagnostics or RevenueCat purchase history is an omitted disclosure. Cross-check the
@@ -171,18 +183,18 @@ Privacy label, and the SDK/subprocessor inventory.
 ## 6. Ephemeral processing — the carve-out
 
 Data **processed ephemerally** must still be **reported in the form**, but is **not
-shown** in the public Data safety card as "collected." [settled — Help 10787469, verified 2026-06-06]
+shown** in the public Data safety card as "collected." [settled — Help 10787469, verified 2026-11-18]
 
 - **Definition:** "accessing and using it while the data is only stored in memory and
   retained for no longer than necessary to service the specific request in real-time."
   (Google, Play Console Help 10787469, https://support.google.com/googleplay/android-developer/answer/10787469)
-  [settled — Help 10787469, verified 2026-06-06]
+  [settled — Help 10787469, verified 2026-11-18]
 - **Qualifying example (Google's):** a weather app transmits location off-device to
   fetch current weather, uses it only in memory, and discards it once the request is
-  served → transient use of location may be treated as ephemeral. [settled — Help 10787469, verified 2026-06-06]
+  served → transient use of location may be treated as ephemeral. [settled — Help 10787469, verified 2026-11-18]
 - **Disqualifying example (Google's):** data used to build advertising or other user
   profiles **cannot** count as ephemeral; declare it as collected or shared.
-  [settled — Help 10787469, verified 2026-06-06]
+  [settled — Help 10787469, verified 2026-11-18]
 
 > **Worked (example app):** persisted Firestore sessions, Analytics events, and Crashlytics reports
 > are **stored** beyond the request → **NOT ephemeral**. Mark ephemeral = No across the
@@ -193,27 +205,28 @@ shown** in the public Data safety card as "collected." [settled — Help 1078746
 ## 7. The importable CSV schema (the deliverable artifact)
 
 The Data safety form can be **exported to CSV** and **imported from CSV** in Play
-Console (**App content → Data safety**). **Import overwrites** existing answers. The
+Console (**App content → Data safety → Start**, then **Export to CSV** or **Import to CSV**
+near the top right of the page). **Import overwrites** existing answers. The
 Android Publisher API `applications.dataSafety` accepts the **same CSV contents**
-programmatically (see §8). [settled — API doc + harvested notes (rel=high), verified 2026-06-06; exact Console menu path: verify]
+programmatically (see §8). [settled — Help 10787469 + API doc, verified 2026-11-18]
 
-**Five columns** (one row per response choice): [settled — Android Publisher API doc + fastlane-plugin-google_data_safety + harvested notes, verified 2026-06-06]
+**Five columns** (one row per response choice): [settled — Help 10787469 and its sample CSV (header row as below) + Android Publisher API doc, verified 2026-11-18]
 
 | Column header | Meaning | Allowed values |
 |---|---|---|
 | **Question ID (machine readable)** | Stable machine ID for the question | Google-assigned opaque IDs (treat as fixed; obtain by exporting the current template) |
 | **Response ID (machine readable)** | Stable machine ID for a specific answer choice within that question | Google-assigned opaque IDs (from the exported template) |
 | **Response value** | Whether this choice is selected | `TRUE` / `FALSE` (or blank) |
-| **Answer requirement** | Cardinality/required-ness of the question | `OPTIONAL` · `REQUIRED` · `MULTIPLE_CHOICE` |
+| **Answer requirement** | Cardinality/required-ness of the question | `OPTIONAL` · `REQUIRED` · `MULTIPLE_CHOICE` · `SINGLE_CHOICE` · `MAYBE_REQUIRED` (required only when an earlier answer makes it so) |
 | **Human-friendly question label** | Display text (for humans; not parsed) | Free text — the question as the form words it |
 
 **Operating rules:**
 - One row per response choice; set **Response value = TRUE** for selected choices,
-  **FALSE** (or blank) otherwise. [settled — fastlane plugin + harvested notes, verified 2026-06-06]
+  **FALSE** (or blank where the question is optional or multiple choice) otherwise. [settled — Help 10787469, verified 2026-11-18]
 - **Do not invent Question/Response IDs.** They are Google-assigned and version with the
   form — always **export the current template first**, then edit `Response value` only,
-  then re-import. [settled — derived from export/import workflow + API doc, verified 2026-06-06]
-- Import **overwrites** the entire form; treat the CSV as the single source of truth. [verify — "overwrite" behavior from harvested notes, not re-confirmed against the page this run]
+  then re-import. [settled — derived from export/import workflow + API doc, verified 2026-11-18]
+- Import **overwrites** the answers already in the form ("Answers already entered into your form will be overwritten when you import a CSV"); treat the CSV as the single source of truth. [settled — Help 10787469, verified 2026-11-18]
 
 **CI / reference tooling:**
 - `owenbean400/fastlane-plugin-google_data_safety` — `prompt_create_data_safety_csv`
@@ -226,7 +239,7 @@ programmatically (see §8). [settled — API doc + harvested notes (rel=high), v
 
 ## 8. The `applications.dataSafety` API (programmatic submit)
 
-[settled — Android Publisher API v3 doc, verified 2026-06-06]
+[settled — Android Publisher API v3 doc, verified 2026-11-18]
 
 ```
 POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/dataSafety
@@ -242,16 +255,17 @@ POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{p
 
 > The API page does **not** itself enumerate the CSV column schema — it links out to
 > the Help Center for the format and template. Use the §7 schema (from the export
-> template) as the authoritative column spec. [settled — API doc, verified 2026-06-06]
+> template) as the authoritative column spec. [settled — API doc, verified 2026-11-18]
 
 ---
 
-## 9. Sign-off checklist (PASS/FAIL gates)
+## 9. Review checklist (PASS/FAIL gates)
 
 Use to adjudicate the app's Data safety declaration (the items name the example app's SDKs; substitute the app's own). Severity: 🔴 blocker · 🟠 must-fix · 🟡 review.
 
-1. 🔴 **No over-declaration of Health & fitness.** For an app with no Health Connect / fitness API,
-   confirm both Health info and Fitness info are **NOT collected/shared**. [settled, verified 2026-06-06]
+1. **Hard condition — Health & fitness answer confirmed.** For an app with no Health Connect / fitness API,
+   confirm whether Health info and Fitness info are collected or shared; a declaration is not by itself a
+   defect. [verify — Google's types turn on the data, not the API; see §5 trap note]
 2. 🔴 **Every off-device SDK is declared.** Scan merged manifest + release APK
    (Exodus/MobSF) and assert Firebase Auth/Firestore/Analytics, Crashlytics, Cloud
    Functions, RevenueCat each map to a declared category. No omitted disclosures. [verify]
@@ -265,8 +279,8 @@ Use to adjudicate the app's Data safety declaration (the items name the example 
 7. 🟠 **Form ↔ Apple App Privacy parity.** Three-way reconcile (form ⇄ Apple label ⇄
    policy); flag any divergence in category mapping (e.g. Email, User IDs, Purchase
    history, Crash, Diagnostics, Device IDs). [verify]
-8. 🟡 **Device IDs declared** if Firebase installation/instance IDs leave the device
-   (incl. the April 2025 Android-ID reclassification). [verify-pinpoint]
+8. 🟠 **Device IDs declared** if Firebase installation/instance IDs leave the device; a missing row is a GAP, as in `legal-cross-store.md`
+   (and Android ID, which fits the type's definition; see §1). [verify]
 9. 🟡 **Required vs optional** matches the in-app opt-outs (Analytics/Crashlytics
    toggles → optional). [verify]
 10. 🟡 **Ephemeral = No** for all persisted data (Firestore/Analytics/Crashlytics). [verify]
@@ -282,16 +296,16 @@ Use to adjudicate the app's Data safety declaration (the items name the example 
 | Account & data deletion | Help **13327111** | In-app path + public web deletion URL; delete-on-delete. [verify-pinpoint] |
 | User Data policy (privacy URL) | Help **10144311** | Non-PDF, non-geofenced, non-editable, labelled, in-Console + in-app, entity-name match. [verify-pinpoint] |
 | Health Content & Services | Help **16679511** | Wellness framing may need the Health apps declaration; "not a medical device" disclaimer in the store description. [verify-pinpoint] |
-| AD_ID / manifest hygiene | Help **6048248** | AD_ID auto-merged by SDKs; strip via `tools:node="remove"`; must match "no advertising ID" answer. [verify-pinpoint] |
+| AD_ID / manifest hygiene | Help **6048248** | AD_ID auto-merged by SDKs; strip via `tools:node="remove"` **and** set `google_analytics_adid_collection_enabled=false` (both controls, `sdk-data-map.md` §3); must match "no advertising ID" answer. [verify-pinpoint] |
 | Target audience / Families | Help **9893335** | Declare "not targeted at children"; reconcile with 16+ age gate. [verify-pinpoint] |
 
 ---
 
 ### Open items for human confirmation
-- The **April 2025 Android-ID → Device IDs** reclassification and the **CSV
-  import-overwrite** behavior come from harvested notes, not re-fetched against the live
-  page this run. (`[verify-pinpoint]` / `[verify]`)
-- Exact Play Console **menu path** wording ("App content → Data safety → Export/Import to CSV").
+- The **"April 2025" Android-ID reclassification** date: not found on Help 10787469 on
+  2026-11-18 (§1). The CSV import-overwrite behaviour and the Console menu path were
+  confirmed on the page that day (§7).
+- Whether synced breathing sessions fall under Google's **Fitness info** type (§5, §9 item 1).
 - All **app-specific** mappings in §5 (esp. RevenueCat/Firebase **service-provider
   vs sharing** framing, and the App-activity sub-type for synced sessions) need
   confirmation against the current DPAs and the actual code/data flows.

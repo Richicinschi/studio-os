@@ -454,6 +454,12 @@ When they say "check my setup": re-run the check of every ticked row in `adoptio
 item's card, and report pass or fail per item, with the line that showed it. Change nothing. For a
 failure, say what to look at next, and offer to fix it as a new plan row on their yes.
 
+Whatever the plan holds, also send each git guard one fake force-push: every `block-dangerous-git.mjs`
+that a `hooks.PreToolUse` entry names in `.claude/settings.json`, `.claude/settings.local.json` or the
+user settings, with the line of `cards/git-guardrails.md`, Check step 1. Report one line per guard:
+`exit 2` is pass; any other exit, a missing file among them, is fail. A path that is not a
+file, such as a folder, is fail and is never run. Run no other hook from the settings.
+
 ## When a session ends partway
 
 The adoption uses its own handoff. When a session stops before the adoption is finished (they say

@@ -3,12 +3,12 @@
 **Scope:** the load-bearing GDPR (EU 2016/679) / AVG articles a reviewer needs to adjudicate a mobile-app Privacy Policy + ToS for an EU/NL publisher. Worked examples use the **example app** (`legal-guardrails.md` §8; apply the rules to the app under review from its fact sheet) — a Flutter breathing/mindfulness app published by a **Dutch eenmanszaak** (sole proprietor = sole controller; **no employees, no DPO**), EU-first, auto-renewing subscriptions sold **through Apple/Google** (merchants of record) via **RevenueCat** + **Firebase** (Auth, Firestore, Analytics, Crashlytics, Cloud Functions, Hosting; region `europe-west`). General wellness, **no medical claims** ("supports / may help relax"). Free tier = **on-device data only**; Pro = **Firestore sync**.
 
 **Citation tiers used below:**
-- `[settled — <source>, verified 2026-06-06]` — confirmed against the primary source fetched this run.
+- `[settled — <source>, verified <date>]` — confirmed against the source on that date (re-check: 2026-11-18).
 - `[verify]` — believed correct, not confirmed this run.
 - `[verify-pinpoint]` — right substance, exact article/paragraph/letter still to pin.
 - `[low-confidence]` — novel / contested / fact-specific.
 
-> NL note: the GDPR is implemented in the Netherlands by the **UAVG** (*Uitvoeringswet Algemene verordening gegevensbescherming*). The supervisory authority ("toezichthouder") is the **Autoriteit Persoonsgegevens (AP)**. The regulation itself is identical EU-wide; the UAVG sets the NL-specific options (notably the Art 8 child-consent age).
+> NL note: the GDPR is implemented in the Netherlands by the **UAVG** (*Uitvoeringswet Algemene verordening gegevensbescherming*). The supervisory authority ("toezichthouder") is the **Autoriteit Persoonsgegevens (AP)**. The regulation itself is identical EU-wide; the UAVG sets the NL-specific options. It does not lower the Art 8 child-consent age, so the GDPR's 16 applies; UAVG art. 5(1) also requires a legal representative's consent for under-16s where consent is the basis and Art 8 does not apply.
 
 ---
 
@@ -18,7 +18,7 @@
 |---|---|---|
 | 6 | Six lawful bases | Pick **ONE** basis per purpose. Core delivery = **6(1)(b)** contract. Analytics/crash = **consent** (6(1)(a)), not 6(1)(f) — ePrivacy 5(3) bites first. |
 | 7 | Consent conditions | Demonstrable, unbundled, plain-language, **as easy to withdraw as to give**, no pre-ticked boxes. |
-| 8 + UAVG | Child consent age | **NL = 16** (UAVG took the max of the 13–16 band). A 13+ gate is **non-compliant** for an NL publisher. |
+| 8 + UAVG | Child consent age | **NL = 16** (the GDPR default; the UAVG does not lower it). A 13+ gate is **non-compliant** for an NL publisher. |
 | 9 | Special-category / health | Bare session logs **arguably not** Art 9 *if no health/mood/stress inference*. Any scoring/inference → **9(2)(a) explicit, separate consent**. |
 | 12 / 15–22 | Data-subject rights + SLA | Name all rights; **respond within 1 month** (+2-month extension). |
 | 13 | Privacy-notice content | **12-point** mandatory checklist (1(a)–(f), 2(a)–(f)). Missing any one = incomplete notice. |
@@ -31,7 +31,7 @@
 
 ## Article 6 — Lawfulness of processing (the six bases)
 
-### The six lawful bases (Art 6(1)) `[settled — gdpr-info.eu/art-6, verified 2026-06-06]`
+### The six lawful bases (Art 6(1)) `[settled — GDPR Art 6(1) (EUR-Lex; gdpr-info.eu/art-6), verified 2026-11-18]`
 
 | Letter | Basis | Exact trigger wording |
 |---|---|---|
@@ -42,13 +42,13 @@
 | (e) | **Public task** | "necessary for the performance of a task carried out in the public interest or in the exercise of official authority…" |
 | (f) | **Legitimate interests** | "necessary for the purposes of the legitimate interests pursued by the controller or by a third party, **except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject** … in particular where the data subject is a child" |
 
-- **One basis per purpose.** Each distinct processing purpose in the RoPA / privacy notice must name **exactly one** Art 6 basis (Art 13(1)(c) makes stating it mandatory). Do not "stack" bases as a hedge. `[settled — gdpr-info.eu/art-6 + EDPB practice, verified 2026-06-06]`
-- **6(1)(f) is the only basis with a balancing test** → it requires a documented **Legitimate Interests Assessment (LIA)** (purpose / necessity / balancing). `[settled — gdpr-info.eu/art-6, verified 2026-06-06]`
+- **One basis per purpose (drafting practice).** Decide the Art 6 basis for each purpose **before** processing starts and state it in the notice (Art 13(1)(c)); a controller cannot later swap from consent to another basis (EDPB Guidelines 05/2020 paras 121, 123). Art 6(1) itself only requires that "at least one" basis applies, so naming **exactly one** per purpose is the safe practice, not a rule in the text. Do not "stack" bases as a hedge. `[settled — GDPR Art 6(1), 13(1)(c); EDPB Guidelines 05/2020 paras 121, 123, verified 2026-11-18]`
+- **6(1)(f) is the only basis whose text carries a balancing test** → document a **Legitimate Interests Assessment (LIA)**: the EDPB says controllers should assess and document its three cumulative conditions (legitimate interest / necessity / balancing) before processing. `[settled — GDPR Art 6(1)(f); EDPB Guidelines 1/2024 v2.0 (adopted 10 Nov 2026), executive summary, verified 2026-11-18]`
 - **6(1)(f) is UNAVAILABLE** in three situations relevant here:
-  1. **Device-side analytics/telemetry where ePrivacy Art 5(3) bites** — the *reading/writing of information on the device* needs **prior consent**; 6(1)(f) cannot launder away that consent. 6(1)(f) at most governs the *downstream* processing after consent is obtained. `[settled — Art 6 text + ePrivacy 5(3) interaction, verified 2026-06-06]` (see ePrivacy/cookiewet reference)
+  1. **Device-side analytics/telemetry where ePrivacy Art 5(3) bites** — the *reading/writing of information on the device* needs **prior consent**; 6(1)(f) cannot launder away that consent. 6(1)(f) at most governs the *downstream* processing after consent is obtained. `[settled — ePrivacy Art 5(3); EDPB Opinion 5/2019 paras 40–41, verified 2026-11-18]` (see ePrivacy/cookiewet reference)
   2. **Children** — the recital text singling out children as overriding cautions against 6(1)(f) for child-directed processing. `[verify-pinpoint]` (Recital 38)
-  3. **Art 9 special-category (health) data** — Art 9 needs its **own** condition (9(2)(a) explicit consent); 6(1)(f) does not satisfy it. `[settled — Art 9 supremacy over Art 6, verified 2026-06-06]`
-- **6(4)** purpose-compatibility test (for re-using data for a new purpose without fresh consent/legal authority) weighs: link between purposes; collection context + controller–subject relationship; nature of data (esp. special categories); consequences for subjects; safeguards (encryption/pseudonymisation). `[settled — gdpr-info.eu/art-6, verified 2026-06-06]`
+  3. **Art 9 special-category (health) data** — Art 9 needs its **own** condition (9(2)(a) explicit consent); 6(1)(f) does not satisfy it. `[settled — GDPR Art 9(1)–(2) + Recital 51, verified 2026-11-18]`
+- **6(4)** purpose-compatibility test (for re-using data for a new purpose without fresh consent/legal authority) weighs: link between purposes; collection context + controller–subject relationship; nature of data (esp. special categories); consequences for subjects; safeguards (encryption/pseudonymisation). `[settled — GDPR Art 6(4) (EUR-Lex; gdpr-info.eu/art-6), verified 2026-11-18]`
 
 ### Worked lawful-basis map (the model answer for the example app; build the same map for the app under review)
 
@@ -67,7 +67,7 @@
 
 ## Article 7 — Conditions for consent
 
-`[settled — gdpr-info.eu/art-7, verified 2026-06-06]`
+`[settled — GDPR Art 7 (EUR-Lex; gdpr-info.eu/art-7), verified 2026-11-18]`
 
 | Para | Rule | Exact wording (key phrase) |
 |---|---|---|
@@ -77,10 +77,10 @@
 | 7(4) | **Freely given / no bundling** | service must not be "conditional on consent to the processing of personal data that is not necessary for the performance of that contract" |
 
 **Operational consent rules (reviewer checklist):**
-- **No pre-ticked boxes.** Consent must be an unticked, **affirmative opt-in action** (a deliberate tick/tap). `[settled — Art 7 + Recital 32, verified 2026-06-06]`
-- **No bundling into ToS acceptance.** Each consent (analytics, crash, age, withdrawal-waiver) must be **separate** from blanket "I accept the Terms" acceptance. `[settled — Art 7(2)/(4), verified 2026-06-06]`
-- **Symmetric withdrawal.** If consent is granted with one tap, withdrawal must be ≈ one tap. `[settled — Art 7(3), verified 2026-06-06]`
-- **Log it.** Store timestamped proof (e.g. `ageConfirmedAt`, `withdrawalConsentAt`, analytics-toggle state). `[settled — Art 7(1), verified 2026-06-06]`
+- **No pre-ticked boxes.** Consent must be an unticked, **affirmative opt-in action** (a deliberate tick/tap). `[settled — Art 7 + Recital 32, verified 2026-11-18]`
+- **No bundling into ToS acceptance.** Each consent (analytics, crash, age, withdrawal-waiver) must be **separate** from blanket "I accept the Terms" acceptance. `[settled — Art 7(2)/(4), verified 2026-11-18]`
+- **Symmetric withdrawal.** If consent is granted with one tap, withdrawal must be ≈ one tap. `[settled — Art 7(3), verified 2026-11-18]`
+- **Log it.** Store timestamped proof (e.g. `ageConfirmedAt`, `withdrawalConsentAt`, analytics-toggle state). `[settled — Art 7(1), verified 2026-11-18]`
 
 **Application (worked: example app):**
 - Analytics/crash opt-**in** toggle (or opt-out clearly presented at first run) + Settings off-switch ⇒ satisfies 7(3) easy-withdrawal.
@@ -91,7 +91,7 @@
 
 ## Article 8 — Child's consent for information-society services (+ Dutch UAVG)
 
-`[settled — gdpr-info.eu/art-8, verified 2026-06-06]`
+`[settled — GDPR Art 8 (EUR-Lex; gdpr-info.eu/art-8), verified 2026-11-18]`
 
 - **8(1)** Where consent (Art 6(1)(a)) is the basis for an information-society service offered directly to a child, processing is lawful only if the child is **at least 16**. Below 16, it is lawful "only if and to the extent that consent is given or authorised by the holder of parental responsibility." **Member States may lower the age, but not below 13.**
 - **8(2)** The controller must "make **reasonable efforts to verify** … that consent is given or authorised by the holder of parental responsibility … **taking into consideration available technology**."
@@ -99,7 +99,7 @@
 
 ### NL-specific: the age is **16**
 
-The Netherlands set the digital-consent age at the **maximum of the band — 16 — via the UAVG**. There is **no lower Dutch carve-out**. `[settled — harvest notes / UAVG, verify-pinpoint exact UAVG article]`
+The Dutch digital-consent age is **16, the top of the band**: the UAVG does not use the Art 8(1) option to lower it, so the GDPR's own 16 applies. UAVG art. 5(1) separately requires the legal representative's consent for under-16s where consent is the basis and Art 8 does not apply. There is **no lower Dutch carve-out**. `[settled — GDPR Art 8(1) (EUR-Lex); UAVG art. 5(1) (wetten.overheid.nl, version in force from 1 Sep 2026), verified 2026-11-18]`
 
 > **Reviewer rule:** for an NL-first publisher relying on any Art 6(1)(a) / Art 9(2)(a) consent, the sign-up + notice must enforce a **16+ gate**, not 13+. **A 13+ gate is non-compliant for an NL-first app.** A 16+ self-attestation checkbox (the example app's) is correctly calibrated; it is the pragmatic minimum (true under-16 targeting would require *verifiable parental consent* per 8(2), which an app that does not target children does not do and does not need).
 
@@ -107,23 +107,23 @@ The Netherlands set the digital-consent age at the **maximum of the band — 16 
 
 ## Article 9 — Special categories of personal data (health) — **the key judgement call**
 
-### 9(1) — the prohibition `[settled — gdpr-info.eu/art-9, verified 2026-06-06]`
+### 9(1) — the prohibition `[settled — GDPR Art 9(1) (EUR-Lex; gdpr-info.eu/art-9), verified 2026-11-18]`
 
 Processing is **prohibited** of data revealing: racial/ethnic origin; political opinions; religious/philosophical beliefs; trade-union membership; **genetic data**; **biometric data for unique identification**; **data concerning health**; data concerning sex life or sexual orientation.
 
-### 9(2)(a) — the explicit-consent gateway `[settled — gdpr-info.eu/art-9, verified 2026-06-06]`
+### 9(2)(a) — the explicit-consent gateway `[settled — GDPR Art 9(2)(a) (EUR-Lex; gdpr-info.eu/art-9), verified 2026-11-18]`
 
 "the data subject has given **explicit consent** to the processing of those personal data for **one or more specified purposes** …"
 
 (Other lifts 9(2)(b)–(j): employment/social-security; vital interests; non-profit activities; manifestly-public data; legal claims; substantial public interest; preventive/occupational medicine; public health; archiving/research/statistics. **None apply to a consumer wellness app like the example app** — only 9(2)(a) is realistically available.)
 
-### The inference nuance (decide this explicitly for every sign-off)
+### The inference nuance (decide this explicitly in every review)
 
 - **Inferred health data is Art 9 data even if the inputs were not.** If usage/behavioural data is analysed to **estimate stress, anxiety, sleep, mood, or wellbeing**, the **output is health data** and Art 9 applies. `[verify — regulator/EDPB + commentary position; not a verbatim article rule]`
-- **Bare session logs (technique, duration, timestamp) are arguably NOT Art 9** **if the app makes NO health/stress/mood inference and shows no scoring/labels.** `[low-confidence — fact-specific; defensible but not statutory black-letter]`
-- **The no-medical-claims framing is load-bearing.** The general-wellness posture ("supports / may help relax"; never "treats / cures / diagnoses / prevents") is what keeps a wellness app (like the example app) **defensibly out of Art 9**. If the copy drifts into health claims or the data model adds scoring, the analysis flips. `[low-confidence — but this is the crux of the sign-off]`
+- **Test (GDPR):** data are health data if they are capable of revealing health status, directly or by collation or deduction, even only with a certain probability; their source does not matter. `[settled — GDPR Art 4(15), Recital 35; CJEU C-21/23 paras 81, 83, 90; C-184/20 paras 123, 125, 127, verified 2026-11-19]` **Applied:** logs holding only technique, time, rounds and audio settings, with non-medical goals (calm/focus/reset), are not health data. They become Art 9 data — explicit consent, Art 9(2)(a) — if a technique or program is framed around a condition, the user enters mood or symptoms, the app measures a physiological signal, or the app infers a state. `[low-confidence — fact-specific; no CJEU or EDPB ruling on wellness-session logs; LEGAL REVIEW REQUIRED before relying on "not Art 9" if any trigger is present]`
+- **The no-medical-claims framing is load-bearing.** The general-wellness posture ("supports / may help relax"; never "treats / cures / diagnoses / prevents") is what keeps a wellness app (like the example app) **defensibly out of Art 9**. If the copy drifts into health claims or the data model adds scoring, the analysis flips. `[low-confidence — but this is the crux of the review]`
 
-### Art 9 sign-off procedure (for a wellness app)
+### Art 9 review procedure (for a wellness app)
 
 1. **Scan** the data model + all user-facing copy for any health/stress/mood **inference, score, label, or trend** (e.g. "your calm score", "anxiety down 20%").
 2. **If found** → Art 9 triggers → require **9(2)(a) explicit, separate consent** (a *distinct* interaction, not bundled into ToS/privacy acceptance) **and** surface it in privacy-notice §3.
@@ -135,7 +135,7 @@ Processing is **prohibited** of data revealing: racial/ethnic origin; political 
 
 ## Articles 12 + 15–22 — Data-subject rights and the response deadline
 
-`[settled — gdpr-info.eu/art-12 & 15-22, verify-pinpoint exact paragraph anchors per article]`
+`[settled — GDPR Arts 12, 15–18, 20–22 (EUR-Lex; gdpr-info.eu/art-12), verified 2026-11-18]`
 
 | Art | Right | Operationalisation (worked: example app) |
 |---|---|---|
@@ -144,10 +144,10 @@ Processing is **prohibited** of data revealing: racial/ethnic origin; political 
 | 17 | **Erasure** ("right to be forgotten") | **In-app account-deletion flow** (soft-delete + 30-day grace + `purgeExpiredDeletions` cron) — store-mandated anyway. |
 | 18 | **Restriction** | Stop processing on request (manual for an indie). |
 | 20 | **Portability** | Export of session history (machine-readable). |
-| 21 | **Object** | Honour objection to consent-based processing (= the analytics/crash off-switch). |
+| 21 | **Object** | Honour objections to processing based on 6(1)(e) or (f) (e.g. server-side security logs) and to direct marketing (Art 21(1)–(2)). The analytics/crash off-switch is **consent withdrawal** under Art 7(3), not an Art 21 objection. |
 | 22 | **Automated individual decision-making / profiling** | An app that makes **no** such decisions (the example app) → state "not applicable / we do not carry out automated decision-making". |
 
-**Response deadline (Art 12(3)):** act on a request "without undue delay and **in any event within one month**"; extendable by **two further months** for complexity/volume, with **notice to the subject within the first month** explaining the extension. `[settled — gdpr-info.eu/art-12, verified via harvest 2026-06-06; verify-pinpoint = Art 12(3)]`
+**Response deadline (Art 12(3)):** act on a request "without undue delay and **in any event within one month**"; extendable by **two further months** for complexity/volume, with **notice to the subject within the first month** explaining the extension. `[settled — GDPR Art 12(3) (EUR-Lex; gdpr-info.eu/art-12), verified 2026-11-18]`
 
 **Reviewer checks:**
 - All applicable rights named in the PP (Art 13(2)(b)).
@@ -159,7 +159,7 @@ Processing is **prohibited** of data revealing: racial/ethnic origin; political 
 
 ## Article 13 — Mandatory privacy-notice content (the 12-point checklist)
 
-`[settled — gdpr-info.eu/art-13, verified 2026-06-06]`
+`[settled — GDPR Art 13(1)–(2) (EUR-Lex; gdpr-info.eu/art-13), verified 2026-11-18]`
 
 A privacy notice for data **collected from the data subject** MUST contain **all** of:
 
@@ -178,7 +178,7 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 | 11 | 13(2)(e) | Whether the user is **obliged to give the data** (by law or by contract), and what follows if they don't | E.g. account data is contractually necessary to use the service. |
 | 12 | 13(2)(f) | **Whether decisions are automated or the user is profiled**, and if so the logic and its effect on the user | State **none** (Art 22 N/A). |
 
-**Also:** **13(3)** — if data is later processed for a *new* purpose, inform the subject **beforehand**. **13(4)** — the duty falls away only insofar as the subject **already has** the information. `[settled — gdpr-info.eu/art-13, verified 2026-06-06]`
+**Also:** **13(3)** — if data is later processed for a *new* purpose, inform the subject **beforehand**. **13(4)** — the duty falls away only insofar as the subject **already has** the information. `[settled — GDPR Art 13(3)–(4) (EUR-Lex; gdpr-info.eu/art-13), verified 2026-11-18]`
 
 > **Reviewer rule:** a privacy notice **missing any one of the 12** is incomplete. Grep the PP for each element; report gaps. (For data obtained *indirectly* the parallel checklist is **Art 14** — not needed by an app that collects directly from the user, as the example app does. `[verify]`)
 
@@ -186,7 +186,7 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 
 ## Article 28 — Processor obligations (the eight mandatory DPA clauses)
 
-### 28(3) — every processor contract MUST contain `[settled — gdpr-info.eu/art-28, verified 2026-06-06]`
+### 28(3) — every processor contract MUST contain `[settled — GDPR Art 28(3) (EUR-Lex; gdpr-info.eu/art-28), verified 2026-11-18]`
 
 | Clause | Obligation (exact substance) |
 |---|---|
@@ -199,9 +199,9 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 | (g) | At the controller's choice, **delete or return** all personal data at end of service. |
 | (h) | **Make available all info** to demonstrate compliance + **allow and contribute to audits/inspections**. |
 
-**Supporting paras:** 28(1) controllers must use only processors giving sufficient guarantees; 28(2) no sub-processor without authorisation (general authorisation requires change-notice + right to object); 28(4) sub-processors bound by the **same** obligations, with the primary processor remaining **fully liable**. `[settled — gdpr-info.eu/art-28, verified 2026-06-06]`
+**Supporting paras:** 28(1) controllers must use only processors giving sufficient guarantees; 28(2) no sub-processor without authorisation (general authorisation requires change-notice + right to object); 28(4) sub-processors bound by the **same** obligations, with the primary processor remaining **fully liable**. `[settled — GDPR Art 28(1), (2), (4) (EUR-Lex; gdpr-info.eu/art-28), verified 2026-11-18]`
 
-**Sign-off (worked for the example app's processors; list the app's own):** for **each** sub-processor confirm a signed Art-28 DPA exists covering all of (a)–(h) **and** onward-transfer terms:
+**Review (worked for the example app's processors; list the app's own):** for **each** sub-processor confirm a signed Art-28 DPA exists covering all of (a)–(h) **and** onward-transfer terms:
 
 | Processor | DPA instrument | Status |
 |---|---|---|
@@ -215,21 +215,21 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 
 ## Article 30 — Records of Processing Activities (RoPA)
 
-### 30(1) controller-record contents `[settled — gdpr-info.eu/art-30, verified 2026-06-06]`
+### 30(1) controller-record contents `[settled — GDPR Art 30(1), (3), (4) (EUR-Lex; gdpr-info.eu/art-30), verified 2026-11-18]`
 
-(a) controller (+ joint controller / representative / DPO) name & contact; (b) purposes; (c) categories of data subjects + categories of personal data; (d) categories of recipients; (e) third-country transfers + safeguards; (f) **where possible**, erasure time-limits per category; (g) **where possible**, a general description of the technical & organisational security measures.
+(a) controller (+ joint controller / representative / DPO) name & contact; (b) purposes; (c) categories of data subjects + categories of personal data; (d) categories of recipients; (e) where applicable, third-country transfers, naming the country (and, for transfers under the second subparagraph of Art 49(1), the documented safeguards); (f) **where possible**, erasure time-limits per category; (g) **where possible**, a general description of the technical & organisational security measures.
 
 **30(3)** in writing (incl. electronic). **30(4)** make available to the supervisory authority on request.
 
-### 30(5) — the <250-employee exemption **and its three carve-outs** `[settled — gdpr-info.eu/art-30, verified 2026-06-06]`
+### 30(5) — the <250-employee exemption **and its three carve-outs** `[settled — GDPR Art 30(5) (EUR-Lex, no amendment in force; gdpr-info.eu/art-30), verified 2026-11-18]`
 
 > "The obligations … shall not apply to an enterprise or an organisation employing fewer than 250 persons **unless** the processing it carries out (i) **is likely to result in a risk to the rights and freedoms of data subjects**, (ii) **the processing is not occasional**, or (iii) **the processing includes special categories of data** as referred to in Article 9(1) or personal data relating to criminal convictions and offences referred to in Article 10."
 
 ### Worked conclusion (example app): **RoPA is MANDATORY** (despite the publisher being one person)
 
-- A one-person eenmanszaak is far under 250 — **but** a continuously-running app processes personal data **routinely, not occasionally**, so **carve-out (ii) "not occasional" defeats the exemption**. `[settled — Art 30(5) text + EDPB/WP29 reading of "occasional", verified 2026-06-06; the "continuous app ⇒ not occasional" application is verify]`
+- A one-person eenmanszaak is far under 250 — **but** a continuously-running app processes personal data **routinely, not occasionally**, so **carve-out (ii) "not occasional" defeats the exemption**. `[settled — Art 30(5) text + WP29 position paper on Art 30(5) (endorsed by the EDPB; footnote 1: "occasional" means not carried out regularly), verified 2026-11-18; the "continuous app ⇒ not occasional" application is verify]`
 - If **any Art 9 health inference** exists, **carve-out (iii)** independently requires a RoPA too.
-- The "we're tiny, no RoPA needed" assumption is **wrong** here — cite carve-out (ii) as the reason in the sign-off.
+- The "we're tiny, no RoPA needed" assumption is **wrong** here — cite carve-out (ii) as the reason in the review.
 
 > **Reviewer rule:** confirm a maintained RoPA exists with all 30(1)(a)–(g) fields. Do **not** accept "small publisher exemption" as a reason to skip it.
 
@@ -237,11 +237,11 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 
 ## Article 35 — Data Protection Impact Assessment (DPIA)
 
-### 35(1) trigger `[settled — gdpr-info.eu/art-35, verified 2026-06-06]`
+### 35(1) trigger `[settled — GDPR Art 35(1) (EUR-Lex; gdpr-info.eu/art-35), verified 2026-11-18]`
 
 DPIA required where processing (esp. using new technologies) **"is likely to result in a high risk to the rights and freedoms of natural persons."**
 
-### 35(3) — the three named mandatory cases `[settled — gdpr-info.eu/art-35, verified 2026-06-06]`
+### 35(3) — the three named mandatory cases `[settled — GDPR Art 35(3) (EUR-Lex; gdpr-info.eu/art-35), verified 2026-11-18]`
 
 | Case | Wording (substance) |
 |---|---|
@@ -249,7 +249,7 @@ DPIA required where processing (esp. using new technologies) **"is likely to res
 | (b) | Processing **on a large scale** of **Art 9** special-category (or Art 10 criminal) data |
 | (c) | **Systematic monitoring of a publicly accessible area on a large scale** |
 
-### 35(7) — minimum DPIA content `[settled — gdpr-info.eu/art-35, verified 2026-06-06]`
+### 35(7) — minimum DPIA content `[settled — GDPR Art 35(7) (EUR-Lex; gdpr-info.eu/art-35), verified 2026-11-18]`
 
 (a) systematic description of the processing + purposes (incl. any 6(1)(f) interest); (b) necessity & proportionality assessment; (c) risk assessment to data-subject rights/freedoms; (d) measures/safeguards/security to address the risks.
 
@@ -266,14 +266,14 @@ Also: **35(4)** each supervisory authority publishes its own DPIA-required list 
 
 ## Articles 33 / 34 — Personal-data-breach notification
 
-### 33 — notify the supervisory authority (the AP) `[settled — gdpr-info.eu/art-33, verified 2026-06-06]`
+### 33 — notify the supervisory authority (the AP) `[settled — GDPR Art 33(1), (3)–(5) (EUR-Lex; gdpr-info.eu/art-33), verified 2026-11-18]`
 
 - **33(1):** notify the AP **"without undue delay and, where feasible, not later than 72 hours after having become aware of it"** — **unless** the breach is **unlikely to result in a risk** to rights/freedoms. Delay beyond 72h must be reasoned.
-- **33(2):** a **processor** must inform the **controller** without undue delay on becoming aware. (For a Firebase + RevenueCat app such as the example app: rely on RevenueCat/Google breach-notice clauses in their DPAs to start your 72h clock; likewise for each of the app's own processors.) `[settled — gdpr-info.eu/art-33, verified 2026-06-06]`
+- **33(2):** a **processor** must inform the **controller** without undue delay on becoming aware. (For a Firebase + RevenueCat app such as the example app: rely on RevenueCat/Google breach-notice clauses in their DPAs to start your 72h clock; likewise for each of the app's own processors.) `[settled — GDPR Art 33(2) (EUR-Lex; gdpr-info.eu/art-33), verified 2026-11-18]`
 - **33(3) notification content:** (a) nature of the breach incl. categories + approximate numbers of subjects and records; (b) DPO / contact-point details; (c) likely consequences; (d) measures taken / proposed (incl. mitigation).
 - **33(4):** may be provided **in phases**. **33(5):** **document all breaches** (facts, effects, remedial action) regardless of notification.
 
-### 34 — notify affected individuals `[settled — harvest notes / gdpr-info.eu/art-34, verify-pinpoint exact paragraph anchors]`
+### 34 — notify affected individuals `[settled — GDPR Art 34(1), (3) (EUR-Lex; gdpr-info.eu/art-34), verified 2026-11-18]`
 
 - **34(1):** where the breach is **"likely to result in a HIGH risk"** to individuals → notify the affected data subjects **without undue delay**, in clear, plain language.
 - **34(3) exceptions to individual notice:**
@@ -298,7 +298,7 @@ Also: **35(4)** each supervisory authority publishes its own DPIA-required list 
 1. **Analytics/crash based on "legitimate interest"** instead of consent → **wrong** (ePrivacy 5(3) + Art 6). Flag.
 2. **Single combined "I accept everything" checkbox** covering ToS + analytics + age + withdrawal → **bundling**, violates Art 7(2)/(4). Flag; require separation.
 3. **Pre-ticked consent box** → violates Art 7 + Recital 32. Flag.
-4. **13+ age gate** for an NL publisher → violates UAVG's 16. Flag.
+4. **13+ age gate** for an NL publisher → violates the age of 16 in GDPR Art 8(1), which the UAVG does not lower. Flag.
 5. **Any wellness "score"/mood-trend without Art 9 explicit consent** → Art 9 risk. Flag.
 6. **Health-claim language** ("treats/cures/diagnoses/prevents") → both an Art 9 trigger risk and a health-claim/medical-device risk. Flag.
 7. **Privacy notice missing any of the Art 13 12 points** → incomplete. Flag the specific gap.
@@ -312,14 +312,14 @@ Also: **35(4)** each supervisory authority publishes its own DPIA-required list 
 
 ## Sources fetched this run (primary)
 
-- Art 6 — https://gdpr-info.eu/art-6-gdpr/ `[settled, verified 2026-06-06]`
-- Art 7 — https://gdpr-info.eu/art-7-gdpr/ `[settled, verified 2026-06-06]`
-- Art 8 — https://gdpr-info.eu/art-8-gdpr/ `[settled, verified 2026-06-06]`
-- Art 9 — https://gdpr-info.eu/art-9-gdpr/ `[settled, verified 2026-06-06]`
-- Art 13 — https://gdpr-info.eu/art-13-gdpr/ `[settled, verified 2026-06-06]`
-- Art 28 — https://gdpr-info.eu/art-28-gdpr/ `[settled, verified 2026-06-06]`
-- Art 30 — https://gdpr-info.eu/art-30-gdpr/ `[settled, verified 2026-06-06]`
-- Art 35 — https://gdpr-info.eu/art-35-gdpr/ `[settled, verified 2026-06-06]`
-- Art 33 — https://gdpr-info.eu/art-33-gdpr/ `[settled, verified 2026-06-06]`
+- Art 6 — https://gdpr-info.eu/art-6-gdpr/ `[settled, verified 2026-11-18]`
+- Art 7 — https://gdpr-info.eu/art-7-gdpr/ `[settled, verified 2026-11-18]`
+- Art 8 — https://gdpr-info.eu/art-8-gdpr/ `[settled, verified 2026-11-18]`
+- Art 9 — https://gdpr-info.eu/art-9-gdpr/ `[settled, verified 2026-11-18]`
+- Art 13 — https://gdpr-info.eu/art-13-gdpr/ `[settled, verified 2026-11-18]`
+- Art 28 — https://gdpr-info.eu/art-28-gdpr/ `[settled, verified 2026-11-18]`
+- Art 30 — https://gdpr-info.eu/art-30-gdpr/ `[settled, verified 2026-11-18]`
+- Art 35 — https://gdpr-info.eu/art-35-gdpr/ `[settled, verified 2026-11-18]`
+- Art 33 — https://gdpr-info.eu/art-33-gdpr/ `[settled, verified 2026-11-18]`
 
-Art 12 / 15–22 and Art 34 substance taken from the harvested distilled notes (gdpr-info.eu) — confirm exact paragraph anchors against the primary text. UAVG age-16 implementation: confirm the exact UAVG article.
+Art 12, 15–22 and 34 were re-read on EUR-Lex on 2026-11-18 and the paragraph anchors above pinned (Art 12(3); 34(1), 34(3)(a)–(c)). The Dutch age of 16 rests on GDPR Art 8(1), which the UAVG does not lower; UAVG art. 5(1) covers consent outside Art 8.

@@ -1,6 +1,6 @@
 ---
 name: games-design-prototype-playtest-assets
-description: Use when the user is making a game in any engine: designing the idea, building a first playable, testing it by playing, making art, laying out screens, balancing numbers, porting their own game, or setting up a game folder.
+description: "Use when the user is making a game in any engine: designing the idea, building a first playable, testing it by playing, making art, laying out screens, balancing numbers, porting their own game, or setting up a game folder."
 ---
 
 # Games: design, prototype, playtest, art and ports

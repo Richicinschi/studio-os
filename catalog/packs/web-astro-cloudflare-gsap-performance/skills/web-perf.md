@@ -1,6 +1,10 @@
 ---
 name: web-perf
-description: Audits page performance with DevTools MCP: Core Web Vitals, render-blocking, request chains, layout shifts, caching, accessibility. Use when asked to audit, profile, debug or optimize load, Lighthouse scores, site speed. Biases towards retrieval of current documentation over pre-trained knowledge.
+description: >-
+  Audits page performance with DevTools MCP: Core Web Vitals, render-blocking, request chains,
+  layout shifts, caching, accessibility. Use when asked to audit, profile, debug or optimize load,
+  Lighthouse scores, site speed. Biases towards retrieval of current documentation over pre-trained
+  knowledge.
 metadata:
   category: web
   author: Richicinschi
@@ -28,13 +32,13 @@ Call `navigate_page` or `performance_start_trace` once. If neither exists, stop:
   "mcpServers": {
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"]
+      "args": ["-y", "chrome-devtools-mcp@1.13.0"]
     }
   }
 }
 ```
 
-Some clients use a different config shape, so point the user at the chrome-devtools-mcp README for their client.
+Version 1.13.0 was the current release of chrome-devtools-mcp on 2026-11-19; raise it on purpose, after reading its release notes. Some clients use a different config shape, so point the user at the chrome-devtools-mcp README for their client.
 
 ## Working rules
 

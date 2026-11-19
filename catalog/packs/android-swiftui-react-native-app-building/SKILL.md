@@ -1,6 +1,6 @@
 ---
 name: android-swiftui-react-native-app-building
-description: Use when the user builds, reviews or looks over an Android app with Compose, an iPhone app or SwiftUI screen (including whether Apple will accept it), or a React Native or Expo app, or fixes a Play Store or App Store rejection.
+description: "Use when the user builds, reviews or looks over an Android app with Compose, an iPhone app or SwiftUI screen (including whether Apple will accept it), or a React Native or Expo app, or fixes a Play Store or App Store rejection."
 ---
 
 # Building phone apps: Android, SwiftUI and React Native

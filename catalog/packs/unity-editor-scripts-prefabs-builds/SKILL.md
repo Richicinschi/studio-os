@@ -1,6 +1,6 @@
 ---
 name: unity-editor-scripts-prefabs-builds
-description: Use when the user builds a Unity game: C# scripts, scenes and prefabs, running and testing in the editor, profiling, importing assets, multiplayer basics, and building for PC, Android or iOS.
+description: "Use when the user builds a Unity game: C# scripts, scenes and prefabs, running and testing in the editor, profiling, importing assets, multiplayer basics, and building for PC, Android or iOS."
 ---
 
 # Unity games: editor, scripts, prefabs, tests and builds

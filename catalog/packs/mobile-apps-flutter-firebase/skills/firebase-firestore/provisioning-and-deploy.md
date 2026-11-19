@@ -40,7 +40,7 @@ Enterprise edition adds the edition key:
 ### Creating an Enterprise database (ask first, it can cost money)
 
 ```bash
-firebase firestore:databases:create tasks-db \
+npx firebase-tools@15.36.0 firestore:databases:create tasks-db \
   --location="<chosen-location>" \
   --edition="enterprise" \
   --firestore-data-access="ENABLED" \
@@ -49,7 +49,7 @@ firebase firestore:databases:create tasks-db \
 
 - The id is required and cannot be `(default)`.
 - Add `--realtime-updates="ENABLED"` when the app needs live listeners.
-- Only `--firestore-data-access` (ENABLED or DISABLED) was confirmed against vendor docs; for the other flag values run `firebase firestore:databases:create --help`.
+- Only `--firestore-data-access` (ENABLED or DISABLED) was confirmed against vendor docs; for the other flag values run `npx firebase-tools@15.36.0 firestore:databases:create --help`.
 - Check afterwards with `firestore:databases:get tasks-db`.
 
 ### Starter rules: everything denied
@@ -84,7 +84,7 @@ Deploy is not optional. Until it runs, a Standard database named only in config 
 - Rules only: `deploy --only firestore:rules`
 - Indexes only: `deploy --only firestore:indexes`
 
-Prefix each with `npx -y firebase-tools@latest` when the CLI is not installed.
+Prefix each with `npx firebase-tools@15.36.0` when the CLI is not installed.
 
 ## Emulator
 

@@ -1,7 +1,10 @@
 ---
 id: flutter-use-http-package
 title: Flutter REST calls with the http package
-description: Use when you need a Flutter app to call a REST API with the http package: GET, POST, PUT or DELETE, fetch from or send data to a REST API, typed JSON models, error handling, FutureBuilder display, background parsing.
+description: >-
+  Use when you need a Flutter app to call a REST API with the http package: GET, POST, PUT or
+  DELETE, fetch from or send data to a REST API, typed JSON models, error handling, FutureBuilder
+  display, background parsing.
 ---
 
 # Flutter REST calls with the http package

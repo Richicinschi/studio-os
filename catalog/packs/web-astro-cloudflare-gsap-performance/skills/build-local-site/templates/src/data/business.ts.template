@@ -2,8 +2,10 @@
 // Business data
 // ============================================================
 // One object feeds the header, footer, meta tags, JSON-LD, the
-// contact page and the about page. Replace each __TOKEN__ with
-// the real value. Field names are what the page templates read,
+// contact page and the about page. Replace each upper-case token
+// in double underscores with the real value; `npm run build`
+// refuses to run while one is left in src/ (see
+// scripts/check-placeholders.mjs). Field names are what the page templates read,
 // so rename nothing here without renaming it in src/pages too.
 // ============================================================
 
@@ -85,7 +87,7 @@ export interface Business {
   };
 
   // Credentials
-  /** Licence or registration number printed in footer and about page */
+  /** Licence or registration number, printed in the footer and pages. '' when the business holds none: every licence claim then drops out. */
   license: string;
   yearEstablished: number;
   certifications: string[];
@@ -129,8 +131,8 @@ export const business: Business = {
     country: 'United States',
   },
   coordinates: {
-    lat: 0, // __LATITUDE__ as a number
-    lng: 0, // __LONGITUDE__ as a number
+    lat: __LATITUDE__, // a number, e.g. 40.0821
+    lng: __LONGITUDE__, // a number, e.g. -83.0113
   },
   serviceRadius: '__SERVICE_RADIUS__',
 
@@ -149,10 +151,9 @@ export const business: Business = {
 
   // Credentials
   license: '__LICENSE_NUMBER__',
-  yearEstablished: 2000, // __FOUNDED_YEAR__ as a number
+  yearEstablished: __FOUNDED_YEAR__, // a number, e.g. 2009; the "years in business" copy is worked out from it
   certifications: [
-    // '__CERTIFICATION_1__',
-    // '__CERTIFICATION_2__',
+    // One string per certification the business really holds; leave the list empty if none.
   ],
 
   // Operations
@@ -167,7 +168,7 @@ export const business: Business = {
     { days: 'Saturday', hours: '__SATURDAY_HOURS__', dayOfWeek: ['Saturday'], opens: '__SATURDAY_OPENS__', closes: '__SATURDAY_CLOSES__' },
     { days: 'Sunday', hours: '__SUNDAY_HOURS__', dayOfWeek: [], opens: '', closes: '' },
   ],
-  emergencyService: false, // __EMERGENCY_SERVICE__ as true or false
+  emergencyService: false, // true only if the business really takes emergency calls
   emergencyCta: '__EMERGENCY_CTA__',
 
   // Branding

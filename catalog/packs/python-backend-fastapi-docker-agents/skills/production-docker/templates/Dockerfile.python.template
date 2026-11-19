@@ -5,7 +5,8 @@
 #   runtime : distroless/python3-debian12 (no shell, no package manager, runs as 65532)
 # The pair is chosen so the Python minor version agrees: debian12 distroless ships
 # Python 3.11, and packages built under another minor version fail to import there.
-# Replace each REPLACE_WITH_CURRENT_DIGEST with the digest of the current tag.
+# Replace each REPLACE_WITH_CURRENT_DIGEST with the digest of the current tag. The
+# runtime line already carries one, read on 2026-11-19; read it again before you build.
 
 # ---- Stage 1: builder ------------------------------------------------------
 FROM python:3.11-slim-bookworm@sha256:REPLACE_WITH_CURRENT_DIGEST AS builder
@@ -32,7 +33,9 @@ RUN pip install \
     -r requirements.txt
 
 # ---- Stage 2: runtime ------------------------------------------------------
-FROM gcr.io/distroless/python3-debian12@sha256:REPLACE_WITH_CURRENT_DIGEST AS runtime
+# Tag nonroot (runs as 65532), digest read 2026-11-19 with
+# `docker buildx imagetools inspect gcr.io/distroless/python3-debian12:nonroot`.
+FROM gcr.io/distroless/python3-debian12:nonroot@sha256:7d1042ce588ab97019fe95c24ffca7bc5a82ccdac572511d5e09bda4435c89c5 AS runtime
 
 # Standard OCI metadata; fill in the real values.
 LABEL org.opencontainers.image.title="shopapi" \

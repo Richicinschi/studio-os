@@ -1,7 +1,11 @@
 ---
 id: ab-testing
 title: A/B testing and experiments
-description: Use when comparing versions or planning, designing, implementing an A/B test or experiment: split test, multivariate, hypothesis, variant copy, significance, run length, growth experiments, velocity, ICE; build a systematic program to measure better. Tracking: analytics; page-level conversion: cro.
+description: >-
+  Use when comparing versions or planning, designing, implementing an A/B test or experiment: split
+  test, multivariate, hypothesis, variant copy, significance, run length, growth experiments,
+  velocity, ICE; build a systematic program to measure better. Tracking: analytics; page-level
+  conversion: cro.
 ---
 
 # A/B testing and experiments

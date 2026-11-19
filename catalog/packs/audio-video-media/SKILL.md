@@ -1,6 +1,6 @@
 ---
 name: audio-video-media
-description: Use when the user brings a video, audio or recording, or asks to understand, clip, clean up, transcribe, subtitle or shrink one, to make a narrated, launch, AI-generated or story video, or to post media. Open this before replying, even to ask for the file or other details.
+description: "Use when the user brings a video, audio or recording, or asks to understand, clip, clean up, transcribe, subtitle or shrink one, to make a narrated, launch, AI-generated or story video, or to post media. Open this before replying, even to ask for the file or other details."
 ---
 
 # Audio, video and media

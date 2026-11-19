@@ -26,7 +26,7 @@ Operates under legal-guardrails — load its constitution + the references liste
 code itself — the flow set is an INPUT from `legal-data-surface-scan`.
 
 ## References to load (by path; do NOT inline them)
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` (constitution — attribution tiers, severity, finding format, de-facto-counsel authority, "no silent supplement")
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` (constitution — attribution tiers, staleness, severity, finding format, verdicts and their limits, "no silent supplement")
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/disclosure-grading.md` (the 5-grade entity-aware rubric — primary method)
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/finding-format.md` (the FLOW-n finding shape)
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/verdict-model.md` (severity floor/max, code-faithfulness dominance, grade bands)
@@ -45,7 +45,7 @@ code itself — the flow set is an INPUT from `legal-data-surface-scan`.
 3. **Locate the PP assertion(s)** for each flow — search by data-type AND by entity name. Record the section/line.
 4. **Grade per the rubric** in `disclosure-grading.md` (full table there — do not restate it):
    - **clear** 🟢 — exact named (data-type, entity) disclosure.
-   - **vague** 🟡/🟠 — mentions the data-type or "third parties/service providers" but NOT the named entity. Entity-awareness is the core rule: a generic processor line does NOT clear a flow to a named processor (GDPR Art. 13(1)(e); Play User Data policy).
+   - **vague** 🟡/🟠 — mentions the data-type or "third parties/service providers" but NOT the named entity. Entity-awareness is the core rule: a generic processor line does NOT clear a flow to a named processor (GDPR Art. 13(1)(e); Play User Data policy). Outside the Netherlands and the EU (`legal-guardrails.md` §9) the grade rests on the Play User Data policy / Apple 5.1.1(i) only; a vague flow neither store rule covers is a 🟡 note.
    - **omitted** 🟠 (🔴 if sensitive) — code does it, PP silent.
    - **incorrect** 🔴 — PP affirmatively states the opposite (e.g. "we never share X" while an SDK sends X; or "all data stays in the EU" while Firebase Auth/Analytics/Crashlytics are US/global per `sdk-data-map.md`).
    - **ambiguous** 🟠 — PP self-contradicts, or two sections disagree on the flow.
@@ -53,21 +53,21 @@ code itself — the flow set is an INPUT from `legal-data-surface-scan`.
    - **Over-disclosure** (PP claims a flow the app does NOT do — e.g. declares "biometric data" off transitive `USE_BIOMETRIC` perms that carry no data, or a never-fired event) → 🟡 MINOR / 🟠 MATERIAL. Flag for tightening; over-claims mislead the store label.
    - **Under-disclosure** (app does a flow the PP hides) → 🟠 MATERIAL / 🔴 BLOCKER (BLOCKER when the data is sensitive or the silence makes the store-label false). This is the dangerous direction and, in practice, the most common finding-type.
 6. **EN/NL parity:** grade `privacy.nl.md` independently. A flow disclosed in EN but absent/weaker in NL grades **omitted** for the NL doc, because an NL reader relies on the NL text alone. Native-NL legal-idiom quality is OUT OF SCOPE → reserve as a `[low-confidence]` note for a Dutch advocaat.
-7. **Tag every legal proposition** with an attribution tier; cite the forcing provision at pinpoint where a grade rests on law (Art. 13(1)(e), Play User Data, ePrivacy 5(3)). Prefer the primary-source facts in `sdk-data-map.md` over paraphrase.
+7. **Tag every legal proposition** with an attribution tier; cite the forcing provision at pinpoint where a grade rests on law (Art. 13(1)(e), Play User Data, ePrivacy 5(3)); outside the Netherlands and the EU, cite only the store rules (§9). Prefer the primary-source facts in `sdk-data-map.md` over paraphrase.
 8. **Emit** the flow-to-policy table + FLOW-n findings for every non-🟢 row, then a one-paragraph code-faithfulness summary. Surface anything outside this checklist as a MINOR "no silent supplement" note.
 
 ## Entity-aware grading checklist (a Firebase + RevenueCat stack, the example app's in `legal-guardrails.md` §8 — facts in `sdk-data-map.md`)
 Grade each SDK the app actually ships, in every language the PP ships; for an SDK not listed here, build the same row from `sdk-data-map.md` or the SDK's own privacy docs. Severity floor = the higher when this overlaps another skill.
 - **Firebase Auth** (Google) — email, UID, tokens, **IP**; **US-only by architecture** → a blanket "EU region" PP line is **incorrect** 🔴 for this flow; needs US transfer + DPF/SCC named.
 - **Cloud Firestore** (Google) — profile, consent timestamps, **Pro** session history (off-device), **subscription mirror**. **FREE tier = on-device only** → a PP implying server-side history for all users is **incorrect** 🔴 for free users. EU `europe-west`.
-- **Firebase Analytics** (Google) — usage events + **app-instance ID**, **no AD_ID** (stripped). PP "no advertising ID" is only **clear** if the merged manifest shows AD_ID absent; consent basis is the COOK skill's call (note, don't relitigate).
+- **Firebase Analytics** (Google) — usage events + **app-instance ID**, **no AD_ID** only with both controls. PP "no advertising ID" is only **clear** if the merged manifest shows AD_ID absent **and** `google_analytics_adid_collection_enabled=false` (`sdk-data-map.md` §3); consent basis is the COOK skill's call (note, don't relitigate).
 - **Crashlytics** (Google) — crash + device diag, install UUID/FID; **global (any GCP)** → "Crashlytics stays in the EU" is **incorrect** 🔴.
 - **Cloud Functions** (Google) — IP, RevenueCat webhook payload, deletion ops; EU `europe-west1`.
 - **Firebase Hosting** (Google) — request **IPs** (often **omitted** 🟠 — it logs IPs even for static legal pages).
 - **RevenueCat Inc.** — **App User ID (= Firebase UID)**, purchase tokens/receipts, sub status, IP/device; **US (AWS)**. Must be **named** as a US processor + transfer safeguard (DPA→SCC, `[verify]`). A bare "service providers" line grades **vague** 🟠 here.
 - **Google Sign-In** → feeds Firebase Auth; email/profile/OAuth token. Transitive `USE_BIOMETRIC`/`USE_FINGERPRINT` perms carry **no biometric data** → if the PP declares "biometric data", grade **over-disclosure** 🟠; if a scan flags the perm, it's a false-positive permission, not an omitted flow.
 - **Apple / Google Play billing** — merchants of record; an app that sells through store billing receives **no payment-card data**, only post-purchase token/receipt. PP must say so; do not over-claim card collection.
-- **Deliberate non-collection** (AD_ID/GAID stripped) — verify the PP/Data-Safety "no advertising ID" answer is consistent; an over-claim of ad-ID collection is 🟡.
+- **Deliberate non-collection** (AD_ID/GAID stripped + the flag when Firebase Analytics ships) — verify the PP/Data-Safety "no advertising ID" answer is consistent; an over-claim of ad-ID collection is 🟡.
 
 ## OUTPUT
 Flow-to-policy table feeding `legal-privacy-review` + `legal-cross-store`:
@@ -82,7 +82,7 @@ Then, per non-🟢 row, a finding in the standard shape (see `finding-format.md`
 ```
 [FLOW-<n>] <emoji> <title>
   Location:   privacy.md §x (line) / privacy.nl.md §x
-  Basis:      <provision + attribution tier>   e.g. GDPR Art. 13(1)(e) [settled — verified 2026-06-06]
+  Basis:      <provision + attribution tier>   e.g. GDPR Art. 13(1)(e) [settled — verified 2026-11-18]
   Issue:      <under/over/incorrect/ambiguous; entity named>
   Redline:    <exact replacement text; name the entity, never "third parties">
   Confidence: high | medium | low

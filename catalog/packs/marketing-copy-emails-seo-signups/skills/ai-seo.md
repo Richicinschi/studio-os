@@ -1,7 +1,11 @@
 ---
 id: ai-seo
 title: AI search optimization
-description: Use to get content cited by AI search and assistants: AI SEO, AEO, GEO, LLMO, LLM mentions, AI Overviews, optimize for ChatGPT, Perplexity, Claude, Gemini, generative engine optimization, citations, visibility, zero-click, show up in AI answers, llms.txt, OKF, knowledge bundle, agent-readable site
+description: >-
+  Use to get content cited by AI search and assistants: AI SEO, AEO, GEO, LLMO, LLM mentions, AI
+  Overviews, optimize for ChatGPT, Perplexity, Claude, Gemini, generative engine optimization,
+  citations, visibility, zero-click, show up in AI answers, llms.txt, OKF, knowledge bundle,
+  agent-readable site
 ---
 
 ## When to use

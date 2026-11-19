@@ -1,7 +1,10 @@
 ---
 id: firebase-firestore
 title: Firebase Firestore
-description: Use when work touches Firestore: configuring security rules, listing or creating databases, designing data models, checking indexes, or writing client SDK queries (including search and joins via pipelines). Open it before any Firestore step, even a tiny one.
+description: >-
+  Use when work touches Firestore: configuring security rules, listing or creating databases,
+  designing data models, checking indexes, or writing client SDK queries (including search and joins
+  via pipelines). Open it before any Firestore step, even a tiny one.
 ---
 
 # Firebase Firestore
@@ -22,7 +25,7 @@ Neighbours: sign-in and user identity belong to the auth skill. Auditing a finis
 
 ## How it works
 
-1. **Check the tooling.** The Firebase CLI helps but is not required. If it is missing, run it through `npx -y firebase-tools@latest <command>`. Read-only commands are always safe to run. Anything that creates a database, deploys, or deletes needs the user's yes first (step 5 and the deploy rule in the checks).
+1. **Check the tooling.** The Firebase CLI helps but is not required. If it is missing, run it through `npx firebase-tools@15.36.0 <command>`. Read-only commands are always safe to run. Anything that creates a database, deploys, or deletes needs the user's yes first (step 5 and the deploy rule in the checks).
 2. **List the databases:** `firestore:databases:list`. For each one, run `firestore:databases:get <database-id>` and note its `edition`. Do this before you touch dependencies, models or rules.
 3. **Ask which one.** Show the user what exists and let them pick a database or ask for a new one. Do not choose for them.
 4. **Choose the guide set from the edition.** `STANDARD` follows the Standard notes in the topic files. `ENTERPRISE`, or native mode on an enterprise database, follows the Enterprise notes. The topic files mark which paragraph is for which edition.

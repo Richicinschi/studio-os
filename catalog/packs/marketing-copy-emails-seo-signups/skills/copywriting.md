@@ -1,7 +1,11 @@
 ---
 id: copywriting
 title: Page copywriting
-description: Page copy (home, landing, pricing, about, product): tagline, value proposition, write copy for, make this more compelling, above the fold, CTA copy, this copy is weak, subheadline, rewrite this page, hero section copy, headline help, improve this copy, marketing copy, help me describe my product.
+description: >-
+  Page copy (home, landing, pricing, about, product): tagline, value proposition, write copy for,
+  make this more compelling, above the fold, CTA copy, this copy is weak, subheadline, rewrite this
+  page, hero section copy, headline help, improve this copy, marketing copy, help me describe my
+  product.
 ---
 
 # Page copywriting

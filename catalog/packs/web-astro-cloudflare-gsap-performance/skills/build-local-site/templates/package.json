@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/check-placeholders.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -14,7 +15,7 @@
     "@astrojs/sitemap": "^3.7.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
-    "astro": "^7.3.3",
+    "astro": "^7.4.7",
     "astro-icon": "^1.1.5",
     "tailwindcss": "^4.1.18"
   },

@@ -2,7 +2,7 @@
 name: legal-apple-gate
 description: >-
   Use when checking iOS App Store submission-readiness for legal/privacy: the Apple half of
-  the platform sign-off gate. Verifies App Store Review Guidelines 5.1.1(i) (privacy-policy
+  the platform store gate. Verifies App Store Review Guidelines 5.1.1(i) (privacy-policy
   link in ASC metadata + in-app), 5.1.1(v) (mandatory in-app account deletion), 5.1.2/5.1.3
   (data use, no-HealthKit-for-ads), 3.1.1/3.1.2 (IAP + auto-renewable-subscription paywall
   disclosure), 1.4.1 (no medical claims), the Minimum Licensed-Application EULA 10 clauses in
@@ -82,32 +82,32 @@ on the label, `legal-health-claims` on 1.4.1), take the higher severity.
 | **A3** | 5.1.2 / 5.1.3 — data use | No undisclosed sharing; no third-party AI (project rule = none); health-context data not used for ads/marketing/mining; no health data in iCloud; no ATT unless a real cross-app tracking SDK exists. | N/A-PASS — no HealthKit, no ads, no tracking | 🔴 affirmative false data statement · 🟠 undisclosed flow |
 | **A4** | 3.1.1 / 3.1.2 — IAP + subscription disclosure | Pro unlocks **only** via Apple IAP (RevenueCat = StoreKit middleware, not a bypass); paywall discloses all **six**: (1) title, (2) period length, (3) price/period, (4) content per period, (5) auto-renew terms, (6) **functional EULA + PP links**; trial duration + post-trial price if a trial is offered; ToS routes cancellation/refunds to the **Store** (merchant of record). | VERIFY — confirm all six on the paywall | 🔴 IAP bypass · 🟠 missing disclosure item / link |
 | **A5** | 1.4.1 — health claims | No medical/diagnostic/treatment claims in PP/ToS/store-listing/in-app; "consult a doctor" reminder present; general-wellness framing ("supports / may help relax"). **Defer claim-text detail to `legal-health-claims`**; here, gate only the presence of the firewall + disclaimer. | PASS — breathing-only disclaimer ships | 🟠 over-claim language (escalate to health-claims) |
-| **A6** | Minimum Licensed-Application EULA | ToS §25 (iOS section) contains all **10** terms (Acknowledgement·Scope·Maintenance/Support·Warranty·Product Claims·IP·Legal Compliance·Developer Name+Address·Third-Party Terms·Apple Third-Party Beneficiary) at verbatim-equivalent substance; scoped to App-Store downloads; does **not** name Apple a party/warrantor/support-provider; #8 has **real** name+registered address (no `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` placeholder). | PASS — §25 has all 10 + scoping + the "Apple not responsible" close | 🔴 missing/weakened term, Apple-adverse drafting, or #8 placeholder |
+| **A6** | Minimum Licensed-Application EULA | ToS §25 (iOS section) contains all **10** terms (Acknowledgement·Scope·Maintenance/Support·Warranty·Product Claims·IP·Legal Compliance·Developer Name+Address·Third-Party Terms·Apple Third-Party Beneficiary) at verbatim-equivalent substance; scoped to App-Store downloads; does **not** name Apple a party/warrantor/support-provider; #8 has the developer's **real** name, address, telephone number and email (no placeholder such as `[REGISTERED ADDRESS]`); `[KVK]`/`[BTW]` are not part of #8 and are checked under Dutch and EU law (`dsa-trader.md` placeholder row; Netherlands and EU only, `legal-guardrails.md` §9). | PASS — §25 has all 10 + scoping + the "Apple not responsible" close | 🔴 missing/weakened term, Apple-adverse drafting, or #8 placeholder |
 | **A7** | PrivacyInfo.xcprivacy | Manifest present + every bundled SDK ships a signed manifest (no ITMS-91053 missing-declaration / ITMS-91061 missing-signature); `NSPrivacyTracking=false` matches "no tracking"; `NSPrivacyAccessedAPITypes` declares each required-reason API with a code (e.g. `UserDefaults → CA92.1`); each `NSPrivacyCollectedDataTypes` entry's Linked/Tracking flags are **correct** vs the scan. | VERIFY against merged manifest | 🔴 submission-blocking missing/unsigned manifest · 🟠 wrong Linked/Tracking flag (see watch-list below) |
-| **A8** | App Privacy label ⇄ PP ⇄ manifest ⇄ Play | Every actually-collected `(data-type, entity)` flow → matching label type (correct Linked/Tracking/purpose); affirmatively mark Health & Fitness / Sensitive Info / Location / Contacts / Device-Advertising-ID = **Not Collected**; **empty "Data Used to Track You"** + no ATT; purposes limited to **App Functionality / Analytics** (never advertising); label reconciles 3-/4-way with PP, the manifest, and Play Data Safety. | VERIFY — derive via the template + §6 table | 🔴 incorrect (false) declaration · 🟠 omitted flow or cross-artefact drift |
+| **A8** | App Privacy label ⇄ PP ⇄ manifest ⇄ Play | Every actually-collected `(data-type, entity)` flow → matching label type (correct Linked/Tracking/purpose); affirmatively mark Sensitive Info / Location / Contacts = **Not Collected**, Health & Fitness = **Not Collected** only once confirmed (`[verify]`, see the watch-list), and Device ID = **Yes** while Firebase Analytics can be enabled (see the watch-list); **empty "Data Used to Track You"** + no ATT; purposes limited to **App Functionality / Analytics** (never advertising); label reconciles 3-/4-way with PP, the manifest, and Play Data Safety. | VERIFY — derive via the template + §6 table | 🔴 incorrect (false) declaration · 🟠 omitted flow or cross-artefact drift |
 
 ### A7/A8 watch-list (discrepancies to check first; seen in the example app's Firebase stack)
 - **Crashlytics `Linked` flag.** A `PrivacyInfo.xcprivacy` that declares `NSPrivacyCollectedDataTypeCrashData` with **`Linked=false`** clashes with the App Privacy reference (apple-app-privacy.md §6 + §10), which treats Crashlytics crash data as **identity-synced = Linked** (Crashlytics UID identity sync). Reconcile: either confirm crash logs carry **no** account identifier (then Not-Linked is defensible) or flip the manifest + label to **Linked**. Grade `ambiguous`/`incorrect` until resolved. `[verify]`
 - **Performance Data.** Declare `Diagnostics → Performance Data` only if Firebase Performance Monitoring actually ships (`pubspec.lock`/pods). Don't declare a flow the app doesn't perform.
 - **Email vs UserID double-count.** Declare email under **Contact Info → Email Address** and the account key under **Identifiers → User ID** — not the same data twice.
 - **Name.** Declare `Contact Info → Name` only if a Google-Sign-In display name is **persisted off-device**.
-- **Session logs.** Cloud-synced session logs of a wellness app with no health data (e.g. a paid tier's Firestore-synced breathing logs) map to **Usage Data → Product Interaction** (or User Content → Other), **never** Health & Fitness; keep PP + label + the GDPR-Art.9 section consistent (no over-declaration of health data).
-- **Device/Advertising ID.** If the Android `AD_ID` is stripped (as in the example app), declare Device ID / Advertising Data = **Not Collected** to keep the "no advertising ID" claim honest.
+- **Session logs.** Cloud-synced session logs of a wellness app (e.g. a paid tier's Firestore-synced breathing logs) map to **Usage Data → Product Interaction** (or User Content → Other) unless they are health or fitness data under Apple's definition, which covers user-provided health data from any source `[verify]`; keep PP + label + the GDPR-Art.9 section consistent.
+- **Device/Advertising ID.** The Android `AD_ID` strip does not settle the iOS answer. Firebase Analytics collects the IDFV and app-instance ID once enabled (the IDFA reads as zeros without ATT), so declare Device ID = **Yes, Linked, Analytics** whenever it can be enabled for any user; **Not Collected** only if the iOS build sets `GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED = NO`, drops Ad ID support, and no other SDK reads a device-level ID `[settled — App Privacy Details; Firebase Analytics config (Apple platforms), verified 2026-11-19]` `[verify — IDFV default inferred from Firebase's off-switch]`.
 
 ## Common indie failure modes (adjudicator quick-scan)
-- Over-declaring **Health & Fitness** because the app is "wellness" → PP↔label drift + false Art. 9 signal. A wellness app with no HealthKit and no health records = **Not Collected**.
+- Over-declaring **Health & Fitness** because the app is "wellness" → PP↔label drift + false Art. 9 signal. No HealthKit does not by itself mean **Not Collected**: Apple's Health type also covers user-provided health data `[verify]`.
 - Forgetting **Purchases → Purchase History** (RevenueCat subscription state) or **Diagnostics → Crash** (Crashlytics).
 - Marking account-bound analytics **Not Linked** when a UID ties it back → declare **Linked**.
 - Declaring **Tracking** without an ATT prompt (an app with no tracking needs no ATT — correct, as in the example app).
 - PP says "third parties" generically → 5.1.1(i)(2) needs **named** entities + equal-protection.
 - ToS §25 omits **#1** (not-a-party-with-Apple) or **#10** (Apple third-party beneficiary) — the two most-missed EULA clauses.
-- #8 left as `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` → **HARD BLOCKER** (reserved for the human; cannot sign off).
+- #8 left with a placeholder name, address, telephone number or email (e.g. `[REGISTERED ADDRESS]`) → **HARD BLOCKER** (BLOCKED until the placeholder is gone; the suite checks that it is filled, not that the value is right). `[KVK]`/`[BTW]` are not part of #8; they are checked under Dutch and EU law (`dsa-trader.md`; Netherlands and EU only).
 
 ## OUTPUT format
 
 ```
 # legal-apple-gate — iOS submission gate: <app> (PP v<n> / ToS v<n>, manifest <path>) — <date>
-Apple verdict: <SIGN-OFF | FIX-THEN-SIGN-OFF | BLOCK>
+Apple verdict: <SHIP | FIX FIRST | BLOCKED>
 
 ## Per-guideline summary
 | Check | Guideline / gate              | Result               | Sev |
@@ -123,7 +123,7 @@ Apple verdict: <SIGN-OFF | FIX-THEN-SIGN-OFF | BLOCK>
 ## Findings (ranked 🔴 → 🟠 → 🟡)
 [APL-1] <emoji> <title>
   Location:   <doc §/line, ASC field, paywall screen, or PrivacyInfo.xcprivacy key>
-  Basis:      <citation + tier>  e.g. App Store Review Guidelines 5.1.1(v) [settled — verified 2026-06-06]
+  Basis:      <citation + tier>  e.g. App Store Review Guidelines 5.1.1(v) [settled — verified 2026-11-18]
   Issue:      <what is wrong / missing / over-claimed / contradicted by manifest>
   Redline:    <specific, entity-named fix — name Apple / Google-Firebase / RevenueCat>
   Confidence: high | medium | low
@@ -135,15 +135,16 @@ Apple verdict: <SIGN-OFF | FIX-THEN-SIGN-OFF | BLOCK>
 ## §11 verdict-template checklist (PASS/FAIL per line)
 <from apple-app-privacy.md §11>
 
-## Conditions to clear (if FIX-THEN-SIGN-OFF)
+## Conditions to clear (if FIX FIRST)
 | # | Condition | Owner | Sev | Basis |
 
 ## Confirmed-good (🟢) + reasoned decisions
 ```
 
-Findings carry the skill-id **`APL`** (per `finding-format.md`). Always end the full sign-off run with
-the `legal-guardrails` §5 authority footer; the orchestrator appends it once for the combined report.
+Findings carry the skill-id **`APL`** (per `finding-format.md`). Always end the full review run with
+the `legal-guardrails` §5 review footer; the orchestrator appends it once for the combined report.
 
-— *de-facto counsel: this skill decides and signs the Apple gate. It reserves to a Dutch-qualified
-advocaat / registration ONLY the EULA #8 `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL
-idiom of `terms.nl.md`, and any item it marks `[low-confidence]`.*
+— *This skill gives a firm verdict on the Apple gate; it is an automated review, not legal advice, and
+a lawyer signs off. It gives no verdict on the §5 carve-outs (the EULA #8
+`[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL idiom of `terms.nl.md`, any item it marks
+`[low-confidence]`); they need a lawyer or a registration first.*

@@ -1,7 +1,7 @@
 ---
 id: setup-check
 module: 03-planning
-checked: 2026-11-02
+checked: 2026-11-18
 other_figures:
   - 29
 ---
@@ -11,7 +11,7 @@ other_figures:
 ## Why
 
 - **The problem:** adopted items drift. A hook is switched off, a tool is uninstalled or drops off the PATH, a settings file stops parsing, a new machine is missing half the setup. Nothing announces it: the parts fail quietly, and a quiet check reads like a pass.
-- **The reason:** your adoption plan already holds a check for every item, the one in the item's card that passed when its row was ticked. Saying "check my setup" makes `drill-to-adopt` run every ticked row's check again and report pass or fail per item, with the line that showed it. It changes nothing; a failure turns into an offer of a new plan row, on your yes.
+- **The reason:** your adoption plan already holds a check for every item, the one in the item's card that passed when its row was ticked. Saying "check my setup" makes `drill-to-adopt` run every ticked row's check again and report pass or fail per item, with the line that showed it, and send each git guard your settings name one fake force-push, which it must refuse. It changes nothing; a failure turns into an offer of a new plan row, on your yes.
 - **The cost of skipping it:** drift is found when a mistake finds it. The studio's lesson about checks is that a green signal can be wrong: a run passed every check while its output would have deleted about 190 pages ([module 03, Evidence](../modules/03-planning/README.md#evidence)). A check run again against the setup as it is today is evidence; the memory of a pass months ago is not.
 - **The principle:** [evidence before claims](../PRINCIPLES.md#evidence-before-claims). "My setup works" stays a claim until each check has run again.
 
@@ -48,7 +48,7 @@ The menu marks the item **have** when a plan with ticked rows exists and your ki
 2. **you:** when Detect says your kit copy is older than the mode, update it: `! git -C <kit> pull`.
 3. **you:** in a terminal, start Claude Code in the kit folder with your setup added, the way you started the adoption (START-HERE, "Your first session"): `claude --add-dir "<your setup>"`. This starts Claude Code itself, so it goes in a terminal, not after `!` inside a session.
 4. **you:** say "check my setup".
-5. **Claude:** reads `adoption/plan.md`. For each ticked row it opens that item's card in the kit and runs its Check part, then reports one line per item: **pass**, **fail**, or **needs you** for a check only you can do (the first answer in a new session, a push to your server), each with the line that showed it. It changes nothing in your setup. For a failure it says what to look at next and offers a new plan row to fix it, on your yes.
+5. **Claude:** reads `adoption/plan.md`. For each ticked row it opens that item's card in the kit and runs its Check part, then reports one line per item: **pass**, **fail**, or **needs you** for a check only you can do (the first answer in a new session, a push to your server), each with the line that showed it. Whatever the plan holds, it also sends one fake force-push to each git guard (`block-dangerous-git.mjs`) that a PreToolUse entry in your settings names, as in Check step 3, and reports pass for `exit 2`, fail otherwise; it runs no other hook. It changes nothing in your setup. For a failure it says what to look at next and offers a new plan row to fix it, on your yes.
 6. **Claude:** with the reminder chosen, adds one line to your front door and shows the change first:
 
    ```markdown
@@ -60,10 +60,15 @@ The menu marks the item **have** when a plan with ticked rows exists and your ki
 
 ## Check
 
-1. **you:** say "check my setup". Expected: one line per ticked row of `adoption/plan.md`, each **pass**, **fail** or **needs you**, with the line that showed it; the number of lines equals what `grep -c '\[x\]' adoption/plan.md` prints. Where your setup is a git repository, `git -C "<your setup>" status --short` prints the same before and after the run.
+1. **you:** say "check my setup". Expected: one line per ticked row of `adoption/plan.md`, each **pass**, **fail** or **needs you**, with the line that showed it, then one line per git guard your settings name (step 3); the number of row lines equals what `grep -c '\[x\]' adoption/plan.md` prints. Where your setup is a git repository, `git -C "<your setup>" status --short` prints the same before and after the run.
 2. **you:** show that it can fail. Switch one adopted item off for a minute yourself, for example by renaming a hook script that a settings entry runs, and say "check my setup" again. Expected: that row reads **fail** and names the missing file. Rename it back and run once more: **pass**.
+3. **Claude:** the guard lines of step 1 come from this test, run whatever the plan holds: it sends the test force-push to every git guard that a `hooks.PreToolUse` entry names (`block-dangerous-git.mjs`, in `.claude/settings.json`, `.claude/settings.local.json` or `~/.claude/settings.json`), the line of [git-guardrails](git-guardrails.md), Check step 1:
 
-A row reported as pass without its check having run, a ticked row missing from the report, or a row that stays pass in step 2, means the item is not done: the plan row stays unticked.
+   `echo '{"tool_name":"Bash","tool_input":{"command":"git push --force origin main"}}' | node <path to block-dangerous-git.mjs>; echo "exit $?"`
+
+   In PowerShell, `; "exit $LASTEXITCODE"` in place of `; echo "exit $?"`. Expected: a `BLOCKED` line, then `exit 2`, reported as **pass**. Any other exit, a missing file among them, is **fail**; a path that is not a file, such as a folder, is **fail** and is never run: a guard that stopped refusing looks the same as one that works until it is tested. No other hook from the settings is run.
+
+A row reported as pass without its check having run, a ticked row missing from the report, a row that stays pass in step 2, or a guard reported as pass that did not print `exit 2` in step 3, means the item is not done: the plan row stays unticked.
 
 ## Undo
 

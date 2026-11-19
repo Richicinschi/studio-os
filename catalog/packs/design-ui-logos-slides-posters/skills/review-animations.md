@@ -1,6 +1,8 @@
 ---
 name: review-animations
-description: Audit animation and motion code for craft (design engineering approach). Strict: flags first, approves only when earned. Manual use only.
+description: >-
+  Audit animation and motion code for craft (design engineering approach). Strict: flags first,
+  approves only when earned. Manual use only.
 disable-model-invocation: true
 metadata:
   author: Richicinschi

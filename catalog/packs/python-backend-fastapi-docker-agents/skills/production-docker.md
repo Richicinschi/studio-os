@@ -29,7 +29,8 @@ WORKDIR /build
 COPY requirements.txt .
 RUN pip install --no-cache-dir --no-compile --prefix=/install -r requirements.txt
 
-FROM gcr.io/distroless/python3-debian12
+# tag nonroot (runs as 65532), digest read 2026-11-19 with docker buildx imagetools inspect
+FROM gcr.io/distroless/python3-debian12:nonroot@sha256:7d1042ce588ab97019fe95c24ffca7bc5a82ccdac572511d5e09bda4435c89c5
 COPY --from=builder /install /usr/local
 COPY --chown=65532:65532 ./app /app
 WORKDIR /app
@@ -448,18 +449,21 @@ Rules:
 Production build:
 
 ```bash
+TAG=$(git rev-parse --short HEAD)
 DOCKER_BUILDKIT=1 docker build \
   --target runtime \
-  --tag shopapi:$(git rev-parse --short HEAD) \
+  --tag shopapi:$TAG \
   --label org.opencontainers.image.revision=$(git rev-parse HEAD) \
   --label org.opencontainers.image.created=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   .
 ```
 
+The commands below use `$TAG`, the commit hash the build just tagged; run them in the same shell.
+
 Confirm the user is not root:
 
 ```bash
-docker run --rm shopapi:latest whoami
+docker run --rm shopapi:$TAG whoami
 # Expected: nonroot or svcuser, NEVER root
 ```
 
@@ -472,5 +476,5 @@ docker images shopapi --format "{{.Repository}}:{{.Tag}} {{.Size}}"
 Look for secrets in layers:
 
 ```bash
-docker history --no-trunc shopapi:latest | grep -iE "(key|secret|password|token)"
+docker history --no-trunc shopapi:$TAG | grep -iE "(key|secret|password|token)"
 ```

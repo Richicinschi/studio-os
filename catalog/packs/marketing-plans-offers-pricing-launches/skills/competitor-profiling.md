@@ -1,7 +1,10 @@
 ---
 id: competitor-profiling
 title: Competitor profiling
-description: Use to research, profile, analyze competitors from URLs into structured markdown: "competitor profile", "competitive intelligence", "deep dive", "dossier", "audit", "landscape", "who are my competitors". For comparison or alternative pages see competitors; battle cards, sales-enablement.
+description: >-
+  Use to research, profile, analyze competitors from URLs into structured markdown: "competitor
+  profile", "competitive intelligence", "deep dive", "dossier", "audit", "landscape", "who are my
+  competitors". For comparison or alternative pages see competitors; battle cards, sales-enablement.
 ---
 
 ## When to use

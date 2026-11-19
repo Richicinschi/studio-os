@@ -1,6 +1,7 @@
 ---
 title: Data work
 pack: data-work
+checked: 2026-11-19
 studio_sources:
   - .claude/skills/claim-auditor/SKILL.md
   - .claude/skills/modern-python/SKILL.md
@@ -53,7 +54,7 @@ An adoption order for a data analyst, each item through `vet-and-adopt`, which r
 
 1. `claim-auditor` first; it pays off on your next report. ADAPT its list of claims that are RED on sight (graded RED until checked independently, whatever their source) to what is sensitive in your company (studio-specific: its examples come from the studio's own kinds of work).
 2. `tdd`, if you write code. ADAPT it to your own test runner, for Python usually pytest (studio-specific: `tdd` names the runners of the studio's own stacks).
-3. Before your next package install, read what the package would run: its install scripts and its maintainers. A skill for this is not in this version of the kit.
+3. Before your next package install, read what the package would run: its install scripts and its maintainers. `supply-chain-risk-auditor` checks the maintainers for you; it ships in the kit inside a domain of its own, [dependency supply-chain risk checks](../../cards/pack-dependency-supply-chain-risk-checks.md), and needs `gh`, GitHub's command-line tool, signed in.
 4. `drawio-diagrams` when you document a pipeline (studio-specific: its trigger examples name the studio's own work).
 5. Later, if it fits: `diagnosing-bugs` for a failure or a slowdown.
 
@@ -72,4 +73,4 @@ Then put the tool-contract checklist into the front door of the repository where
 4. Paste the tool-contract checklist into the instructions of any Project where you design agents.
 5. To use `claim-auditor` itself, it must be vetted first, and vetting needs a terminal with the scanner (START-HERE, "Install steps that come later"). With one, vet it there, write it in your words (ADAPT), then upload it as a custom skill (same facts section). Without one, use the prompt pattern in step 3.
 
-Catalog items used here: [claim-auditor](../../catalog/skills/claim-auditor/SOURCE.md) · [tdd](../../catalog/skills/tdd/SOURCE.md) · [drawio-diagrams](../../catalog/skills/drawio-diagrams/SOURCE.md) · [diagnosing-bugs](../../catalog/skills/diagnosing-bugs/SOURCE.md). Named in the catalog without files in the kit: `dataviz` (catalog-only: no files and no published source, so it cannot be adopted).
+Catalog items used here: [claim-auditor](../../catalog/skills/claim-auditor/SOURCE.md) · [tdd](../../catalog/skills/tdd/SOURCE.md) · [drawio-diagrams](../../catalog/skills/drawio-diagrams/SOURCE.md) · [diagnosing-bugs](../../catalog/skills/diagnosing-bugs/SOURCE.md) · [dependency-supply-chain-risk-checks](../../catalog/packs/dependency-supply-chain-risk-checks/SOURCE.md). Named in the catalog without files in the kit: `dataviz` (catalog-only: no files and no published source, so it cannot be adopted).

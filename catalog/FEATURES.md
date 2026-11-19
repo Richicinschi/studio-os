@@ -74,22 +74,22 @@ Every session for this module: about 130 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 1,323) | 75 |
+| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 2,808) | 64 |
 | git-hooks | practice: The git hook templates | recommended | Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands. | none | 0 |
 | sensitive-file-deny-rules | practice: Deny rules for secret files | recommended | A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files. | none | 0 |
 | commit-and-pr-writing | practice: Commit messages and PR bodies that say why | optional; recommended for software, ml, data | A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does. | every session | 69 |
-| finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 1,932) | 33 |
-| git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | description every session, body on demand (about 2,344) | 46 |
+| finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 2,225) | 33 |
+| git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | description every session, body on demand (about 2,575) | 46 |
 | git-identity-per-folder | practice: One git identity per folder | optional; recommended for software, ml, data | Company work committed under a personal address, or the reverse, is hard to undo; each folder picks its own address. | none | 0 |
 | grant-ledger | practice: The grant ledger for risky acts | optional; recommended for software, ml, data | One recorded yes per force-push, merge, tag or hook skip, so a vague "clean up" never covers an act you did not name. | every session | 101 |
 | merge-commit-only | practice: Merge commits only | optional; recommended for software, ml, data | A squash folds a branch into one commit and a rebase rewrites every one; a merge commit keeps the full history. | every session | 78 |
 | never-share-list | practice: A never-share list | optional; recommended for software, ml, data | Client names and internal terms leak through commits and posts; a private list the pre-commit checks refuses them first. | every session | 61 |
 | rules-audit | practice: The periodic rules audit | optional; recommended for software, ml, data | Rules drift from what enforces them; a read-only session every few months finds contradictions and gaps. | on demand | 0 |
 | signed-commits | practice: Signed commits | optional; recommended for software, ml, data | A signature proves a commit came from you; some companies require it, and a server shows signed commits as verified. | none | 0 |
-| using-git-worktrees | skill | optional; recommended for software, ml, data | Sets up a separate worktree for a branch, so parallel work never switches branches under another session. | description every session, body on demand (about 1,637) | 57 |
+| using-git-worktrees | skill | optional; recommended for software, ml, data | Sets up a separate worktree for a branch, so parallel work never switches branches under another session. | description every session, body on demand (about 1,688) | 57 |
 | worktrees | practice: One worktree per parallel session | optional; recommended for software, ml, data | Two sessions in one checkout switch branches under each other; a worktree each keeps their work apart. | none | 0 |
 
-Every session for this module: about 520 tokens (estimate).
+Every session for this module: about 509 tokens (estimate).
 
 ## Identity and contract (`07-identity-and-contract`)
 
@@ -162,7 +162,7 @@ A domain is a set of skills for one kind of job, installed together as a pack. E
 |---|---|---|---|---|---|
 | advisor-council-for-big-decisions | Advisor council for big decisions: A panel of eight viewpoints (founder, skeptic, designer, architect, counsel, treasurer, user advocate, operator) for a real fork. | 1 | 8 | 49 | about 171 |
 | android-swiftui-react-native-app-building | Building phone apps: Android, SwiftUI and React Native: Build or review an Android, iPhone or React Native app, and fix a store rejection. | 3 | 0 | 57 | about 299 |
-| app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,194 |
+| app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,200 |
 | audio-video-media | Audio, video and media: Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos. | 13 | 1 | 69 | about 1,112 |
 | dependency-supply-chain-risk-checks | Dependency supply-chain risk checks: The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities. | 1 | 0 | 43 | about 176 |
 | design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 18 | 1 | 74 | about 1,343 |

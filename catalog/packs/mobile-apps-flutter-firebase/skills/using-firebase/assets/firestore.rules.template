@@ -18,8 +18,10 @@ service cloud.firestore {
     }
 
     // ---- users ----
+    // a user document holds email, so only its owner reads it; copy public fields
+    // such as a display name onto what the user creates, or keep them in a public collection
     match /users/{uid} {
-      allow read: if signedIn();
+      allow read: if me(uid);
       allow create: if me(uid)
                     && keysInclude(['email', 'createdAt'])
                     && request.resource.data.createdAt == request.time;
@@ -48,7 +50,10 @@ service cloud.firestore {
       match /comments/{commentId} {
         allow read: if true;
         allow create: if ownsIncoming();
-        allow update, delete: if ownsExisting();
+        // the author edits, but cannot hand the comment to someone else
+        allow update: if ownsExisting()
+                      && request.resource.data.authorId == resource.data.authorId;
+        allow delete: if ownsExisting();
       }
     }
 

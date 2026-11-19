@@ -55,7 +55,7 @@ Good fits:
 - Personalised clips addressed to a named recipient. Only with a lawful basis for using that data, and never sent without approval.
 - One composition rendered in 1:1 for feed, 9:16 for stories, 16:9 for video sites.
 
-Commands: `npx create-video@latest` starts a project; `npx remotion render src/index.ts Promo out/promo.mp4` renders one composition; pass `--props` with a path to a JSON file to feed data (on Windows shells, inline JSON loses its quotes, so use a file). Check the Remotion documentation for the current render syntax. Check the license terms for company size before commercial use.
+Commands: `npx create-video@4.0.545` starts a project (4.0.545 was the current release of create-video on 2026-11-19; raise it on purpose); `npx remotion render src/index.ts Promo out/promo.mp4` renders one composition; pass `--props` with a path to a JSON file to feed data (on Windows shells, inline JSON loses its quotes, so use a file). Check the Remotion documentation for the current render syntax. Check the license terms for company size before commercial use.
 
 ## Hybrid workflow for volume
 

@@ -1,6 +1,9 @@
 ---
 name: gsap-timeline
-description: GSAP timelines: gsap.timeline(), position parameter, labels, nesting, playback. Use to sequence animations or choreograph keyframes; also when the user asks how to order or time animations, or when a library that supports timelines is being recommended.
+description: >-
+  GSAP timelines: gsap.timeline(), position parameter, labels, nesting, playback. Use to sequence
+  animations or choreograph keyframes; also when the user asks how to order or time animations, or
+  when a library that supports timelines is being recommended.
 metadata:
   category: web
   author: Richicinschi

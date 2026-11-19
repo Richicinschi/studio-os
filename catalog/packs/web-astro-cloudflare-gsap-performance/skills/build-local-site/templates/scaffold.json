@@ -3,9 +3,30 @@
     "__SITE_URL__": "Full live URL with https:// and no trailing slash such as https://www.riverbend-plumbing.example",
     "__PROJECT_SLUG__": "Lowercase hyphenated name for package.json such as riverbend-plumbing",
     "__PRIMARY_COLOR__": "Brand colour as HSL numbers, used to derive the brand-50 to brand-950 shades (e.g., 205 70% 35%)",
-    "__ACCENT_COLOR__": "Call-to-action colour as HSL numbers (e.g., 28 90% 52%)"
+    "__ACCENT_COLOR__": "Call-to-action colour as HSL numbers (e.g., 28 90% 52%)",
+    "__LICENCE_STATEMENT__": "One sentence naming the licence the owner really holds (e.g., Sam Ortiz holds Texas Master Plumber licence M-12345.). Ask the owner; never invent it. If there is none, delete the text it sits in.",
+    "__RATING_BADGE__": "Short label for a rating the business really holds (e.g., BBB A+ Rated). Ask the owner; if there is none, delete each element it sits in.",
+    "__HOURS_STATEMENT__": "When the business takes urgent calls, written to follow 'takes urgent calls' (e.g., 24 hours a day, every day, only if true; or Monday to Saturday, 7 AM to 6 PM)",
+    "__INSURANCE_STATEMENT__": "One sentence on the insurance the business really carries (e.g., Insured for public liability up to $2 million.). Ask the owner; if there is none, delete each element it sits in.",
+    "__GUARANTEE_STATEMENT__": "One sentence on the guarantee or warranty the business really gives (e.g., Our workmanship is guaranteed for 12 months.). Ask the owner; if there is none, delete each element it sits in.",
+    "__ESTIMATE_OFFER__": "How estimates work, as a short phrase that stands alone (e.g., Free on-site estimates for most jobs, only if true; or Written estimates before any work starts)",
+    "__RESPONSE_TIME__": "How soon the business really answers routine messages, written to follow 'get an answer' (e.g., within one business day)",
+    "__FORM_ENDPOINT__": "URL that receives the contact form by POST (a form service or the site's own Worker). If there is none yet, delete the form."
   },
+  "buildCheck": "package.json runs scripts/check-placeholders.mjs as prebuild: npm run build stops and lists file:line for every upper-case token in double underscores still left in src/ or public/ (*.template files and binary files are skipped; public/robots.txt ships with __SITE_URL__). Fill every placeholder, including the data-template tokens, or delete the element it sits in.",
   "reusableFiles": [
+    {
+      "description": "Build check run as prebuild: refuses the build while any placeholder is left in src/ or public/",
+      "path": "scripts/check-placeholders.mjs"
+    },
+    {
+      "description": "Tests for the build check (node --test scripts/check-placeholders.test.mjs)",
+      "path": "scripts/check-placeholders.test.mjs"
+    },
+    {
+      "description": "Where to put the self-hosted .woff2 font files, and why",
+      "path": "public/fonts/README.md"
+    },
     {
       "description": "TypeScript settings that extend Astro's strict preset",
       "path": "tsconfig.json"
@@ -19,7 +40,7 @@
       "path": "src/lib/urls.ts"
     },
     {
-      "description": "Page shell: head with SEO, fonts and analytics, then header, slot and footer",
+      "description": "Page shell: head with SEO, a note on the self-hosted fonts and analytics that stays off until ANALYTICS_ENABLED is set to true, then header, slot and footer",
       "path": "src/layouts/BaseLayout.astro"
     },
     {
@@ -32,6 +53,9 @@
     },
     {
       "description": "Footer with service and area links, contact details and copyright",
+      "placeholders": [
+        "__RATING_BADGE__"
+      ],
       "path": "src/components/Footer.astro"
     },
     {
@@ -56,14 +80,29 @@
     },
     {
       "description": "Homepage: hero, stats, services, process, reviews, areas and closing call to action",
+      "placeholders": [
+        "__RATING_BADGE__",
+        "__HOURS_STATEMENT__",
+        "__GUARANTEE_STATEMENT__"
+      ],
       "path": "src/pages/index.astro"
     },
     {
       "description": "About page: story, team, values and trust signals",
+      "placeholders": [
+        "__LICENCE_STATEMENT__",
+        "__RATING_BADGE__",
+        "__INSURANCE_STATEMENT__"
+      ],
       "path": "src/pages/about.astro"
     },
     {
       "description": "Contact page: form, contact details, hours and an urgent-call box",
+      "placeholders": [
+        "__FORM_ENDPOINT__",
+        "__RESPONSE_TIME__",
+        "__HOURS_STATEMENT__"
+      ],
       "path": "src/pages/contact.astro"
     },
     {
@@ -72,10 +111,19 @@
     },
     {
       "description": "One page per service, paths taken from serviceTypes",
+      "placeholders": [
+        "__HOURS_STATEMENT__"
+      ],
       "path": "src/pages/services/[service].astro"
     },
     {
-      "description": "One page per area and service pair: the page type that targets "service in area" searches",
+      "description": "One page per area and service pair: the page type that targets \"service in area\" searches",
+      "placeholders": [
+        "__INSURANCE_STATEMENT__",
+        "__GUARANTEE_STATEMENT__",
+        "__ESTIMATE_OFFER__",
+        "__HOURS_STATEMENT__"
+      ],
       "path": "src/pages/services/[area]/[service].astro"
     },
     {

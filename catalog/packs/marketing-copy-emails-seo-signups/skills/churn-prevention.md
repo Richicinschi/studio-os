@@ -1,7 +1,11 @@
 ---
 id: churn-prevention
 title: Churn prevention
-description: Use when losing subscribers: churn, prevent, cancel flow, offboarding, save offer, exit survey, pause subscription, dunning, involuntary churn, failed payment recovery, retention, win-back, canceling, keep users, customers leaving. Post-cancel email sequences: emails. In-app upgrade: paywalls.
+description: >-
+  Use when losing subscribers: churn, prevent, cancel flow, offboarding, save offer, exit survey,
+  pause subscription, dunning, involuntary churn, failed payment recovery, retention, win-back,
+  canceling, keep users, customers leaving. Post-cancel email sequences: emails. In-app upgrade:
+  paywalls.
 ---
 
 ## When to use

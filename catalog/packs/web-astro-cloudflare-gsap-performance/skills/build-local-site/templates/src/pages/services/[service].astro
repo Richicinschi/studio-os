@@ -78,7 +78,7 @@ const serviceSchema = {
         {service.emergency && (
           <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-medium text-red-700 ring-1 ring-red-200/60">
             <Icon name="lucide:alert-circle" class="size-4 text-red-500" />
-            Emergency callouts available day and night
+            Urgent calls __HOURS_STATEMENT__
           </div>
         )}
 
@@ -157,7 +157,7 @@ const serviceSchema = {
     <div class="mx-auto max-w-4xl px-5 text-center lg:px-8">
       <h2 class="font-display text-2xl text-white sm:text-3xl">Book {service.name}</h2>
       <p class="mx-auto mt-4 max-w-2xl text-brand-200">
-        {business.name} has worked in Fairmont and nearby towns for {yearsInBusiness()} years. Phone for a free estimate or to pick a day.
+        {business.name} has worked in Fairmont and nearby towns for {yearsInBusiness()} years. Phone for an estimate or to pick a day.
       </p>
       <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
         <a

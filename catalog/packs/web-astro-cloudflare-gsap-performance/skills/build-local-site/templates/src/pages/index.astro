@@ -8,8 +8,11 @@ import { serviceUrl, areaUrl, contactUrl } from '../lib/urls';
 import { reviews } from '../data/seoContent';
 
 const years = yearsInBusiness();
+// Every licence claim on this page shows only when business.license is filled
+// in; leave it '' when the business holds no licence and they all drop out.
+const licensed = business.license.trim() !== '';
 const siteId = business.website;
-const pageTitle = `${business.name} | Fairmont TX Plumber`;
+const pageTitle = `${business.name} | ${business.address.city} ${business.address.stateCode} Plumber`;
 
 // No reviews yet means no rating block and no rating schema.
 const avgRating = reviews.length
@@ -23,7 +26,7 @@ const steps = [
     title: 'Give Us a Call',
     icon: 'lucide:phone-call',
     summary: 'Tell us what is wrong and we book a visit.',
-    detail: `Phone ${business.phone} or use the web form. A few quick questions let us size up the problem, share what it may involve, and pick the soonest open slot. In an emergency, a plumber heads your way at once.`,
+    detail: `Phone ${business.phone} or use the web form. A few quick questions let us size up the problem, share what it may involve, and pick the soonest open slot.`,
     image: '/images/hero.webp',
   },
   {
@@ -31,7 +34,7 @@ const steps = [
     title: 'On-Site Assessment',
     icon: 'lucide:search',
     summary: 'We look closely and quote a clear price.',
-    detail: 'A licensed plumber shows up on schedule and checks the problem with proper tools such as inspection cameras, pressure gauges and leak detectors. You hear what needs doing and get the estimate in writing before we begin. Nothing is a surprise.',
+    detail: `A ${licensed ? 'licensed ' : ''}plumber shows up on schedule and checks the problem with proper tools such as inspection cameras, pressure gauges and leak detectors. You hear what needs doing and get the estimate in writing before we begin. Nothing is a surprise.`,
     image: '/images/leak-repair.webp',
   },
   {
@@ -39,7 +42,7 @@ const steps = [
     title: 'Expert Repair',
     icon: 'lucide:wrench',
     summary: 'The fix is done properly, with good parts.',
-    detail: 'Once you say yes, we start straight away. Parts are trade-grade, the work follows state plumbing code, and we keep the house tidy as we go. Most repairs wrap up in a single day.',
+    detail: 'Once you say yes, we agree a start date. Parts are trade-grade, the work follows state plumbing code, and we keep the house tidy as we go.',
     image: '/images/repiping.webp',
   },
   {
@@ -47,17 +50,24 @@ const steps = [
     title: 'Final Walkthrough',
     icon: 'lucide:check-circle',
     summary: 'We test it all and check you are happy.',
-    detail: 'When the work is finished, we test the whole system, clear the area and show you what was done. We stay until you are satisfied, and our workmanship guarantee covers every job.',
+    detail: 'When the work is finished, we test the whole system, clear the area and show you what was done. __GUARANTEE_STATEMENT__',
     image: '/images/water-heater.webp',
   },
 ];
 
-// Sample claims: keep only the badges this business can prove, and delete the rest.
+// Keep only the badges this business can prove, and delete the rest. The tokens
+// in double underscores must be filled before `npm run build` will run:
+// RATING_BADGE is a rating the business really holds (e.g. "BBB A+ Rated");
+// HOURS_STATEMENT says when it takes urgent calls, written to follow "Urgent
+// calls", e.g. "24 hours a day" only if that is true, or "Mon to Sat, 7 AM to 6 PM";
+// GUARANTEE_STATEMENT (in the steps above) is one sentence on the guarantee or
+// warranty the business really gives, e.g. "Our workmanship is guaranteed for
+// 12 months."; delete it if there is none.
 const stats = [
   { icon: 'lucide:award', label: `${years}+ Years Experience` },
-  { icon: 'lucide:shield-check', label: 'A+ BBB Rating' },
-  { icon: 'lucide:clock', label: '24/7 Emergency Service' },
-  { icon: 'lucide:badge-check', label: 'Licensed & Insured' },
+  { icon: 'lucide:shield-check', label: '__RATING_BADGE__' },
+  { icon: 'lucide:clock', label: 'Urgent calls __HOURS_STATEMENT__' },
+  ...(licensed ? [{ icon: 'lucide:badge-check', label: `Licence ${business.license}` }] : []),
 ];
 
 const schema = {
@@ -197,7 +207,7 @@ const schema = {
           Plumbing Services We Offer
         </h2>
         <p class="mx-auto mt-4 max-w-2xl text-stone-600">
-          A burst pipe at midnight or a whole new build, each job gets careful work
+          A burst pipe or a whole new build, each job gets careful work
           and the same high standard.
         </p>
       </div>
@@ -211,7 +221,7 @@ const schema = {
             {service.emergency && (
               <span class="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
                 <Icon name="lucide:zap" class="size-3" />
-                24/7
+                Urgent
               </span>
             )}
             <div class="flex size-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-100">

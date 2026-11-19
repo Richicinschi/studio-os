@@ -4,6 +4,8 @@ title: Crash reports and release health
 requires: [a Firebase or Sentry account]
 ---
 
+Ask the person before any deploy, any delete of a remote resource, and any publish or upload; show the command and what it changes.
+
 ## When to use
 
 Use when the user wants to find out why an app crashes on other people's phones, or wants to watch how a new release is doing. Typical wording: "my app crashes for some users and I cannot reproduce it", "set up crash reporting", "the crash report is unreadable gibberish", "is version 1.4 worse than 1.3", "what should I fix first".

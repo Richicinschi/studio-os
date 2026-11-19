@@ -1,6 +1,6 @@
 ---
 name: web-api-security-login-and-graphql
-description: Use when the user designs or reviews a web API or OpenAPI file, checks a server's headers and security, adds sign-in, roles or password resets, or builds or fixes a GraphQL API.
+description: "Use when the user designs or reviews a web API or OpenAPI file, checks a server's headers and security, adds sign-in, roles or password resets, or builds or fixes a GraphQL API."
 ---
 
 # Web back ends: API design, security, sign-in and GraphQL

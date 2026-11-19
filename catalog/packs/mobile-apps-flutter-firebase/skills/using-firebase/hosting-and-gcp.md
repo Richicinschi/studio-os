@@ -11,11 +11,11 @@ Core keys: `public` (folder to serve), `ignore`, `cleanUrls`, `trailingSlash`, `
 
 ## Preview channels and releases
 
-`firebase hosting:channel:deploy <name> --expires 7d` makes a temporary URL. Expiry runs from hours (`1h`) to days, defaults to 7 days, and has a ceiling set by the platform (30 days at the time of writing; check the vendor's documentation). Promote with `firebase hosting:clone <site>:<channel> <site>:live`; a specific past version clones as `<site>:@<version-id>`. List and delete channels with `hosting:channel:list` and `hosting:channel:delete`. The CLI has no rollback command: roll back in the console (Release history, then Roll back on the earlier release) or clone the old version to live. In CI, deploy a channel per pull request.
+`npx firebase-tools@15.36.0 hosting:channel:deploy <name> --expires 7d` makes a temporary URL. Expiry runs from hours (`1h`) to days, defaults to 7 days, and has a ceiling set by the platform (30 days at the time of writing; check the vendor's documentation). Promote with `npx firebase-tools@15.36.0 hosting:clone <site>:<channel> <site>:live`; a specific past version clones as `<site>:@<version-id>`. List and delete channels with `hosting:channel:list` and `hosting:channel:delete`. The CLI has no rollback command: roll back in the console (Release history, then Roll back on the earlier release) or clone the old version to live. In CI, deploy a channel per pull request.
 
 ## Several sites in one project
 
-Create with `firebase hosting:sites:create <id>`. In `firebase.json` make `hosting` an array where each entry has a `target`. Bind names with `firebase target:apply hosting <target> <site-id>`. Deploy one with `firebase deploy --only hosting:<target>`.
+Create with `npx firebase-tools@15.36.0 hosting:sites:create <id>`. In `firebase.json` make `hosting` an array where each entry has a `target`. Bind names with `npx firebase-tools@15.36.0 target:apply hosting <target> <site-id>`. Deploy one with `npx firebase-tools@15.36.0 deploy --only hosting:<target>`.
 
 ## A Firebase project is a GCP project
 
@@ -34,7 +34,7 @@ Grant the smallest role that works: `gcloud projects add-iam-policy-binding PROJ
 
 ## Secret Manager
 
-The Firebase CLI route (`firebase functions:secrets:*`) is the one to use for functions because it also grants access. Direct `gcloud secrets create`, `versions add`, `versions access latest`, `list` and `delete` work too, and then you must grant the function's service account `roles/secretmanager.secretAccessor` on that secret.
+The Firebase CLI route (`npx firebase-tools@15.36.0 functions:secrets:*`) is the one to use for functions because it also grants access. Direct `gcloud secrets create`, `versions add`, `versions access latest`, `list` and `delete` work too, and then you must grant the function's service account `roles/secretmanager.secretAccessor` on that secret.
 
 ## Logging, metrics, alerts
 

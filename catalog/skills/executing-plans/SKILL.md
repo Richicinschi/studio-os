@@ -1,6 +1,9 @@
 ---
 name: executing-plans
-description: Use when you run an implementation plan yourself, as the implementer, inside the current session: executing it inline because your human partner chose inline execution or because no subagent tool is available.
+description: >-
+  Use when you run an implementation plan yourself, as the implementer, inside the current session:
+  executing it inline because your human partner chose inline execution or because no subagent tool
+  is available.
 metadata:
   category: workflow
   author: Richicinschi

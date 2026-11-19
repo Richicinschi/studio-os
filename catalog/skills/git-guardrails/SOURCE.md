@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone letting Claude run git commands.
 - **Pack / module:** way-of-working / 06-git-and-guardrails
-- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-10; 4 findings, all read: 3 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#git-guardrails-do_not_install-100100-4-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-19; 19 findings, all read: 17 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#git-guardrails-do_not_install-100100-19-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

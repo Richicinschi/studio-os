@@ -8,6 +8,8 @@ import { serviceUrl, areaUrl } from '../lib/urls';
 // Street is optional: print it only when the business filled it in.
 const { street, city, state, zip } = business.address;
 const addressLine = `${street ? `${street}, ` : ''}${city}, ${state} ${zip}`;
+// The licence shows only when business.license is filled in.
+const licensed = business.license.trim() !== '';
 
 const heading = 'mb-4 text-xs font-semibold uppercase tracking-wider text-stone-500';
 const link = 'text-sm text-stone-400 transition-colors hover:text-white';
@@ -31,7 +33,7 @@ const rowIcon = 'mt-0.5 size-4 shrink-0 text-stone-500';
         </div>
       </a>
       <p class="mt-4 max-w-md text-sm leading-relaxed text-stone-400">
-        {business.tagline}. Licensed, insured and locally owned since {business.yearEstablished}.
+        {business.tagline}. In business since {business.yearEstablished}.
       </p>
     </div>
 
@@ -82,9 +84,9 @@ const rowIcon = 'mt-0.5 size-4 shrink-0 text-stone-500';
     <div class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row">
       <p class="text-xs text-stone-600">&copy; {new Date().getFullYear()} {business.name}. All rights reserved.</p>
       <div class="flex gap-4 text-xs text-stone-600">
-        <span>{business.license}</span>
-        <!-- Sample badge: keep it only if the business can prove it, otherwise delete it. -->
-        <span>BBB A+ Rated</span>
+        {licensed && <span>{business.license}</span>}
+        <!-- Fill with a rating the business really holds, such as its BBB grade, or delete this span. -->
+        <span>__RATING_BADGE__</span>
       </div>
     </div>
   </div>

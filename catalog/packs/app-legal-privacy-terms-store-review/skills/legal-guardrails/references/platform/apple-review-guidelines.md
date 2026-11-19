@@ -9,10 +9,10 @@ merchant of record via RevenueCat + Firebase `europe-west`; general-wellness, no
 no HealthKit). Adjudicate the app under review from its fact sheet and its actual build.
 
 **Primary source:** App Store Review Guidelines — https://developer.apple.com/app-store/review/guidelines/
-**Last verified against primary source:** 2026-06-06.
+**Last verified against primary source:** 2026-11-18 (the page shows "Last Updated: October 16, 2026").
 
 > Apple ships the Guidelines as a living document with no version numbers; section numbers are
-> stable but wording is edited without notice. Before a hard sign-off, have the person open the
+> stable but wording is edited without notice. Before a firm verdict, have the person open the
 > live page and compare.
 
 ---
@@ -21,7 +21,7 @@ no HealthKit). Adjudicate the app under review from its fact sheet and its actua
 
 | Tag | Meaning |
 |---|---|
-| `[settled — <source>, verified 2026-06-06]` | Confirmed verbatim against the primary Apple page fetched this run. |
+| `[settled — <source>, verified <date>]` | Confirmed verbatim against the primary Apple page fetched on that date. |
 | `[verify]` | Believed correct; not confirmed against primary source this run. |
 | `[verify-pinpoint]` | Right substance; exact clause/date still to pin. |
 | `[low-confidence]` | Novel / contested / fact-specific. |
@@ -32,7 +32,7 @@ no HealthKit). Adjudicate the app under review from its fact sheet and its actua
 
 Adjudicate the doc set against these. "Gate" = a reviewer-enforced condition the PP/ToS/paywall
 must satisfy. "Worked verdict" is the example app's outcome, shown as a pattern; derive the app
-under review's own verdict from its actual build + App Store Connect at sign-off.
+under review's own verdict from its actual build + App Store Connect at review time.
 
 | # | Guideline | Gate (what the docs/app must show) | Worked verdict (example app) |
 |---|---|---|---|
@@ -55,7 +55,7 @@ under review's own verdict from its actual build + App Store Connect at sign-off
 Guideline 5.1.1 is under **5. Privacy**. It is the primary reviewer hook for the Privacy Policy.
 
 ### 5.1.1(i) Privacy Policies — required content + placement
-`[settled — App Store Review Guidelines 5.1.1(i), verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.1(i), verified 2026-11-18]`
 
 > "All apps must include a link to their privacy policy in the App Store Connect metadata field
 > and within the app in an easily accessible manner."
@@ -87,7 +87,7 @@ In this suite's words, the privacy policy must state clearly:
   deletion (in-app delete flow). GDPR Arts. 13/17 satisfy this when present. `[verify]`
 
 ### 5.1.1(ii) Permission
-`[settled — App Store Review Guidelines 5.1.1(ii), verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.1(ii), verified 2026-11-18]`
 
 - Apps that collect user/usage data must **secure consent**, even for data anonymous at/after
   collection.
@@ -102,7 +102,7 @@ In this suite's words, the privacy policy must state clearly:
   See the NL/ePrivacy reference.) `[verify]`
 
 ### 5.1.1(iii) Data Minimization
-`[settled — App Store Review Guidelines 5.1.1(iii), verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.1(iii), verified 2026-11-18]`
 
 Request only data relevant to **core functionality**; collect/use only what's required. Prefer
 out-of-process pickers / share sheets over full access to protected resources (Photos, Contacts).
@@ -110,14 +110,14 @@ out-of-process pickers / share sheets over full access to protected resources (P
 (e.g. notifications for reminders) must map to a stated PP purpose.
 
 ### 5.1.1(iv) Access
-`[settled — App Store Review Guidelines 5.1.1(iv), verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.1(iv), verified 2026-11-18]`
 
 Respect permission settings; do not manipulate/trick/force consent to unnecessary access; do not
 require unrelated permissions; provide alternatives when a user declines. Low relevance for an
 app that asks for almost no permissions (the example app), but the "no dark-pattern consent" rule informs paywall + consent-checkbox UX review.
 
 ### 5.1.1(v) Account Sign-In / **Account Deletion** (mandatory)
-`[settled — App Store Review Guidelines 5.1.1(v), verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.1(v), verified 2026-11-18]`
 
 > "If your app supports account creation, you must also offer account deletion within the app."
 > (Apple, App Store Review Guidelines 5.1.1(v), https://developer.apple.com/app-store/review/guidelines/)
@@ -140,7 +140,7 @@ deletion-request mechanism. `[verify]`
 ---
 
 ## 5.1.2 — Data Use and Sharing
-`[settled — App Store Review Guidelines 5.1.2, verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.2, verified 2026-11-18]`
 
 | Sub | Rule | Relevance (worked: example app) |
 |---|---|---|
@@ -154,12 +154,12 @@ deletion-request mechanism. `[verify]`
 
 **Sanction (for risk framing):** an app that shares user data without consent, or otherwise
 breaks data-privacy law, can be removed from sale, and the developer can be removed from the
-Apple Developer Program. `[settled — 5.1.2(i), verified 2026-06-06]`
+Apple Developer Program. `[settled — 5.1.2(i), verified 2026-11-18]`
 
 ---
 
 ## 5.1.3 — Health and Health Research
-`[settled — App Store Review Guidelines 5.1.3, verified 2026-06-06]`
+`[settled — App Store Review Guidelines 5.1.3, verified 2026-11-18]`
 
 | Sub | Rule |
 |---|---|
@@ -169,16 +169,16 @@ Apple Developer Program. `[settled — 5.1.2(i), verified 2026-06-06]`
 | (iv) | Such research requires independent ethics-review-board approval; proof on request. |
 
 **Application (worked: example app) — N/A-PASS:** the example app does **not** use HealthKit, Clinical Health Records,
-Motion & Fitness, or any medical-research API, and stores no health data in iCloud. Breathing
-session logs are **not** special-category health data here because there is no HealthKit/clinical
-source — confirm the PP's Art. 9 GDPR section is consistent (i.e. it does not over-declare health
-data). The 5.1.3 restrictions mostly don't bite; the operative health gate for such an app is **1.4.1**
+Motion & Fitness, or any medical-research API, and stores no health data in iCloud. Whether breathing
+session logs are special-category health data turns on what the data can reveal, not on the API
+(`data-category-ontology.md` §3) — confirm the PP's Art. 9 GDPR section is consistent (i.e. it does
+not over-declare health data). The 5.1.3 restrictions mostly don't bite; the operative health gate for such an app is **1.4.1**
 (claim language), below. `[verify]`
 
 ---
 
 ## 3.1.1 — In-App Purchase
-`[settled — App Store Review Guidelines 3.1.1, verified 2026-06-06]`
+`[settled — App Store Review Guidelines 3.1.1, verified 2026-11-18]`
 
 > "If you want to unlock features or functionality within your app … you must use in-app
 > purchase."
@@ -199,13 +199,13 @@ record and that subscription management/cancellation happens in the user's Apple
 ---
 
 ## 3.1.2 — Auto-Renewable Subscriptions (the paywall-disclosure gate)
-`[settled — App Store Review Guidelines 3.1.2, verified 2026-06-06]`
+`[settled — App Store Review Guidelines 3.1.2, verified 2026-11-18]`
 
 Auto-renewable subscriptions are allowed in any category. Before asking a customer to subscribe,
 the app must **clearly describe what the user gets for the price** and **clearly communicate the
 requirements described in Schedule 2 of the Apple Developer Program License Agreement (ADPLA)**.
 
-**Pre-purchase paywall must disclose (checklist):**
+**Pre-purchase paywall must disclose (checklist):** items 1–3 and 6 are ADPLA Schedule 2 §3.8(b) (title; length; price, and price per unit if appropriate; links to the Privacy Policy and Terms of Use accessible within the app; Schedules 2 and 3 last updated 13 October 2026, verified 2026-11-18). Item 4 is 3.1.2(c). Item 5 is in neither Apple text `[verify]`; placing the links on the paywall itself is this suite's practice.
 
 | # | Required disclosure | Check (worked: example app) |
 |---|---|---|
@@ -216,10 +216,11 @@ requirements described in Schedule 2 of the Apple Developer Program License Agre
 | 5 | **Auto-renew terms** — renews automatically until cancelled | must be stated on paywall |
 | 6 | **Functional links to Terms of Use (EULA) + Privacy Policy** | both must be tappable on the paywall |
 
-Plus: a **free trial** (if offered) must clearly disclose its **duration** and the **price after
-trial**; the subscription must last **at least 7 days** and be available across all the user's
-devices; must provide **ongoing value**; no bait-and-switch. `[settled — 3.1.2 / 3.1.2(c),
-verified 2026-06-06]`
+Plus: a **free trial** may be offered by providing the relevant information in App Store Connect
+(the Guidelines' duty to state a trial's duration and later charges, in 3.1.1, is written for
+non-subscription trials); the subscription must last **at least 7 days** and be available across
+all the user's devices; must provide **ongoing value**; no bait-and-switch. `[settled — 3.1.1 /
+3.1.2(a), verified 2026-11-18]`
 
 **Application (worked: example app):** confirm the paywall surfaces all six items + the dynamic trial-length
 copy and the post-trial price. The unticked withdrawal/immediate-delivery checkbox
@@ -227,14 +228,15 @@ copy and the post-trial price. The unticked withdrawal/immediate-delivery checkb
 an Apple requirement — Apple does not mandate or prohibit it. Do not conflate the two: Apple 3.1.2
 governs *disclosure*, the CRD governs the *14-day withdrawal waiver*. `[verify]`
 
-> **Schedule 2 ADPLA is the binding source** for required subscription metadata; 3.1.2 points to
-> it. If a custom EULA is shipped, also check Apple's **Minimum Terms of Developer's EULA** (10
-> mandatory clauses) — that is a separate reference, not duplicated here. `[verify]`
+> **Schedule 2 ADPLA is the binding source** for required subscription metadata (§3.8(b)); 3.1.2(c)
+> points to it. If a custom EULA is shipped, also check Apple's **Minimum Terms of Developer's EULA** (10
+> mandatory clauses) — that is a separate reference, not duplicated here. `[settled — ADPLA
+> Schedule 2 §§3.8(b), 4.2, verified 2026-11-18]`
 
 ---
 
 ## 1.4.1 — Medical / Physical Harm (the health-claim gate)
-`[settled — App Store Review Guidelines 1.4.1, verified 2026-06-06]`
+`[settled — App Store Review Guidelines 1.4.1, verified 2026-11-18]`
 
 Apple reviews medical apps harder when they could give inaccurate data or be used to diagnose or
 treat patients. In this suite's words, the rule's three prongs:
@@ -267,12 +269,17 @@ treat patients. In this suite's words, the rule's three prongs:
 These are not single-clause gates but reviewer cross-checks the legal docs must survive:
 
 1. **App Privacy "nutrition label" ⇄ PP must reconcile.** The App Store Connect App Privacy
-   declarations (the 14 data categories) must match what the PP says is collected. A mismatch is a
-   common enforcement/rejection trigger. For the example app: declare Identifiers (User ID/Device ID),
-   Contact Info (Email), Purchases (Purchase History), Usage Data (Product Interaction),
-   Diagnostics (Crash/Performance); affirmatively mark **Health & Fitness = Not Collected** and
+   declarations (15 data categories plus "Other Data") must match what the PP says is collected. A mismatch is a
+   common enforcement/rejection trigger. `[settled — App Privacy Details + 5.1.1, verified 2026-11-18]`
+   For the example app: declare Identifiers (User ID; **Device ID = Yes, Linked (via `setUserId`),
+   not tracking, Analytics**, whenever Firebase Analytics ships enabled for any user — Firebase
+   Analytics collects the IDFV and app-instance ID; the IDFA reads as zeros without ATT `[settled —
+   App Privacy Details; Firebase Analytics config (Apple platforms); Apple advertisingIdentifier docs,
+   verified 2026-11-19]` `[verify — IDFV default inferred from Firebase's off-switch; RevenueCat default
+   inferred from its docs]`), Contact Info (Email), Purchases (Purchase History), Usage Data
+   (Product Interaction), Diagnostics (Crash/Performance); mark **Health = Not Collected** for bare
+   session logs (Fitness: the developer's call `[verify — see data-category-ontology.md §3]`) and
    **Sensitive Info = Not Collected**, and ensure the PP matches.
-   `[settled — App Privacy Details + 5.1.1, verified 2026-06-06]`
 2. **PrivacyInfo.xcprivacy manifest ⇄ PP/label.** The merged privacy manifest's
    `NSPrivacyCollectedDataTypes` must align with both the App Privacy label and the PP data
    inventory; each bundled "commonly used" SDK (FirebaseAuth/Crashlytics/Firestore/Core,
@@ -287,10 +294,12 @@ These are not single-clause gates but reviewer cross-checks the legal docs must 
 ## eenmanszaak publisher notes for the reviewer (the example app's profile)
 
 - **Sole controller, no DPO, no employees:** Apple does not require a DPO; GDPR Art. 37 likely
-  doesn't either for this profile. The PP must still name the controller with a real contact —
-  the `[KVK]`, `[BTW]`, and `[REGISTERED ADDRESS]` placeholders are a **hard blocker** for the
-  developer-identity/complaint-contact obligations (relevant to a custom EULA's developer
-  name+address clause and to 5.1.1(i)). `[verify]`
+  doesn't either for this profile. The PP must still name the controller with a real contact. A
+  custom EULA's minimum term #8 needs the developer's name, address, telephone number and email; a
+  placeholder in any of them (e.g. `[REGISTERED ADDRESS]`) blocks (`apple-min-eula.md` #8,
+  `[settled — minterms #8, verified 2026-11-18]`). `[KVK]` and `[BTW]` are not part of #8: they are
+  checked under Dutch and EU law (`dsa-trader.md` placeholder row; Netherlands and EU only,
+  `legal-guardrails.md` §9).
 - **Merchant of record:** Apple (iOS) / Google (Android) are MoR; the developer is not the seller
   of the subscription for tax/refund purposes — keep ToS billing/cancellation/refund language
   pointing to the Store, not the publisher.
@@ -311,6 +320,7 @@ These are not single-clause gates but reviewer cross-checks the legal docs must 
   codes. `[verify-pinpoint]`
 - PP retention/deletion + consent-revocation wording actually present and accurate vs. the shipped
   30-day soft-delete + opt-out toggle. `[verify]`
-- Schedule 2 ADPLA exact required-metadata enumeration (paywall disclosure list derived from it).
-  `[verify]`
+- Schedule 2 ADPLA required-metadata list: pinned 2026-11-18 to §3.8(b) (title, length, price,
+  Privacy Policy and Terms of Use links). Auto-renew wording on the paywall (checklist item 5) is
+  not in it. `[verify]` for item 5 only.
 - ToS merchant-of-record + Store-cancellation language present. `[verify]`

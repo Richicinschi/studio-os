@@ -34,9 +34,12 @@ const nearby = getNearbyAreas(area);
 const nearbyList = nearby.map((a) => a.name).join(', ');
 const lowerName = service.name.toLowerCase();
 const span = getPriceSpan(service);
+// Every licence claim on this page shows only when business.license is filled
+// in; leave it '' when the business holds no licence and they all drop out.
+const licensed = business.license.trim() !== '';
 
-const pageTitle = `${service.name} in ${area.name}, TX | ${business.name}`;
-const pageDescription = `Looking for ${lowerName} in ${area.name}? ${business.name} is licensed, fairly priced and usually there within ${area.responseTime}. Call ${business.phone}.`;
+const pageTitle = `${service.name} in ${area.name}, ${area.state} | ${business.name}`;
+const pageDescription = `Looking for ${lowerName} in ${area.name}? ${business.name} is ${licensed ? 'licensed and ' : ''}usually there within ${area.responseTime}. Call ${business.phone}.`;
 const pageUrl = `${business.website}${comboUrl(area.slug, service.slug)}`;
 
 // Two graph nodes: the Service for this town, and the breadcrumb trail.
@@ -68,11 +71,15 @@ const schema = {
         },
         founder: { '@type': 'Person', name: business.owner },
         foundingDate: `${business.yearEstablished}`,
-        hasCredential: {
-          '@type': 'EducationalOccupationalCredential',
-          credentialCategory: 'License',
-          name: business.license,
-        },
+        ...(licensed
+          ? {
+              hasCredential: {
+                '@type': 'EducationalOccupationalCredential',
+                credentialCategory: 'License',
+                name: business.license,
+              },
+            }
+          : {}),
       },
       areaServed: [
         {
@@ -98,15 +105,23 @@ const schema = {
   ],
 };
 
-// The four "why us" cards. Edit the claims to match what the business can truly say.
+// The four "why us" cards. Fill the tokens in double underscores or delete the
+// card: INSURANCE_STATEMENT is one sentence on the insurance the business really
+// carries; GUARANTEE_STATEMENT one sentence on the guarantee or warranty it
+// really gives. The build refuses while either is left.
 const reasons = [
-  { icon: 'lucide:shield-check', title: 'Licensed and insured', text: `${business.license}. Insured on every job.` },
-  { icon: 'lucide:map-pin', title: 'Local owners', text: `${years}+ years working in ${area.name} and ${area.county}.` },
-  { icon: 'lucide:clock', title: 'Quick arrival', text: `About ${area.responseTime} to reach ${area.name}. Same-day visits possible.` },
-  { icon: 'lucide:badge-check', title: 'Work backed up', text: 'Each repair and install comes with a satisfaction guarantee.' },
+  licensed
+    ? { icon: 'lucide:shield-check', title: 'Licensed', text: `${business.license}. __INSURANCE_STATEMENT__` }
+    : { icon: 'lucide:shield-check', title: 'Insured', text: '__INSURANCE_STATEMENT__' },
+  { icon: 'lucide:map-pin', title: 'Years in the area', text: `${years}+ years working in ${area.name} and ${area.county}.` },
+  { icon: 'lucide:clock', title: 'Quick arrival', text: `About ${area.responseTime} to reach ${area.name}.` },
+  { icon: 'lucide:badge-check', title: 'Work backed up', text: '__GUARANTEE_STATEMENT__' },
 ];
 
-const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed before work starts'];
+// One short line per pricing promise the business really makes. ESTIMATE_OFFER
+// (in double underscores) says how estimates work, e.g. "Free on-site estimates
+// for most jobs" only if true, or "Written estimates before any work starts".
+const promises = ['__ESTIMATE_OFFER__'];
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} canonicalUrl={pageUrl} schema={schema}>
@@ -125,17 +140,17 @@ const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed
         <div class="lg:flex-1">
           <div class="flex items-center gap-3 text-brand-600">
             <Icon name={service.icon} class="size-8" />
-            <span class="text-sm font-semibold uppercase tracking-wide">Trusted {service.name}</span>
+            <span class="text-sm font-semibold uppercase tracking-wide">Local {service.name}</span>
           </div>
           <h1 class="mt-3 font-display text-3xl text-brand-900 sm:text-4xl lg:text-5xl">
-            {service.name} in {area.name}, TX
+            {service.name} in {area.name}, {area.state}
           </h1>
           <p class="mt-4 max-w-3xl text-lg leading-relaxed text-stone-600">{pageDescription}</p>
         </div>
         <div class="mt-6 lg:mt-0 lg:w-80 lg:shrink-0">
           <img
             src={service.image}
-            alt={`${service.name} in ${area.name}, TX`}
+            alt={`${service.name} in ${area.name}, ${area.state}`}
             class="rounded-xl shadow-lg"
             width="1024"
             height="1024"
@@ -148,7 +163,7 @@ const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed
     <div class="mb-10 overflow-hidden rounded-xl">
       <img
         src={service.image}
-        alt={`${service.name} job in ${area.name}, TX`}
+        alt={`${service.name} job in ${area.name}, ${area.state}`}
         class="h-64 w-full object-cover sm:h-80 lg:h-96"
         width="1408"
         height="768"
@@ -163,9 +178,9 @@ const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed
           <Icon name="lucide:zap" class="size-6 text-amber-600" />
         </div>
         <div>
-          <p class="font-semibold text-amber-900">Urgent {lowerName} in {area.name}, any hour</p>
+          <p class="font-semibold text-amber-900">Urgent {lowerName} in {area.name}</p>
           <p class="mt-1 text-sm text-amber-700">
-            Pipes do not break on a schedule. Phone at any time and we send someone to {area.name} first.
+            We take urgent calls __HOURS_STATEMENT__. Phone and we will tell you when someone can reach {area.name}.
           </p>
         </div>
         <a
@@ -184,13 +199,13 @@ const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed
       <p>{service.description}</p>
       <p>
         {business.name} has looked after {area.name} and the rest of {area.county} for {years} years.
-        We live nearby, so we know what the local pipes, water and weather do to a house.
+        We work nearby, so we know what the local pipes, water and weather do to a house.
         {area.description}
       </p>
       {nearby.length > 0 && (
         <p>
           The same {lowerName} service also reaches {nearbyList}. Wherever you are in the region,
-          expect a prompt visit from a licensed crew.
+          phone and we will tell you when a {licensed && 'licensed '}crew can be there.
         </p>
       )}
     </section>
@@ -276,7 +291,7 @@ const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed
           Book {lowerName} in {area.name}
         </h2>
         <p class="mx-auto mt-4 max-w-xl text-brand-200">
-          Urgent fix or a planned visit, the team is ready. Phone now or ask for a free estimate online.
+          Urgent fix or a planned visit, the team is ready. Phone now or ask for an estimate online.
         </p>
         <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
           <a
@@ -291,7 +306,7 @@ const promises = ['Free estimates on every job', 'No hidden fees', 'Price agreed
             class="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-all hover:bg-white/20"
           >
             <Icon name="lucide:message-square" class="size-5" />
-            Free estimate
+            Get an estimate
           </a>
         </div>
       </div>

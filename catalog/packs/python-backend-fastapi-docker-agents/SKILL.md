@@ -1,6 +1,6 @@
 ---
 name: python-backend-fastapi-docker-agents
-description: Use when the user sets up a Python project, builds a FastAPI service, hardens a Docker image, or builds an AI agent in Python with Pydantic AI.
+description: "Use when the user sets up a Python project, builds a FastAPI service, hardens a Docker image, or builds an AI agent in Python with Pydantic AI."
 ---
 
 # Python back ends: FastAPI, Docker and AI agents

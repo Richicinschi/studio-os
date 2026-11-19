@@ -1,7 +1,11 @@
 ---
 id: marketing-plan
 title: Marketing plan
-description: Use when a client or product needs a plan: go-to-market plan, 12-month marketing roadmap, marketing plan, AARRR plan, fractional CMO plan, growth plan, 90-day marketing plan, GTM plan, fCMO plan. Budget, team, stage, funding; idea library, audit rubric; onboarding, signup, emails, referrals, pricing
+description: >-
+  Use when a client or product needs a plan: go-to-market plan, 12-month marketing roadmap,
+  marketing plan, AARRR plan, fractional CMO plan, growth plan, 90-day marketing plan, GTM plan,
+  fCMO plan. Budget, team, stage, funding; idea library, audit rubric; onboarding, signup, emails,
+  referrals, pricing
 ---
 
 # Marketing plan

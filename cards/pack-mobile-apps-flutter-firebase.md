@@ -27,7 +27,7 @@ tokens:
 
 Read-only: presence and versions, never the contents of your app. Tools the skills use, printed as found or not found:
 
-- `flutter --version 2>/dev/null | head -1`, `dart --version`, `node --version`, `npx --version`, `flutterfire --version` and `gcloud --version 2>/dev/null | head -1`. The Firebase skills run the CLI as `npx -y firebase-tools@latest`, so `firebase --version` is optional.
+- `flutter --version 2>/dev/null | head -1`, `dart --version`, `node --version`, `npx --version`, `flutterfire --version` and `gcloud --version 2>/dev/null | head -1`. The Firebase skills run the CLI as `npx firebase-tools@15.36.0` (pinned), so `firebase --version` is optional.
 - The pack, at project and user level: `ls -d .claude/skills/mobile-apps-flutter-firebase "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/mobile-apps-flutter-firebase 2>/dev/null`.
 - Another skill that already covers the same jobs, from front matter only. Print each file's `name` and `description` lines and nothing below them:
   `awk 'FNR==1{n=0} /^---[[:space:]]*$/{n++; next} n==1 && /^(name|description):/{p=1; print FILENAME": "$0; next} n==1 && p && /^[[:space:]]/{print FILENAME": "$0; next} {p=0}' .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md 2>/dev/null | grep -iE 'flutter|dart|firebase|firestore|crashlytics'`
@@ -50,7 +50,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 ## Needs
 
 - For the Flutter skills: the Flutter SDK (`flutter`, which brings `dart`). Three of them name it as a requirement: integration tests, widget previews and localization. Nothing in the pack asks for an Android signing keystore.
-- For the Firebase skills: Node and `npx`, which run the Firebase CLI (`npx -y firebase-tools@latest`). `firebase-basics` is the skill that checks this and walks through installing Node.
+- For the Firebase skills: Node and `npx`, which run the Firebase CLI (`npx firebase-tools@15.36.0`, a pinned version). `firebase-basics` is the skill that checks this and walks through installing Node.
 - `flutterfire` (`dart pub global activate flutterfire_cli`) to link a Flutter app to a Firebase project.
 - `gcloud` for two commands of the `using-firebase` helper script: listing secrets, and exporting or importing production Firestore data through a `gs://` bucket.
 - Accounts: a Google account with a Firebase project (the skill can create one, after your yes). The CLI signs in through the browser with `login`. The app's config files (`google-services.json`, `GoogleService-Info.plist`) are fetched by the CLI, not downloaded by hand. Cloud Functions secrets are set with a command the script runs after you approve. The pack mentions billing and IAM only as shared project settings in `skills/using-firebase/hosting-and-gcp.md`; it does not turn billing on.
@@ -79,7 +79,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 
 ## Watch out
 
-- **The entry is the one cost every session:** about 49 tokens (estimate, bytes divided by 4). Its index, about 1,275 tokens (estimate), loads when a task reaches the pack, and each skill only when it is used.
+- **The entry is the one cost every session:** about 49 tokens (estimate, bytes divided by 4). Its index, about 1,252 tokens (estimate), loads when a task reaches the pack, and each skill only when it is used.
 - **Steps that touch a live Firebase project ask for your yes first.** The skills say so for: turning on sign-in providers (`deploy --only auth`), a live Hosting deploy (preview channel first), a Remote Config deploy (Claude hands you the file and waits for the word "deploy"), a Firestore index build, creating a Firebase project, and any `fbtool.sh` deploy, Functions deploy, production export or import, or secret delete. The helper's `--force` flag skips that question and is your call, not Claude's. Keep this behaviour when you adapt the skills.
 - **Your app is session content.** Files Claude reads from your app, and Crashlytics reports it fetches, go over the network like any other session content ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"). Check your company's data rules before you open an app that holds customer data.
 - **Outside installs.** `firebase-basics` and its environment notes mention installing Firebase's own skills and the Genkit skills with `npx`. Those are outside code: vet them with SkillSpector before you accept them.

@@ -20,25 +20,31 @@ interface Props {
 
 const { area } = Astro.props;
 const neighbours = getNearbyAreas(area);
+// Every licence claim on this page shows only when business.license is filled
+// in; leave it '' when the business holds no licence and they all drop out.
+const licensed = business.license.trim() !== '';
 
-const pageTitle = `Plumber in ${area.name}, TX`;
-const metaDescription = `Licensed plumber for ${area.name}, ${area.county}, TX. Typical arrival ${area.responseTime}. Repairs, installs and urgent calls for homes and businesses. Phone ${business.phone}.`;
+const pageTitle = `Plumber in ${area.name}, ${area.state}`;
+const metaDescription = `${licensed ? 'Licensed plumber' : 'Plumber'} for ${area.name}, ${area.county}, ${area.state}. Typical arrival ${area.responseTime}. Repairs, installs and urgent calls for homes and businesses. Phone ${business.phone}.`;
 
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': business.schemaType,
   name: business.name,
-  description: `${business.name} sends licensed plumbers to homes and businesses in ${area.name}, ${area.county}, Texas.`,
+  description: `${business.name} sends ${licensed ? 'licensed ' : ''}plumbers to homes and businesses in ${area.name}, ${area.county}, ${area.state}.`,
   telephone: business.phone,
   url: business.website,
+  // The business's own premises, the same on every area page: an address or
+  // map point in each town served would claim an office there. The town this
+  // page covers goes in areaServed below.
   address: {
     '@type': 'PostalAddress',
-    addressLocality: area.name,
-    addressRegion: 'TX',
-    postalCode: area.zipCodes[0],
+    addressLocality: business.address.city,
+    addressRegion: business.address.stateCode,
+    postalCode: business.address.zip,
     addressCountry: 'US',
   },
-  geo: { '@type': 'GeoCoordinates', latitude: area.lat, longitude: area.lng },
+  geo: { '@type': 'GeoCoordinates', latitude: business.coordinates.lat, longitude: business.coordinates.lng },
   areaServed: [
     { '@type': 'City', name: area.name },
     { '@type': 'AdministrativeArea', name: area.county },
@@ -65,8 +71,8 @@ const factLabel = 'text-xs font-medium uppercase tracking-wide text-stone-400';
         <p class="mt-6 text-lg leading-relaxed text-stone-600">{area.description}</p>
         <p class="mt-4 text-stone-600">
           {business.name} has worked in {area.name} and {area.county} for {yearsInBusiness()} years.
-          A leak at midnight, a new water heater or a full repipe of an old house: our licensed
-          plumbers do honest work at fair prices, and we live in the same communities as our customers.
+          A leak, a new water heater or a full repipe of an old house: phone and tell us what
+          you need, and we will say when our {licensed && 'licensed '}plumbers can be there.
         </p>
       </div>
 
@@ -174,7 +180,7 @@ const factLabel = 'text-xs font-medium uppercase tracking-wide text-stone-400';
     <div class="mx-auto max-w-4xl px-5 text-center lg:px-8">
       <h2 class="font-display text-2xl text-white sm:text-3xl">Plumber wanted in {area.name}?</h2>
       <p class="mx-auto mt-4 max-w-2xl text-brand-200">
-        {business.name} is local and licensed ({business.license}), serving {area.county} since {business.yearEstablished}.
+        {business.name} is local{licensed && ` and licensed (${business.license})`}, serving {area.county} since {business.yearEstablished}.
         Phone today and we will get someone moving.
       </p>
       <div class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

@@ -2,7 +2,7 @@
 name: legal-reg-monitor
 description: >-
   Use when a legal/regulatory or platform-policy change might affect already-shipped legal
-  docs — the law moved AFTER sign-off and you need the delta, not a full re-review. Extracts
+  docs — the law moved AFTER review and you need the delta, not a full re-review. Extracts
   the concrete NEW requirement from a specific change (an EU/NL ruling, an AP/EDPB guidance
   update, an Apple Review Guidelines or Google Play policy revision, an ePrivacy/cookiewet or
   DPF development), diffs each against the shipped Privacy Policy + Terms + compliance pack,
@@ -25,19 +25,19 @@ metadata:
 
 Operates under `legal-guardrails` — load its constitution + the references listed below.
 
-This skill answers **"the law/policy changed — does it affect our already-shipped legal docs, and if so what is the smallest fix?"** It is a *delta* tool, not a full sign-off: it extracts the **new requirement**, diffs it against current state, and classifies the **remediation effort + owner**. It never re-derives the whole doc set (use `legal-privacy-review` / `legal-terms-review` for that).
+This skill answers **"the law/policy changed — does it affect our already-shipped legal docs, and if so what is the smallest fix?"** It is a *delta* tool, not a full review: it extracts the **new requirement**, diffs it against current state, and classifies the **remediation effort + owner**. It never re-derives the whole doc set (use `legal-privacy-review` / `legal-terms-review` for that).
 
 Adapts: claude-for-legal **reg-gap-analysis** (requirement-extraction table + per-requirement diff block, Apache-2.0, attributed) and simota **clause** Pattern 4 **Compliance Delta** (IDENTIFY → MAP → GAP → SUGGEST) + its effort taxonomy (MIT, re-authored). AGPL/no-license sources were not copied.
 
 ## Load before running
-- Constitution: `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` (tiering, severity, finding format, verdict bands, authority footer, "no silent supplement").
+- Constitution: `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` (tiering, the 90-day staleness rule, severity, finding format, verdicts, review footer, "no silent supplement").
 - Method: `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/*` (attribution-tiering, finding-format, verdict-model, disclosure-grading).
 - NL/EU law (load the slice the change touches — for a freshness re-check, load all):
   `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/{gdpr-articles,bw-unfair-terms,crd-withdrawal,eprivacy-cookiewet,mdr-hbnr,transfers-dpf-scc,adr-bodies,ap-guidance,dsa-trader}.md`
 - Platform (load when the change is store-side): `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/{apple-app-privacy,apple-review-guidelines,apple-min-eula,play-data-safety,play-policies}.md`
 
 ## Inputs
-- **The change** — one of: (a) a specific delta the user names (a ruling, guidance note, ASRG/Play-policy revision, a date), or (b) **no change named** → run **freshness mode**: re-validate every `[settled — … verified <date>]` anchor in the loaded references against its verified-date and flag stale ones.
+- **The change** — one of: (a) a specific delta the user names (a ruling, guidance note, ASRG/Play-policy revision, a date), or (b) **no change named** → run **freshness mode**: re-validate every `[settled — … verified <date>]` anchor in the loaded references against its verified-date and flag stale ones (verified more than 90 days before the run, `legal-guardrails.md` §1).
 - **App fact sheet** (the orchestrator's Step 0 sheet; run alone, read the project first and ask only for the rest): publisher (legal form, controller, DPO or none); processors, each named, with hosting region; who sells (stores as merchants of record or the publisher); health claims; what each tier stores where. Worked case: the example app in `legal-guardrails.md` §8 (NL eenmanszaak, sole controller, no DPO; Apple, Google Firebase in EU `europe-west`, RevenueCat, Cloudflare for DNS/email routing; stores as merchants of record; no medical claims; free tier on-device, paid tier Firestore sync).
 - **Current state to diff against**: the shipped Privacy Policy + Terms (paths, languages, version from the fact sheet); the project's compliance pack, if it keeps one (RoPA, LIA, TIA, DPA register, DPF log, retention schedule, SDK inventory, breach runbook); and any store-declaration notes it keeps. Grep these; never assume — quote what they actually say.
 
@@ -50,7 +50,7 @@ Adapts: claude-for-legal **reg-gap-analysis** (requirement-extraction table + pe
 3. **DIFF each requirement against current state.** Grep the shipped docs + pack; record verbatim what they say today; grade the gap **None / Partial / Full** (per the disclosure-grading entity-awareness rule — name the processor, never "third parties").
 4. **CLASSIFY remediation effort** per gap (taxonomy below) and assign an **owner**.
 5. **SEVERITY** each gap on the shared floor (🔴/🟠/🟡/🟢); a false statement about data practices or a void clause introduced by the change = 🔴; a real gap a regulator/store/consumer could act on = 🟠.
-6. **EMIT** findings in the standard format + the remediation plan + (freshness mode) the verified-date hygiene table. Roll up to a verdict band scoped to *this change* (does it BLOCK the current shipped docs / require FIX-THEN-SIGN-OFF / leave them clean).
+6. **EMIT** findings in the standard format + the remediation plan + (freshness mode) the verified-date hygiene table. Roll up to a verdict scoped to *this change* (does it leave the current shipped docs BLOCKED / FIX FIRST / clean for SHIP).
 7. **No silent supplement**: a related issue the change surfaces but that isn't in scope → a 🟡 note, not an action.
 
 ## Requirement-extraction table (Step 2)
@@ -83,14 +83,14 @@ Categories: **Notice** (Arts 12–14) · **Rights** (Arts 15–22) · **Lawful-b
 *Severity floor:* if the honest fix is PRODUCT-CHANGE or VENDOR-RENEGOTIATION, a POLICY-ONLY edit that papers over it is a 🔴 (false statement about data practices). Code-faithfulness dominates the doc.
 
 ## Freshness mode (verified-date hygiene) — run when no specific change is named
-Re-validate the KB anchors against their `verified <date>` and the standing facts below; flag any whose date is stale or whose underlying fact has a known pending move. Emit a table `Anchor | Reference file | Verified date | Status (current / pending / superseded) | Action`.
+Re-validate the KB anchors against their `verified <date>` and the standing facts below; flag any whose date is stale (more than 90 days before the run, `legal-guardrails.md` §1) or whose underlying fact has a known pending move. Emit a table `Anchor | Reference file | Verified date | Status (current / pending / superseded) | Action`.
 
-| Standing fact (re-confirm, don't assume) | Status as of 2026-06-06 | Watch |
+| Standing fact (re-confirm, don't assume) | Status (re-checked 2026-11-18 unless marked) | Watch |
 |---|---|---|
-| **EU ODR platform** | **Dead — shut down 2025-07-19, data deleted 2025-07-20; trader obligation lifted.** Any ToS linking `ec.europa.eu/consumers/odr` = 🔴. | a successor EU digital tool is proposed (not live) — re-check |
-| **EU-US Data Privacy Framework** | **In force** — adequacy Decision 2023/1795 (adopted 2023-07-10); survived its first CJEU/General Court challenge in 2025. DPF-certified US importers ride adequacy. | re-check each US sub-processor's certification at dataprivacyframework.gov; further challenges pending |
-| **Cookiewet / analytics consent** | **AP position stands**: GA4 / default Firebase Analytics fails the Tw 11.7a exemption → **opt-IN required** in NL; legitimate interest does **not** cure Art. 5(3). | the **ACM→AP** single-authority transfer for Tw 11.7a is a **proposal** (2025-03-26), not yet law — do NOT assert it as done |
-| **NL digital-consent age** | **16** (UAVG, max under GDPR Art. 8). | stable |
+| **EU ODR platform** | **Dead — shut down 2025-07-19, data deleted 2025-07-20; trader obligation lifted.** Any ToS linking `ec.europa.eu/consumers/odr` = 🔴. | Reg. (EU) 2024/3228 repealed the ODR Regulation; Dir. (EU) 2025/2647 amends the ADR Directive and has the Commission set up an information tool on redress (due 20 Apr 2026; not a dispute platform; live status not checked) — re-check `[settled — adr-bodies.md :38–:39, verified 2026-11-18]` |
+| **EU-US Data Privacy Framework** | **In force** — adequacy Decision 2023/1795 (adopted 2023-07-10); upheld by the General Court in T-553/23 (2025). DPF-certified US importers ride adequacy. `[settled — transfers-dpf-scc.md :43, verified 2026-11-18]` | re-check each US sub-processor's certification at dataprivacyframework.gov; a preliminary question on the decision (C-804/25) is pending |
+| **Cookiewet / analytics consent** | **AP position, as reported by secondary sources**: GA4 / default Firebase Analytics fails the Tw 11.7a exemption → **opt-IN required** in NL `[verify — source blocked 2026-11-19: AP Google Analytics documents behind a CAPTCHA; status as of 2026-06-06]`; the opt-in itself rests on Tw 11.7a(1), (3)(b) and ePrivacy Art. 5(3) (`ap-guidance.md` §3); legitimate interest does **not** cure Art. 5(3). | the **ACM→AP** single-authority transfer for Tw 11.7a is a **proposal** (2025-03-26), not yet law per the AP site on 2026-11-19 — do NOT assert it as done |
+| **NL digital-consent age** | **16**: GDPR Art. 8(1) sets 16 unless a Member State lowers it, and the UAVG does not (its art. 5(1) covers consent outside Art. 8). `[settled — GDPR Art. 8(1); UAVG art. 5 (wetten.overheid.nl, in force from 1 Sep 2026), verified 2026-11-18]` | stable |
 | **Apple ASRG / App Privacy + Google Play policies** | account-deletion (Apple 5.1.1(v) / Play 13327111), Data Safety, health-content, subscription-disclosure rules current. | platform policies revise frequently — have the person open the named Help/Guideline page and compare |
 
 ## Output format
@@ -100,11 +100,11 @@ Re-validate the KB anchors against their `verified <date>` and the standing fact
 4. **Findings** — per-requirement diff blocks, ranked 🔴 → 🟠 → 🟡.
 5. **Remediation plan** — `# | Requirement | Gap | Class | Owner | Sev | Target date`.
 6. **Freshness table** (freshness mode) or a one-line "anchors current as of <date>" note.
-7. **Verdict** (scoped to this change): SIGN-OFF (no impact) / FIX-THEN-SIGN-OFF (conditions table) / BLOCK (a 🔴 the change introduces into the shipped docs); per-doc grade only if the change touches that doc.
-8. **Authority footer** (verbatim from the constitution): reserve ONLY the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review, and any `[low-confidence]` calls for a Dutch advocaat; the suite decides and signs everything else.
+7. **Verdict** (scoped to this change): SHIP (no impact) / FIX FIRST (conditions table) / BLOCKED (a 🔴 the change introduces into the shipped docs); per-doc grade only if the change touches that doc.
+8. **Review footer** (from the constitution §5: what was checked, against which law, each source's verified date): give no verdict on the §5 carve-outs (the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review, any `[low-confidence]` call); they need a lawyer or a registration first. A lawyer signs off on the whole.
 
 ## Guardrails
-- **Primary-source over paraphrase.** A regulator press release or blog → `[verify]` until checked against the statute/guidance; never let a summary drive a 🔴 BLOCK.
+- **Primary-source over paraphrase.** A regulator press release or blog → `[verify]` until checked against the statute/guidance; never let a summary drive a 🔴 BLOCKED verdict.
 - **Delta, not dump.** Extract only what changed; don't re-litigate clauses the change didn't touch.
 - **Entity-named redlines** — name Apple / Google-Firebase / RevenueCat / Cloudflare, never "third parties".
 - **Effective ≠ enforcement.** A future effective date is a dated condition, not an immediate blocker.

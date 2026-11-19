@@ -33,7 +33,7 @@ The stack below is fixed (non-negotiable): do not swap in another framework, CSS
 
 `templates/package.json` is the source of truth for exact versions. Older notes that say "Astro 5" are out of date: the scaffold in `templates/` was built on Astro 7 following the rules in section 3. Cloudflare Pages can also run Workers for any route that must render on the server.
 
-Set up a project by copying `templates/` and running `npm install`. The templates carry sample text that belongs to the sample business and must be replaced: the brand name in `SEO.astro`, `Header.astro`, `Footer.astro`, `BaseLayout.astro` and `content.config.ts`; `TX`, the sample town and the sample county names in page titles and copy (`services/[service].astro`, `areas/index.astro`, `blog/`, `contact.astro`, `index.astro`, `about.astro`); the trade words ("plumbing", "plumber") in `SeoFaq.astro` and the page copy; the `TRADE_NOUN` token in `seoContent.ts`; the sample badges ("BBB A+", "24/7") and sample promises (reply time on the contact page, "repairs finish in a day" on the home page) unless the business can stand behind them; the form `action` on the contact page; and the GA4 id in `BaseLayout.astro`. To start from nothing instead, create a minimal Astro project (`npm create astro@latest -- --template minimal`) and install `@astrojs/cloudflare @astrojs/sitemap @tailwindcss/vite @tailwindcss/typography tailwindcss astro-icon`, plus `@iconify-json/lucide` as a dev dependency.
+Set up a project by copying `templates/` and running `npm install`. The templates carry sample text that belongs to the sample business and must be replaced: the brand name in `SEO.astro`, `Header.astro`, `Footer.astro`, `BaseLayout.astro` and `content.config.ts`; the sample town and the sample county names in page titles and copy (`services/[service].astro`, `areas/index.astro`, `blog/`, `index.astro`, `about.astro`); the trade words ("plumbing", "plumber") in `SeoFaq.astro` and the page copy; the `TRADE_NOUN` token in `seoContent.ts`; and the GA4 id in `BaseLayout.astro` if analytics is turned on there (`ANALYTICS_ENABLED`, off by default). The state in titles comes from `business.address.stateCode` and `area.state`. The licence, rating, insurance and guarantee claims, the hours for urgent calls, how estimates work, the reply time on the contact page and the contact form's `action` are tokens in double underscores: `npm run build` runs `scripts/check-placeholders.mjs` first and refuses to build while any token is left in `src/` or `public/`. To start from nothing instead, create a minimal Astro project (`npm create astro@5.3.2 -- --template minimal`; 5.3.2 was the current release of create-astro on 2026-11-19, raise it on purpose) and install `@astrojs/cloudflare @astrojs/sitemap @tailwindcss/vite @tailwindcss/typography tailwindcss astro-icon`, plus `@iconify-json/lucide` as a dev dependency.
 
 Folder map of a finished site:
 
@@ -167,7 +167,7 @@ Internal links are how visitors and search engines reach the many generated page
 
 ## 9. Design system
 
-**Fonts.** Two Google fonts: a display face for headings (H1, H2, H3) and a clean sans for paragraphs, labels and interface text. Pairings by tone:
+**Fonts.** Two fonts, served from the site itself (a font CDN would receive each visitor's IP address): a display face for headings (H1, H2, H3) and a clean sans for paragraphs, labels and interface text. Pairings by tone:
 
 - traditional and professional: DM Serif Display with DM Sans
 - modern and tidy: Inter for both
@@ -176,7 +176,7 @@ Internal links are how visitors and search engines reach the many generated page
 - industrial and strong: Oswald with Source Sans 3
 - clinical: Merriweather with Roboto
 
-Whichever pair you choose, change the `<link>` in `BaseLayout.astro` and the two font tokens in `global.css` together.
+All of these are Google Fonts families. Whichever pair you choose, put its `.woff2` files in `public/fonts/` (the README there says how), then change the `@font-face` rules and the two font tokens in `global.css` together.
 
 **Phone button.** The number is visible on every page through a sticky header button (an icon, the number on wide screens, "Call Now" on narrow ones). `Header.astro` has it.
 

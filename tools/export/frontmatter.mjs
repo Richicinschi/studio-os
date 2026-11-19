@@ -9,9 +9,28 @@ export function splitFrontmatter(text) {
 
 const indentOf = (line) => line.length - line.trimStart().length;
 
+// YAML 1.2 double-quoted escapes. \x, \u and \U take 2, 4 and 8 hex digits; any other escape (or a malformed
+// one) is kept as written.
+const YAML_ESCAPES = {
+  0: '\0', a: '\x07', b: '\b', t: '\t', '\t': '\t', n: '\n', v: '\v', f: '\f', r: '\r', e: '\x1b',
+  ' ': ' ', '"': '"', '/': '/', '\\': '\\', N: '\u0085', _: '\u00a0', L: '\u2028', P: '\u2029',
+};
+function yamlDoubleQuoted(s) {
+  return s.replace(/\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8}|[\s\S])/g, (all, e) => {
+    if (e.length > 1) {
+      const code = parseInt(e.slice(1), 16);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : all;
+    }
+    return Object.hasOwn(YAML_ESCAPES, e) ? YAML_ESCAPES[e] : all;
+  });
+}
+
+// A quoted scalar as YAML reads it: double quotes decode their escapes (\" is "); in single quotes '' is one
+// quote.
 function unquote(s) {
   const t = s.trim();
-  if (t.length >= 2 && ((t[0] === '"' && t.at(-1) === '"') || (t[0] === "'" && t.at(-1) === "'"))) return t.slice(1, -1);
+  if (t.length >= 2 && t[0] === '"' && t.at(-1) === '"') return yamlDoubleQuoted(t.slice(1, -1));
+  if (t.length >= 2 && t[0] === "'" && t.at(-1) === "'") return t.slice(1, -1).replace(/''/g, "'");
   return t;
 }
 
@@ -72,4 +91,38 @@ export function parseFrontmatter(text) {
   const { raw, body } = splitFrontmatter(text);
   if (raw === null) return { data: null, body };
   return { data: parseBlock(raw.split('\n'), 0, 0)[0], body };
+}
+
+// A quoted scalar that closes on its own line: "..." (with \ escapes) or '...' (with '' escapes).
+const closedQuote = (s) => (s[0] === '"' ? /^"(?:[^"\\]|\\.)*"/ : /^'(?:[^']|'')*'/).test(s);
+
+// Keys whose plain value (not quoted, not a block scalar, not a [flow list]) holds ": " or " #", or
+// ends in ":". Real YAML reads those as a nested mapping or a comment (a ":" at the end of a line is a
+// mapping indicator, an error there), so the reader above and a YAML parser disagree. `raw` is
+// splitFrontmatter(text).raw. One message per key, nested keys included.
+export function plainValueProblems(raw) {
+  const problems = [];
+  const lines = raw.replace(/\r\n/g, '\n').split('\n');
+  let blockIndent = -1; // inside a block scalar: skip lines indented deeper than its key
+  let openQuote = null; // inside a quoted value that runs over lines: skip to its closing quote
+  for (const line of lines) {
+    if (openQuote) { if (line.includes(openQuote)) openQuote = null; continue; }
+    if (blockIndent >= 0) {
+      if (!line.trim() || indentOf(line) > blockIndent) continue;
+      blockIndent = -1;
+    }
+    const content = line.trimStart();
+    const item = content.match(/^-\s+(["'].*)$/); // a quoted list item may run over lines too
+    const m = content.match(/^([A-Za-z0-9_.-]+):(?:\s+(.*))?$/);
+    const value = item ? item[1].trim() : m ? (m[2] || '').trim() : '';
+    if (!value) continue;
+    if (value[0] === '"' || value[0] === "'") {
+      if (!closedQuote(value)) openQuote = value[0];
+    } else if (/^[>|][-+]?$/.test(value)) {
+      blockIndent = indentOf(line);
+    } else if (!value.startsWith('[') && (value.includes(': ') || value.includes(' #') || value.endsWith(':'))) {
+      problems.push(`${m[1]}: value is not valid YAML; quote it or use >-`);
+    }
+  }
+  return problems;
 }

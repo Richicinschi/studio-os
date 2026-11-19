@@ -1,7 +1,9 @@
 ---
 name: motion-dev-animations
-description: Use when the user requests Motion.dev work in React, Next.js, Svelte or Astro: page transitions, micro-interactions, animated UI, layout animations, whileInView animations, whileHover effects, spring physics, drag interactions, gestures, parallax, scroll effects, hero animations, or motion.
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+description: >-
+  Use when the user requests Motion.dev work in React, Next.js, Svelte or Astro: page transitions,
+  micro-interactions, animated UI, layout animations, whileInView animations, whileHover effects,
+  spring physics, drag interactions, gestures, parallax, scroll effects, hero animations, or motion.
 metadata:
   version: "3.0.0"
   tags: ["motion-dev", "animation", "page-transitions", "layout-animations", "springs", "gestures", "scroll-effects", "parallax", "react", "nextjs", "svelte", "astro"]

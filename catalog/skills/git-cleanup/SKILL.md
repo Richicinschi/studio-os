@@ -1,12 +1,14 @@
 ---
 name: git-cleanup
-description: Tidy up local branches and worktrees whose work has already landed: shows the evidence for each one, asks twice, and deletes only what the user approves. Runs only when the user asks.
+description: >-
+  Tidy up local branches and worktrees whose work has already landed: shows the evidence for each
+  one, asks twice, and deletes only what the user approves. Runs only when the user asks.
 metadata:
   category: studio
   author: Richicinschi
   version: 1.0.0
   domain: pruning landed branches and worktrees
-allowed-tools: Bash Read Grep AskUserQuestion
+allowed-tools: Bash(git branch --merged:*) Bash(git branch -vv) Bash(git fetch --prune) Bash(git for-each-ref:*) Bash(git log:*) Bash(git status:*) Bash(git symbolic-ref --short refs/remotes/origin/HEAD) Bash(git worktree list:*) Read Grep AskUserQuestion
 disable-model-invocation: true
 ---
 # Git cleanup
@@ -143,6 +145,8 @@ Two checks run on every worktree and on the current directory.
 
 Dirty state. Run `git status --porcelain` in each one. For each dirty location, show a prominent warning. List the changed files and state that removing the worktree destroys those changes.
 
+Ignored files. Run `git status --porcelain --ignored` in each worktree. `git worktree remove` deletes ignored files without a word, and plain status does not list them. Lines starting `!!` are ignored files. Skip dependency folders (`node_modules/`, `.venv/`, `venv/`, `build/`, `dist/`, `.dart_tool/`): an install or a build brings them back. List anything else (`.env`, results, logs, local data) under that worktree and state that removing it deletes those files.
+
 Live sessions. Another session may be using a worktree. Treat a worktree as in use if either is true:
 
 - A running `claude` process has its working directory inside that worktree.
@@ -178,11 +182,15 @@ git branch -D 'cache-warm-prefetch'        # squash-merged
 git worktree remove '../tidepool-wt-spike' # worktree
 ```
 
+Above each `git worktree remove` line, repeat the ignored files found in Step 5 that are not dependency folders, so the user sees what goes with it.
+
 Ask for a yes or no. This is the only deletion confirmation. A forced delete that is needed is already on the list, so ask nothing more.
 
 ## Step 6. Execute and report
 
 Run each deletion as its own command, so one failure does not block the rest. Report each result. On a failure, report the error and carry on.
+
+Before a worktree removal, ask the user to close every session and terminal open inside that worktree. On Windows an open one makes removal fail half-way: if git reports "failed to delete", the worktree is already unregistered, and the leftover folder is deleted by hand once whatever holds it is closed.
 
 Finish with two parts: what was deleted, and a table of the branches that remain with their status.
 

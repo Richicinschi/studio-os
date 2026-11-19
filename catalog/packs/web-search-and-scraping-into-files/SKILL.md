@@ -1,6 +1,6 @@
 ---
 name: web-search-and-scraping-into-files
-description: Use when the user wants data, prices or text pulled from web pages, wants to search the web for a list of businesses or results and save them to a file or spreadsheet, or asks whether a site may be scraped.
+description: "Use when the user wants data, prices or text pulled from web pages, wants to search the web for a list of businesses or results and save them to a file or spreadsheet, or asks whether a site may be scraped."
 ---
 
 # Searching the web and pulling page data into files, lawfully

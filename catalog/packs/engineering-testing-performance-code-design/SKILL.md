@@ -1,6 +1,6 @@
 ---
 name: engineering-testing-performance-code-design
-description: Use when the user tests a web page in a real browser, speeds up slow code or pages, or wants help shaping the structure of a codebase.
+description: "Use when the user tests a web page in a real browser, speeds up slow code or pages, or wants help shaping the structure of a codebase."
 ---
 
 # Engineering: browser testing, performance and code design

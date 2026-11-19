@@ -16,16 +16,16 @@ Typical wordings: "add a feature flag", "change this text without an update", "r
 ## How it works
 
 1. Confirm a Firebase project and an Android or iOS app are registered. Without both there is nothing to configure.
-2. Run the CLI as `npx -y firebase-tools@latest`. Two known failures:
-   - Registry 403 from npx: tell the user the latest tools could not be fetched, and only if they confirm a global install (`npm install -g firebase-tools`) fall back to the plain `firebase` command.
+2. Run the CLI as `npx firebase-tools@15.36.0`. Two known failures:
+   - Registry 403 from npx: tell the user the pinned CLI package could not be fetched, and only if they confirm a global install (`npm install -g firebase-tools@15.36.0`) fall back to the plain `firebase` command.
    - "No active project": run `login:list`, and if logged in, ask the user for the project ID. Add `--project <PROJECT_ID>` to every later command.
-3. Pull the live template into a file: `npx -y firebase-tools@latest remoteconfig:get -o remote_config.json`. Never edit blind; always start from what is live.
+3. Pull the live template into a file: `npx firebase-tools@15.36.0 remoteconfig:get -o remote_config.json`. Never edit blind; always start from what is live.
 4. Edit that file. Pick the targeting signal that fits the request (for example `device.country` for a region, `percent` for a staged rollout), then add or change entries in `conditions` and `parameters`.
 5. Stop and hand the file to the user. Say the changes are in `remote_config.json`, ask them to read it, and wait for the word "deploy". Do not deploy on your own judgment.
 6. Deploy and verify:
    - If `firebase.json` is missing, create it with `{ "remoteconfig": { "template": "remote_config.json" } }`.
-   - Run `npx -y firebase-tools@latest deploy --only remoteconfig`.
-   - Run `npx -y firebase-tools@latest remoteconfig:versions:list` and confirm the newest version is yours.
+   - Run `npx firebase-tools@15.36.0 deploy --only remoteconfig`.
+   - Run `npx firebase-tools@15.36.0 remoteconfig:versions:list` and confirm the newest version is yours.
 7. In the app, shape the loading pattern:
    - Set in-app defaults so the app works offline and before the first fetch.
    - At startup, activate whatever was fetched last time, then fetch fresh values in the background for the next launch. The user never waits on the network.

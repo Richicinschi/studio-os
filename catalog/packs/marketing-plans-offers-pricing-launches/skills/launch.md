@@ -1,7 +1,10 @@
 ---
 id: launch
 title: Launch planning
-description: Use when planning a launch, feature announcement, release, go-to-market, GTM, beta, early access, waitlist, Product Hunt, update or checklist, "we're about to ship", publicly. Ongoing: marketing-ideas. Bonuses, guarantees, scarcity, naming: offers.
+description: >-
+  Use when planning a launch, feature announcement, release, go-to-market, GTM, beta, early access,
+  waitlist, Product Hunt, update or checklist, "we're about to ship", publicly. Ongoing:
+  marketing-ideas. Bonuses, guarantees, scarcity, naming: offers.
 ---
 
 ## When to use

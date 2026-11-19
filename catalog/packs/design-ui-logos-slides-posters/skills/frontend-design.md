@@ -1,6 +1,9 @@
 ---
 name: frontend-design
-description: Use when building a new UI or reshaping an existing one and the result must have a distinctive, intentional look: aesthetic direction, typography, layout, motion and interface copy, with choices that do not read as templated defaults.
+description: >-
+  Use when building a new UI or reshaping an existing one and the result must have a distinctive,
+  intentional look: aesthetic direction, typography, layout, motion and interface copy, with choices
+  that do not read as templated defaults.
 metadata:
   author: Richicinschi
   category: design

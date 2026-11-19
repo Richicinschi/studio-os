@@ -1,6 +1,8 @@
 ---
 name: finishing-a-development-branch
-description: Use when implementation is complete and all tests pass, and you must decide how to integrate the work: open a PR or keep the branch.
+description: >-
+  Use when implementation is complete and all tests pass, and you must decide how to integrate the
+  work: open a PR or keep the branch.
 metadata:
   category: workflow
   author: Richicinschi
@@ -152,6 +154,27 @@ Only a local merge or a confirmed discard gets here. Options 1 and 2 never remov
 - `GIT_DIR` equals `GIT_COMMON`: a plain repo, no worktree. Nothing to do.
 - This session made the worktree (through using-git-worktrees): you remove it. Studio worktrees all sit in one folder next to the repo, together with those of other live sessions, so the location says nothing. Only creating it yourself in this session counts.
 
+  First look for ignored files. `git worktree remove` deletes them without a word, and plain `status --porcelain` does not list them:
+
+  ```bash
+  git -C "$WORKTREE_PATH" status --porcelain --ignored
+  ```
+
+  Lines starting `!!` are ignored files. Dependency folders (`node_modules/`, `.venv/`, `venv/`, `build/`, `dist/`, `.dart_tool/`) come back with an install or a build; skip them. If anything else is listed (`.env`, results, logs, local data), it exists only here. List it and ask:
+
+  ```
+  These ignored files are not in git and go with the worktree:
+
+  <file list>
+
+  1. Move them into <main repo root> or a folder you name
+  2. Delete them with the worktree (cannot be undone)
+
+  Which one?
+  ```
+
+  Do what they choose. Close every session and terminal open inside the worktree, then remove it. On Windows an open one makes removal fail half-way: if git reports "failed to delete", the worktree is already unregistered, and you delete the leftover folder by hand once whatever holds it is closed.
+
   ```bash
   git worktree remove "$WORKTREE_PATH"
   git worktree prune
@@ -203,3 +226,4 @@ Do what they choose, then remove the worktree.
 | "The base is obviously main." | Confirm it first. Fixing a wrong base later is painful. |
 | "The push was rejected, a force-push will sort it." | The remote has new commits. Find out why. Force-push only at your partner's explicit request, once its grant row is recorded (the rule that each risky act needs a recorded yes). |
 | "CI is green, so I may as well press merge for them." | Merging is their job. Hand over the URL and stop there. |
+| "Status is clean, so removing loses nothing." | Plain status hides ignored files such as `.env` and results, and removal deletes them. Run it with `--ignored`. |

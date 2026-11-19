@@ -1,4 +1,4 @@
-# ATTRIBUTION — legal-* sign-off skill suite
+# ATTRIBUTION — legal-* review skill suite
 
 This suite takes method, structure and checklists from open-source projects, and a small amount of text from two MIT projects; the Dutch/EU and platform substance is written from primary law. This file records, for each source, its licence as found, its copyright line, and what was really taken: **text**, **structure**, **method**, or **nothing**.
 
@@ -19,7 +19,7 @@ These two sources gave text. Each file that holds it carries, next to the text, 
 
 | Source | Licence | Copyright | What was taken |
 |---|---|---|---|
-| [anthropics/claude-for-legal](https://github.com/anthropics/claude-for-legal) | Apache-2.0 | Copyright 2026 Anthropic PBC (in its README; its LICENSE file has no copyright line) | **Method and structure**: the governance layer — source-attribution tiering (`references/method/attribution-tiering.md`), the severity floor, the anti-hallucination cite rule, the verdict-band model, and the legal-disclaimer convention (turned into our authority footer); the requirement table and per-requirement diff of its `reg-gap-analysis` skill (→ `legal-reg-monitor`); the per-phrase pattern of its `marketing-claims-review` skill (→ `legal-health-claims`). No text. |
+| [anthropics/claude-for-legal](https://github.com/anthropics/claude-for-legal) | Apache-2.0 | Copyright 2026 Anthropic PBC (in its README; its LICENSE file has no copyright line) | **Method and structure**: the governance layer — source-attribution tiering (`references/method/attribution-tiering.md`), the severity floor, the anti-hallucination cite rule, the verdict-band model, and the legal-disclaimer convention (turned into our review footer); the requirement table and per-requirement diff of its `reg-gap-analysis` skill (→ `legal-reg-monitor`); the per-phrase pattern of its `marketing-claims-review` skill (→ `legal-health-claims`). No text. |
 | [simota/agent-skills](https://github.com/simota/agent-skills) (`clause`) | MIT | Copyright (c) 2025 (no name given) | **Structure and method**: the SCOPE→SCAN→ASSESS→REPORT→SUGGEST flow, the finding-ID convention, and the EULA enforceability table and cross-document consistency matrix as ideas (→ `legal-terms-review-nl`, `legal-cross-store`); its Compliance Delta pattern and effort taxonomy (→ `legal-reg-monitor`). No text. |
 | [cruisediary/apple-app-review-skills](https://github.com/cruisediary/apple-app-review-skills) | MIT | Copyright (c) 2026 Cruz | **Structure**: atomic check → composed agent → Scan/Analyze/Report/Remediate, and the severity tiers, mirrored for `legal-apple-gate` and `legal-play-gate`. No text. |
 | [mukul975/Privacy-Data-Protection-Skills](https://github.com/mukul975/Privacy-Data-Protection-Skills) | Apache-2.0 | Copyright 2025 Mahipal | **Structure**: the SKILL.md frontmatter and the `references` + `scripts` + `assets` folder layout. No text; the long runs both share are quotations of EU law. |

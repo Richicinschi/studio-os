@@ -1,6 +1,6 @@
 ---
 name: dependency-supply-chain-risk-checks
-description: Use when the user wants the packages a project depends on checked for supply-chain risk: single maintainers, abandoned or takeover-prone libraries, past vulnerabilities.
+description: "Use when the user wants the packages a project depends on checked for supply-chain risk: single maintainers, abandoned or takeover-prone libraries, past vulnerabilities."
 ---
 
 # Dependency supply-chain risk checks

@@ -4,8 +4,8 @@ description: >-
   Use when ruling whether an app's analytics/telemetry SDKs (Firebase Analytics, Crashlytics,
   Google Analytics / GA4, Remote Config) may run opt-OUT or must be gated behind PRIOR OPT-IN
   consent under the EU ePrivacy Directive Art. 5(3) and the Dutch cookiewet (Telecommunicatiewet
-  Art. 11.7a). Applies the 5-condition NL analytics-exemption test + the AP's GA4 "cookie letter"
-  position, rules that Art. 6(1)(f) legitimate interest does NOT cure the device-access gate, and
+  Art. 11.7a). Applies the statute test (Tw 11.7a(3)(b) "geen of geringe gevolgen"), the
+  5-condition test from secondary sources and the AP's GA4 position as they report it, rules that Art. 6(1)(f) legitimate interest does NOT cure the device-access gate, and
   checks the implementation (first-run opt-in gate vs opt-out toggle vs pre-init telemetry).
   Produces findings + Privacy-Policy redlines + the Flutter consent-gate pattern. Trigger on
   "analytics consent", "cookiewet", "ePrivacy", "Telecommunicatiewet 11.7a", "Firebase Analytics
@@ -43,7 +43,7 @@ This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a
 2. **Apply the Tw 11.7a 5-condition analytics-exemption test** (§3.1 below). The exemption ("geen of geringe gevolgen voor de persoonlijke levenssfeer") holds only if **ALL FIVE** pass. **Fail any one → prior opt-in consent required.**
 
 3. **Rule per SDK.**
-   - **Firebase Analytics / GA4** → **FAILS** conditions 1 and 4 (Google service; data shared with Google for Google's own purposes) per the **AP GA4 "cookie letter"** position → **PRIOR OPT-IN required in NL.** (`eprivacy-cookiewet.md` §3.2; `ap-guidance.md` §3.)
+   - **Firebase Analytics / GA4** → **FAILS** conditions 1 and 4 (Google service; data shared with Google for Google's own purposes) → **PRIOR OPT-IN required in NL.** The ruling rests on the statute: default Firebase Analytics stores and reads an app-instance identifier (on iOS also the IDFV), and an identifier linked to a user ID and sent to Google does not safely meet Tw 11.7a(3)(b)'s "geen of geringe gevolgen" `[settled — Tw 11.7a(1), (3)(b), wetten-overheid.nl mirror, verified 2026-11-19; ePrivacy Art 5(3) + EDPB Guidelines 2/2023, verified 2026-11-18]`; the AP's GA4 position, as secondary sources report it (a "cookie letter"; no AP page by that name was found on 2026-11-19), supports it but could not be read `[verify — source blocked 2026-11-19: AP GA4 position; the AP's Google Analytics documents sat behind a CAPTCHA]`. (`eprivacy-cookiewet.md` §3.2; `ap-guidance.md` §3.)
    - **Crashlytics** → cannot safely ride "strictly necessary" (third-party Google SDK; benefits the developer's diagnostics, not the user's requested service; same condition-4 sharing logic). **Recommend opt-in, same gate** `[verify / low-confidence — no AP statement specifically on Crashlytics; flag for jurist]`. (`eprivacy-cookiewet.md` §6.)
    - **Genuinely strictly-necessary (no consent):** Firebase **Auth** session, RevenueCat + store purchase/entitlement, Firestore **sync the Pro user explicitly requested**. Do not gate these. `[verify — document the per-SDK necessity analysis]`
 
@@ -54,6 +54,7 @@ This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a
    - ❌ **Opt-OUT only** (collection on by default; Settings toggle to disable) → 🟠 **MATERIAL** → must become opt-in. *The most common pattern in indie apps, and the example app's.*
    - ❌ **"Legitimate interest" claimed** in PP for analytics → 🟠/🔴 (false/over-claimed basis).
    - ✅ **First-run opt-in gate** (boot OFF; affirmative, granular, no cookie wall; records `analyticsConsentAt`; easy withdrawal) → 🟢 OK.
+   - **iOS kill-switch key.** The iOS Info.plist must use the documented key `FIREBASE_ANALYTICS_COLLECTION_ENABLED` (or `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED`). Any other spelling (e.g. `FirebaseAnalyticsCollectionEnabled`) may not be recognised, so native Analytics could log `first_open` before Dart applies the kill switch → a hard condition: confirm on a device that nothing is logged before consent; if something is, it is telemetry before consent (🔴 above) `[verify — on a device]`. `[settled — Firebase Analytics config (Apple platforms), verified 2026-11-19]`
 
 6. **Validate the consent mechanics** (if a gate exists) against `eprivacy-cookiewet.md` §4 / `gdpr-articles.md` Art. 7: **prior** (no telemetry before the click), **affirmative** (no pre-ticked box, no "by continuing"), **freely given** (no cookie wall — declining must not block the app), **granular / unbundled** (separate from the 16+ age checkbox and the paywall withdrawal-waiver checkbox — AP G2 separate-consent-per-data-type), **reject as easy as accept** (no asymmetric buttons), **withdrawable** as easily as granted (Art. 7(3); Settings → Data & privacy), **informed** (names Google/Firebase, the events/identifiers, the purpose), and **recorded** (timestamp + wording version, Art. 7(1)).
 
@@ -65,7 +66,7 @@ This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a
 
 ## The Tw 11.7a 5-condition analytics-exemption test (§3.1)
 
-Source of truth: `eprivacy-cookiewet.md` §3.1 (`[settled in substance — AP analytics conditions; verify-pinpoint the exact lid/onderdeel + an AP page cite — AP pages 403 to fetchers]`). All five must hold; failing one removes the exemption.
+Source of truth: `eprivacy-cookiewet.md` §3.1 (`[verify — five conditions per secondary sources; not on the AP's pages, checked 2026-11-19]`; the AP's own test is "geen of geringe gevolgen", and on its cookie-banner page (9 Nov 2026) analytics with "meer dan een geringe impact" need consent). All five must hold; failing one removes the exemption.
 
 | # | Condition | Firebase / GA4 default status |
 |---|---|---|
@@ -75,7 +76,7 @@ Source of truth: `eprivacy-cookiewet.md` §3.1 (`[settled in substance — AP an
 | 4 | **No data shared with third parties for their own purposes** | ❌ **FAILS** — Google uses the data for its own purposes |
 | 5 | **Minimal privacy impact** (solely measuring quality/performance of *this* service) | Fails by consequence of 1–4 |
 
-**Decisive AP finding:** standard **GA4 — and by extension Firebase Analytics in default config — does NOT qualify** for the exemption (fails condition 4), so it needs **prior opt-IN consent** in NL. Decision logic re-authored from the lawve-ai *politique-cookies* analytics-consent engine, **CNIL → AP** (AGPL donor: pattern only, no text). The CNIL-anchored ~6-month / max-13-month consent-record/re-ask cadence is applied EU-wide by analogy `[verify — not a hard AP-published number]`.
+**Decisive finding:** standard **GA4 — and by extension Firebase Analytics in default config — does NOT qualify** for the exemption (fails condition 4), so it needs **prior opt-IN consent** in NL; this rests on Tw 11.7a(1), (3)(b) and ePrivacy Art 5(3), and the AP's own GA4 position could not be read on 2026-11-19 (`eprivacy-cookiewet.md` §3.2). Relying on the exemption instead of consent is `[low-confidence — LEGAL REVIEW REQUIRED]`: no verdict given. Decision logic re-authored from the lawve-ai *politique-cookies* analytics-consent engine, **CNIL → AP** (AGPL donor: pattern only, no text). The CNIL-anchored ~6-month / max-13-month consent-record/re-ask cadence is applied EU-wide by analogy `[verify — not a hard AP-published number]`.
 
 ---
 
@@ -133,11 +134,13 @@ Per-finding (the suite shape from `references/method/finding-format.md`; skill-i
   Confidence: high | medium | low
 ```
 
-Then a **per-document letter grade** (Privacy, and the implementation as a sub-grade) and the **verdict band**:
-- **BLOCK** — telemetry runs before consent, or a false "legitimate interest / no analytics" data statement (🔴).
-- **FIX-THEN-SIGN-OFF** — opt-out-only or legitimate-interest claim, no 🔴 (🟠) → emit a `Condition | Owner | Severity` table.
-- **SIGN-OFF** — first-run opt-in gate present, mechanics valid, surfaces reconciled (no 🔴/🟠).
+Then a **per-document letter grade** (Privacy, and the implementation as a sub-grade) and the **verdict**:
+- **BLOCKED** — telemetry runs before consent, or a false "legitimate interest / no analytics" data statement (🔴).
+- **FIX FIRST** — opt-out-only or legitimate-interest claim, no 🔴 (🟠) → emit a `Condition | Owner | Severity | Basis` table.
+- **SHIP** — first-run opt-in gate present, mechanics valid, surfaces reconciled (no 🔴/🟠).
 
-End with the `legal-guardrails` §5 authority footer. **Decide and sign** the ruling; reserve **only** for a Dutch advocaat: the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review of the consent copy, and any item marked `[low-confidence]` (notably the Crashlytics "strictly necessary" boundary and the exact Tw 11.7a lid/onderdeel + AP page citation — see `eprivacy-cookiewet.md` §9 open items).
+End with the `legal-guardrails` §5 review footer. **Give a firm ruling**, each finding tied to its clause and rule (an automated review, not legal advice: a lawyer signs off); give no verdict on the §5 carve-outs (they need a lawyer or a registration first): the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review of the consent copy, and any item marked `[low-confidence]` (notably the Crashlytics "strictly necessary" boundary and the exact Tw 11.7a lid/onderdeel + AP page citation — see `eprivacy-cookiewet.md` §9 open items).
 
-**Typical headline for an app that ships Firebase telemetry opt-out (the example app's case):** `[COOK-1] 🟠 Firebase Analytics/Crashlytics ship opt-OUT (default-ON, legitimate-interest framing) — NL requires prior opt-in` → **FIX-THEN-SIGN-OFF**.
+**Jurisdiction (`legal-guardrails.md` §9):** outside the Netherlands and the EU this ruling is not given. In EU states other than the Netherlands it rests on ePrivacy Art. 5(3) and GDPR Arts. 6–7; the Tw 11.7a and AP-guidance points are 🟡 notes only.
+
+**Typical headline for an app that ships Firebase telemetry opt-out (the example app's case):** `[COOK-1] 🟠 Firebase Analytics/Crashlytics ship opt-OUT (default-ON, legitimate-interest framing) — NL requires prior opt-in` → **FIX FIRST**.

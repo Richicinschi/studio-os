@@ -7,7 +7,7 @@ Gradle Kotlin DSL and Kotlin code.
 Before touching the app, enable the service for the Firebase project:
 
 ```bash
-npx -y firebase-tools@latest init auth
+npx firebase-tools@15.36.0 init auth
 ```
 
 ## 2. Add the library

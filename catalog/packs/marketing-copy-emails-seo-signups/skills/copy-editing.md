@@ -1,7 +1,11 @@
 ---
 id: copy-editing
 title: Copy editing
-description: Use when existing marketing copy needs edit, review or refresh: edit this copy, review my copy, proofread, polish this, make this better, clean up this text, too wordy, tighten this up, this reads awkwardly, sharpen the messaging, refresh this content, content audit. New copy: copywriting.
+description: >-
+  Use when existing marketing copy needs edit, review or refresh: edit this copy, review my copy,
+  proofread, polish this, make this better, clean up this text, too wordy, tighten this up, this
+  reads awkwardly, sharpen the messaging, refresh this content, content audit. New copy:
+  copywriting.
 ---
 
 ## When to use

@@ -30,7 +30,7 @@ Neighbours: `firebase-basics` handles CLI install, login, project and app creati
 
 ## Without local tools
 
-The CLI is optional. When it is not installed, run it through `npx -y firebase-tools@latest <command>`. If neither the CLI nor the MCP server is available, create the project and app in the Firebase console and download the config file from there; verify the test crash in the console.
+The CLI is optional. When it is not installed, run it through `npx firebase-tools@15.36.0 <command>`. If neither the CLI nor the MCP server is available, create the project and app in the Firebase console and download the config file from there; verify the test crash in the console.
 
 ## Checks before done
 

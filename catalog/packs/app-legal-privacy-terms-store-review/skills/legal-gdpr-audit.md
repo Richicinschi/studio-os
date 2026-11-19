@@ -29,9 +29,13 @@ purpose, whether the data is Art. 9 health data, whether a DPIA/RoPA is required
 processor + transfer mechanics hold. It is the *engine* check; the prose/notice-completeness review
 (Art. 13 12-point) is `privacy-review`'s job. When the two overlap, severity floor = the higher.
 
+**Jurisdiction (`legal-guardrails.md` §9):** this is GDPR law. Outside the Netherlands and the EU it does
+not run. In EU states other than the Netherlands the GDPR determinations count, and points resting only
+on the UAVG or AP guidance are 🟡 notes.
+
 ## Load at runtime (by path, do not inline)
 
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — the constitution (tiers, severity, finding/verdict format, authority footer).
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — the constitution (tiers, severity, staleness, finding/verdict format, review footer).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/*` — attribution-tiering, finding-format, verdict-model, disclosure-grading.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md` — **the backbone**: Art. 6/7/8/9/28/30/35 tables + the worked lawful-basis map (example app) + the adjudication cheat-sheet.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/transfers-dpf-scc.md` — Chapter V, DPF adequacy, 2021 SCCs, TIA, per-recipient register.
@@ -84,22 +88,29 @@ answer for the example app (add a row for every purpose the person's app has tha
 - 🟠 **basis-stacking** (two bases hedged on one purpose) — pick one.
 - 🟢 confirm each 6(1)(f) use has an **LIA** on file (the project's LIA record, e.g. `lia.md`); flag absence 🟠.
 
-Each finding cites the exact letter, e.g. `Art. 6(1)(a) + ePrivacy 5(3) [settled — verified 2026-06-06]`.
+Each finding cites the exact letter, e.g. `Art. 6(1)(a) + ePrivacy 5(3) [settled — verified 2026-11-18]`.
 
 ### 2 — Art. 9 special-category (health) determination — **the crux call**
 
 Per `gdpr-articles.md` §Art. 9 + the **Privado adversarial test** (re-authored, see Sources):
 
 1. **Scan** the data model AND all user-facing copy (Privacy + Terms + in-app + store copy +
-   any health-disclaimer document the project keeps) for any health/stress/mood **inference, score, label, or
-   trend** — e.g. "calm score", "anxiety down 20%", mood graph, stress trend, wellbeing rating.
-   The adversarial framing: *if no code field and no copy matches a health-inference pattern, that
+   any health-disclaimer document the project keeps) against the CJEU test: data are health data if
+   they are **capable of revealing health status**, directly or by collation or deduction, even only
+   with a certain probability, whatever their source (C-21/23 paras 81, 83, 90; C-184/20;
+   `data-category-ontology.md` §3). Look for the four triggers: (a) a technique, program or
+   challenge **framed around a condition** (sleep problems, anxiety or panic, blood pressure);
+   (b) **mood, symptoms or stress levels the user enters**; (c) a **physiological measurement**
+   (breath rate, heart rate); (d) an **inference, score, label, or trend** — e.g. "calm score",
+   "anxiety down 20%", mood graph, stress trend, wellbeing rating.
+   The adversarial framing: *if no code field and no copy matches any of the four triggers, that
    is positive evidence the app does NOT process Art. 9 data.*
 2. **If found** → Art. 9 triggers → require **Art. 9(2)(a) explicit, SEPARATE consent** (a distinct
    interaction, never bundled into ToS/privacy acceptance) **and** a dual basis (Art. 6 + 9(2)(a))
    surfaced in Privacy §3. Missing = **🔴 BLOCKER**; present-but-only-ordinary-consent = **🟠**.
 3. **If absent** → emit the **reasoned 🟢 determination**: *"bare session logs (technique,
-   duration, timestamp), no health/mood/stress inference, no scoring → NOT Art. 9; defensible on
+   duration, timestamp), none of the four triggers (no condition framing, no user-entered mood or
+   symptoms, no physiological measurement, no inference or scoring) → NOT Art. 9; defensible on
    the no-medical-claims posture."* Record it for the LIA/DPIA; cross-check the health disclaimer
    stays inference-free. Mark the conclusion `[low-confidence — fact-specific]` per the reference.
 
@@ -160,9 +171,9 @@ verified-active **DPF certification** **or** **2021 SCCs + a TIA**:
 | Recipient | Mechanism to record |
 |---|---|
 | **Google LLC** (Firebase/Analytics) | **DPF-certified** → adequacy; + SCC Module 2 belt-and-braces. Confirm europe-west residency claim isn't overstated. |
-| **Apple Inc.** | **DPF-listed** where processor; independent-controller flows ride Apple's own policy. |
+| **Apple Inc.** | **Not on the DPF List** (Active or Inactive, checked 2026-11-19): do not rely on the DPF for Apple. Apple's Privacy Policy (updated 30 July 2025): transfers of EEA, UK and Swiss data are "governed by Standard Contractual Clauses" `[settled — apple.com/legal/privacy, verified 2026-11-19]`; independent-controller flows ride Apple's own policy. |
 | **RevenueCat** | **NOT DPF-certified** — relies **exclusively on 2021 SCCs** (+ UK Addendum / Swiss). Must be named with **SCCs, NOT DPF**. |
-| **Cloudflare, Inc.** | **DPF-certified** (verify on list); or SCC + TIA. |
+| **Cloudflare, Inc.** | **DPF-certified**: Active on EU-US, UK Extension and Swiss-US `[settled — DPF List, verified 2026-11-19]` (`transfers-dpf-scc.md` §6); or SCC + TIA. |
 
 - 🔴 a PP/register that lists **RevenueCat as "DPF-certified"** — factually false.
 - 🔴 any US recipient with **neither** active DPF **nor** SCC+TIA — unlawful transfer.
@@ -170,7 +181,7 @@ verified-active **DPF certification** **or** **2021 SCCs + a TIA**:
 - 🟠 names **Privacy Shield** (invalidated 2020) or the **old 2010/2004 SCCs** (repealed).
 - **Cross-check the project's TIA and DPF verification log (e.g. `tia.md`, `dpf-verification-log.md`)**: every US recipient appears
   with a recorded mechanism. Each DPF entity must be marked `[verify]` against the live list at
-  dataprivacyframework.gov (exact legal entity + **Active** + **EU-US** scope) before sign-off.
+  dataprivacyframework.gov (exact legal entity + **Active** + **EU-US** scope) before a SHIP verdict.
 
 ---
 
@@ -211,11 +222,12 @@ silently act on or drop it.
    - RoPA: *mandatory via 30(5) carve-out (ii)* (+ (iii) if Art. 9).
 4. **Compliance-pack reconciliation table** — `Artifact | Present? | Covers required fields? | Gap`
    over `ropa.md`, `dpa-subprocessor-register.md`, `tia.md`, `dpf-verification-log.md`, `lia.md`.
-5. **Per-document letter grade** (Privacy engine) + **verdict band**: SIGN-OFF / FIX-THEN-SIGN-OFF
-   (emit the `Condition | Owner | Severity` table) / BLOCK, per `method/verdict-model.md`.
-6. The **authority footer** (`legal-guardrails` §5) — reserving ONLY: the
-   `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review, and any item this
-   report marks `[low-confidence]` (notably the Art. 9 fact-specific call) for a Dutch advocaat.
+5. **Per-document letter grade** (Privacy engine) + **verdict**: SHIP / FIX FIRST
+   (emit the `Condition | Owner | Severity | Basis` table) / BLOCKED, per `method/verdict-model.md`.
+6. The **review footer** (`legal-guardrails` §5: what was checked, against which law, each source's
+   verified date) — listing the §5 carve-outs, which get no verdict (they need a lawyer or a registration first): the
+   `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review, and any item this
+   report marks `[low-confidence]` (notably the Art. 9 fact-specific call).
 
 ---
 

@@ -1,7 +1,11 @@
 ---
 id: analytics
 title: Analytics and tracking
-description: Set up tracking, analytics implementation, track conversions, "how do I measure this", "are my events firing", "analytics isn't working": plan, GA4, Google Analytics, GTM, tag manager, conversion tracking, event tracking, UTM parameters, attribution, Mixpanel, Segment, results; ab-testing.
+description: >-
+  Set up tracking, analytics implementation, track conversions, "how do I measure this", "are my
+  events firing", "analytics isn't working": plan, GA4, Google Analytics, GTM, tag manager,
+  conversion tracking, event tracking, UTM parameters, attribution, Mixpanel, Segment, results;
+  ab-testing.
 ---
 
 # Analytics and tracking

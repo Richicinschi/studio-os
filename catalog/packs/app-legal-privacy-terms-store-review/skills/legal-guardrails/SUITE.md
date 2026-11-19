@@ -1,13 +1,13 @@
-# legal-* sign-off skill suite — overview
+# legal-* review skill suite — overview
 
-A user-level Claude Code skill suite (`~/.claude/skills/legal-*`) that acts as the **de-facto jurist who signs off** a mobile app's Privacy Policy + Terms of Service before App Store / Google Play submission. Built for a Dutch/EU app (GDPR/AVG, Dutch consumer law, Apple/Google platform rules) and works for any app — app-specific facts (publisher, registration number, data model, SDK list, doc paths) are inputs, gathered in the orchestrator's Step 0 fact sheet. Worked examples in the references use one example app profile (`legal-guardrails.md` §8).
+A user-level Claude Code skill suite (`~/.claude/skills/legal-*`) that reviews a mobile app's Privacy Policy + Terms of Service before App Store / Google Play submission and gives one firm verdict: **SHIP**, **FIX FIRST** or **BLOCKED**, each finding tied to its clause and rule. An automated review, not legal advice: a lawyer signs off. Built for a Dutch/EU app (GDPR/AVG, Dutch consumer law, Apple/Google platform rules) and works for any app — app-specific facts (publisher, registration number, data model, SDK list, doc paths) are inputs, gathered in the orchestrator's Step 0 fact sheet. Worked examples in the references use one example app profile (`legal-guardrails.md` §8).
 
-**Start here:** invoke **`legal-signoff-orchestrator`** ("sign off the privacy policy and terms"). It runs the whole suite and returns one verdict. For a narrow question, invoke the specific skill.
+**Start here:** invoke **`legal-signoff-orchestrator`** ("review the privacy policy and terms"). Its first question is where the app is offered; it then runs the whole suite and returns one verdict. For a narrow question, invoke the specific skill.
 
 ## The 16 skills
 
 **Governance / hub**
-- `legal-guardrails` — the constitution (attribution tiering, severity floor, finding format, verdict model, authority footer) + the EU/NL + platform **knowledge base** (`references/`). Every skill operates under it.
+- `legal-guardrails` — the constitution (attribution tiering, 90-day staleness rule, severity floor, finding format, verdict model, review footer, jurisdiction rule) + the EU/NL + platform **knowledge base** (`references/`). Every skill operates under it.
 - `legal-signoff-orchestrator` — entry point; fans out, aggregates one verdict + report + store artifacts.
 
 **Substantive review (the core)**
@@ -40,5 +40,5 @@ A user-level Claude Code skill suite (`~/.claude/skills/legal-*`) that acts as t
 ## Scanners (`legal-data-surface-scan/scripts/`, `legal-play-gate/scripts/`)
 Node ESM, no deps for the parsers; verified against the real app. `scan_pubspec.mjs`, `scan_android_manifest.mjs`, `scan_ios_privacy.mjs`, `run_exodus.mjs`, `run_mobsf.mjs` (graceful degrade), `emit_play_csv.mjs`.
 
-## Authority & limits
-Decides and signs. Reserves for a human Dutch *advocaat* / registration only: the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review, and any `[low-confidence]` call. See `ATTRIBUTION.md` for licensing of adapted sources. Design spec: `<HUB>/docs/specs/2026-06-06-legal-signoff-skill-suite-design.md`.
+## Verdict & limits
+Gives a firm verdict and signs nothing: a lawyer signs off. The law tables cover the Netherlands and the EU; for an app offered only outside them, the store-rule and data-collection checks still run and there is no verdict on law. Every report ends with a footer stating what was checked, against which law, and the date each cited source was last verified; a finding resting on a source verified more than 90 days before the run is marked "re-check before relying on it". Gives no verdict on the §5 carve-outs (the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review, any `[low-confidence]` call); they need a lawyer or a registration first. For an app offered in EU states but not the Netherlands, Dutch national-law findings are notes only. See `ATTRIBUTION.md` for licensing of adapted sources. Design spec: `<HUB>/docs/specs/2026-06-06-legal-signoff-skill-suite-design.md`.

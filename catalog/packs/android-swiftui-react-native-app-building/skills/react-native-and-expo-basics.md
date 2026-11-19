@@ -20,7 +20,7 @@ Boundaries. Ask first, and state the cost, before anything that spends money or 
 
 1. Look before you act. Open `package.json` and note the Expo SDK version (the `expo` dependency), the React Native version, and whether the folders `android` and `ios` exist. Note the package manager from the lock file (npm, yarn, pnpm or bun) and use only that one. If the project already exists, do not re-create it.
 
-2. Set up a new project. Check `node --version` first (any current long-term-support release is the safe choice; an odd-numbered or very new release sometimes breaks tooling). Then run `npx create-expo-app@latest my-app`, `cd my-app`, and `npx expo start`. The terminal shows a QR code and keys for opening Android, iOS or web. Keep the app small at first: one screen, one navigation setup, then grow.
+2. Set up a new project. Check `node --version` first (any current long-term-support release is the safe choice; an odd-numbered or very new release sometimes breaks tooling). Then run `npx create-expo-app@5.0.0 my-app`, `cd my-app`, and `npx expo start`. That version, 5.0.0, was the current release of create-expo-app on 2026-11-19; raise it on purpose, after reading its release notes. The terminal shows a QR code and keys for opening Android, iOS or web. Keep the app small at first: one screen, one navigation setup, then grow.
 
 3. Install libraries the Expo way. Use `npx expo install <package>` and not a plain `npm install`, because it picks the version that matches the project's SDK. After any dependency change run `npx expo-doctor`; it lists mismatched versions and known problems. Fix what it reports before debugging anything else.
 
@@ -49,7 +49,7 @@ Boundaries. Ask first, and state the cost, before anything that spends money or 
 9. Upgrading versions, one step at a time. Never jump several major versions in one go.
    - Find the current version from more than one source: `package.json`, the lock file and the config files. If these disagree, stop and ask the person; do not guess.
    - Read the official upgrade notes for exactly the next version only (Expo SDK, then React Native follows with it). Make a git branch first.
-   - Upgrade one step: `npx expo install expo@latest` for the next step (name the exact version you intend), then `npx expo install --fix`, then `npx expo-doctor`.
+   - Upgrade one step: `npx expo install expo@^<N>.0.0`, where N is the next SDK version only (for example `expo@^58.0.0` when moving from SDK 57), then `npx expo install --fix`, then `npx expo-doctor`.
    - Rebuild the development build, run the app and tests, fix breakage, commit. Only then report the next step, and start it as a new pass.
    - If the project has native folders, regenerate or diff them rather than hand-merging.
 

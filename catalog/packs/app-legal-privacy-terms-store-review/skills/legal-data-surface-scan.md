@@ -49,8 +49,8 @@ Run from the app root, or pass `appDir` as the first positional arg to point the
 
 ## Scanners (AUTHORED + TESTED — invoke via `node`, never modify)
 
-All scripts emit JSON to stdout, need only Node ≥16 (no npm deps for the source scanners), and **degrade
-gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never crash a sign-off).
+All scripts emit JSON to stdout, need Node 18 or newer (no npm deps for the source scanners), and **degrade
+gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never crash a review run).
 
 ### 1. `scan_pubspec.mjs` — Dart SDK → data-flow profile (source-of-truth for Flutter)
 - **Why:** Exodus/MobSF/Privado are blind to Dart's pub ecosystem; this closes that blind spot.
@@ -73,13 +73,13 @@ gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never cra
 ### 4. `run_exodus.mjs` — Android tracker/permission scan on a built APK (OPTIONAL)
 - **Why:** Exodus statically matches APK bytecode against a tracker-signature DB (advertising/analytics/crash incl. Google Firebase Analytics, Crashlytics, RevenueCat) — off-device truth the source scan can miss. Exodus (`exodus-standalone`) is **AGPL-3.0: invoked as an external CLI via Docker, never linked.**
 - **Command:** `node legal-data-surface-scan/scripts/run_exodus.mjs --apk <path.apk>`
-- **Requires:** Docker + image `exodusprivacy/exodus-standalone` (auto-pulled). **Output:** `trackers[]`, `permissions[]`, `report`.
+- **Requires:** Docker + image `exodusprivacy/exodus-standalone:v1.5.0@sha256:a6531be9a6b666a8ffb6aec98b409cf6faf65536c5b9597e5b99195ca9422b88` (tag v1.5.0, digest read 2026-11-18 from Docker Hub; auto-pulled; the APK folder is mounted read-only). **Output:** `trackers[]`, `permissions[]`, `report`.
 - **Degrades:** no Docker → `skipped` + install hint; no/invalid `--apk` → `skipped` + the `flutter build apk --release --dart-define-from-file=.env` instruction.
 
 ### 5. `run_mobsf.mjs` — cross-platform static scan of APK **or** IPA (OPTIONAL)
 - **Why:** MobSF (GPLv3) statically analyses APK *and* IPA → SDKs, permissions, trackers (reuses Exodus signatures), and **network domains** — the only scanner that covers iOS binaries and reveals which endpoints actually receive data. **GPL: driven over its REST API, never linked.**
 - **Command:** `node legal-data-surface-scan/scripts/run_mobsf.mjs --file <path.apk|.ipa>`
-- **Env:** `MOBSF_URL` (default `http://localhost:8000`), `MOBSF_API_KEY` (required to scan). Server: `docker run -it -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest`.
+- **Env:** `MOBSF_URL` (default `http://localhost:8000`), `MOBSF_API_KEY` (required to scan). Server: `docker run -it -p 127.0.0.1:8000:8000 opensecurity/mobile-security-framework-mobsf:v4.6.6@sha256:1108d19cf0e1dd1350f049d94f39c64fa9c029f4b5f17ef1dc33b489a149371e` (tag v4.6.6, digest read 2026-11-18 from Docker Hub; the port is bound to this machine only).
 - **Output:** `permissions[]`, `trackers[]`, `domains[]` (reconcile against declared recipients + EU-region/transfer claims). **Degrades:** server unreachable / no API key / no file → `skipped` + the precise next step.
 
 ## WORKFLOW
@@ -94,10 +94,11 @@ gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never cra
    - **Entity-name every recipient** (Google LLC / Google Ireland (Firebase), RevenueCat Inc. (US), Apple Distribution International, Google Commerce/Payment) — never "third parties."
    - **Carry the tier** from the SDK map; downgrade to `[verify]` for anything a skipped scanner would have confirmed.
 5. **Reconcile signals into SCAN findings.** Emit a finding (per `finding-format.md`) for each material discrepancy or load-bearing fact:
-   - `advertisingId.verdict` ≠ "stripped" → 🔴/🟠 (contradicts the "no advertising ID" PP §4 / Data-Safety answer).
+   - `advertisingId.consistentWithNoAdvertisingId` ≠ `true` → 🔴/🟠 (contradicts the "no advertising ID" PP §4 / Data-Safety answer). It is `true` only when the merged manifest has AD_ID absent or stripped **and**, when Firebase Analytics ships (`advertisingId.firebaseAnalytics`), `google_analytics_adid_collection_enabled=false` — the flag is required when Firebase Analytics ships (`sdk-data-map.md` §3); for such an app a strip without the flag is not enough.
    - A scanner-detected tracker/recipient with **no entry in the SDK map** → 🟠 (unmapped flow; extend the map + check the PP discloses it).
    - `unrecognisedDirectDeps[]` non-empty → 🟡 (direct dep not profiled — could be an undisclosed flow).
-   - iOS `healthOrFitnessDeclared` non-empty, or `anyTracking:true`, for a no-HealthKit/no-ATT wellness app → 🔴.
+   - `anyTracking:true` for a no-ATT app → 🔴.
+   - iOS `healthOrFitnessDeclared` non-empty for a no-HealthKit wellness app → a **hard condition**, not a 🔴: confirm whether the app's data is health or fitness data under Apple's definition, which does not turn on HealthKit; a declared Health type is not by itself a defect `[verify]`.
    - A sensitive permission (location, contacts, mic, `QUERY_ALL_PACKAGES`) present with no plausible purpose → 🟠.
    - **No-silent-supplement:** any data behaviour you observe that isn't in the SDK map or the ontology → surface as a 🟡 MINOR note so a human can confirm it belongs.
 6. **Output** the canonical flow set + the SCAN findings + the **coverage note**, structured for legal-flow-grader and legal-cross-store to consume directly.
@@ -126,7 +127,7 @@ Coverage verdict: <FULL | PARTIAL — iOS pods + binary scans pending macOS buil
 | Free-tier breathing history | (none — on-device) | on | On-device storage | n/a | device | n/a | pubspec | [settled …] |
 
 ### Deliberate non-collection
-- Google Advertising ID (AD_ID/GAID) + AdServices — STRIPPED via tools:node="remove" → verdict: <…>
+- Google Advertising ID (AD_ID/GAID) + AdServices — STRIPPED via tools:node="remove" + the flag (google_analytics_adid_collection_enabled=false) when Firebase Analytics ships → verdict: <…>
 
 ### Findings
 [SCAN-1] <emoji> <title>
@@ -137,11 +138,11 @@ Coverage verdict: <FULL | PARTIAL — iOS pods + binary scans pending macOS buil
   Confidence: high|medium|low
 ```
 
-## Boundaries (de-facto-counsel authority)
+## Boundaries
 
 This skill **decides and reports** the factual flow set within its evidence. It does **not** grade
-disclosure (that's legal-flow-grader) and does **not** issue a sign-off band. Reserve for a human Dutch
-advocaat only: the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review, and any flow
+disclosure (that's legal-flow-grader) and does **not** give a verdict (SHIP / FIX FIRST / BLOCKED). It
+runs wherever the app is offered (`legal-guardrails.md` §9). It gives no verdict on the §5 carve-outs (they need a lawyer or a registration first): the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review, and any flow
 or basis you mark `[low-confidence]` (e.g. the Analytics/Crashlytics consent-vs-LI lawful basis — flag it,
 don't resolve it here). When a scanner is skipped, say so in the coverage table; **partial coverage is a
 PARTIAL verdict**, never a clean one.

@@ -1,6 +1,6 @@
 ---
 name: django-flask-laravel-shops-and-chat
-description: Use when the user builds or upgrades a Django, Flask or Laravel project, an online shop or content system back end, live chat or live updates, or a background job that must retry.
+description: "Use when the user builds or upgrades a Django, Flask or Laravel project, an online shop or content system back end, live chat or live updates, or a background job that must retry."
 ---
 
 # Web back ends: Django, Flask, Laravel, shops, chat and jobs

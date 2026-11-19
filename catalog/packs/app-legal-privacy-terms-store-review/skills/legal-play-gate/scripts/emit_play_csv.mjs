@@ -21,7 +21,8 @@ import { resolve } from 'node:path';
 // The example app of legal-guardrails.md section 8: a Firebase + RevenueCat
 // wellness app with no health data. Derived from the Data Safety taxonomy
 // (14 categories / 7 purposes / 2 security declarations) and that app's data
-// surface. NOT "Health & fitness". Mirrors assets/data-safety-answers.example.json.
+// surface. "Health & fitness" left unmarked, to be confirmed [verify] (see
+// notCollected below). Mirrors assets/data-safety-answers.example.json.
 const EXAMPLE_ANSWERS = {
   app: '<app name>',
   security: { encryptedInTransit: true, userCanRequestDeletion: true },
@@ -37,9 +38,13 @@ const EXAMPLE_ANSWERS = {
     { category: 'App activity', type: 'App interactions', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['Analytics', 'App functionality'], recipient: 'Google (Firebase Analytics, processor)' },
     { category: 'App info and performance', type: 'Crash logs', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['Fraud prevention, security, and compliance', 'App functionality'], recipient: 'Google (Crashlytics, processor)' },
     { category: 'App info and performance', type: 'Diagnostics', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['App functionality'], recipient: 'Google (Crashlytics, processor)' },
+    { category: 'Device or other IDs', type: 'Device or other IDs', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['Analytics', 'Fraud prevention, security, and compliance'], recipient: 'Google (Firebase installation/app-instance IDs, processor)' },
   ],
-  // Categories explicitly NOT collected (asserted for the cross-check).
-  notCollected: ['Location', 'Health & fitness', 'Messages', 'Photos & videos', 'Audio', 'Files & docs', 'Calendar', 'Contacts', 'Web browsing history'],
+  // Categories the example app answers NOT collected, for the cross-check.
+  // 'Health & fitness' is the example's answer, to be confirmed against the
+  // app's own data, not asserted [verify]: Google's Health info and Fitness info
+  // turn on the data, not on Health Connect (play-data-safety.md section 5).
+  notCollected: ['Location', 'Health & fitness', 'Messages', 'Photos & videos', 'Audio', 'Files & docs', 'Calendar', 'Contacts', 'Web browsing history', 'Advertising ID'],
 };
 
 const args = process.argv.slice(2);

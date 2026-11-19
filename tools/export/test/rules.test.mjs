@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { rewriteText, findSecrets, findDenied, findPaths, loadDenyList, loadOwnerName, loadLocalRewrites, fileKind } from '../rules.mjs';
+import { rewriteText, findSecrets, findDenied, findPaths, findRisky, loadDenyList, loadOwnerName, loadLocalRewrites, fileKind } from '../rules.mjs';
 import { gatePrivacy } from '../gates.mjs';
 
 // Studio paths, hostnames and addresses are assembled at runtime, so no kit file carries them as literals.
@@ -192,4 +192,22 @@ test('text is decided by content: UTF-8 without NUL bytes; known binary types pa
   assert.equal(fileKind('a/logo.png', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0xff])), 'binary');
   assert.equal(fileKind('a/notes.md', Buffer.from('﻿hi', 'utf16le')), 'unknown');
   assert.equal(fileKind('a/blob.dat', Buffer.from([0xff, 0xfe, 0x00])), 'unknown');
+});
+
+test('image rule: a content path, URL or media file in a YAML image field is not a container image', () => {
+  const fence = '```';
+  const yml = [
+    'image: ./cover.webp', 'image: /images/hero.png', 'image: hero.jpg', 'image: https://cdn.example.com/x.png',
+    'image: ~/pictures/a', 'image: ../art/b', '  - image: "./c.svg"', "image: 'poster.PDF'", 'image: clip.mp4',
+    'image: a.jpeg', 'image: a.avif', 'image: a.gif', 'image: a.ico', 'image: a.bmp', 'image: a.tiff', 'image: a.webm',
+  ].join('\n');
+  assert.deepEqual(findRisky(yml, 'site/content/post.yml'), []);
+  assert.deepEqual(findRisky(`${fence}yaml\nimage: ./cover.webp\nimage: http://x.test/y\n${fence}\n`, 'a.md'), []);
+});
+
+test('image rule: a bare, registry or quoted image name is still flagged', () => {
+  const fence = '```';
+  const yml = ['image: nginx', 'image: ghcr.io/x/y', 'image: "redis"', 'image: localhost:5000/app', 'image: redis:7'].join('\n');
+  assert.deepEqual(findRisky(yml, 'docker-compose.yml').map((f) => f.line), [1, 2, 3, 4]);
+  assert.deepEqual(findRisky(`${fence}yml\nimage: nginx\n${fence}\n`, 'a.md').map((f) => f.line), [2]);
 });

@@ -7,9 +7,9 @@ Run `firebase-basics` project and app setup first if needed.
 If the app module already holds a `google-services.json`, use the project and app it names. Otherwise create them:
 
 - CLI logged in (see `firebase-basics`). Creating a project or app changes the person's cloud account: say so and get a yes before running either command below.
-- Project: `npx -y firebase-tools@latest projects:create`.
-- App: `npx -y firebase-tools@latest apps:create ANDROID <package-name>` (the same command takes IOS or WEB for other platforms).
-- Config file missing from the app module folder: `npx -y firebase-tools@latest apps:sdkconfig ANDROID <App-ID>` prints it; save it as `google-services.json` in the module.
+- Project: `npx firebase-tools@15.36.0 projects:create`.
+- App: `npx firebase-tools@15.36.0 apps:create ANDROID <package-name>` (the same command takes IOS or WEB for other platforms).
+- Config file missing from the app module folder: `npx firebase-tools@15.36.0 apps:sdkconfig ANDROID <App-ID>` prints it; save it as `google-services.json` in the module.
 
 ## 2. Gradle
 

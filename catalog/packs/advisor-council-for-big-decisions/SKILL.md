@@ -1,6 +1,6 @@
 ---
 name: advisor-council-for-big-decisions
-description: Use when the user faces a real fork and wants a panel of different viewpoints: founder, skeptic, designer, architect, counsel, treasurer, user advocate and operator, with one synthesised answer.
+description: "Use when the user faces a real fork and wants a panel of different viewpoints: founder, skeptic, designer, architect, counsel, treasurer, user advocate and operator, with one synthesised answer."
 ---
 
 # Advisor council for big decisions

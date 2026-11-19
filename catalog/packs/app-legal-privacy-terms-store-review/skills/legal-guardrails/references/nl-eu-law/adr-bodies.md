@@ -1,11 +1,11 @@
-# Dutch / EU Consumer Dispute-Resolution (ADR) — Reference for ToS Sign-Off
+# Dutch / EU Consumer Dispute-Resolution (ADR) — Reference for ToS Review
 
 **Scope:** Adjudicating the "dispute resolution / out-of-court complaints" clause of a consumer Terms of Service for a Dutch publisher (eenmanszaak / sole proprietorship), EU/NL-first, after the EU ODR platform shutdown.
 
 **Worked example:** the applications below use the example app (`legal-guardrails.md` §8) — a Flutter breathing/mindfulness app; publisher is a Dutch sole proprietor (sole data controller, no DPO); subscriptions sold *through* Apple/Google as merchants of record (RevenueCat + Firebase backend, EU `europe-west`); general-wellness, no medical claims. Apply the rules to the app under review from its fact sheet (`legal-signoff-orchestrator.md` Step 0).
 
 **Citation tiers used below:**
-- `[settled — <source>, verified 2026-06-06]` confirmed against a primary source fetched this run
+- `[settled — <source>, verified 2026-11-18]` confirmed against a primary source fetched on that date
 - `[verify]` believed correct, not confirmed this run
 - `[verify-pinpoint]` right substance, exact article/§/letter still to pin
 - `[low-confidence]` novel / contested / fact-specific
@@ -16,11 +16,11 @@
 
 | # | Rule | Tier |
 |---|---|---|
-| R1 | **The EU ODR platform is DEAD.** Any ToS that links or references `ec.europa.eu/consumers/odr` (or "EU ODR platform" / "online dispute resolution platform") is a **FINDING — must be removed.** | `[settled — ECC Nederland, verified 2026-06-06]` |
-| R2 | Do **NOT** promise binding ADR via De Geschillencommissie unless the publisher has **actually affiliated** (aangesloten) with a relevant geschillencommissie. Affiliation is voluntary; an unaffiliated trader cannot be compelled into binding advice. | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| R3 | If the publisher is **not** affiliated, the correct clause = (a) internal complaints contact + reasonable response window, (b) **ConsuWijzer** (ACM) for free consumer guidance, and (c) the consumer's right to bring the matter before the **competent court**. | `[settled — composite, verified 2026-06-06]` |
-| R4 | **ConsuWijzer is NOT a dispute-resolution body** — it is the ACM's information/guidance portal. Never describe it as deciding or arbitrating disputes. | `[settled — consument.acm.nl, verified 2026-06-06]` |
-| R5 | **ConsuWijzer's old URL `consuwijzer.nl` now 301-redirects to `consument.acm.nl`.** Prefer citing `consument.acm.nl` (or "ACM ConsuWijzer"); a bare `consuwijzer.nl` link still resolves but is the legacy host. | `[settled — observed redirect, verified 2026-06-06]` |
+| R1 | **The EU ODR platform is DEAD.** Any ToS that links or references `ec.europa.eu/consumers/odr` (or "EU ODR platform" / "online dispute resolution platform") is a **FINDING — must be removed.** | `[settled — ECC Nederland, verified 2026-11-18]` |
+| R2 | Do **NOT** promise binding ADR via De Geschillencommissie unless the publisher has **actually affiliated** (aangesloten) with a relevant geschillencommissie. Affiliation is voluntary; an unaffiliated trader cannot be compelled into binding advice. | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| R3 | If the publisher is **not** affiliated, the correct clause = (a) internal complaints contact + reasonable response window, (b) **ConsuWijzer** (ACM) for free consumer guidance, and (c) the consumer's right to bring the matter before the **competent court**. | `[settled — composite, verified 2026-11-18]` |
+| R4 | **ConsuWijzer is NOT a dispute-resolution body** — it is the ACM's information/guidance portal. Never describe it as deciding or arbitrating disputes. | `[settled — consument.acm.nl, verified 2026-11-18]` |
+| R5 | **ConsuWijzer's old URL `consuwijzer.nl` now 301-redirects to `consument.acm.nl`.** Prefer citing `consument.acm.nl` (or "ACM ConsuWijzer"); a bare `consuwijzer.nl` link still resolves but is the legacy host. | `[settled — observed redirect, verified 2026-11-18]` |
 | R6 | A consumer's right to go to the **competent court** can never be excluded or made contingent on first using ADR. ADR is always **voluntary and additional** to the court route. | `[verify-pinpoint]` (ADR Directive 2013/11/EU principle) |
 
 ---
@@ -31,13 +31,13 @@
 
 | Fact | Detail | Tier |
 |---|---|---|
-| Platform | EU Online Dispute Resolution (ODR) platform, formerly at **`ec.europa.eu/consumers/odr`** | `[settled — historic, verified 2026-06-06]` (URL well-established; the ECC article itself did not restate the URL) |
-| Shutdown date | **Platform shut down 19 July 2025**; user data on the platform **deleted 20 July 2025** | `[settled — ECC Nederland, verified 2026-06-06]` |
-| Trader obligation lifted | From **20 July 2025**, businesses are **no longer required** to refer to the ODR platform on their complaints page or in their general terms & conditions | `[settled — ECC Nederland, verified 2026-06-06]` |
-| Pending cases | Businesses with cases pending on the platform had to notify the affected customers | `[settled — ECC Nederland, verified 2026-06-06]` |
-| Underlying law | The ODR platform existed under **Regulation (EU) No 524/2013** (the "ODR Regulation"), now **repealed**; the **ADR Directive 2013/11/EU** is being amended in parallel | `[verify-pinpoint]` — the ECC article references an amendment to the "ADR Directive" and "European legislation" but did **not** state the regulation number; "524/2013 repealed" matches the project's existing memory note and standard reporting but the **exact repealing instrument/number was not confirmed this run** |
-| Future replacement | A new EU digital tool is proposed to eventually replace the ODR platform (still under review); not yet live | `[settled — ECC Nederland, verified 2026-06-06]` |
-| ECC role | **ECC Nederland** (European Consumer Centre) is the NL ODR contact point and the source of this shutdown notice; for cross-border EU disputes consumers can still use **ECC-Net** | `[settled — ECC Nederland, verified 2026-06-06]` |
+| Platform | EU Online Dispute Resolution (ODR) platform, formerly at **`ec.europa.eu/consumers/odr`** | `[settled — historic, verified 2026-11-18]` (the URL now redirects to a European Commission notice that the platform is closed) |
+| Shutdown date | **Platform shut down 19 July 2025**; user data on the platform **deleted 20 July 2025** | `[settled — ECC Nederland, verified 2026-11-18]` |
+| Trader obligation lifted | From **20 July 2025**, businesses are **no longer required** to refer to the ODR platform on their complaints page or in their general terms & conditions | `[settled — ECC Nederland, verified 2026-11-18]` |
+| Pending cases | Businesses with cases pending on the platform had to notify the affected customers | `[settled — ECC Nederland, verified 2026-11-18]` |
+| Underlying law | The ODR platform existed under **Regulation (EU) No 524/2013** (the "ODR Regulation"), **repealed with effect from 20 July 2025 by Regulation (EU) 2024/3228** (Art. 1); the **ADR Directive 2013/11/EU** was amended in parallel by Directive (EU) 2025/2647 | `[settled — Reg. (EU) 2024/3228 Art. 1, EU Publications Office, verified 2026-11-18]` |
+| Future replacement | **Directive (EU) 2025/2647** (amending the ADR Directive, OJ 30 Dec 2025) has the Commission set up, by 20 April 2026, a digital interactive **information** tool on consumer redress and ADR; it is not a dispute platform. Whether the tool is live was not checked | `[settled — Dir. (EU) 2025/2647, verified 2026-11-18]` |
+| ECC role | **ECC Nederland** (European Consumer Centre) hosted the NL ODR contact point until 20 July 2025 and is the source of this shutdown notice; for cross-border EU disputes consumers can still turn to **ECC Nederland** (part of **ECC-Net**) for free advice and mediation | `[settled — ECC Nederland, verified 2026-11-18]` |
 
 ### 1.2 Scanner action
 
@@ -46,7 +46,7 @@
   - `consumers/odr`
   - "ODR platform" / "Online Dispute Resolution platform"
   - "platform voor onlinegeschillenbeslechting" (NL phrasing)
-- Any hit → **FINDING (must remove).** Tier `[settled, verified 2026-06-06]`.
+- Any hit → **FINDING (must remove).** Tier `[settled, verified 2026-11-18]`.
 - Cross-app caution: this is a *very* common boilerplate leftover in EU consumer ToS templates written before mid-2025. Always check both EN and NL versions.
 
 ---
@@ -57,13 +57,13 @@
 
 | Attribute | Detail | Tier |
 |---|---|---|
-| What it is | Dutch out-of-court (ADR) body resolving consumer complaints about products/services; operates ~85 sector "branches" (geschillencommissies) covering 250,000+ affiliated businesses | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| Decision type | Issues a **bindend advies** (binding advice / ruling) that both parties must comply with; **no higher appeal** | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| Typical timeline | ~25 weeks from filing to binding decision (average) | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| Precondition (consumer) | Consumer must **first** lodge the complaint **with the business** before filing with the commission | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| Precondition (trader) | The **business must be affiliated (aangesloten)** with the relevant geschillencommissie (directly, or via an affiliated branche-organisatie) for the binding-advice route to apply | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| Membership | **Voluntary** ("Aansluiten" = opt-in joining); there is no automatic/universal commission for a generic app subscription | `[settled — degeschillencommissie.nl, verified 2026-06-06]` |
-| Filing fee (klachtengeld) | Per-commission fee set in each commission's reglement; commonly cited range **~EUR 27.50 – EUR 340** | `[verify]` — fee *exists* and is per-commission (`[settled, verified 2026-06-06]`), but the **specific EUR 27.50–340 range was NOT visible on the pages fetched this run**; confirm against the relevant commission's reglement |
+| What it is | Dutch out-of-court (ADR) body resolving consumer complaints about products/services; operates ~85 sector "branches" (geschillencommissies) covering 250,000+ affiliated businesses | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| Decision type | Issues a **bindend advies** (binding advice / ruling) that both parties must comply with; **no higher appeal** | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| Typical timeline | ~25 weeks from filing to binding decision (average) | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| Precondition (consumer) | Consumer must **first** lodge the complaint **with the business** before filing with the commission | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| Precondition (trader) | The **business must be affiliated (aangesloten)** with the relevant geschillencommissie (directly, or via an affiliated branche-organisatie) for the binding-advice route to apply | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| Membership | **Voluntary** ("Aansluiten" = opt-in joining); there is no automatic/universal commission for a generic app subscription | `[settled — degeschillencommissie.nl, verified 2026-11-18]` |
+| Filing fee (klachtengeld) | Per-commission fee set in each commission's reglement; commonly cited range **~EUR 27.50 – EUR 340** | `[verify]` — fee *exists* and is per-commission (`[settled, verified 2026-11-18]`), but the **specific EUR 27.50–340 range was NOT visible on the pages fetched this run**; confirm against the relevant commission's reglement |
 
 ### 2.1 Application to an app sold through the stores by an unaffiliated sole trader (worked example)
 
@@ -79,11 +79,11 @@
 
 | Attribute | Detail | Tier |
 |---|---|---|
-| What it is | The ACM's (Autoriteit Consument & Markt) **consumer information & guidance portal** — "praktisch advies voor consumenten" | `[settled — consument.acm.nl, verified 2026-06-06]` |
-| What it offers | Rights information across 16+ topics; **voorbeeldbrieven** (template complaint letters); a "meld een probleem met een bedrijf" reporting mechanism; contact for unanswered questions | `[settled — consument.acm.nl, verified 2026-06-06]` |
-| What it is NOT | **Not a binding dispute-resolution body**; it does not arbitrate or decide individual disputes. Reports feed the ACM's market supervision, not a per-consumer ruling | `[settled — consument.acm.nl, verified 2026-06-06]` |
-| Cost | Free to consumers | `[settled — consument.acm.nl, verified 2026-06-06]` |
-| URL | Cite **`consument.acm.nl`** (or "ACM ConsuWijzer"); avoid relying on the legacy `consuwijzer.nl` host in new copy | `[settled — observed 301, verified 2026-06-06]` |
+| What it is | The ACM's (Autoriteit Consument & Markt) **consumer information & guidance portal** — "praktisch advies voor consumenten" | `[settled — consument.acm.nl, verified 2026-11-18]` |
+| What it offers | Rights information across 16+ topics; **voorbeeldbrieven** (template complaint letters); a "meld een probleem met een bedrijf" reporting mechanism; contact for unanswered questions | `[settled — consument.acm.nl, verified 2026-11-18]` |
+| What it is NOT | **Not a binding dispute-resolution body**; it does not arbitrate or decide individual disputes. Reports feed the ACM's market supervision, not a per-consumer ruling | `[settled — consument.acm.nl, verified 2026-11-18]` |
+| Cost | Free to consumers | `[settled — consument.acm.nl, verified 2026-11-18]` |
+| URL | Cite **`consument.acm.nl`** (or "ACM ConsuWijzer"); avoid relying on the legacy `consuwijzer.nl` host in new copy | `[settled — observed 301, verified 2026-11-18]` |
 
 ### 3.1 Correct framing in a ToS
 
@@ -98,7 +98,7 @@ Do **not** write "submit your dispute to ConsuWijzer" or imply it issues decisio
 | Body | Role | Tier |
 |---|---|---|
 | **ADR-Nederland** | Umbrella collaboration of Dutch ADR entities; useful as background context, not as the *named* route for a specific app dispute | `[verify]` — named in harvested notes as the umbrella; not re-fetched this run |
-| **ECC Nederland / ECC-Net** | European Consumer Centre network — for **cross-border** EU consumer disputes (e.g., an EU consumer vs. a trader in another member state). Still operational post-ODR; was the ODR national contact point | `[settled — ECC Nederland, verified 2026-06-06]` |
+| **ECC Nederland / ECC-Net** | European Consumer Centre network — for **cross-border** EU consumer disputes (e.g., an EU consumer vs. a trader in another member state). Still operational post-ODR; was the ODR national contact point | `[settled — ECC Nederland, verified 2026-11-18]` |
 
 ---
 
@@ -129,12 +129,12 @@ When an app's subscriptions are sold through Apple/Google as merchants of record
 | Point | Guidance | Tier |
 |---|---|---|
 | Billing/refund disputes | For purchase, billing, and refund issues, the consumer's first recourse is often **Apple/Google** (the store handles the transaction and refunds). The ToS should signpost this without disclaiming the publisher's own statutory duties for the *service*. | `[verify]` |
-| Publisher still a trader | The publisher remains the trader of the *app/service* for consumer-law purposes even though the store collects payment; the dispute/complaints clause above still applies to service quality, account, data, and conformity (DCD 2019/770) matters. | `[verify-pinpoint]` |
+| Publisher still a trader | The publisher may remain a trader of the *app/service* for consumer-law purposes even though the store contracts in its own name and collects payment; if so, the dispute/complaints clause above still applies to service quality, account, data, and conformity (DCD 2019/770) matters. See `crd-withdrawal.md` §8.3 and R8: whether the publisher is a co-trader for store-billed sales is open. | `[low-confidence — LEGAL REVIEW REQUIRED]` |
 | Don't double-promise | Avoid implying the publisher will process refunds it cannot (store-controlled) **or** that the store handles service complaints it won't. Keep the two lanes distinct. | `[low-confidence]` |
 
 ---
 
-## 7. Findings catalogue (what to emit during sign-off)
+## 7. Findings catalogue (what to emit during a review)
 
 | Finding ID | Trigger | Severity | Fix |
 |---|---|---|---|
@@ -152,7 +152,7 @@ When an app's subscriptions are sold through Apple/Google as merchants of record
 
 These are the propositions left below `[settled]` — a reviewer should pin them:
 
-1. **Exact repealing instrument for Regulation (EU) 524/2013.** The ECC shutdown notice confirmed the 19/20 July 2025 dates and the lifted trader obligation but did **not** state the repealing regulation number. `[verify-pinpoint]`
+1. ~~Exact repealing instrument for Regulation (EU) 524/2013.~~ Resolved 2026-11-18: Regulation (EU) 2024/3228, Art. 1 (see §1.1).
 2. **De Geschillencommissie klachtengeld figures.** The fee *exists* and is per-commission, but the commonly-cited **EUR 27.50–340** range was not visible on the pages fetched; confirm against the specific commission's reglement (and confirm whether any commission even fits a digital-subscription app). `[verify]`
 3. **ADR-Nederland** as the umbrella name/role — from harvested notes, not re-fetched this run. `[verify]`
 4. **ADR Directive 2013/11/EU voluntariness / no-mandatory-ADR principle** (R6) — substance correct, pin the article. `[verify-pinpoint]`
@@ -160,7 +160,9 @@ These are the propositions left below `[settled]` — a reviewer should pin them
 
 ---
 
-### Primary sources fetched this run (2026-06-06)
-- ECC Nederland — "ODR platform shut down 19 July 2025": `https://www.eccnederland.nl/en/news/odr-platform-shut-down-19-july-2025`
-- De Geschillencommissie (SGC): `https://www.degeschillencommissie.nl/` and `/over-ons/commissies/`
-- ConsuWijzer (ACM), via 301 redirect: `https://www.consuwijzer.nl/` → `https://consument.acm.nl/`
+### Primary sources (first fetched 2026-06-06, re-verified 2026-11-18)
+- ECC Nederland — "ODR platform shut down 19 July 2025": `https://www.eccnederland.nl/en/news/odr-platform-shut-down-19-july-2025`; cross-border role: `https://www.eccnederland.nl/en/check-your-rights/getting-justice-eu/what-can-i-do-if-ecc-netherlands-cannot-help-me`
+- European Commission: `https://ec.europa.eu/consumers/odr/` now redirects to `https://consumer-redress.ec.europa.eu/site-relocation_en` (platform closed)
+- Directive (EU) 2025/2647 (CELEX 32025L2647), via the EU Publications Office
+- De Geschillencommissie (SGC): `https://www.degeschillencommissie.nl/`, `/over-ons/commissies/`, `/klacht-indienen/aangesloten-ondernemers/`, `/klacht-indienen/kosten/`, `/ondernemers/`
+- ConsuWijzer (ACM), via 301 redirect: `https://www.consuwijzer.nl/` → `https://consument.acm.nl/`; also `https://consument.acm.nl/contact`

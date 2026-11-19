@@ -1,7 +1,10 @@
 ---
 id: godot-camera-systems
 title: Godot camera systems
-description: Use for Godot 4 2D/3D camera control: Camera2D, Camera3D, SpringArm3D, position_smoothing, smooth following, lerp, camera shake, trauma system, screen shake, deadzone, drag_margin, look_ahead, camera_limits, camera_transition, cinematic sequences, multi-camera.
+description: >-
+  Use for Godot 4 2D/3D camera control: Camera2D, Camera3D, SpringArm3D, position_smoothing, smooth
+  following, lerp, camera shake, trauma system, screen shake, deadzone, drag_margin, look_ahead,
+  camera_limits, camera_transition, cinematic sequences, multi-camera.
 requires: [Godot]
 ---
 

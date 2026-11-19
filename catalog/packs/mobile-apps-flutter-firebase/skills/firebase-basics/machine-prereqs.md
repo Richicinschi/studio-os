@@ -17,16 +17,16 @@ Studio note: on the studio machines, Vite and Astro projects run on Node 22 LTS 
 
 ## 2. Firebase CLI reachable
 
-Run `npx -y firebase-tools@latest --version`. A version string means it works. Nothing needs a global install.
+Run `npx firebase-tools@15.36.0 --version`. A version string means it works. Nothing needs a global install. Why the version is pinned, and how to move it, is in [firebase-basics.md](../firebase-basics.md).
 
 ## 3. Signed in
 
-Run `npx -y firebase-tools@latest login`. With no browser available (remote shell, container), use `login --no-localhost` and let the user paste the code back.
+Run `npx firebase-tools@15.36.0 login`. With no browser available (remote shell, container), use `login --no-localhost` and let the user paste the code back.
 
-## 4. Agent skills and MCP server
+## 4. Agent skills and MCP server (recommended)
 
-Full Firebase support needs the Firebase skills and the Firebase MCP server inside your agent. The per-agent steps are in [agent-environments.md](agent-environments.md). Installing from outside the studio counts as adopting an outside skill or server: scan and vet it first.
+The Firebase plugin (or the Firebase skills) and the Firebase MCP server inside your agent are recommended, not required. Together they give full Firebase support: the MCP server adds the Firebase documentation search and reads remote data such as Crashlytics reports and Data Connect queries. The per-agent steps are in [agent-environments.md](agent-environments.md). Installing from outside the studio counts as adopting an outside skill or server: scan and vet it first, and ask the person before installing.
 
 ## Gate
 
-Do not move on to project work until all four pass. If a user asks to skip, explain that the later commands depend on them, and offer to do the missing one now.
+Do not move on to project work until items 1 to 3 pass. If a user asks to skip one of them, explain that the later commands depend on it, and offer to do the missing one now. Item 4 is recommended, not required: offer it, and if the person declines, carry on with the CLI and tell them which later steps need it. No command in this pack needs the plugin or the outside skills. The MCP server is used in `firebase-basics` step 4 (searching the Firebase docs; without it, use the docs on the web) and for reading remote data from the agent: Crashlytics reports in `firebase-crashlytics` steps 1 and 4, and Data Connect queries. Without it, the person reads that data in the Firebase console.

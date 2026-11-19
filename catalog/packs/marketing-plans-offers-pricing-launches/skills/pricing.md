@@ -1,7 +1,10 @@
 ---
 id: pricing
 title: Pricing and packaging
-description: Use for pricing, packaging, monetization, tiers, freemium, free trial, price increase, value metric, Van Westendorp, willingness to pay, wrong pricing, pricing page, annual vs monthly, per seat, free plan, offer plans. Upgrade screens: paywalls. Service offers: offers.
+description: >-
+  Use for pricing, packaging, monetization, tiers, freemium, free trial, price increase, value
+  metric, Van Westendorp, willingness to pay, wrong pricing, pricing page, annual vs monthly, per
+  seat, free plan, offer plans. Upgrade screens: paywalls. Service offers: offers.
 ---
 
 # Pricing and packaging

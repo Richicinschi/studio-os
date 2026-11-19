@@ -1,5 +1,5 @@
 // tools/export/gates.mjs
-// The export gates (secrets incl. gitleaks, privacy, paths, accounting, links) plus the --note and
+// The export gates (secrets incl. gitleaks, privacy, paths, risky, accounting, links) plus the --note and
 // diagram-link checks. Each returns findings; any finding fails the export. Privacy findings name the
 // deny-list position, never the term.
 import { spawnSync } from 'node:child_process';
@@ -7,7 +7,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node
 import os from 'node:os';
 import path from 'node:path';
 import { inflateRawSync } from 'node:zlib';
-import { findSecrets, findDenied, findPaths, fileKind, PATHS_ALLOW } from './rules.mjs';
+import { findSecrets, findDenied, findPaths, findRisky, fileKind, PATHS_ALLOW, RISKY_ALLOW } from './rules.mjs';
 import { isMenuItem } from './manifest.mjs';
 
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
@@ -65,15 +65,20 @@ export function gatePrivacy(root, deny) {
   ]);
 }
 
-export function gatePaths(root, allow = PATHS_ALLOW) {
+// Per-line findings in every text file but rules.mjs, less those whose line holds an allowed phrase of that file.
+function gateLines(root, find, allow) {
   return textFiles(root).filter((r) => !EXEMPT.has(r)).flatMap((r) => {
     const text = read(root, r);
     const lines = text.split(/\r?\n/);
-    return findPaths(text)
+    return find(text, r)
       .filter((f) => !allow.some((a) => a.file === r && (lines[f.line - 1] || '').includes(a.phrase)))
       .map((f) => `${r}:${f.line} ${f.reason}`);
   });
 }
+
+export const gatePaths = (root, allow = PATHS_ALLOW) => gateLines(root, findPaths, allow);
+
+export const gateRisky = (root, allow = RISKY_ALLOW) => gateLines(root, findRisky, allow);
 
 export function gateNotes(notes, deny) {
   return notes.flatMap((n, i) => [

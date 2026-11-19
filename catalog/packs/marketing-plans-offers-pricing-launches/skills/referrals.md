@@ -1,7 +1,10 @@
 ---
 id: referrals
 title: Referral and affiliate programs
-description: Use when the user wants a referral program, affiliate program or word of mouth plan created, optimized or analyzed: ambassador, viral loop, refer a friend, partner program, referral incentive, customers referring customers, affiliate payout. For launch virality see launch.
+description: >-
+  Use when the user wants a referral program, affiliate program or word of mouth plan created,
+  optimized or analyzed: ambassador, viral loop, refer a friend, partner program, referral
+  incentive, customers referring customers, affiliate payout. For launch virality see launch.
 ---
 
 # Referral and affiliate programs

@@ -1,7 +1,10 @@
 ---
 id: customer-research
 title: Customer research
-description: Use for customer research, customer personas, JTBD, VOC, Reddit mining, G2 reviews, digital watering holes, community research, competitor reviews: analyze and synthesize existing assets or gather new online sources. Copywriting writes the copy; cro improves pages.
+description: >-
+  Use for customer research, customer personas, JTBD, VOC, Reddit mining, G2 reviews, digital
+  watering holes, community research, competitor reviews: analyze and synthesize existing assets or
+  gather new online sources. Copywriting writes the copy; cro improves pages.
 ---
 
 # Customer research

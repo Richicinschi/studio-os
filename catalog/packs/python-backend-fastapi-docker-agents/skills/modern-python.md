@@ -7,6 +7,8 @@ metadata:
 
 # Modern Python
 
+Ask the person before any deploy, any delete of a remote resource, and any publish or upload; show the command and what it changes.
+
 Astral toolchain: uv (packages, environments), ruff (lint, format), ty (types), pytest (tests, coverage), prek (git hooks), plus security checks.
 
 ## When to use it

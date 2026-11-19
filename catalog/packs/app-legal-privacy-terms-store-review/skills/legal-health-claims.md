@@ -30,9 +30,9 @@ This skill does two jobs at once: (1) a **marketing guardrail** — scan every c
 
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/attribution-tiering.md` — tier every legal proposition
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/finding-format.md` — the finding shape (skill-id `HLT`)
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/verdict-model.md` — SIGN-OFF / FIX-THEN-SIGN-OFF / BLOCK + grade
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/verdict-model.md` — SHIP / FIX FIRST / BLOCKED + grade
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/disclosure-grading.md` — entity-named redlines
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/mdr-hbnr.md` — **the substantive engine**: MDR Art. 2(1) purpose table, Recital 19 carve-out, MDCG 2019-11 decision steps, Annex VIII Rule 11, the §5 medical-verb trigger list, the HBNR §318.2 PHR-vendor "multiple sources" gate, the §10 sign-off output template
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/mdr-hbnr.md` — **the substantive engine**: MDR Art. 2(1) purpose table, Recital 19 carve-out, MDCG 2019-11 decision steps, Annex VIII Rule 11, the §5 medical-verb trigger list, the HBNR §318.2 PHR-vendor "multiple sources" gate, the §10 classification output template
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/play-policies.md` — Module 3 Health Content & Services (3B declaration form, 3C prohibited claims, **3D mandatory store-description disclaimer**)
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/platform/apple-review-guidelines.md` — **1.4.1** medical-claim gate (the Apple-side mirror)
 
@@ -64,7 +64,7 @@ Gather: `<app name>`, the **claim surfaces** (Play description, App Store descri
 
 7. **No silent supplement.** Any health-claim question outside this checklist (e.g. an FTC HBNR per-day-penalty multiplier, an MDCG 2019-11 Rev.1 wording delta) → raise as a 🟡 MINOR note, do not act on it silently.
 
-8. **Verdict.** Aggregate per the verdict model; emit the §10 sign-off template from `mdr-hbnr.md`, the finding list, and the authority footer.
+8. **Verdict.** Aggregate per the verdict model; emit the §10 classification template from `mdr-hbnr.md`, the finding list, and the review footer. When the app is offered only outside the Netherlands and the EU, run the store-copy checks (steps 1, 2, 5, 6) and the HBNR screen (step 4, US only), skip the MDR screen (step 3), and say so in the footer (`legal-guardrails.md` §9).
 
 ---
 
@@ -72,13 +72,13 @@ Gather: `<app name>`, the **claim surfaces** (Play description, App Store descri
 
 | # | Check | Source (cite at pinpoint) | Fail → severity |
 |---|---|---|---|
-| HLT-a | Medical-verb scan across ALL surfaces clean | MDR Art. 2(1) + §5 trigger list `[settled — verified 2026-06-06]` | claim present → 🔴 (store/MDR risk) or 🟠 (borderline) |
-| HLT-b | MDR medical-purpose gate → out of scope, reasoned | MDR Art. 2(1) + Recital 19 + MDCG 2019-11 `[settled]` | medical purpose found → 🔴 ESCALATE jurist |
-| HLT-c | HBNR PHR-vendor "multiple sources" gate → not a vendor | 16 CFR §318.2 `[settled — Cornell LII]` / FTC 2024 Final Rule `[low-confidence]` on ultimate call | external health import exists → 🟠 ESCALATE US counsel |
-| HLT-d | "Not a medical device / consult a professional" in the **Play store description** | Google Play Module 3D `[settled — answer/16679511]` | missing from store description → 🟠 MATERIAL |
-| HLT-e | In-app About health disclaimer present + breathing-tailored | Apple 1.4.1 `[settled]` + Module 3D | missing/over-generic → 🟡 |
-| HLT-f | Play Health apps declaration form filed (or reasoned-deferred) | Module 3B `[settled — "all developers"]` / `[verify]` strict requirement | not filed, no reasoning → 🟠 |
-| HLT-g | PP Art. 9 GDPR not over-declaring "health data" (no HealthKit/clinical source) | Apple 5.1.3 note + GDPR Art. 9 `[verify]` | over-declared → 🟡 (consistency) |
+| HLT-a | Medical-verb scan across ALL surfaces clean | MDR Art. 2(1) `[settled — verified 2026-11-18]` + §5 trigger list (verbs beyond the Art. 2(1) terms are a scanner heuristic, `mdr-hbnr.md` §5) | claim present → 🔴 (store/MDR risk) or 🟠 (borderline) |
+| HLT-b | MDR medical-purpose gate → out of scope, reasoned | MDR Art. 2(1) + Recital 19 + MDCG 2019-11 Rev.1 §3.1 `[settled — verified 2026-11-18]` | medical purpose found → 🔴 ESCALATE jurist |
+| HLT-c | HBNR PHR-vendor "multiple sources" gate → not a vendor | 16 CFR §318.2 `[settled — Cornell LII; eCFR, verified 2026-11-18]` / FTC 2024 Final Rule `[low-confidence]` on ultimate call | external health import exists → 🟠 ESCALATE US counsel |
+| HLT-d | "Not a medical device" in the **Play store description**; a "consult a professional" reminder present (Google does not say where) | Google Play Module 3D `[settled — answer/16679511, verified 2026-11-18]` | disclaimer missing from store description, or no reminder → 🟠 MATERIAL |
+| HLT-e | In-app About health disclaimer present + breathing-tailored | Apple 1.4.1 `[settled — verified 2026-11-18]` + Module 3D | missing/over-generic → 🟡 |
+| HLT-f | Play Health apps declaration form filed (or reasoned-deferred) | Module 3B `[settled — "all developers", answer/16679511, verified 2026-11-18]` / `[verify]` strict requirement | not filed, no reasoning → 🟠 |
+| HLT-g | PP Art. 9 GDPR not over-declaring "health data" (test: can the data reveal health status by deduction — CJEU C-21/23) | Apple 5.1.3 note + GDPR Art. 9 `[verify]` | over-declared → 🟡 (consistency) |
 
 Severity is a **floor**: where this overlaps another skill (e.g. PP over-declaring health data, or a store-gate also caught by the play-gate skill), take the higher severity.
 
@@ -119,8 +119,8 @@ Play Health apps declaration form: <filed | reasoned-deferred | needed>
 Re-run triggers: [§5 medical-verb introduced] [HealthKit/Fit/Health Connect/wearable integration added]
 ```
 
-End with the verdict band, per-doc letter grade, and the constitution's authority footer.
+End with the verdict, per-doc letter grade, and the constitution's review footer.
 
-## Authority & carve-outs
+## Verdict & carve-outs
 
-Decide and sign the wellness-vs-medical call, the MDR out-of-scope determination (for a clean-claim self-contained app), the store-disclaimer check, and the declaration-form judgment. **Reserve for a human** only: the binding MDR determination if a medical-purpose phrase is found (Dutch jurist); the binding HBNR PHR-vendor classification (US counsel — the "multiple sources" test is fact-specific and `[low-confidence]`); the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills; native-NL legal-idiom review of any Dutch disclaimer wording; anything you mark `[low-confidence]`.
+An automated review, not legal advice: a lawyer signs off. Give a firm ruling, tied to the clause and rule, on the wellness-vs-medical question, the MDR out-of-scope determination (for a clean-claim self-contained app), the store-disclaimer check, and the declaration-form judgment. **Give no verdict on**, because they need a lawyer or a registration first: the binding MDR determination if a medical-purpose phrase is found (Dutch jurist); the binding HBNR PHR-vendor classification (US counsel — the "multiple sources" test is fact-specific and `[low-confidence]`); the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills; native-NL legal-idiom review of any Dutch disclaimer wording; anything you mark `[low-confidence]`.

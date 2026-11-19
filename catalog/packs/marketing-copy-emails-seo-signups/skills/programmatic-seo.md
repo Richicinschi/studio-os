@@ -1,7 +1,11 @@
 ---
 id: programmatic-seo
 title: Programmatic SEO
-description: Use when making SEO pages: "pSEO," "generate 100 pages," "programmatic SEO," "location pages," "[keyword] + [city] pages," "directory pages," "template pages," "pages at scale," "integration pages," "comparison pages," "data-driven pages," "building many pages for SEO," "templated landing pages."
+description: >-
+  Use when making SEO pages: "pSEO," "generate 100 pages," "programmatic SEO," "location pages,"
+  "[keyword] + [city] pages," "directory pages," "template pages," "pages at scale," "integration
+  pages," "comparison pages," "data-driven pages," "building many pages for SEO," "templated landing
+  pages."
 ---
 
 # Programmatic SEO

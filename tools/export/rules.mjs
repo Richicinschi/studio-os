@@ -193,6 +193,88 @@ export const PATHS_ALLOW = [
   { file: 'catalog/skills/brainstorming/scripts/server.cjs', phrase: 'Tailscale SSH', why: 'an upstream comment naming a product among remote-shell cases; no network detail' },
 ];
 
+// Unsafe patterns a shipped file must not teach: an allowed-tools value granting Bash or Write without a
+// scope in parentheses (inline, comma or space separated, as a YAML list under the key, or as a `>-` or `|`
+// block; `Bash(*)` and `Bash()` count as no scope, and so do `Write(*)`, `Write(**)` and `Write()`), a
+// container image or package pinned to the moving `latest` tag, an image with neither a tag nor a digest,
+// and a proxy or host setting that trusts every address ("*"). Prose about the tag itself (": latest tag"
+// with nothing before the colon) is not an image.
+const RISKY_LINE = [
+  { reason: 'image with :latest', pattern: /[\w./-]+:latest\b(?![.-]\w)/ },
+  { reason: '@latest in a command', pattern: /[\w./-]+@latest\b(?![.-]\w)/ },
+  { reason: 'trust everything ("*")', pattern: /forwarded[-_]allow[-_]ips["']?\s*[=:]?\s*["']?\*|trusted_hosts\s*[=:]\s*\[?\s*["']\*["']/i },
+];
+const ALLOWED_TOOLS = /^(\s*)["']?allowed-tools["']?\s*:\s*(.*)$/;
+function bareTools(value) {
+  const unscoped = value.replace(/\b(Bash|Write)\(\s*\*{0,2}\s*\)/g, '$1').replace(/\([^)]*\)/g, '()');
+  return ['Bash', 'Write'].filter((t) => new RegExp(`\\b${t}\\b(?!\\()`).test(unscoped)).map((t) => `bare ${t} in allowed-tools`);
+}
+
+// The untagged-image rule reads Dockerfile `FROM` lines and YAML `image:` lines only where they are what
+// they look like: in a Dockerfile or a YAML file (by name, `.template` included), or in a Markdown fence
+// labelled dockerfile, docker or containerfile, or yaml or yml. Elsewhere "FROM users" is SQL and
+// "image: '/hero.webp'" is code. `FROM scratch`, a build stage named earlier with `AS`, and a value
+// holding a variable (`$`, `{{`) pass, and so does an `image:` that names page content (CONTENT_IMAGE).
+const DOCKER_FILE = /(?:^|\/)(?:Dockerfile|Containerfile)(?:\.[^/]*)?$|\.(?:dockerfile|containerfile)$/i;
+const YAML_FILE = /\.ya?ml(?:\.template)?$/i;
+const FENCE = /^\s*(`{3,}|~{3,})\s*([\w+-]*)/;
+const FROM_LINE = /^\s*FROM\s+(?:--\S+\s+)*(\S+)(?:\s+AS\s+(\S+))?\s*$/i;
+const IMAGE_LINE = /^\s*(?:-\s+)?image\s*:\s*(["']?)([^\s"'#]+)\1\s*(?:#.*)?$/;
+function untagged(ref) {
+  if (/\$|\{\{/.test(ref) || /@sha256:/.test(ref)) return false;
+  return !ref.slice(ref.lastIndexOf('/') + 1).includes(':');
+}
+// A YAML `image:` that is page content, not a container image: a path (starts with `.`, `/` or `~`), a URL,
+// or a picture, video or document file.
+const CONTENT_IMAGE = /^(?:[./~]|[a-z][a-z0-9+.-]*:\/\/)|\.(?:png|jpe?g|webp|avif|gif|svg|ico|bmp|tiff|mp4|webm|pdf)$/i;
+
+export function findRisky(text, file = '') {
+  const out = [];
+  let list = false; // inside a YAML list under an empty allowed-tools key
+  let block = null; // the key's indent, inside a `>-` or `|` block value of allowed-tools
+  const docker = DOCKER_FILE.test(file);
+  const yaml = YAML_FILE.test(file);
+  let fence = null; // the open Markdown fence: its marker and its language
+  const stages = new Set();
+  text.split(/\r?\n/).forEach((line, i) => {
+    const at = line.match(ALLOWED_TOOLS);
+    if (block !== null && !at && (!line.trim() || line.match(/^\s*/)[0].length > block)) {
+      for (const reason of bareTools(line)) out.push({ reason, line: i + 1 });
+    } else {
+      block = at && /^[>|][+-]?\s*$/.test(at[2]) ? at[1].length : null;
+      if (at) list = !at[2].trim();
+      else if (list && !/^\s*-\s/.test(line)) list = false;
+      const value = at ? (block === null ? at[2] : '') : list ? line.replace(/^\s*-\s/, '') : null;
+      if (value !== null) for (const reason of bareTools(value)) out.push({ reason, line: i + 1 });
+    }
+    for (const { reason, pattern } of RISKY_LINE) if (pattern.test(line)) out.push({ reason, line: i + 1 });
+
+    if (!docker && !yaml) {
+      const f = line.match(FENCE);
+      if (f && fence && f[1][0] === fence.marker[0] && f[1].length >= fence.marker.length && !f[2]) { fence = null; return; }
+      if (f && !fence) { fence = { marker: f[1], lang: f[2].toLowerCase() }; return; }
+    }
+    const inDocker = docker || ['dockerfile', 'docker', 'containerfile'].includes(fence?.lang);
+    const inYaml = yaml || ['yaml', 'yml'].includes(fence?.lang);
+    const from = inDocker && line.match(FROM_LINE);
+    if (from) {
+      const ref = from[1].toLowerCase();
+      if (ref !== 'scratch' && !stages.has(ref) && untagged(from[1])) out.push({ reason: 'image without a tag or digest', line: i + 1 });
+      if (from[2]) stages.add(from[2].toLowerCase());
+    }
+    const image = inYaml && line.match(IMAGE_LINE);
+    if (image && !CONTENT_IMAGE.test(image[2]) && untagged(image[2])) out.push({ reason: 'image without a tag or digest', line: i + 1 });
+  });
+  return out;
+}
+
+// Counter-examples the risky gate flags but that teach the safe way (text warning against the pattern, a
+// test fixture). Matched like PATHS_ALLOW: that phrase on the flagged line, in that file. Never allow a hit
+// that is real; fix it at its source in the hub.
+export const RISKY_ALLOW = [
+  { file: 'catalog/packs/python-backend-fastapi-docker-agents/skills/production-docker.md', phrase: '| `FROM python:latest` | Builds change without warning | Pin version and digest |', why: 'a row of the anti-patterns table, warning against the floating tag' },
+];
+
 // Any IPv4 address is reported except unspecified, loopback, masks and the RFC 5737 documentation
 // ranges; private, CGNAT (tailnet) and link-local ones as private-ip, the rest as public-ip.
 const DOC_NETS = [[192, 0, 2], [198, 51, 100], [203, 0, 113]];

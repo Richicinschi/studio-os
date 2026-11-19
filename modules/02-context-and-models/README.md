@@ -1,7 +1,7 @@
 ---
 title: Context and models
 pack: way-of-working
-checked: 2026-11-02
+checked: 2026-11-19
 studio_sources:
   - .studio/memory/feedback_agents_parent_model.md
   - .studio/memory/feedback_subagent_orchestration.md

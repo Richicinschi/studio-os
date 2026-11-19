@@ -1,7 +1,7 @@
 ---
 id: worktrees
 module: 06-git-and-guardrails
-checked: 2026-11-09
+checked: 2026-11-18
 other_figures:
   - 75
 ---
@@ -55,16 +55,22 @@ The menu marks the item **have** when an instruction file carries a worktree rul
 
 1. **Claude:** writes the rule into your front door (`AGENTS.md`, or `CLAUDE.md` if that is your only one), in your words, and shows it before saving. A starting point: "When another session may be working in this repository, do your work in a worktree of your own, in `<the folder you chose>`, on a new branch off the latest main branch. Never switch branches, stash, reset or clean in a checkout another session may be using, and remove only a worktree you made in this session."
 2. **Claude:** if you chose `.worktrees/` inside a repository, checks that git ignores it with `git -C <repo> check-ignore -q .worktrees`. When it does not, Claude adds the line `.worktrees/` to that repository's `.gitignore` on your yes; you commit that change like any other.
-3. **Claude:** when a parallel session needs a worktree, on your yes, fetches and branches off the latest main branch: `git -C <repo> fetch origin`, then `git -C <repo> worktree add -b <branch> <folder>/<branch> origin/main`, with your own remote and main branch names in place of `origin` and `main`. This makes a new branch starting at `origin/main`, checked out in the new folder; `-b` refuses a branch name that already exists ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees").
-4. **you:** start the second session in that folder, from a new terminal rather than with `!` (which runs inside the current session): `cd <folder>/<branch>`, then `claude`. The worktree holds committed files only, so install the project's dependencies there first.
-5. **Claude:** when the work has landed, removes the worktree it made: `git -C <repo> worktree remove <folder>/<branch>`. Git removes only a clean worktree, with no untracked files and no changes to tracked ones ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"); if it refuses, Claude shows those files and asks you, and it never forces the removal. The routine for the end of a branch is [finishing-a-development-branch](finishing-a-development-branch.md).
+3. **Claude:** when a parallel session needs a worktree, on your yes, fetches and branches off the latest main branch: `git -C <repo> fetch origin`, then `git -C <repo> worktree add --no-track -b <branch> <folder>/<branch> origin/main`, with your own remote and main branch names in place of `origin` and `main`. This makes a new branch starting at `origin/main`, checked out in the new folder; `-b` refuses a branch name that already exists ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"). `--no-track` leaves the new branch with no upstream. Without it git prints "set up to track 'origin/main'", and a plain `git push` from the branch can go to main; the first push sets the branch's own upstream instead: `git push -u origin <branch>` ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees").
+4. **you:** start the second session in that folder, from a new terminal rather than with `!` (which runs inside the current session): `cd <folder>/<branch>`, then `claude`. The worktree holds committed files only, so install the project's dependencies there first. Before the worktree is removed, close that session and every terminal open inside the folder.
+5. **Claude:** when the work has landed, removes the worktree it made, in this order:
+   - It lists the ignored files, which plain `git status --porcelain` does not show and which the removal deletes without a word: `git -C <folder>/<branch> status --porcelain --ignored`. Lines starting `!!` are ignored files ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"). Dependency folders (`node_modules/`, `.venv/`, `venv/`, `build/`, `dist/`, `.dart_tool/`) come back with an install or a build. Anything else (`.env`, results, logs, local data) exists only in that worktree: Claude names it and asks you whether to move it out first or delete it with the worktree.
+   - Once every session and terminal inside the worktree is closed, it runs `git -C <repo> worktree remove <folder>/<branch>`. Git removes only a clean worktree, with no untracked files and no changes to tracked ones ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"); if it refuses, Claude shows those files and asks you, and it never forces the removal.
+   - On Windows, a terminal still open inside the worktree makes the removal fail half-way. When git reports "failed to delete", the worktree is already unregistered and its folder stays; you delete that folder by hand after closing what holds it.
+
+   The routine for the end of a branch is [finishing-a-development-branch](finishing-a-development-branch.md).
 6. **Claude:** says, once, that the full form of this practice is the [using-git-worktrees](using-git-worktrees.md) skill: it checks whether the session is already in a worktree, prefers a worktree tool the session offers, creates the worktree, installs dependencies and runs the tests before work starts. You take it through its own card when the rule alone is not enough.
 7. **Claude:** records the decision, the folder you chose and the undo in `adoption/decisions.md`.
 
 ## Check
 
 1. **Claude:** `grep -ci worktree <your front door>`. Expected: `1` or more.
-2. **you:** in a new session, in a throwaway repository in a temporary folder with one commit, say "Start a branch for a small change; another session is working in this checkout." Expected: Claude proposes a worktree in the folder you chose, not a branch switch here (a throwaway repository has no remote, so it branches off the local main branch). After your yes, `git -C <repo> worktree list | wc -l` prints one more than before, and `git -C <repo> branch --show-current` in the original checkout prints the branch it had before. Then Claude removes the check worktree and you delete the throwaway folder.
+2. **you:** make a throwaway repository with a remote, in a temporary folder: `git init --bare -b main origin.git`, then `git clone origin.git repo`, then in `repo` one commit holding a `.gitignore` with the line `.env`, then `git -C repo push origin main`. In a new session in `repo`, say "Start a branch for a small change; another session is working in this checkout." Expected: Claude proposes a worktree in the folder you chose, not a branch switch here, and its command carries `--no-track`. After your yes, `git -C repo worktree list | wc -l` prints one more than before, `git -C repo branch --show-current` prints the branch it had before, and `git -C <path> status -sb`, with `<path>` the new worktree's folder, prints `## <branch>` with no `...origin/main` after it: the new branch has no upstream.
+3. **you:** create an ignored file in the check worktree, `echo KEY=x > <path>/.env`, then say "Remove the worktree." Expected: before removing, Claude runs `git -C <path> status --porcelain --ignored`, names `.env` (the line `!! .env`) and asks you what happens to it. Answer "delete it"; Claude removes the check worktree, and you delete the throwaway folder.
 
 If Claude runs `git checkout` or `git switch` in the shared checkout instead, the item is not done: the plan row stays unticked, and the wording of the rule is the next thing to look at.
 
@@ -72,12 +78,13 @@ If Claude runs `git checkout` or `git switch` in the shared checkout instead, th
 
 - **Claude:** removes the rule from your front door.
 - **Claude:** removes the `.worktrees/` line from a `.gitignore` it changed, once that folder is empty.
-- **Claude:** removes each worktree it made, with `git worktree remove <path>`, only after `git -C <path> status --porcelain` prints nothing. A refused removal is shown to you, never forced.
+- **Claude:** removes each worktree it made, with `git worktree remove <path>`, only after `git -C <path> status --porcelain` prints nothing and you have answered for each ignored file that `git -C <path> status --porcelain --ignored` lists beyond the dependency folders of step 5. Every session and terminal inside the worktree is closed first. A refused removal is shown to you, never forced. On Windows, a removal that reports "failed to delete" has already unregistered the worktree; you delete the leftover folder by hand after closing what holds it.
 - **you:** the branches stay; deleting them is a separate yes for each ([git-cleanup](git-cleanup.md) sorts them first).
 
 ## Watch out
 
 - **A worktree holds committed files only.** Uncommitted plans, ignored folders, installed dependencies and build output stay in the main checkout. Install again in each worktree, and commit a plan before a session in another worktree needs it.
+- **A worktree's ignored files go with it.** `git worktree remove` deletes the ignored files made in a worktree, such as `.env`, results and logs, without a word, and plain `git status --porcelain` does not list them. Step 5 lists them with `--ignored` first; for a data or training project, an ignored folder is often where the results are.
 - **Never clean up a worktree you did not make.** Several sessions' worktrees can sit in one folder, so the path proves nothing about who owns it; only a worktree made in this session is yours to remove.
 - **Links inside a worktree can fool a tool.** The studio ran a generator in a worktree whose project folders were links to the real ones (on Windows, junctions). The scanner walked into none of them, and a run that passed every check would have deleted about 190 pages ([the green run](../examples/green-run-that-would-have-deleted.md)). Look at the size of a change made in a worktree before you trust it.
 - **The studio's own failure:** a quick branch switch in a shared checkout moved another live session's branch, and its commits landed on the wrong branch. That is the act the rule forbids.

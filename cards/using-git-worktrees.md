@@ -1,7 +1,7 @@
 ---
 id: using-git-worktrees
 module: 06-git-and-guardrails
-checked: 2026-11-09
+checked: 2026-11-18
 tokens:
   description: 57
   body: 1637
@@ -62,7 +62,7 @@ The menu marks the item **have** when a skill of this name is present, in a proj
 2. **Claude:** on ADAPT, writes the skill into the place you chose and shows the diff before saving. It rewrites the studio-specific parts:
    - **The "Studio rule: the shared checkout" section** (the studio's shared checkout is never touched, and work there always gets a worktree without asking): replaced by your own declared preference, for example "always make a worktree in this repository", or dropped, so the skill asks before it creates one, as its consent step already does.
    - **The worktree folder** (in the skill's step 4; in a studio repository, a folder beside the repository, never `.worktrees/` inside it): replaced by the folder you chose on the [worktrees](worktrees.md) card, or dropped, which keeps the skill's lookup of an existing `.worktrees/` or `worktrees/` and its `.worktrees/` default.
-   - **Branching off `origin/main` after a fetch**: kept with your own remote and main branch names, or dropped, which goes back to a branch off the current checkout.
+   - **Branching off `origin/main` after a fetch**: kept with your own remote and main branch names, or dropped, which goes back to a branch off the current checkout. When kept, the skill's `git worktree add --no-track -b <branch> <path> origin/main` keeps `--no-track`: without it the new branch tracks `origin/main`, and a plain `git push` from it can go to main ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees").
    - **The "Studio repo" row** in the quick lookup, and the row in "Excuses that fail" about the shared checkout that cites the studio's own incident: reworded for your setup, or dropped.
    - **The front matter's author**: your own.
    - **The skill's setup commands (its step 5) and test commands (its step 6)**: only those your projects use, written for PowerShell if that is your shell.
@@ -72,7 +72,8 @@ The menu marks the item **have** when a skill of this name is present, in a proj
 ## Check
 
 1. **Claude:** the file exists at `<scope>/.claude/skills/using-git-worktrees/SKILL.md`.
-2. **you:** in a new session, in a throwaway repository in a temporary folder with one commit, say "Set up an isolated workspace for a branch called check-worktree." Expected: Claude says it is running the using-git-worktrees skill and preparing an isolated workspace (or the line you wrote in its place), runs the detection of its step 1 first, asks before it creates the worktree unless your front door declares the preference (say yes), and ends with a report that starts "Worktree ready at" and names the worktree's folder: the one you chose, or the one a worktree tool of the session picked. Then Claude removes the check worktree and you delete the throwaway folder.
+2. **you:** make a throwaway repository with a remote, in a temporary folder: `git init --bare -b main origin.git`, then `git clone origin.git repo`, then in `repo` one commit holding a `.gitignore` with the line `.env`, then `git -C repo push origin main`. In a new session in `repo`, say "Set up an isolated workspace for a branch called check-worktree." Expected: Claude says it is running the using-git-worktrees skill and preparing an isolated workspace (or the line you wrote in its place), runs the detection of its step 1 first, asks before it creates the worktree unless your front door declares the preference (say yes), and ends with a report that starts "Worktree ready at" and names the worktree's folder: the one you chose, or the one a worktree tool of the session picked. When it used git rather than a worktree tool, `git -C <path> status -sb`, with `<path>` that folder, prints `## check-worktree` with no `...origin/main` after it: the branch has no upstream.
+3. **you:** create an ignored file in the check worktree, `echo KEY=x > <path>/.env`, close every terminal open inside it, then say "Remove the check worktree." Expected: before removing, Claude runs `git -C <path> status --porcelain --ignored`, names `.env` (the line `!! .env`) and asks you what happens to it. Answer "delete it"; Claude removes the check worktree, and you delete the throwaway folder.
 
 If Claude creates a branch in the current checkout instead, or skips the detection, the item is not done: the plan row stays unticked.
 
@@ -81,7 +82,7 @@ If Claude creates a branch in the current checkout instead, or skips the detecti
 - **Claude:** deletes the skill folder from the scope it went to: `<repo>/.claude/skills/using-git-worktrees/` or `~/.claude/skills/using-git-worktrees/`.
 - **Claude:** removes the preference line from your front door, if step 3 added one.
 - **Claude:** removes the `.worktrees/` line from a `.gitignore` the skill changed, once that folder is empty.
-- **Claude:** removes each worktree the skill made, with `git worktree remove <path>`, only after `git -C <path> status --porcelain` prints nothing. Git removes only a clean worktree unless forced ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"); a refused removal is shown to you, never forced. Branches stay until you delete them.
+- **Claude:** removes each worktree the skill made, with `git worktree remove <path>`, only after `git -C <path> status --porcelain` prints nothing and you have answered for each ignored file that `git -C <path> status --porcelain --ignored` lists. The removal deletes ignored files without a word, and plain `status --porcelain` does not list them; dependency folders (`node_modules/`, `.venv/`, `venv/`, `build/`, `dist/`, `.dart_tool/`) come back with an install or a build, while anything else (`.env`, results, logs, local data) exists only there, so Claude names it and asks whether to move it out first. Every session and terminal inside the worktree is closed first. Git removes only a clean worktree unless forced ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"); a refused removal is shown to you, never forced. On Windows, a removal that reports "failed to delete" has already unregistered the worktree; you delete the leftover folder by hand after closing what holds it. Branches stay until you delete them.
 
 ## Watch out
 
@@ -89,6 +90,6 @@ If Claude creates a branch in the current checkout instead, or skips the detecti
 - **It installs.** The skill's setup step runs your package manager in the new worktree, which downloads packages. Your company's rules on package sources apply there as anywhere.
 - **A native tool comes first.** The skill uses a worktree tool the session offers before it falls back to git, and that tool decides where the worktree goes. Claude Code's own worktree support: not documented in docs/facts.md as of 2026-11-02.
 - **A sandbox can cancel the isolation.** If creating the worktree fails with a permission error, the skill says so and works in the current folder instead. Read that message when it appears: the work is then not isolated.
-- **A worktree holds committed files only, and links in it can fool a tool.** Uncommitted plans and ignored folders stay behind. The studio once ran a generator in a worktree whose project folders were links to the real ones; the scanner walked into none of them, and the run passed every check while it would have deleted about 190 pages ([the green run](../examples/green-run-that-would-have-deleted.md)).
+- **A worktree holds committed files only, and links in it can fool a tool.** Uncommitted plans and ignored folders stay behind, and the ignored files made in a worktree, such as `.env` and results, go with it when it is removed. The studio once ran a generator in a worktree whose project folders were links to the real ones; the scanner walked into none of them, and the run passed every check while it would have deleted about 190 pages ([the green run](../examples/green-run-that-would-have-deleted.md)).
 - **Two skills, one job.** If you also have another skill that does the same job, both offer themselves for the same task; keep one.
 - **Token cost:** the description loads in every session, about 57 tokens; the body, about 2,060 tokens, loads only when the skill is used. Both are estimates (bytes divided by 4).

@@ -7,23 +7,40 @@ import { serviceAreas } from '../data/serviceAreas';
 import { areaUrl, contactUrl } from '../lib/urls';
 
 const years = yearsInBusiness();
+// Every licence claim on this page shows only when business.license is filled
+// in; leave it '' when the business holds no licence and they all drop out.
+const licensed = business.license.trim() !== '';
+
+// Claims on this page that only the business can vouch for are tokens in
+// double underscores: LICENCE_STATEMENT (one sentence naming the licence the
+// owner really holds, e.g. "Sam Ortiz holds Texas Master Plumber licence
+// M-12345."), RATING_BADGE (a rating the business really holds, e.g. "BBB A+
+// Rated") and INSURANCE_STATEMENT (one sentence on the insurance it really
+// carries, e.g. "Insured for public liability up to $2 million."). Fill each,
+// or delete the element it sits in. `npm run build` refuses to run while one
+// is left (scripts/check-placeholders.mjs).
 
 const trustItems = [
-  {
-    icon: 'lucide:badge-check',
-    title: 'Licensed',
-    detail: business.license,
-  },
+  ...(licensed
+    ? [
+        {
+          icon: 'lucide:badge-check',
+          title: 'Licensed',
+          detail: business.license,
+        },
+      ]
+    : []),
   {
     icon: 'lucide:shield',
-    title: 'Fully Insured',
-    detail: "Every job is covered by liability insurance and workers' compensation.",
+    // Fill with the insurance the business really carries, or delete this item.
+    title: 'Insured',
+    detail: '__INSURANCE_STATEMENT__',
   },
   {
     icon: 'lucide:award',
-    // Sample badge: delete unless the business really holds this rating.
-    title: 'BBB A+ Rating',
-    detail: 'The Better Business Bureau gives us its top A+ grade for fair dealing.',
+    // Fill with a rating the business really holds, or delete this item.
+    title: '__RATING_BADGE__',
+    detail: 'An independent rating anyone can look up.',
   },
   {
     icon: 'lucide:calendar',
@@ -34,8 +51,8 @@ const trustItems = [
 ---
 
 <BaseLayout
-  title={`About ${business.name} | Fairmont TX Plumber`}
-  description={`Learn about ${business.name}, founded by ${business.owner} in ${business.yearEstablished}. ${years}+ years serving ${business.serviceRadius} with licensed, insured plumbing services.`}
+  title={`About ${business.name} | ${business.address.city} ${business.address.stateCode} Plumber`}
+  description={`Learn about ${business.name}, founded by ${business.owner} in ${business.yearEstablished}. ${years}+ years serving ${business.serviceRadius} with ${licensed ? 'licensed ' : ''}plumbing services.`}
 >
   <Breadcrumbs crumbs={[{ label: 'About' }]} />
 
@@ -47,8 +64,8 @@ const trustItems = [
           About {business.name}
         </h1>
         <p class="mt-4 text-lg leading-relaxed text-stone-600">
-          A local, licensed and insured company. Since {business.yearEstablished} we have
-          been fixing plumbing across the Fairmont region.
+          A local{licensed && ', licensed'} company. Since {business.yearEstablished} we have
+          been fixing plumbing across {business.serviceRadius}.
         </p>
       </div>
     </div>
@@ -66,19 +83,16 @@ const trustItems = [
             well made.
           </p>
           <p>
-            The company began with a single plumber and now has more than {years} years
-            behind it. {business.owner} is a licensed Master Plumber and checks each
-            project personally so it meets his own bar.
+            {business.name} now has more than {years} years behind it.
+            __LICENCE_STATEMENT__
           </p>
           <p>
             Our approach is simple: get it right the first time, price it fairly, and treat
-            each house as if it were ours. The result is an A+ from the Better Business
-            Bureau and many customers who call us again.
+            each house as if it were ours.
           </p>
           <p>
-            An emergency at midnight or a planned kitchen remodel gets the same response. We
-            arrive on time, explain what is going on and start work. No upselling, no
-            surprises, just dependable plumbing.
+            An urgent repair or a planned kitchen remodel gets the same care: we explain
+            what is going on before we start work.
           </p>
         </div>
 
@@ -91,31 +105,29 @@ const trustItems = [
               </div>
               <div>
                 <h3 class="font-display text-xl text-brand-900">{business.owner}</h3>
-                <p class="text-sm text-stone-500">Owner & Master Plumber</p>
+                <p class="text-sm text-stone-500">Owner</p>
               </div>
             </div>
             <div class="mt-6 space-y-3 text-sm leading-relaxed text-stone-600">
               <p>
-                {business.owner} has spent over {years} years in the plumbing trade. After
-                earning a Master Plumber license he opened {business.name} to give
-                Fairmont and nearby towns the personal attention bigger firms rarely offer.
-              </p>
-              <p>
-                He works on every job himself, from the first estimate through the final
-                inspection. Call {business.name} and you may well find him on the other end
-                of the line.
+                {business.owner} has spent over {years} years in the plumbing trade and opened
+                {business.name} to give Fairmont and nearby towns the personal attention
+                bigger firms rarely offer.
               </p>
             </div>
             <div class="mt-6 border-t border-stone-100 pt-6">
               <p class="text-xs font-medium uppercase tracking-wider text-stone-400">Credentials</p>
               <div class="mt-2 flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">
-                  <Icon name="lucide:badge-check" class="size-3.5" />
-                  {business.license}
-                </span>
+                {licensed && (
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">
+                    <Icon name="lucide:badge-check" class="size-3.5" />
+                    {business.license}
+                  </span>
+                )}
+                <!-- Fill with a rating the business really holds, or delete this span. -->
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">
                   <Icon name="lucide:shield-check" class="size-3.5" />
-                  BBB A+ Rated
+                  __RATING_BADGE__
                 </span>
               </div>
             </div>
@@ -181,7 +193,7 @@ const trustItems = [
         <div>
           <h2 class="font-display text-3xl text-white">Let Us Help You</h2>
           <p class="mt-2 text-brand-200">
-            Phone for a free estimate or write to us online. We would be glad to earn your business.
+            Phone for an estimate or write to us online. We would be glad to earn your business.
           </p>
         </div>
         <div class="flex shrink-0 flex-wrap gap-4">

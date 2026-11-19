@@ -14,6 +14,16 @@ interface Props {
 }
 
 const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.props;
+
+// Google Analytics is off by default. It sets cookies and sends every visitor's
+// IP address to Google, so it loads only when ANALYTICS_ENABLED is true, and
+// only in the production build. This is a site-wide switch, not a visitor's
+// consent: when true, the script loads for every visitor. Set it to true only
+// after the owner has decided how visitors consent: a consent tool on the site
+// that holds this script back until a visitor agrees, or advice that no consent
+// step is needed where the site's visitors are. Put the real GA4 id in both
+// places in the block below too.
+const ANALYTICS_ENABLED: boolean = false;
 ---
 
 <!doctype html>
@@ -26,13 +36,12 @@ const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.pro
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <!-- Fonts. If you pick other families, change them here and in global.css. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap"
-    />
+    <!-- Fonts are self-hosted: put the .woff2 files in public/fonts/ (see the README there) and
+         declare them with @font-face at the top of src/styles/global.css. Loading them from a
+         font CDN would send each visitor's IP address to a third party. To preload the body
+         font, uncomment and match the file name:
+    <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    -->
 
     <SEO
       title={title}
@@ -43,8 +52,8 @@ const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.pro
       noindex={noindex}
     />
 
-    <!-- Analytics only in the production build. Put the real GA4 id in both places, or delete the block. -->
-    {import.meta.env.PROD && (
+    <!-- Analytics: off until ANALYTICS_ENABLED above is true. Or delete the block. -->
+    {import.meta.env.PROD && ANALYTICS_ENABLED && (
       <>
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
         <script is:inline>

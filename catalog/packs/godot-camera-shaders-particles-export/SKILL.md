@@ -1,6 +1,6 @@
 ---
 name: godot-camera-shaders-particles-export
-description: Use when the user works on a Godot game: GDScript errors and typed code, scenes and nodes, running or testing a change, menus and saves, editor tools, cameras, shaders, particles, tweening, exporting builds, or auditing a project.
+description: "Use when the user works on a Godot game: GDScript errors and typed code, scenes and nodes, running or testing a change, menus and saves, editor tools, cameras, shaders, particles, tweening, exporting builds, or auditing a project."
 ---
 
 # Godot games: camera, shaders, particles, export and audit

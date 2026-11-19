@@ -8,11 +8,16 @@
 //
 // Usage:  node run_mobsf.mjs --file <path-to.apk|.ipa>
 // Env:    MOBSF_URL (default http://localhost:8000), MOBSF_API_KEY (required to scan)
-// Server: docker run -it -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
+// Server: docker run -it -p 127.0.0.1:8000:8000 <IMAGE below> (port bound to this machine only)
 //         (API key is printed in the container logs / Settings page)
 
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
+
+// Pinned by digest so a moved tag cannot swap the scanner. Tag v4.6.6,
+// digest sha256:1108d19cf0e1dd1350f049d94f39c64fa9c029f4b5f17ef1dc33b489a149371e, read 2026-11-18
+// from Docker Hub (docker buildx imagetools inspect). Update tag and digest together.
+const IMAGE = 'opensecurity/mobile-security-framework-mobsf:v4.6.6@sha256:1108d19cf0e1dd1350f049d94f39c64fa9c029f4b5f17ef1dc33b489a149371e';
 
 const args = process.argv.slice(2);
 const fileIdx = args.indexOf('--file');
@@ -37,7 +42,7 @@ async function main() {
     Object.assign(result, {
       skipped: true,
       reason: `MobSF server not reachable at ${MOBSF_URL}.`,
-      howToStart: 'docker run -it -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest',
+      howToStart: `docker run -it -p 127.0.0.1:8000:8000 ${IMAGE}`,
       thenSet: 'set MOBSF_API_KEY=<key from container logs/Settings>, then re-run with --file <apk|ipa>.',
     });
     return console.log(JSON.stringify(result, null, 2));

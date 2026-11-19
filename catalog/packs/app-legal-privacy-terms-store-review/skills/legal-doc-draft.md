@@ -31,7 +31,7 @@ entities), *version-correct* (re-consent bumped on material change), and *langua
 preserves sound wording and changes only what is wrong, missing, or stale.
 
 ## Load before drafting
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — constitution (tiering, severity, finding format, authority footer, carve-outs).
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — constitution (tiering, severity, finding format, review footer, carve-outs).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/*` — attribution-tiering, disclosure-grading (flow→clause), finding-format, verdict-model.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/sdk-data-map.md` — **the audit-from-code source of truth** (every SDK → data, recipient entity, on/off-device, lawful basis, location, transfer). Do NOT invent data behaviour; read it here.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/data-category-ontology.md` — Apple ⇄ Play ⇄ GDPR crosswalk (so doc inventory aligns with the store labels).
@@ -62,7 +62,7 @@ Other `nl-eu-law/*` (crd-withdrawal, bw-unfair-terms, eprivacy-cookiewet, transf
 
 4. **Be SPECIFIC, not generic (anti-generic rule).** Every collection/sharing statement names the **entity** and the **concrete practice**: "RevenueCat, Inc. (US) receives the purchase token and App User ID to validate the subscription" — never "we share data with third parties to improve the product." Use `disclosure-grading.md`: a clause that fails to name the recipient is *vague* and must be rewritten. Tag every legal proposition with its attribution tier ([settled …] / [verify] / [verify-pinpoint] / [low-confidence]) per the constitution.
 
-5. **Placeholders.** Fill `[KVK]` / `[BTW]` / `[REGISTERED ADDRESS]` (and price/trial/VAT figures) **only** when the value is supplied. Otherwise leave the bracket intact and emit an inline **`[LEGAL REVIEW REQUIRED — <what>]`** flag at that spot. These three fills + native-NL idiom + any `[low-confidence]` call are the **only** items reserved for a human advocaat (constitution §5); decide and write everything else.
+5. **Placeholders.** Fill `[KVK]` / `[BTW]` / `[REGISTERED ADDRESS]` (and price/trial/VAT figures) **only** when the value is supplied. Otherwise leave the bracket intact and emit an inline **`[LEGAL REVIEW REQUIRED — <what>]`** flag at that spot. These three values + native-NL idiom + any `[low-confidence]` call are the §5 carve-outs: the suite gives no verdict on them, and they need a lawyer or a registration first. Draft everything else; the review skills give the verdict, and a lawyer signs off.
 
 6. **Patch mode = surgical (preserve validated wording).** For an update, change only the wrong/missing/stale spans. Keep section numbering, the "At a glance" box, the model withdrawal form, and any clause already graded sound. Output a diff or the patched section, not a wholesale rewrite. (The idea comes from a lawve-ai drafting rule; the wording here is the suite's own.)
 
@@ -80,9 +80,9 @@ Other `nl-eu-law/*` (crd-withdrawal, bw-unfair-terms, eprivacy-cookiewet, transf
 
 ## Output format
 Emit, in order:
-1. **Mode + verdict line** — `Mode: <draft|patch>` and the band (SIGN-OFF / FIX-THEN-SIGN-OFF / BLOCK) with per-doc letter grade, per the verdict model.
+1. **Mode + verdict line** — `Mode: <draft|patch>` and the verdict (SHIP / FIX FIRST / BLOCKED) with per-doc letter grade, per the verdict model.
 2. **The drafted/patched text** — full doc for a new draft; a **diff or the changed sections** for an update (EN and NL side by side or sequential). Inline `[LEGAL REVIEW REQUIRED — …]` flags stay in the text where they belong.
 3. **Inserted-flags list** — every `[LEGAL REVIEW REQUIRED]` flag + every `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` left unfilled, with location.
 4. **Version-bump note** — material? → version constant `N→N+1`, doc version + date in every legal-doc file, re-consent will fire; or "MINOR — no bump." Note hosted-deploy is owner-side if pages changed.
 5. **Findings** (only where a draft choice resolved a gap/risk) in the constitution's finding format `[legal-doc-draft-<n>] <emoji> …` with Basis (citation + tier), Redline, Confidence — floor severity when overlapping another skill.
-6. **Authority footer** (constitution §5 verbatim) — reserving only the identity fills, native-NL idiom review, and `[low-confidence]` items for a Dutch advocaat.
+6. **Review footer** (constitution §5: what was checked, against which law, each source's verified date) — listing the §5 carve-outs (identity values, native-NL idiom review, `[low-confidence]` items), which get no verdict; they need a lawyer or a registration first.

@@ -18,7 +18,7 @@ const infoLink = 'text-sm text-brand-700 transition-colors hover:text-brand-900'
 
 <BaseLayout
   title={`Contact ${business.name}`}
-  description={`Ask ${business.name} for a free estimate. Call ${business.phone} or send the form below. We cover ${business.serviceRadius}.`}
+  description={`Ask ${business.name} for an estimate. Call ${business.phone} or send the form below. We cover ${business.serviceRadius}.`}
 >
   <Breadcrumbs crumbs={[{ label: 'Contact' }]} />
 
@@ -27,7 +27,8 @@ const infoLink = 'text-sm text-brand-700 transition-colors hover:text-brand-900'
       <div class="max-w-3xl animate-fade-up">
         <h1 class="font-display text-4xl text-brand-900 sm:text-5xl">Contact {business.name}</h1>
         <p class="mt-4 text-lg leading-relaxed text-stone-600">
-          Call, email or use the form. Routine requests get an answer within one business day.
+          {/* Fill with how soon the business really answers, written to follow "get an answer", e.g. "within one business day". */}
+          Call, email or use the form. Routine requests get an answer __RESPONSE_TIME__.
         </p>
       </div>
     </div>
@@ -42,8 +43,9 @@ const infoLink = 'text-sm text-brand-700 transition-colors hover:text-brand-900'
             <h2 class="font-display text-2xl text-brand-900">Send a message</h2>
             <p class="mt-2 text-sm text-stone-500">Tell us what you need and we will reply soon.</p>
 
-            <!-- The form posts nowhere yet: point `action` at a real endpoint before launch. -->
-            <form action="#" method="POST" class="mt-8 space-y-6">
+            <!-- Fill `action` with the real endpoint that receives this form (a form service or
+                 the site's own Worker), or delete the form. The build refuses while it is unfilled. -->
+            <form action="__FORM_ENDPOINT__" method="POST" class="mt-8 space-y-6">
               <div class="grid gap-6 sm:grid-cols-2">
                 <div>
                   <label for="name" class={labelClass}>Full name <span class="text-red-500">*</span></label>
@@ -144,7 +146,7 @@ const infoLink = 'text-sm text-brand-700 transition-colors hover:text-brand-900'
               </li>
             </ul>
 
-            <!-- Edit or delete this box if the business has no after-hours service. -->
+            <!-- Delete this box if the business takes no urgent calls. -->
             <div class="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-4">
               <div class="flex items-start gap-3">
                 <Icon name="lucide:alert-triangle" class="mt-0.5 size-5 shrink-0 text-amber-600" />
@@ -153,7 +155,7 @@ const infoLink = 'text-sm text-brand-700 transition-colors hover:text-brand-900'
                   <p class="mt-1 text-sm text-amber-700">
                     Burst pipe, gas smell or a sewer backing up: phone
                     <a href={business.phoneHref} class="font-semibold underline">{business.phone}</a>
-                    now. Someone answers around the clock.
+                    now. We take urgent calls __HOURS_STATEMENT__.
                   </p>
                 </div>
               </div>

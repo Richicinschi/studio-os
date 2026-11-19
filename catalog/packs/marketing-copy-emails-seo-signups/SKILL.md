@@ -1,6 +1,6 @@
 ---
 name: marketing-copy-emails-seo-signups
-description: Use when the user wants web or sales copy edited or written, emails and cold outreach, search optimisation, a signup, onboarding, paywall or churn fix, page conversion, an A/B test, analytics set-up or app-store optimisation.
+description: "Use when the user wants web or sales copy edited or written, emails and cold outreach, search optimisation, a signup, onboarding, paywall or churn fix, page conversion, an A/B test, analytics set-up or app-store optimisation."
 ---
 
 # Marketing: copy, emails, search, signups and tests

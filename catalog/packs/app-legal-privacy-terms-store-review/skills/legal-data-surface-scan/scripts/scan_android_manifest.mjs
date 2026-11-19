@@ -5,8 +5,13 @@
 // pulled in by firebase_analytics) into the MERGED manifest even when the app
 // claims "no advertising ID". This greps the merged manifest (preferred) or the
 // source manifest, classifies permissions, and reports whether AD_ID is present
-// or has been stripped via tools:node="remove" — to reconcile against the Play
-// Data Safety "no advertising ID" answer and Privacy Policy §4.
+// or has been stripped via tools:node="remove", and whether Firebase's
+// google_analytics_adid_collection_enabled meta-data is set to false — to
+// reconcile against the Play Data Safety "no advertising ID" answer and Privacy
+// Policy §4. When Firebase Analytics ships (its measurement components in the
+// manifest, or firebase_analytics in pubspec.yaml / the app's Gradle file), only
+// both controls together support "no advertising ID" (sdk-data-map.md §3);
+// without Firebase Analytics the flag is not applicable.
 //
 // Usage:  node scan_android_manifest.mjs [appDir]
 // No external dependencies.
@@ -105,6 +110,46 @@ if (existsSync(source) && source !== manifestPath) {
 const adIdName = 'com.google.android.gms.permission.AD_ID';
 const adIdInMerged = perms.find((p) => p.name === adIdName);
 const adIdStripped = sourceStrips.includes(adIdName) || (adIdInMerged?.stripped ?? false);
+const adIdPresent = !!adIdInMerged && !adIdInMerged.stripped;
+
+// Firebase's documented switch: <meta-data android:name="google_analytics_adid_collection_enabled"
+// android:value="false"/>, read from the manifest used (the merged one when it exists, as that ships).
+function adidFlagValue(t) {
+  for (const m of t.matchAll(/<meta-data\b[^>]*>/g)) {
+    const tag = m[0];
+    if (!/android:name\s*=\s*"google_analytics_adid_collection_enabled"/.test(tag)) continue;
+    const v = tag.match(/android:value\s*=\s*"([^"]*)"/);
+    return v ? v[1] : null;
+  }
+  return null;
+}
+const adidFlag = adidFlagValue(text);
+const adidCollectionDisabled = adidFlag !== null && adidFlag.trim().toLowerCase() === 'false';
+
+// The flag is required only when Firebase Analytics ships. Signs: its measurement components
+// (com.google.android.gms.measurement.*) in the manifest used, or firebase_analytics /
+// firebase-analytics / play-services-measurement in pubspec.yaml or android/app/build.gradle(.kts).
+function firebaseAnalyticsEvidence() {
+  const ev = [];
+  if (/com\.google\.android\.gms\.measurement\./.test(text)) ev.push(`${merged ? 'merged' : 'source'} manifest: com.google.android.gms.measurement components`);
+  const pubspec = join(appDir, 'pubspec.yaml');
+  if (existsSync(pubspec) && /^\s+firebase_analytics\s*:/m.test(readFileSync(pubspec, 'utf8'))) ev.push('pubspec.yaml: firebase_analytics');
+  for (const f of ['build.gradle.kts', 'build.gradle']) {
+    const p = join(appDir, 'android', 'app', f);
+    if (existsSync(p) && /firebase-analytics|play-services-measurement/.test(readFileSync(p, 'utf8'))) ev.push(`android/app/${f}: firebase-analytics / play-services-measurement`);
+  }
+  return ev;
+}
+const firebaseEvidence = firebaseAnalyticsEvidence();
+const firebaseAnalytics = firebaseEvidence.length > 0;
+const consistent = !adIdPresent && (!firebaseAnalytics || adidCollectionDisabled);
+const FLAG = 'google_analytics_adid_collection_enabled=false';
+const adIdState = adIdStripped ? 'AD_ID stripped via tools:node="remove"' : 'AD_ID not present';
+let verdict;
+if (adIdPresent) verdict = 'AD_ID PRESENT in merged manifest — reconcile with Data Safety / Privacy §4 or strip it' + (firebaseAnalytics ? ', and set ' + FLAG : '') + '.';
+else if (consistent && !firebaseAnalytics) verdict = adIdState + '; Firebase Analytics not detected, so ' + FLAG + ' is not applicable — consistent with "no advertising ID".';
+else if (consistent) verdict = adIdState + ' and ' + FLAG + ' set — both controls present; consistent with "no advertising ID".';
+else verdict =(adIdStripped ? 'AD_ID stripped via tools:node="remove"' : 'AD_ID not present') + ', but ' + FLAG + ' is ' + (adidFlag === null ? 'missing' : `"${adidFlag}"`) + ' in the ' + (merged ? 'merged' : 'source') + ' manifest while Firebase Analytics ships — NOT yet consistent with "no advertising ID": set the flag too (sdk-data-map.md §3).';
 
 const out = {
   appDir,
@@ -118,11 +163,14 @@ const out = {
   })),
   sensitivePermissions: perms.filter((p) => SENSITIVE[p.name]).map((p) => p.name),
   advertisingId: {
-    presentInMerged: !!adIdInMerged && !adIdInMerged.stripped,
+    presentInMerged: adIdPresent,
     strippedInSource: adIdStripped,
-    verdict: adIdStripped
-      ? 'AD_ID stripped via tools:node="remove" — consistent with "no advertising ID".'
-      : (adIdInMerged ? 'AD_ID PRESENT in merged manifest — reconcile with Data Safety / Privacy §4 or strip it.' : 'AD_ID not present.'),
+    firebaseAnalytics,
+    firebaseAnalyticsEvidence: firebaseEvidence,
+    adidCollectionFlag: adidFlag,
+    adidCollectionDisabled,
+    consistentWithNoAdvertisingId: consistent,
+    verdict,
   },
   reconcile: 'Compare sensitivePermissions against Play Data Safety declarations and Privacy §4 "what we do not collect". Any sensitive perm with no Data Safety coverage is a finding.',
 };

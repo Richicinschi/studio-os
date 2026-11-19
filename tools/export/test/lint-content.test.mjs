@@ -4,8 +4,11 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { lintModulePage, lintKit, lintStartHere, lintCard, lintBanned } from '../lint-content.mjs';
+import { fileURLToPath } from 'node:url';
+import { lintModulePage, lintKit, lintStartHere, lintCard, lintBanned, lintFrontmatterYaml, frontmatterFiles } from '../lint-content.mjs';
 import { cardText } from './fixture-hub.mjs';
+
+const KIT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 const good = ['---', 'title: Continuity', 'pack: way-of-working', 'studio_sources:', '  - .studio/memory/a.md', 'questions:', '  - Where should memory live?', '---',
   '# 01 Continuity', '', '## The problem', 'x', '## The mechanism', 'x', '## Evidence', 'x', '## Apply it in Claude Code', 'x', '## Apply it in claude.ai', 'x', ''].join('\n');
@@ -87,6 +90,29 @@ test('the kit skills, START-HERE, ADOPT and the cards use none of the minimizing
     w('modules/01-continuity/README.md', good.replace('x\n## The mechanism', 'Just a module.\n## The mechanism'));
     assert.deepEqual(lintKit(root), ['START-HERE.md:3 minimizing word "just"', '.claude/skills/drill-to-adopt/SKILL.md:5 minimizing word "easy"']);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('lintKit reports front matter that real YAML reads differently, in every shipped Markdown file', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'kit-lint-'));
+  const w = (rel, t) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), t); };
+  try {
+    w('START-HERE.md', '# Start here\n\n### Windows\nx\n\n### macOS\nx\n\n### Linux\nx\n'); w('ADOPT.md', 'x'); w('CHANGELOG.md', 'x'); w('export.manifest.json', '{}');
+    w('catalog/skills/tdd/SKILL.md', '---\nname: tdd\ndescription: Use when: testing.\n---\n'); w('catalog/skills/tdd/SOURCE.md', '# tdd: source\n');
+    w('catalog/packs/p/agents/a.md', '---\nname: a\ndescription: It covers:\n---\n');
+    w('catalog/packs/p/skills/ok.md', '---\nname: ok\ndescription: "Quoted: fine"\n---\n');
+    w('catalog/packs/p/skills/plain.md', '# no front matter: nothing to read\n');
+    assert.deepEqual(lintKit(root), [
+      'catalog/packs/p/agents/a.md: front matter description: value is not valid YAML; quote it or use >-',
+      'catalog/skills/tdd/SKILL.md: front matter description: value is not valid YAML; quote it or use >-',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('every front matter the kit ships is valid YAML as the reader takes it', () => {
+  const files = frontmatterFiles(KIT);
+  assert.ok(files.length >= 300, `only ${files.length} files with front matter found`);
+  for (const rel of ['catalog/skills/git-guardrails/SKILL.md', 'catalog/packs/mobile-apps-flutter-firebase/SKILL.md', 'cards/git-guardrails.md']) assert.ok(files.includes(rel), rel);
+  assert.deepEqual(lintFrontmatterYaml(KIT), []);
 });
 
 test('lintKit lints every card', () => {

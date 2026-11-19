@@ -1,6 +1,10 @@
 ---
 name: workers-best-practices
-description: Write or review Cloudflare Workers code. Load for configuring wrangler.jsonc, writing new Workers, reviewing Worker code, or checking common Workers anti-patterns: observability gaps, bindings misuse, secrets, global state, floating promises, streaming. Favours fetching Cloudflare docs over recall.
+description: >-
+  Write or review Cloudflare Workers code. Load for configuring wrangler.jsonc, writing new Workers,
+  reviewing Worker code, or checking common Workers anti-patterns: observability gaps, bindings
+  misuse, secrets, global state, floating promises, streaming. Favours fetching Cloudflare docs over
+  recall.
 metadata:
   category: web
   author: Richicinschi

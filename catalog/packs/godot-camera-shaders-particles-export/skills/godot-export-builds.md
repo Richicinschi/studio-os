@@ -1,7 +1,10 @@
 ---
 id: godot-export-builds
 title: Godot export builds
-description: Godot multi-platform exports: export templates, export_preset, command-line exports, headless mode, Windows, Linux, macOS, Android, iOS, Web, codesign, notarization, Android SDK, feature flags, OS.has_feature, CI/CD, GitHub Actions, build optimization, size reduction, debug stripping
+description: >-
+  Godot multi-platform exports: export templates, export_preset, command-line exports, headless
+  mode, Windows, Linux, macOS, Android, iOS, Web, codesign, notarization, Android SDK, feature
+  flags, OS.has_feature, CI/CD, GitHub Actions, build optimization, size reduction, debug stripping
 requires: [Godot]
 ---
 

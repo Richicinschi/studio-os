@@ -1,7 +1,10 @@
 ---
 id: flutter-fix-layout-issues
 title: Fix Flutter layout errors
-description: Use when addressing Flutter layout errors with Dart and Flutter MCP tools: "RenderFlex overflowed", "Vertical viewport was given unbounded height", unbounded width, ParentData misuse, overflow stripes or similar layout issues.
+description: >-
+  Use when addressing Flutter layout errors with Dart and Flutter MCP tools: "RenderFlex
+  overflowed", "Vertical viewport was given unbounded height", unbounded width, ParentData misuse,
+  overflow stripes or similar layout issues.
 ---
 
 # Fix Flutter layout errors

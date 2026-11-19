@@ -493,11 +493,11 @@ gunicorn app.main:app \
     --graceful-timeout 30 \
     --max-requests "$MAX_REQUESTS" \
     --max-requests-jitter "$MAX_JITTER" \
-    --forwarded-allow-ips="*" \
+    --forwarded-allow-ips="$FORWARDED_ALLOW_IPS" \
     --access-logfile -
 ```
 
-Install the worker with `pip install gunicorn uvicorn-worker`. The old `uvicorn.workers.UvicornWorker` that ships inside Uvicorn is deprecated; the `uvicorn-worker` package replaces it. `--timeout 30` and `--graceful-timeout 30` are Gunicorn's defaults, written out so they are visible.
+Set the `FORWARDED_ALLOW_IPS` environment variable to the address of your reverse proxy (a comma-separated list if there are several), never `*`: Gunicorn and Uvicorn believe the `X-Forwarded-For` header only from those addresses. Install the worker with `pip install gunicorn uvicorn-worker`. The old `uvicorn.workers.UvicornWorker` that ships inside Uvicorn is deprecated; the `uvicorn-worker` package replaces it. `--timeout 30` and `--graceful-timeout 30` are Gunicorn's defaults, written out so they are visible.
 
 - **Workers.** Gunicorn's docs suggest `(2 x cores) + 1` as a starting point; measure and adjust from there.
 - **`max-requests` and jitter.** Each worker restarts after N requests, which contains slow memory leaks. Choose N from how fast your memory grows, and set the jitter to a fraction of N so the workers do not all restart together.
@@ -506,12 +506,18 @@ Install the worker with `pip install gunicorn uvicorn-worker`. The old `uvicorn.
 ### Behind a reverse proxy
 
 ```python
+import os
+
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])
+# The proxy's own address (comma-separated if several), read from the environment.
+app.add_middleware(
+    ProxyHeadersMiddleware,
+    trusted_hosts=os.environ["FORWARDED_ALLOW_IPS"].split(","),
+)
 ```
 
-Without it, `request.client.host` is the proxy's address, and per-client rate limits and audit logs record the wrong machine. Narrow `trusted_hosts` to your proxy's address when you know it.
+Without it, `request.client.host` is the proxy's address, and per-client rate limits and audit logs record the wrong machine. Trust only the proxy's own address, never `*`: with `*`, any client can send its own `X-Forwarded-For` header and choose the address your app sees.
 
 ### Dockerfile
 
@@ -547,6 +553,7 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
+# The client address is only trustworthy behind the trusted-proxy setting above (FORWARDED_ALLOW_IPS).
 limiter = Limiter(key_func=get_remote_address)
 
 

@@ -1,7 +1,10 @@
 ---
 id: offers
 title: Offer design
-description: Use when designing an offer: grand slam, irresistible, value or bonus stack, money-back guarantee, risk reversal, scarcity, urgency, naming, payment plan, down-sell, upsell, productize a service, high-ticket, self-serve SaaS pricing, copywriting, launch, sales-enablement, offer not converting
+description: >-
+  Use when designing an offer: grand slam, irresistible, value or bonus stack, money-back guarantee,
+  risk reversal, scarcity, urgency, naming, payment plan, down-sell, upsell, productize a service,
+  high-ticket, self-serve SaaS pricing, copywriting, launch, sales-enablement, offer not converting
 ---
 
 # Offer design

@@ -43,12 +43,13 @@ Add the server to the project's `.mcp.json` or to Claude Code settings:
   "mcpServers": {
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest", "--isolated"]
+      "args": ["-y", "chrome-devtools-mcp@1.13.0", "--isolated"]
     }
   }
 }
 ```
 
+Version 1.13.0 was the current release of chrome-devtools-mcp on 2026-11-19; raise it on purpose, after reading its release notes.
 `-y` answers the npx prompt for you. Without further flags the server starts Chrome with its own
 profile folder under `~/.cache/chrome-devtools-mcp/`, apart from your daily browser.
 `--isolated` makes that profile temporary: it is deleted when the browser closes. Use this for

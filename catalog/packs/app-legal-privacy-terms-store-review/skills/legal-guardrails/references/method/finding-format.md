@@ -5,7 +5,7 @@ The single shape every `legal-*` skill emits. Consistency lets the orchestrator 
 ```
 [<skill-id>-<n>] <emoji> <one-line title>
   Location:   <doc + § / line range, or "Play Console > Data safety > <field>", or "paywall screen">
-  Basis:      <citation + attribution tier>     e.g. BW 6:236(h) [settled — verified 2026-06-06]
+  Basis:      <citation + attribution tier>     e.g. BW 6:236(h) [settled — verified 2026-11-18]
   Issue:      <what is wrong / missing / over-claimed / contradicted by code>
   Redline:    <concrete fix; exact replacement text in quotes where possible>
   Confidence: high | medium | low
@@ -25,10 +25,12 @@ The single shape every `legal-*` skill emits. Consistency lets the orchestrator 
 ```
 [COOK-1] 🟠 Analytics relies on legitimate interest + opt-out; NL requires opt-in
   Location:   privacy.md §3.1 / §9; Settings "Data & privacy" toggle
-  Basis:      ePrivacy Art. 5(3) + Telecommunicatiewet 11.7a (fails condition (4): data shared
-              with Google) + AP GA4 position [settled — verified 2026-06-06]
-  Issue:      Firebase Analytics/Crashlytics read/write device storage; in NL that needs PRIOR
-              opt-in consent, not opt-out. 6(1)(f) does not cure the Art. 5(3) device-access gate.
+  Basis:      ePrivacy Art. 5(3) + Telecommunicatiewet 11.7a(1), (3)(b): an app-instance ID
+              linked to a user ID and sent to Google does not safely meet "geen of geringe
+              gevolgen" [settled — Tw 11.7a(1), (3)(b), wetten-overheid.nl mirror, verified
+              2026-11-19; ePrivacy Art 5(3) + EDPB Guidelines 2/2023, verified 2026-11-18]
+  Issue:      Firebase Analytics reads/writes device storage; in NL that needs PRIOR opt-in
+              consent, not opt-out (Crashlytics: same gate recommended [verify / low-confidence]). 6(1)(f) does not cure the Art. 5(3) device-access gate.
   Redline:    Gate Firebase init behind a first-run consent screen (setAnalyticsCollectionEnabled
               (false) at boot until consent); reword §3.1/§9 from "legitimate interest, you may
               opt out" to "with your consent, which you can withdraw at any time."
@@ -38,7 +40,7 @@ The single shape every `legal-*` skill emits. Consistency lets the orchestrator 
 ```
 [TNL-1] 🔴 Consumer indemnity of the publisher is void against an NL consumer
   Location:   terms.md §15 (Indemnification)
-  Basis:      BW 6:236(h) [settled — verify-pinpoint lettering]
+  Basis:      BW 6:236(h) [settled — verified 2026-11-18]
   Issue:      A clause making the consumer indemnify the trader for third-party damage beyond
               their legal obligation is on the black list — automatically void.
   Redline:    Limit indemnity to the consumer's own unlawful/infringing use, or remove for

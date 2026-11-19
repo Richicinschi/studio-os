@@ -35,7 +35,7 @@ Annex).
 > subscription is limited to the **fees you actually paid us (via Apple or Google) for the
 > subscription in the twelve (12) months** before the event giving rise to the claim.
 
-- Basis: BW 6:237(f) `[settled — verified 2026-06-06]`; carve-outs BW 6:248 + Dir. 93/13 Annex 1(a)
+- Basis: BW 6:237(f) `[settled — verified 2026-11-18]`; carve-outs BW 6:248 + Dir. 93/13 Annex 1(a)
   + DCD 2019/770 conformity non-waiver `[verify-pinpoint]`. Reasonableness of the 12-month figure
   for a low-priced app: **`[low-confidence]` — jurist to confirm.**
 - Carve-out retain-list shape re-authored from the nisrulz `tnc` pattern (AGPL — not copied).
@@ -106,9 +106,9 @@ protected expression at all. A credit line is optional.
 
 ---
 
-## 3. Dispute-resolution / ADR clause (replaces forum 6:236(m), arbitration 6:236(n), dead EU-ODR)
+## 3. Dispute-resolution / ADR clause (replaces forum 6:236(n), chosen domicile 6:236(m), arbitration 6:236(n), dead EU-ODR)
 
-Three hits this cures: a foreign/seat forum (6:236(m), void), mandatory arbitration or binding
+Three hits this cures: a foreign/seat forum without the one-month court choice (6:236(n), void; a forced chosen domicile is 6:236(m)), mandatory arbitration or binding
 advice that ousts the court (6:236(n), void), and any link to the **dead EU ODR platform**
 (`ec.europa.eu/consumers/odr` — shut down 19/20 Jul 2025, must be removed). Do **not** name
 De Geschillencommissie as the route unless the publisher has actually affiliated (ask; an
@@ -124,9 +124,9 @@ ConsuWijzer as guidance, never as a body that decides disputes.
 > the **competent court for your place of residence**. These Terms are governed by Dutch law; the
 > mandatory consumer-protection rights of your country of residence are unaffected.
 
-- Basis: BW 6:236(m)/(n) `[settled — verified 2026-06-06]`; EU-ODR shutdown `[settled — ECC
-  Nederland, verified 2026-06-06]`; ConsuWijzer = guidance not arbitration `[settled — consument.acm.nl,
-  verified 2026-06-06]`; right to competent court not ousted by ADR `[verify-pinpoint — ADR Dir. 2013/11/EU]`.
+- Basis: BW 6:236(m)/(n) `[settled — verified 2026-11-18]`; EU-ODR shutdown `[settled — ECC
+  Nederland, verified 2026-11-18]`; ConsuWijzer = guidance not arbitration `[settled — consument.acm.nl,
+  verified 2026-11-18]`; right to competent court not ousted by ADR `[verify-pinpoint — ADR Dir. 2013/11/EU]`.
 - NL mirror: see `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/adr-bodies.md` §5.
 
 ---
@@ -144,12 +144,12 @@ consumers. The "you hold us harmless for all claims" pattern from US templates i
 > indemnify us beyond your liability under the applicable law, and it does not affect your statutory
 > consumer rights.
 
-- Basis: BW 6:236(h) `[settled — verified 2026-06-06]`. Do not name the consumer as indemnitor of
+- Basis: BW 6:236(h) `[settled — verified 2026-11-18]`. Do not name the consumer as indemnitor of
   third-party claims generally.
 
 ---
 
-## 5. Auto-renewal / cancellation clause (replaces 6:236(j)/(o)/(r-s) and stricter-form 6:237(m))
+## 5. Auto-renewal / cancellation clause (replaces 6:236(j)/(o)/(r) and stricter-form 6:237(m))
 
 The Wet van Dam regime: after the initial term a tacitly-renewing subscription must be terminable
 **at any time with notice ≤ 1 month**, cancellation **as easy as sign-up**, and a free trial must
@@ -159,14 +159,29 @@ meets "easy cancel"; the ToS must point there and **not** impose any harder publ
 longer-notice requirement is void/presumed-unfair).
 
 > **Auto-renewal and cancellation.** Your subscription renews automatically at the end of each
-> period unless you cancel. You can cancel at any time, with no more than one month's notice, **in
-> your Apple App Store or Google Play account** (Settings › your name › Subscriptions on iOS;
-> Play Store › Payments & subscriptions on Android) — cancellation is as easy as subscribing and
-> requires no special form. If you cancel during a free trial before it ends, you will not be
-> charged. After cancellation you keep Pro access until the end of the paid period already started.
+> period unless you cancel. You can cancel at any time in your Apple App Store or Google Play
+> account (Settings › your name › Subscriptions on iOS; Play Store › Payments & subscriptions on
+> Android); cancellation stops the next renewal, and you keep Pro access until the end of the period
+> already paid. Cancellation is as easy as subscribing and requires no special form. If you cancel
+> during a free trial before it ends, you will not be charged.
 
-- Basis: BW 6:236(j)/(o), trial-trap (r/s) `[settled letters j/o; verify-pinpoint r/s — verified
-  2026-06-06]`; stricter-form 6:237(m) `[settled]`. Store-native cancel meets "easy cancellation"
+- **Drafting rule:** offer only monthly auto-renewal to Dutch consumers, or have a lawyer clear annual
+  plans. ("You can cancel at any time, with no more than one month's notice" is untrue for annual
+  store plans, a misleading-statement risk.)
+- Basis: BW 6:236(j)/(o)/(r) `[settled — verified 2026-11-18]`; **Free trial → paid.** 6:236(s) covers
+  newspaper and magazine trials only. A trial converting into a **monthly** plan cancellable at any time
+  (effective at the end of the current month) complies on any reading. Every later **annual
+  auto-renewal** is a tacit renewal into a fixed term, black-listed under j where the renewal clause is
+  the publisher's general term (who is "gebruiker" of that clause in store-billed subscriptions is the
+  open point below). Store cancellation stops only the next renewal and gives no monthly exit. At
+  sign-up (the paywall) the consumer must be shown the trial length, the price per billing period and
+  how to cancel (CRD Art 6(1)(e), (o), 8(2)); if so, no second withdrawal right arises at conversion.
+  `[settled — BW 6:236(j), (s); CRD Arts 6(1)(e), (o), 8(2); CJEU C-565/22 paras 47–51, verified
+  2026-11-19]` A trial converting into an **annual** plan is black-listed under j on the continuation
+  reading, and compliant if the first paid year counts as the agreed initial term; which reading holds,
+  and who is "gebruiker" of the renewal clause in store-billed subscriptions: `[low-confidence — LEGAL
+  REVIEW REQUIRED]`;
+  stricter-form 6:237(m) `[settled — verified 2026-11-18]`. Store-native cancel meets "easy cancellation"
   `[verify]`. Cross-ref `bw-unfair-terms.md` §5.
 
 ## 5a. Unilateral-change clause (replaces an unfettered 6:237(c)/(b) "we may change anything" hit)
@@ -177,7 +192,7 @@ longer-notice requirement is void/presumed-unfair).
 > period**. We will not exercise unfettered discretion over the core functionality you subscribed
 > to.
 
-- Basis: BW 6:237(c) (also (b)) `[settled — verified 2026-06-06]`. The wellness/health disclaimer
+- Basis: BW 6:237(c) (also (b)) `[settled — verified 2026-11-18]`. The wellness/health disclaimer
   is separate and legitimate — do not conflate it with disclaiming the core paid feature.
 
 ---

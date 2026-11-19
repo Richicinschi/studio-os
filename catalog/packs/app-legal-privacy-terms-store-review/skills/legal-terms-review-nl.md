@@ -1,8 +1,8 @@
 ---
 name: legal-terms-review-nl
 description: >-
-  Use when reviewing, auditing, or signing off a mobile-app Terms of Service / general terms
-  (algemene voorwaarden) for a Dutch or EU consumer audience. Scans every clause against the
+  Use when reviewing or auditing a mobile-app Terms of Service / general terms (algemene
+  voorwaarden) for a Dutch or EU consumer audience, or checking they are ready to ship. Scans every clause against the
   Dutch black list (BW 6:236, always-void) and grey list (BW 6:237, presumed-unfair) plus the
   Unfair Terms Directive 93/13/EEC backstop, emits a red/amber clause map, and proposes EU-safe
   replacement wording from a clause library. The flagship Terms reviewer in the legal-* suite.
@@ -10,8 +10,8 @@ description: >-
   "algemene voorwaarden", "zwarte lijst", "grijze lijst", "liability cap", "indemnity / vrijwaring",
   "auto-renewal", "dispute resolution / arbitration", "governing law", "consumer terms",
   "Apple EULA / Licensed Application", "withdrawal right". Works for any app (app facts are
-  inputs). Reserves only the [KVK]/[BTW]/[REGISTERED ADDRESS] fills, native-NL
-  legal-idiom review, and [low-confidence] calls for a Dutch advocaat.
+  inputs). Gives no verdict on the [KVK]/[BTW]/[REGISTERED ADDRESS] values, native-NL
+  legal-idiom review or [low-confidence] calls; those need a lawyer first.
 metadata:
   category: legal
   author: Richicinschi (Claude-authored)
@@ -27,8 +27,9 @@ Operates under **legal-guardrails** — load its constitution + the references l
 This skill adjudicates an app's Terms of Service against **Dutch mandatory consumer-protection law**
 (BW Afdeling 6.5.3 unfair-terms regime) and the EU baseline, produces a **red/amber clause map**,
 emits findings in the suite format, proposes EU-safe replacement wording, and assigns the Terms a
-letter grade + verdict band. It acts as **de-facto counsel**: it decides and signs, reserving only
-the §5 carve-outs for a Dutch advocaat.
+letter grade + verdict (SHIP / FIX FIRST / BLOCKED), each finding tied to its clause and BW letter.
+It is an automated review, not legal advice: a lawyer signs off; it gives no verdict on the §5
+carve-outs; they need a lawyer or a registration first.
 
 ## Load these (by path, on demand — do not inline their contents)
 
@@ -54,14 +55,16 @@ Gather these for the person's app; the bracketed values are the example app's (`
 1. **SCOPE.** Confirm B2C (consumer counterparty) + NL/EU audience → BW lists apply. Identify the
    doc + version (EN and NL), and whether the publisher has actually **affiliated** with any
    geschillencommissie (default: **no**). Note Apple/Google as merchants of record. If B2B-only or
-   non-EU, say so and stop (the lists don't bite).
+   non-EU, say so and stop (the lists don't bite). If the app is offered in EU states but not the
+   Netherlands, BW 6:236/6:237 findings are 🟡 notes only and Dir. 93/13 findings drive the verdict
+   (`legal-guardrails.md` §9).
 2. **SCAN.** Walk every clause against the **red/amber scanner** in `bw-unfair-terms.md` §4. For
    each clause classify: BLACK-LIST hit (6:236 letter) / GREY-LIST hit (6:237 letter) / 93/13
    backstop concern / OK. Check **both** EN and NL versions; a divergence is itself a finding.
    Apply the poison-pill language scan (below) and the dead-link string scan (below).
 3. **ASSESS + cite.** For each hit, pin the **exact BW letter** with its attribution tier from the
-   reference (most ToS-critical letters are now `[settled — verified 2026-06-06]`; the `[verify-pinpoint]`
-   letters must be confirmed before they drive a hard BLOCK). Set severity: black-list = **🔴 BLOCKER**
+   reference (most ToS-critical letters are now `[settled — verified 2026-11-18]`; the `[verify-pinpoint]`
+   letters must be confirmed before they drive a BLOCKED verdict). Set severity: black-list = **🔴 BLOCKER**
    (void — delete/rewrite); grey-list = **🟠 MATERIAL** (presumed unfair — justify-or-soften, and for
    a low-priced consumer app the rebuttal burden rarely discharges, so default to soften);
    93/13 transparency / EN-only / minor = **🟡**.
@@ -71,10 +74,10 @@ Gather these for the person's app; the bracketed values are the example app's (`
 5. **CROSS-REF the specialists.** Hand §6 withdrawal mechanics to `legal-withdrawal-waiver` and the
    §25 Apple-EULA 10-term gate to `legal-apple-gate`; here, only confirm those sections **exist,
    are scoped, and disclose**. Surface any "question not in my checklist" as a 🟡 (no silent supplement).
-6. **MAP + GRADE.** Emit the red/amber clause map (table), the ranked findings, the verdict band
-   (BLOCK if any 🔴; FIX-THEN-SIGN-OFF if any 🟠; else SIGN-OFF), and the per-doc Terms grade.
+6. **MAP + GRADE.** Emit the red/amber clause map (table), the ranked findings, the verdict
+   (BLOCKED if any 🔴; FIX FIRST if any 🟠; else SHIP), and the per-doc Terms grade.
    A 🔴 resting only on `[verify-pinpoint]`/`[low-confidence]` is downgraded to a **hard condition**,
-   not an outright BLOCK.
+   not an outright BLOCKED verdict.
 
 ## The core checks (apply each; cite the letter)
 
@@ -82,29 +85,29 @@ Gather these for the person's app; the bracketed values are the example app's (`
 
 | Check | Letter | Tier |
 |---|---|---|
-| Consumer **indemnifies / vrijwaart** the trader for third-party claims ("hold us harmless") | 6:236(**h**) | `[settled]` |
-| **Foreign / seat / "chosen domicile" forum** against an NL consumer's residence | 6:236(**m**) | `[settled]` |
-| **Mandatory arbitration / binding advice / non-court** dispute resolution | 6:236(**n**) | `[settled]` |
-| **Claim/limitation window < 1 year** ("claims within 6 months / 90 days") | 6:236(**g**) | `[settled]` |
-| **Auto-renewal without easy cancel** / >1-month notice / hard cancel method / trial auto-traps | 6:236(**j**),(**o**),(**r/s**) | `[settled j/o; verify-pinpoint r/s]` |
-| **Burden-of-proof reversal** against the consumer | 6:236(**k**) | `[settled]` |
-| Price rise within 3 months **with no right to dissolve** | 6:236(**i**) | `[settled]` (usually N/A — store sets price) |
-| Excludes consumer's **ontbinding** (dissolution) / **opschorting** (suspension) right | 6:236(**b**)/(**c**) | `[settled b; verify-pinpoint c]` |
-| Trader may **assign its obligations** to a third party without a consumer dissolution right | 6:236(**e**) | `[verify-pinpoint]` |
+| Consumer **indemnifies / vrijwaart** the trader for third-party claims ("hold us harmless") | 6:236(**h**) | `[settled — verified 2026-11-18]` |
+| **Foreign / seat / non-competent court** without the one-month court choice; a forced **"chosen domicile"** for an NL consumer | 6:236(**n**) for the court; (**m**) for the chosen domicile | `[settled — verified 2026-11-18]` |
+| **Mandatory arbitration / binding advice / non-court** dispute resolution | 6:236(**n**) | `[settled — verified 2026-11-18]` |
+| **Claim/limitation window < 1 year** ("claims within 6 months / 90 days") | 6:236(**g**) | `[settled — verified 2026-11-18]` |
+| **Auto-renewal without easy cancel** / >1-month notice / hard cancel method / notice tied to a fixed moment / trial auto-traps | 6:236(**j**),(**o**),(**r**) | `[settled j/o/r — verified 2026-11-18]`; **Free trial → paid.** 6:236(s) covers newspaper and magazine trials only. A trial converting into a **monthly** plan cancellable at any time (effective at the end of the current month) complies on any reading. Every later **annual auto-renewal** is a tacit renewal into a fixed term, black-listed under j where the renewal clause is the publisher's general term (who is "gebruiker" of that clause in store-billed subscriptions is the open point below). Store cancellation stops only the next renewal and gives no monthly exit. At sign-up (the paywall) the consumer must be shown the trial length, the price per billing period and how to cancel (CRD Art 6(1)(e), (o), 8(2)); if so, no second withdrawal right arises at conversion. `[settled — BW 6:236(j), (s); CRD Arts 6(1)(e), (o), 8(2); CJEU C-565/22 paras 47–51, verified 2026-11-19]` A trial converting into an **annual** plan is black-listed under j on the continuation reading, and compliant if the first paid year counts as the agreed initial term; which reading holds, and who is "gebruiker" of the renewal clause in store-billed subscriptions: `[low-confidence — LEGAL REVIEW REQUIRED]` |
+| **Burden-of-proof reversal** against the consumer | 6:236(**k**) | `[settled — verified 2026-11-18]` |
+| Price rise within 3 months **with no right to dissolve** | 6:236(**i**) | `[settled — verified 2026-11-18]` (usually N/A — store sets price) |
+| Excludes consumer's **ontbinding** (dissolution) / **opschorting** (suspension) right | 6:236(**b**)/(**c**) | `[settled — verified 2026-11-18]` |
+| Trader may **assign its obligations** to a third party without a consumer dissolution right | 6:236(**e**) | `[settled — verified 2026-11-18]` |
 
 ### B. BW 6:237 GRIJZE LIJST — any hit = 🟠 PRESUMED UNFAIR (justify-or-soften)
 
 | Check | Letter | Tier |
 |---|---|---|
-| **Liability cap / exclusion** ("limited to €X / fees paid / nil / max extent permitted") | 6:237(**f**) | `[settled]` → §1 clause |
-| **"We may change / suspend / discontinue any feature at any time"** (unfettered) | 6:237(**c**) (also **b**) | `[settled]` → §5a clause |
-| Service "as is", **core paid function** not guaranteed | 6:237(**b**) | `[settled]` (wellness disclaimer is SEPARATE + OK) |
-| **Early-termination fee / forfeiture** of the prepaid period beyond actual loss | 6:237(**i**) | `[settled]` |
-| **Forfeit rights for any minor breach** of ToS | 6:237(**h**) | `[settled]` |
-| **No set-off** allowed | 6:237(**g**) | `[settled]` |
-| **Initial term > 1 yr** with no post-year-one exit | 6:237(**k**) | `[settled]` |
-| **Asymmetric notice** (consumer must give longer notice than trader) | 6:237(**l**) | `[settled]` |
-| **Stricter-than-written form** to cancel (registered post / notarised) | 6:237(**m**) | `[settled]` (also 6:236(o)) |
+| **Liability cap / exclusion** ("limited to €X / fees paid / nil / max extent permitted") | 6:237(**f**) | `[settled — verified 2026-11-18]` → §1 clause |
+| **"We may change / suspend / discontinue any feature at any time"** (unfettered) | 6:237(**c**) (also **b**) | `[settled — verified 2026-11-18]` → §5a clause |
+| Service "as is", **core paid function** not guaranteed | 6:237(**b**) | `[settled — verified 2026-11-18]` (wellness disclaimer is SEPARATE + OK) |
+| **Early-termination fee / forfeiture** of the prepaid period beyond actual loss | 6:237(**i**) | `[settled — verified 2026-11-18]` |
+| **Forfeit rights for any minor breach** of ToS | 6:237(**h**) | `[settled — verified 2026-11-18]` |
+| **No set-off** allowed | 6:237(**g**) | `[settled — verified 2026-11-18]` |
+| **Initial term > 1 yr** with no post-year-one exit | 6:237(**k**) | `[settled — verified 2026-11-18]` |
+| **Asymmetric notice** (consumer must give longer notice than trader) | 6:237(**l**) | `[settled — verified 2026-11-18]` |
+| **Stricter-than-written form** to cancel (registered post / notarised) | 6:237(**m**) | `[settled — verified 2026-11-18]` (also 6:236(o)) |
 
 ### C. Liability-cap deep check (6:237(f)) — MUST carry the carve-outs
 
@@ -114,15 +117,15 @@ proportional, and **carves out all** of: **intent (opzet) + gross negligence (be
 (93/13 Annex 1(a)), and **statutory consumer-conformity remedies** (DCD 2019/770). A bare "we exclude
 all liability to the maximum extent permitted by law" is presumed unfair and likely unenforceable →
 rewrite to the §1 clause in `legal-terms-review-nl/assets/eu-safe-clauses.md`. Mark the cap's reasonableness for a
-low-priced consumer app **`[low-confidence]` — jurist to confirm**; do not let it drive a clean
-SIGN-OFF on its own.
+low-priced consumer app **`[low-confidence]` — jurist to confirm**; do not let it drive a SHIP
+verdict on its own.
 
 ### D. Dispute / governing-law / dead-link scan
 
 - **String-scan EN + NL + the Firebase-Hosted web ToS** for the **dead EU ODR platform**:
   `ec.europa.eu/consumers/odr`, `consumers/odr`, "ODR platform", "Online Dispute Resolution
   platform", "platform voor onlinegeschillenbeslechting". Any hit → 🟠 **must remove** (platform shut
-  down 19/20 Jul 2025) `[settled — ECC Nederland, verified 2026-06-06]`.
+  down 19/20 Jul 2025) `[settled — ECC Nederland, verified 2026-11-18]`.
 - **De Geschillencommissie named without affiliation** → 🟠 (unenforceable/misleading promise).
 - **ConsuWijzer described as deciding/arbitrating** → 🟠 (it is ACM guidance only); legacy
   `consuwijzer.nl` link in new copy → 🟡 (use `consument.acm.nl`).
@@ -133,7 +136,7 @@ SIGN-OFF on its own.
 
 - Where a clause isn't squarely on a list, apply **Art. 3** (good-faith / significant-imbalance) and
   **Art. 5** (plain intelligible language; ambiguity read **contra proferentem**, in the consumer's
-  favour). `[settled — Dir. 93/13 Arts. 3 & 5, verified 2026-06-06]`.
+  favour). `[settled — Dir. 93/13 Arts. 3 & 5, verified 2026-11-18]`.
 - **English-only ToS for an NL consumer base** → 🟠 (Art. 5 transparency; the binding consumer
   version should be **Dutch**). Note the NL version's legal idiom is a **native-NL review** item
   reserved for the advocaat.
@@ -170,24 +173,25 @@ Emit, in order:
    ```
    [TNL-<n>] <emoji> <one-line title>
      Location:   terms.md §<n> (+ terms.nl.md §<n>)
-     Basis:      BW 6:23X(<letter>) <tier>   (e.g. BW 6:236(h) [settled — verified 2026-06-06])
+     Basis:      BW 6:23X(<letter>) <tier>   (e.g. BW 6:236(h) [settled — verified 2026-11-18])
      Issue:      <void clause / presumed-unfair / contradiction / dead link>
      Redline:    "<exact replacement>"  (from legal-terms-review-nl/assets/eu-safe-clauses.md §<n>; entity-named)
      Confidence: high | medium | low
    ```
 3. **Confirmed-good (🟢)** + reasoned decisions (e.g. "§11 wellness disclaimer is legitimate, not a
    6:237(b) core-obligation disclaimer").
-4. **Verdict + grade:** band (BLOCK / FIX-THEN-SIGN-OFF / SIGN-OFF) + **Terms <letter grade>**, and
+4. **Verdict + grade:** BLOCKED / FIX FIRST / SHIP + **Terms <letter grade>**, and
    a conditions table for every 🟠 (`Condition | Owner: owner / code / jurist | Sev | Basis`).
-5. **Authority footer** verbatim from the constitution §5 — reserve only the
-   `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review, and `[low-confidence]`
-   items (chiefly the liability-cap reasonableness) for a Dutch advocaat.
+5. **Review footer** from the constitution §5 (what was checked, against which law, each source's
+   verified date) — list the §5 carve-outs, which get no verdict (they need a lawyer or a registration first):
+   the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review, and `[low-confidence]`
+   items (chiefly the liability-cap reasonableness).
 
 ## Hard limits (a black-list hit is non-negotiable)
 
-No consumer indemnity (h) · no foreign forum (m) · no arbitration-only (n) · no <1-yr claim window
-(g) · no auto-renewal without easy store-native cancel (j/o/r/s) · no burden-of-proof reversal (k) ·
-no ousting of the consumer's court right. Any of these present → **BLOCK** until removed/rewritten.
+No consumer indemnity (h) · no foreign forum (n) · no forced chosen domicile (m) · no arbitration-only (n) · no <1-yr claim window
+(g) · no auto-renewal without easy store-native cancel (j/o/r) · no burden-of-proof reversal (k) ·
+no ousting of the consumer's court right. Any of these present → **BLOCKED** until removed/rewritten.
 
 Before final filing, re-pull `wetten.overheid.nl/BWBR0005289` art. 236 + 237 to confirm the literal
 wording of any letter still flagged `[verify-pinpoint]`.

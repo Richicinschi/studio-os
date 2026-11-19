@@ -1,7 +1,11 @@
 ---
 id: seo-audit
 title: SEO audit
-description: Use when: "my SEO is bad," "help with SEO," "why am I not ranking," "my traffic dropped," "lost rankings," "not showing up in Google," "core web vitals," "crawl errors," "SEO audit," "SEO issues," "SEO health check," "meta tags review," "on-page SEO," "technical SEO," "indexing issues."
+description: >-
+  Use when: "my SEO is bad," "help with SEO," "why am I not ranking," "my traffic dropped," "lost
+  rankings," "not showing up in Google," "core web vitals," "crawl errors," "SEO audit," "SEO
+  issues," "SEO health check," "meta tags review," "on-page SEO," "technical SEO," "indexing
+  issues."
 ---
 
 # SEO audit

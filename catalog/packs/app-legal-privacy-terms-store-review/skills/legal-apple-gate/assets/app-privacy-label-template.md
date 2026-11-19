@@ -47,7 +47,7 @@ crosswalk — map by *meaning*, never by category name).
 | Crash reporting | Diagnostics (Crash Data; Performance Data if shipped) |
 | Subscriptions / IAP | Purchases (Purchase History) |
 | Advertising | Identifiers (Device ID), Usage Data (Advertising Data) — **N/A for an app with no ads** (the example app) |
-| Location / Photos / Health | Location / Photos or Videos / Health & Fitness — **N/A for an app that reads none of these** (the example app) |
+| Location / Photos / Health | Location / Photos or Videos / Health & Fitness — **N/A for an app that reads none of these** (the example app); Health & Fitness also covers user-provided health data, so confirm it `[verify]` |
 
 **Licence notice for this table.** The table is adapted from the "Privacy Nutrition Labels" table
 in `skills/legal/privacy-policy/SKILL.md` of
@@ -95,14 +95,14 @@ The rows below are the example app's answers.
 | Contact Info → Email Address | **Yes** | Firebase Auth | Linked | No | App Functionality | account credential |
 | Contact Info → Name | _Yes only if persisted off-device_ | Google Sign-In | Linked | No | App Functionality | declare only if display name stored; else **No** |
 | Identifiers → User ID | **Yes** | Firebase UID; RC `app_user_id` (=UID) | Linked | No | App Functionality, Analytics | account-level ID |
-| Identifiers → Device ID | **No** | — | — | — | — | AD_ID stripped; no device/advertising ID |
+| Identifiers → Device ID | **Yes** (whenever Firebase Analytics ships enabled for any user) | Firebase Analytics (IDFV, app-instance ID); IDFA reads as zeros without ATT | Linked (via `setUserId`) | No | Analytics | **No** only if the iOS build sets `GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED = NO`, drops Ad ID support, and no other SDK reads a device-level ID. The Android AD_ID strip says nothing about iOS. [settled — App Privacy Details; Firebase Analytics config (Apple platforms); Apple advertisingIdentifier docs, verified 2026-11-19] [verify — IDFV default inferred from Firebase's off-switch; RevenueCat default inferred from its docs] |
 | Purchases → Purchase History | **Yes** | RevenueCat / App Store status | Linked | No | App Functionality | subscription/entitlement state |
 | Usage Data → Product Interaction | **Yes** | Firebase Analytics | Linked | No | Analytics | launches, screen views, taps |
 | Usage Data → Advertising Data | **No** | — | — | — | — | no ads |
 | Diagnostics → Crash Data | **Yes** | Crashlytics | _Linked vs Not-Linked — RESOLVE_ | No | App Functionality | **watch-list:** the example app's manifest says `Linked=false`; if UID-synced, set **Linked** |
 | Diagnostics → Performance Data | _Yes only if shipped_ | Firebase Performance | Linked | No | App Functionality | declare only if Performance Monitoring SDK present |
 | User Content → Other User Content | **Yes (paid tier)** | Firestore session sync | Linked | No | App Functionality | paid-tier breathing logs; alt-classify as Usage Data — keep PP consistent |
-| Health & Fitness | **No** | — | — | — | — | **affirmatively Not Collected** (no HealthKit/Motion) |
+| Health & Fitness | **No** | — | — | — | — | Apple's Health type also covers user-provided health data, so no HealthKit/Motion does not settle it; bare session logs are not health or medical data (Health = No); Fitness is the developer's call `[verify — data-category-ontology.md §3]` |
 | Sensitive Info | **No** | — | — | — | — | Not Collected (keep consistent with PP GDPR Art. 9 section) |
 | Location (Precise / Coarse) | **No** | — | — | — | — | no location APIs |
 | Contacts | **No** | — | — | — | — | no address-book access |
@@ -117,12 +117,12 @@ does cross-app ad attribution, this flips and `AppTrackingTransparency` becomes 
 
 **Public buckets that result:**
 - *Data Used to Track You* — (none)
-- *Data Linked to You* — Email, User ID, Purchase History, Product Interaction, (Crash Data if Linked), (Name / Performance / Session content if declared)
+- *Data Linked to You* — Email, User ID, Device ID, Purchase History, Product Interaction, (Crash Data if Linked), (Name / Performance / Session content if declared)
 - *Data Not Linked to You* — (Crash Data only if confirmed identifier-free)
 
 ---
 
-## Three/four-way reconciliation gate (must pass for sign-off)
+## Three/four-way reconciliation gate (must pass for a SHIP verdict)
 
 1. **Label ⇄ Privacy Policy** — every declared label type appears in the PP data inventory; every
    PP-disclosed collection has a matching label type; the PP **names** Google/Firebase, RevenueCat,
@@ -143,7 +143,9 @@ does cross-app ad attribution, this flips and `AppTrackingTransparency` becomes 
 [ ] Linked/Not-Linked correct per type (account-bound telemetry = Linked)              PASS/FAIL
 [ ] Tracking section empty AND no ATT (no cross-app ad/data-broker flow)               PASS/FAIL
 [ ] Purposes limited to App Functionality / Analytics (no advertising)                 PASS/FAIL
-[ ] Health & Fitness, Sensitive Info, Location, Contacts, Device ID = NOT collected    PASS/FAIL
+[ ] Sensitive Info, Location, Contacts = NOT collected                                 PASS/FAIL
+[ ] Device ID declared (Yes, Linked, Analytics) while Firebase Analytics can be enabled PASS/FAIL
+[ ] Health & Fitness: answer confirmed against the data (Fitness call) [verify]       CONFIRM
 [ ] Purchases (Purchase History) + Diagnostics (Crash) declared                        PASS/FAIL
 [ ] Third-party SDK collection (Firebase, RevenueCat) reflected in label               PASS/FAIL
 [ ] Label ⇄ Privacy Policy data inventory consistent; PP names each processor          PASS/FAIL

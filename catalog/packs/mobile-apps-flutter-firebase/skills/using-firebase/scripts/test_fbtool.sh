@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test_fbtool.sh: checks fbtool.sh with stand-in firebase and gcloud programs on PATH.
+# test_fbtool.sh: checks fbtool.sh with stand-in npx and gcloud programs on PATH.
 # Nothing real is called and nothing is written outside a temporary folder.
 # Usage: bash test_fbtool.sh        (exit 0 = all checks passed)
 set -u
@@ -10,10 +10,18 @@ trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/bin"
 log="$tmp/calls.log"
 
-# Stand-ins: firebase answers "use" with an active project; gcloud logs its arguments.
-cat > "$tmp/bin/firebase" <<'EOF'
+# Stand-ins: npx, run as the pinned Firebase CLI, answers "use" with an active project and logs the rest;
+# gcloud logs its arguments. A bare firebase on PATH logs too, so a call that skips the pin is caught.
+# Every npx call is also written, in order, to FB_ORDER; "--version" prints a marker on stdout and stderr,
+# so a hidden (redirected or captured) first call is caught.
+cat > "$tmp/bin/npx" <<'EOF'
 #!/usr/bin/env bash
-if [[ "$1" == "use" ]]; then
+echo "$*" >> "$FB_ORDER"
+if [[ "$1" == "firebase-tools@15.36.0" && "$2" == "--version" ]]; then
+  echo "VERSION-SHOWN"; echo "VERSION-SHOWN" >&2
+  exit 0
+fi
+if [[ "$1" == "firebase-tools@15.36.0" && "$2" == "use" ]]; then
   case "${FB_USE:-bare}" in
     bare) echo "demo-proj" ;;
     alias) echo "Active Project: staging (demo-proj)" ;;
@@ -22,19 +30,24 @@ if [[ "$1" == "use" ]]; then
   esac
   exit 0
 fi
-echo "firebase $*" >> "$FB_LOG"
+echo "npx $*" >> "$FB_LOG"
+EOF
+cat > "$tmp/bin/firebase" <<'EOF'
+#!/usr/bin/env bash
+echo "bare firebase $*" >> "$FB_LOG"
 EOF
 cat > "$tmp/bin/gcloud" <<'EOF'
 #!/usr/bin/env bash
 echo "gcloud $*" >> "$FB_LOG"
 EOF
-chmod +x "$tmp/bin/firebase" "$tmp/bin/gcloud"
+chmod +x "$tmp/bin/npx" "$tmp/bin/firebase" "$tmp/bin/gcloud"
 mkdir -p "$tmp/proj"; echo "{}" > "$tmp/proj/firebase.json"
-export FB_LOG="$log" PATH="$tmp/bin:$PATH"
+order="$tmp/order.log"
+export FB_LOG="$log" FB_ORDER="$order" PATH="$tmp/bin:$PATH"
 
 fails=0
 check() { if [[ "$2" == 1 ]]; then echo "pass  $1"; else echo "FAIL  $1"; fails=$((fails + 1)); fi; }
-run() { : > "$log"; cd "$tmp/proj" || exit 1; bash "$tool" "$@" > "$tmp/out" 2> "$tmp/err"; rc=$?; }
+run() { : > "$log"; : > "$order"; cd "$tmp/proj" || exit 1; bash "$tool" "$@" > "$tmp/out" 2> "$tmp/err"; rc=$?; }
 
 # 1. No answer (EOF) at the export prompt cancels non-zero and runs nothing.
 run export --output gs://b/x < /dev/null
@@ -75,7 +88,7 @@ check "no collections, no flag" $(grep -qx 'gcloud firestore export gs://b/x --p
 # 8. Project lookup: bare id, "alias (id)" and plain forms resolve; no project stops every command.
 for form in bare alias plain; do
   FB_USE=$form run deploy --dry-run
-  check "project resolved ($form)" $(grep -qx 'firebase deploy --dry-run' "$log" && echo 1 || echo 0)
+  check "project resolved ($form)" $(grep -qx 'npx firebase-tools@15.36.0 deploy --dry-run' "$log" && echo 1 || echo 0)
 done
 for cmd in "deploy --dry-run" "deploy --force" "fn-deploy --force a" "secret list" "export --output gs://b/x"; do
   FB_USE=none run $cmd < /dev/null
@@ -102,6 +115,23 @@ check "import --emulator local folder prints the command" $(grep -q "emu --impor
 # 11. Typed project-id prompt with no input exits non-zero.
 run import --input gs://b/x < /dev/null
 check "import with no answer exits non-zero" $((rc != 0))
+
+# 12. Every Firebase CLI call goes through the pinned npx form, never a bare firebase.
+run deploy --force < /dev/null
+check "deploy --force runs the pinned CLI" $(grep -qx 'npx firebase-tools@15.36.0 deploy' "$log" && echo 1 || echo 0)
+run secret get KEY
+check "secret get runs the pinned CLI" $(grep -qx 'npx firebase-tools@15.36.0 functions:secrets:get KEY' "$log" && echo 1 || echo 0)
+run export --emulator --output ./x
+check "no bare firebase call" $(grep -q '^bare firebase' "$log" && echo 0 || echo 1)
+
+# 13. Before any call whose output is hidden, "--version" runs first and in the open, so npx's
+#     "Ok to proceed?" question for a first download is visible instead of looking like a hang.
+for cmd in "init" "deploy --dry-run" "secret list"; do
+  run $cmd < /dev/null
+  check "'$cmd': --version is the first npx call" $([[ "$(head -n 1 "$order")" == "firebase-tools@15.36.0 --version" ]] && echo 1 || echo 0)
+  check "'$cmd': --version stdout not hidden" $(grep -qx 'VERSION-SHOWN' "$tmp/out" && echo 1 || echo 0)
+  check "'$cmd': --version stderr not hidden" $(grep -qx 'VERSION-SHOWN' "$tmp/err" && echo 1 || echo 0)
+done
 
 if ((fails)); then echo "$fails check(s) failed"; exit 1; fi
 echo "all checks passed"

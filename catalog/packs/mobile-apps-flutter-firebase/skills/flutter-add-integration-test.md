@@ -1,7 +1,10 @@
 ---
 id: flutter-add-integration-test
 title: Flutter integration tests
-description: Use when adding Flutter integration testing to a project: explore UI components via MCP, automate user flows with the integration_test package. Configures Flutter Driver and converts MCP actions into permanent integration tests.
+description: >-
+  Use when adding Flutter integration testing to a project: explore UI components via MCP, automate
+  user flows with the integration_test package. Configures Flutter Driver and converts MCP actions
+  into permanent integration tests.
 requires: [flutter]
 ---
 ## When to use

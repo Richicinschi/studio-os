@@ -1,6 +1,9 @@
 ---
 name: brand
-description: Use when the work touches a brand: style guides, tone of voice, branded content, marketing assets, brand compliance. It covers brand voice, visual identity, messaging frameworks, asset management and consistency checks.
+description: >-
+  Use when the work touches a brand: style guides, tone of voice, branded content, marketing assets,
+  brand compliance. It covers brand voice, visual identity, messaging frameworks, asset management
+  and consistency checks.
 argument-hint: "[update|review|create] [args]"
 metadata:
   version: "1.0.0"

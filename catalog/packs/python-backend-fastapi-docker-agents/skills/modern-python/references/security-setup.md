@@ -56,4 +56,4 @@ uv run pip-audit .      # audits the project without installing
 uv run pip-audit --fix  # upgrades vulnerable packages
 ```
 
-It checks the PyPA advisory database. On a finding: decide whether the CVE touches how you use the package. If so, `uv add pkg@latest`. If not, assess the risk, look for alternatives, or add it to an ignore list with a reason.
+It checks the PyPA advisory database. On a finding: decide whether the CVE touches how you use the package. If so, `uv add "pkg>=X.Y.Z"`, where X.Y.Z is the first fixed version pip-audit lists for that finding. If not, assess the risk, look for alternatives, or add it to an ignore list with a reason.

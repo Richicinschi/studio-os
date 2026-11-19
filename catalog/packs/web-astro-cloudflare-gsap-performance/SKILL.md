@@ -1,6 +1,6 @@
 ---
 name: web-astro-cloudflare-gsap-performance
-description: Use for websites and Cloudflare Workers: Astro pages, deploying or reviewing a Worker (wrangler), GSAP animation (tweens, easing, scroll, timelines), site structure, structured data, speed, local business sites. Open before starting.
+description: "Use for websites and Cloudflare Workers: Astro pages, deploying or reviewing a Worker (wrangler), GSAP animation (tweens, easing, scroll, timelines), site structure, structured data, speed, local business sites. Open before starting."
 ---
 
 # Websites: Astro, Cloudflare, animation and speed

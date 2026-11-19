@@ -1,6 +1,9 @@
 ---
 name: wrangler
-description: Use before any wrangler command: the Cloudflare Workers CLI to deploy, develop and manage Workers and their storage and compute products (Queues, Containers, Workflows, Pipelines, Workers AI, Hyperdrive, Vectorize, D1, R2, KV, Secrets Store). Fetch current docs, do not trust memory.
+description: >-
+  Use before any wrangler command: the Cloudflare Workers CLI to deploy, develop and manage Workers
+  and their storage and compute products (Queues, Containers, Workflows, Pipelines, Workers AI,
+  Hyperdrive, Vectorize, D1, R2, KV, Secrets Store). Fetch current docs, do not trust memory.
 metadata:
   category: web
   author: Richicinschi
@@ -8,6 +11,8 @@ metadata:
 ---
 
 # Wrangler
+
+Ask the person before any command that changes the Cloudflare account (`deploy`, any `delete`, `secret put`, `versions deploy`) and before any command with `--remote`, read or write (it reaches the live account); show the command and what it does.
 
 Prefer retrieval over memory. Flags get renamed, config fields appear, binding shapes shift. Fetch the latest docs and schema before you write or review any wrangler command or config, and do not rely on memory for CLI flags, config fields or binding shapes. Where this file is unsure, run `wrangler <command> --help`; the installed version is the final word.
 
@@ -26,8 +31,10 @@ wrangler --version
 This guide is written against Wrangler 4. Older releases behave differently (for example, `wrangler types` needed an extra flag to emit runtime types on late 3.x), so update before you trust any command below. Not installed:
 
 ```bash
-npm install -D wrangler@latest
+npm install -D wrangler@4.165.0
 ```
+
+Version 4.165.0 of wrangler and 2.74.15 of create-cloudflare (below) were the current releases on 2026-11-19; raise them on purpose, after reading the release notes.
 
 Use wrangler whenever it can do the job; do not hand-build Cloudflare API calls.
 
@@ -37,7 +44,7 @@ New project:
 npx wrangler init edge-api
 
 # or scaffold with a framework
-npx create-cloudflare@latest demo-app
+npx create-cloudflare@2.74.15 demo-app
 ```
 
 Daily commands:

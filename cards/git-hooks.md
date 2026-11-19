@@ -25,7 +25,7 @@ Read-only. Settings as set or not set, presence, counts and versions; no network
   - a `.husky/` folder, present or not;
   - a `.pre-commit-config.yaml` file, present or not;
   - files in `<repo>/.git/hooks/` other than git's `.sample` files, counted;
-  - `git -C <repo> config --get core.hooksPath >/dev/null && echo set || echo "not set"`.
+  - `git -C "<repo>" config --get core.hooksPath >/dev/null && echo set || echo "not set"`.
 - Your user setting, which applies to every repository: `git config --global --get core.hooksPath >/dev/null && echo set || echo "not set"`.
 - Whether the template is already in your setup: `<your setup>/git-hooks/check-staged.mjs`, present or not.
 - Whether git knows who you are, which the canary needs: `git config --global --get user.email >/dev/null && echo set || echo "not set"`.
@@ -43,7 +43,7 @@ The menu marks the item **have** when the repositories you chose run the templat
    - Default when skipped: light.
 2. **"Turn the hooks on?"**
    - Yes, through `core.hooksPath`, in one repository first. Recommended when Detect found no `.husky/`, no `.pre-commit-config.yaml`, no hook files and no `core.hooksPath` in that repository.
-   - Yes, by calling `check-staged.mjs` from the hook the repository already has. Recommended when Detect found any of those: while `core.hooksPath` points at the template, git looks for hooks there instead of in `.git/hooks`, so the existing hooks stop running ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees").
+   - Yes, by calling the checks from the hooks the repository already has: `check-staged.mjs` from its pre-commit and, at standard and full, `check-message.mjs` from its commit-msg. Recommended when Detect found any of those: while `core.hooksPath` points at the template, git looks for hooks there instead of in `.git/hooks`, so the existing hooks stop running ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees").
    - No.
    - Not sure: the option recommended above for what Detect found: through `core.hooksPath` in one repository that has no hooks of its own, or a call from the existing hook where it has one. Either way the canary runs first, in a throwaway repository.
    - Skip for now: leave it open; nothing is set, and it comes back in a later wave.
@@ -85,8 +85,8 @@ Which steps each size takes: **light** and **standard** every step but 3 and 4, 
 5. **Claude:** on macOS and Linux, makes the hooks executable: `chmod +x "<your setup>/git-hooks/pre-commit" "<your setup>/git-hooks/commit-msg"`. Windows needs nothing.
 6. **Claude:** runs the canary (Check, step 1). Nothing goes further until every line reads PASS or SKIP.
 7. On your yes, the hooks go on in the first repository:
-   - no existing hooks: **Claude** gives you the line with both paths filled in, and **you** run it in a terminal of your own: `git -C <repo> config core.hooksPath <full path to the folder>` ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"), with the folder written with forward slashes on Windows, as the canary writes it. It is your command because the setting that turns the hooks on can as well point git at an empty folder and turn every hook off: [git-guardrails](git-guardrails.md) refuses it from Claude for that reason (version 1.3.0), and the kit leaves it with you whether that guard is installed or not;
-   - existing hooks: **Claude** adds one line in the repository's existing pre-commit hook that runs `node "<your setup>/git-hooks/check-staged.mjs"`, shown to you first. Where that hook file is committed and shared, as a `.husky/` file usually is, Claude asks you before touching it (Watch out).
+   - no existing hooks: **Claude** gives you the line with both paths filled in, and **you** run it in a terminal of your own: `git -C "<repo>" config core.hooksPath "<full path to the folder>"` ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees"), with the folder written with forward slashes on Windows, as the canary writes it. Keep both pairs of quotes: without them, a path with a space is cut at the space, git stores the first part, and no hook runs. It is your command because the setting that turns the hooks on can as well point git at an empty folder and turn every hook off: [git-guardrails](git-guardrails.md) refuses it from Claude for that reason (version 2.0.0), and the kit leaves it with you whether that guard is installed or not;
+   - existing hooks: **Claude** adds `node "<your setup>/git-hooks/check-staged.mjs" || exit 1` to the repository's pre-commit hook and, at standard and full, `node "<your setup>/git-hooks/check-message.mjs" "$1" || exit 1` to its commit-msg hook, and shows you both first. Where the repository has no commit-msg hook, Claude creates the file with `#!/bin/sh` as its first line and that line below it, and on macOS and Linux makes it executable with `chmod +x`; without the `#!/bin/sh` line, git on Windows stops every commit with `cannot spawn`. Each line goes straight after the hook's first line, so an `exit` or `exec` further down cannot skip it; without `|| exit 1`, a refusal is printed and the commit still goes through whenever the hook runs another command after it. Where a hook file is committed and shared, as a `.husky/` file usually is, Claude asks you before touching it (Watch out).
 8. **you:** after a week without surprises, tell Claude which other repositories get them; step 7 is repeated there, the setting by you and the hook line by Claude.
 9. **Claude:** records the decision, the size (which says whether `commit-msg` was kept), the repositories, and the undo in `adoption/decisions.md`. It never records the terms of your never-share list.
 
@@ -104,16 +104,16 @@ Which steps each size takes: **light** and **standard** every step but 3 and 4, 
    ```
 
    Without gitleaks, the last line reads `SKIP  the secret scan (gitleaks is not installed)`; at light, the trailer line is not there.
-2. **Claude:** for each repository turned on through the setting, `git -C <repo> config --get core.hooksPath` prints the folder from step 7.
-3. For the existing-hook route: in that repository, with nothing else staged, Claude stages a new file holding one conflict-marker line (`<<<<<<< check`) and tries `git commit -m "hooks check"`. Expected: `pre-commit refused this commit:` and a line naming the conflict marker. Then it unstages and deletes the file.
+2. **Claude:** for each repository turned on through the setting, `git -C "<repo>" config --get core.hooksPath` prints the folder from step 7.
+3. **Claude:** on every route, in each repository from step 7, with nothing else staged: stages a new file holding one conflict-marker line (`<<<<<<< check`) and tries `git commit -m "hooks check"`. Expected: `pre-commit refused this commit:` and a line naming the conflict marker. Then it unstages and deletes the file. At standard and full, it then tries `git commit --allow-empty -m x -m "Co-authored-by: Check <check@example.invalid>"`. Expected: `commit-msg refused`. The canary proves the scripts work; this proves the real repository runs them.
 4. At full, for the never-share list: Claude makes a throwaway repository in a temporary folder and gives you the line that points its `core.hooksPath` at your folder, which you run as in step 7. Claude then stages a file holding one term from your list and tries `git commit -m "list check"`. Expected: `pre-commit refused this commit:` and a line ending `a term from your never-share list (line <n> of the list)`, which names the line of the list, never the term. Then it deletes the folder.
 
 A `FAIL` line, or a commit that goes through in step 3 or 4, means the item is not done: the plan row stays unticked, and the failing line's message is the next thing to look at. A commit that went through in step 3 is removed only on your yes. If the canary stops with "a plain commit fails here", git cannot commit even in a throwaway repository, often because signing cannot ask for its passphrase; fix that first.
 
 ## Undo
 
-- **you:** in each repository turned on through the setting, in a terminal of your own: `git -C <repo> config --unset core.hooksPath` (newer git also accepts `git -C <repo> config unset core.hooksPath`). git-guardrails refuses removing the setting from Claude, as it refuses setting it. **Claude:** then `git -C <repo> config --get core.hooksPath` prints nothing.
-- **Claude:** for the existing-hook route, removes the line it added to that hook.
+- **you:** in each repository turned on through the setting, in a terminal of your own: `git -C "<repo>" config --unset core.hooksPath` (newer git also accepts `git -C "<repo>" config unset core.hooksPath`). git-guardrails refuses removing the setting from Claude, as it refuses setting it. **Claude:** then `git -C "<repo>" config --get core.hooksPath` prints nothing.
+- **Claude:** for the existing-hook route, removes the lines it added to those hooks, and the commit-msg file when it created it.
 - **Claude:** deletes `<your setup>/git-hooks/` once no repository uses it (your never-share list inside it only on your yes; it is yours to keep or move), removes the list's line from your setup's `.gitignore`, and marks the row in `adoption/decisions.md` as undone.
 - **you:** Node.js and gitleaks stay installed; removing them is your decision, and their uninstall commands are not documented in docs/facts.md as of 2026-11-02.
 
@@ -128,4 +128,6 @@ A `FAIL` line, or a commit that goes through in step 3 or 4, means the item is n
 - **Roll out on a canary first.** A mistake in a shared hook reaches every repository at once; the order in step 8 keeps it to one.
 - **gitleaks** v8.30.1 is the current release, and its author has announced security fixes only from here on ([docs/facts.md](../docs/facts.md)).
 - **Windows:** write the `core.hooksPath` folder with forward slashes, as the canary does; a canary that reads PASS on your machine shows git found the scripts there.
+- **Known gaps.** The checks refuse too much or too little in a few cases, listed under "What they do not do" in [templates/git-hooks/README.md](../templates/git-hooks/README.md): concluding a merge, gitleaks still reads the lines from the other branch; a cherry-pick or a `git merge --squash` counts the other branch's lines as new; an address written as `version: <address>` passes; gitleaks cannot read UTF-16 files; and the scissors line of `git commit -v` is missed with a `core.commentString` longer than one character. A refusal reading `gitleaks could not run (exit N)` means gitleaks itself failed, for example on a broken `.gitleaks.toml`, and it stops every commit until that file is fixed.
+- **Lockfiles are checked.** A text file that `.gitattributes` marks `-diff` or `binary`, such as a lockfile, is checked like plain text: git hides its lines from the diff, so the hook reads the staged file. An address or a never-share term in one is refused.
 - **Token cost:** none. The hooks run inside git, not in Claude's context.

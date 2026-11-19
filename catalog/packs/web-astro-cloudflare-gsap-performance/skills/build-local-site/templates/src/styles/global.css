@@ -2,11 +2,31 @@
 @plugin '@tailwindcss/typography';
 
 /*
-  Site stylesheet. Fill these tokens before the first build:
-    __FONT_DISPLAY__   heading font family, e.g. DM Serif Display
-    __FONT_BODY__      body font family, e.g. DM Sans
-    __BRAND_50__ .. __BRAND_950__   the eleven brand shades (hex)
-  The fonts must also be loaded in BaseLayout.astro.
+  Site stylesheet. Fill these tokens (each sits between double underscores
+  below) before the first build; `npm run build` refuses while one is left:
+    FONT_DISPLAY          heading font family, e.g. DM Serif Display
+    FONT_BODY             body font family, e.g. DM Sans
+    BRAND_50 .. BRAND_950 the eleven brand shades (hex)
+  The fonts are self-hosted: put the .woff2 files in public/fonts/ (see the
+  README there) and declare each one with @font-face as in the example below.
+*/
+
+/* Self-hosted fonts. Uncomment, then match the family names to the two font
+   tokens in @theme and the file names to what is in public/fonts/.
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DM Serif Display';
+  src: url('/fonts/dm-serif-display-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 */
 
 /* The stagger-N classes are built from a number at render time, so Tailwind

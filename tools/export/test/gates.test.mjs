@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { deflateRawSync } from 'node:zlib';
-import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage } from '../gates.mjs';
+import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage, gateRisky } from '../gates.mjs';
 
 function kit(files) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-gates-'));
@@ -55,6 +55,116 @@ test('paths: an allowed phrase passes only in its own file, and only that phrase
   });
   try {
     assert.deepEqual(gatePaths(root, allow), ['catalog/skills/x/server.cjs:2 tailnet', 'catalog/skills/y/server.cjs:1 tailnet']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// The risky patterns are assembled at runtime, so this file itself passes the risky gate.
+const AT = ['allowed', 'tools'].join('-');
+const LATEST = ['lat', 'est'].join('');
+const FWD = ['forwarded', 'allow', 'ips'].join('-');
+const TRUSTED = ['trusted', 'hosts'].join('_');
+
+test('risky: each unsafe pattern is found, with its line and reason; rules.mjs is exempt', () => {
+  const root = kit({
+    'catalog/skills/a/SKILL.md': `---\nname: a\n${AT}: Bash Read\n---\n`,
+    'catalog/skills/b/SKILL.md': `---\nname: b\n${AT}: Read, Write, Grep\n---\n`,
+    'catalog/skills/c/SKILL.md': `---\nname: c\n${AT}: [Read, Bash, Write]\n---\n`,
+    'catalog/skills/d/SKILL.md': `---\nname: d\n${AT}:\n  - Read\n  - Bash\n---\n`,
+    'catalog/packs/p/skills/docker.md': `FROM python:3.12-slim\nimage: ghcr.io/acme/app:${LATEST}\n`,
+    'catalog/packs/p/skills/mcp.md': `Run \`npx -y some-mcp@${LATEST}\` once.\nnpm i @scope/tool@${LATEST}\n`,
+    'catalog/packs/p/skills/proxy.md': [
+      `uvicorn app:app --${FWD}=*`, `${FWD}="*"`, `app.add_middleware(ProxyHeadersMiddleware, ${TRUSTED}="*")`, `${TRUSTED}=["*"]`, '',
+    ].join('\n'),
+    'tools/export/rules.mjs': `// ${AT}: Bash\n// x/y:${LATEST} z@${LATEST} ${FWD}="*"\n`,
+  });
+  try {
+    assert.deepEqual(gateRisky(root, []), [
+      'catalog/packs/p/skills/docker.md:2 image with :latest',
+      'catalog/packs/p/skills/mcp.md:1 @latest in a command',
+      'catalog/packs/p/skills/mcp.md:2 @latest in a command',
+      'catalog/packs/p/skills/proxy.md:1 trust everything ("*")',
+      'catalog/packs/p/skills/proxy.md:2 trust everything ("*")',
+      'catalog/packs/p/skills/proxy.md:3 trust everything ("*")',
+      'catalog/packs/p/skills/proxy.md:4 trust everything ("*")',
+      'catalog/skills/a/SKILL.md:3 bare Bash in allowed-tools',
+      'catalog/skills/b/SKILL.md:3 bare Write in allowed-tools',
+      'catalog/skills/c/SKILL.md:3 bare Bash in allowed-tools',
+      'catalog/skills/c/SKILL.md:3 bare Write in allowed-tools',
+      'catalog/skills/d/SKILL.md:5 bare Bash in allowed-tools',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('risky: scoped tools, other tags, prose about the tag and narrow trust lists pass', () => {
+  const root = kit({
+    'catalog/skills/a/SKILL.md': `---\nname: a\n${AT}: Bash(git branch:*) Read\n---\n`,
+    'catalog/skills/b/SKILL.md': `---\nname: b\n${AT}: Read, Write(docs/**), Bash(npm test), NotebookEdit\n---\nUse Bash and Write freely in the body.\n`,
+    'catalog/packs/p/skills/docker.md': `image: ghcr.io/acme/app:1.4.2\nPin a version; the :${LATEST} tag moves.\nnpx -y some-mcp@1.2.3\n`,
+    'catalog/packs/p/skills/proxy.md': `--${FWD}=192.0.2.1\n${TRUSTED}=["192.0.2.1"]\n`,
+  });
+  try { assert.deepEqual(gateRisky(root, []), []); } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('risky: an allowed phrase passes only in its own file, and only on its line', () => {
+  const allow = [{ file: 'catalog/skills/x/SKILL.md', phrase: 'Never write', why: 'a warning against the pattern' }];
+  const root = kit({
+    'catalog/skills/x/SKILL.md': `Never write \`image: app:${LATEST}\`.\nimage: app:${LATEST}\n`,
+    'catalog/skills/y/SKILL.md': `Never write \`image: app:${LATEST}\`.\n`,
+  });
+  try {
+    assert.deepEqual(gateRisky(root, allow), ['catalog/skills/x/SKILL.md:2 image with :latest', 'catalog/skills/y/SKILL.md:1 image with :latest']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('risky: an image with neither a tag nor a digest, in a Dockerfile, a YAML file or a fenced block', () => {
+  const fence = '```';
+  const root = kit({
+    'catalog/packs/p/templates/Dockerfile.python.template': [
+      'FROM python:3.12-slim AS builder', 'FROM builder', 'FROM scratch', 'FROM gcr.io/distroless/python3-debian12',
+      'FROM --platform=linux/amd64 alpine', 'FROM ghcr.io/acme/app@sha256:' + 'ab'.repeat(32), 'FROM localhost:5000/app',
+      'FROM ${BASE_IMAGE}', 'from node AS web', '',
+    ].join('\n'),
+    'catalog/packs/p/templates/docker-compose.yml': [
+      'services:', '  db:', '    image: postgres', '  cache:', '    image: redis:7-alpine', '  app:', '    image: shopapi:${APP_VERSION}',
+      '  - image: "nginx"', '  web:', '    image:', '      repository: nginx', '',
+    ].join('\n'),
+    'catalog/packs/p/skills/docker.md': [
+      'FROM there, the image: a picture.', `${fence}dockerfile`, 'FROM node:22-slim AS build', 'FROM node', `${fence}`,
+      `${fence}yaml`, 'image: busybox', `${fence}`, `${fence}`, 'FROM ubuntu', 'image: ubuntu', `${fence}`, '',
+    ].join('\n'),
+    'catalog/packs/p/skills/page.ts': "  image: '/images/hero.webp',\nFROM users\n",
+  });
+  try {
+    assert.deepEqual(gateRisky(root, []), [
+      'catalog/packs/p/skills/docker.md:4 image without a tag or digest',
+      'catalog/packs/p/skills/docker.md:7 image without a tag or digest',
+      'catalog/packs/p/templates/Dockerfile.python.template:4 image without a tag or digest',
+      'catalog/packs/p/templates/Dockerfile.python.template:5 image without a tag or digest',
+      'catalog/packs/p/templates/Dockerfile.python.template:7 image without a tag or digest',
+      'catalog/packs/p/templates/Dockerfile.python.template:9 image without a tag or digest',
+      'catalog/packs/p/templates/docker-compose.yml:3 image without a tag or digest',
+      'catalog/packs/p/templates/docker-compose.yml:8 image without a tag or digest',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('risky: Bash(*), Bash(), Write(*) and Write() are bare, and an allowed-tools block value is read', () => {
+  const root = kit({
+    'catalog/skills/a/SKILL.md': `---\nname: a\n${AT}: Bash(*) Read\n---\n`,
+    'catalog/skills/b/SKILL.md': `---\nname: b\n${AT}: Read, Bash(), Write( * )\n---\n`,
+    'catalog/skills/c/SKILL.md': `---\nname: c\n${AT}: Write() Write(**)\n---\n`,
+    'catalog/skills/d/SKILL.md': `---\nname: d\n${AT}: >-\n  Read Grep\n  Bash Write(docs/**)\ndescription: Bash and Write in prose.\n---\n`,
+    'catalog/skills/e/SKILL.md': `---\nname: e\n${AT}: |\n  Bash(git status:*) Read\n\n  Write\n---\n`,
+  });
+  try {
+    assert.deepEqual(gateRisky(root, []), [
+      'catalog/skills/a/SKILL.md:3 bare Bash in allowed-tools',
+      'catalog/skills/b/SKILL.md:3 bare Bash in allowed-tools',
+      'catalog/skills/b/SKILL.md:3 bare Write in allowed-tools',
+      'catalog/skills/c/SKILL.md:3 bare Write in allowed-tools',
+      'catalog/skills/d/SKILL.md:5 bare Bash in allowed-tools',
+      'catalog/skills/e/SKILL.md:6 bare Write in allowed-tools',
+    ]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

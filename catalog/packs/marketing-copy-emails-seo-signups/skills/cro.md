@@ -1,7 +1,11 @@
 ---
 id: cro
 title: Page and form conversion audit
-description: Use on homepage, landing, pricing, feature, lead form: CRO, conversion rate optimization, nobody's converting, landing sucks, form abandonment, needs work, why isn't this working, improve conversions, URL feedback. Not signup, registration flows, post-signup activation, onboarding, popups, modals.
+description: >-
+  Use on homepage, landing, pricing, feature, lead form: CRO, conversion rate optimization, nobody's
+  converting, landing sucks, form abandonment, needs work, why isn't this working, improve
+  conversions, URL feedback. Not signup, registration flows, post-signup activation, onboarding,
+  popups, modals.
 ---
 
 ## When to use

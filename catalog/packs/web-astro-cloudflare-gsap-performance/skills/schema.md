@@ -1,6 +1,10 @@
 ---
 name: schema
-description: Add, fix or optimize schema, structured data, schema markup, JSON-LD, schema.org, rich snippets, Google rich results, knowledge panel, star ratings in search, FAQ schema, product schema, review schema, breadcrumb schema, add structured data. Broader SEO issues: see seo-audit; AI search: ai-seo.
+description: >-
+  Add, fix or optimize schema, structured data, schema markup, JSON-LD, schema.org, rich snippets,
+  Google rich results, knowledge panel, star ratings in search, FAQ schema, product schema, review
+  schema, breadcrumb schema, add structured data. Broader SEO issues: see seo-audit; AI search:
+  ai-seo.
 metadata:
   version: 2.0.0
   category: marketing

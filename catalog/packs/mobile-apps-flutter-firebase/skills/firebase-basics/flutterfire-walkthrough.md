@@ -6,7 +6,7 @@
    - Find the machine type: `uname -m` tells Intel (`x64`) from Apple Silicon (`arm64`).
    - Download the latest stable SDK from the Flutter archive page for that platform, unzip it somewhere permanent such as `~/tools/flutter-sdk`, and add its `bin` folder to PATH in the shell profile (`~/.profile` for example).
    - Run `flutter doctor` to confirm.
-2. **Firebase CLI signed in:** `npx -y firebase-tools@latest --version`, then `login`.
+2. **Firebase CLI signed in:** `npx firebase-tools@15.36.0 --version`, then `login`.
 3. **FlutterFire CLI:** `dart pub global activate flutterfire_cli`. If `flutterfire` is then not found, add `~/.pub-cache/bin` to PATH.
 
 ## The path

@@ -1,7 +1,10 @@
 ---
 id: firebase-auth-basics
 title: Firebase Auth basics
-description: Use when the app needs login, user management, or locked-down data via auth rules (user sign-in, secure data access): enabling providers, Flutter, web, Android or iOS clients, request.auth checks in Firestore or Storage rules.
+description: >-
+  Use when the app needs login, user management, or locked-down data via auth rules (user sign-in,
+  secure data access): enabling providers, Flutter, web, Android or iOS clients, request.auth checks
+  in Firestore or Storage rules.
 ---
 
 ## When to use
@@ -15,7 +18,7 @@ Neighbours:
 
 ## How it works
 
-1. **Have a project and the CLI.** You need a Firebase project and a logged-in CLI (run it with `npx -y firebase-tools@latest`; a global install is optional). A new project is made with `npx -y firebase-tools@latest projects:create`. If the project or the login is missing, hand over to `firebase-basics` first.
+1. **Have a project and the CLI.** You need a Firebase project and a logged-in CLI (run it with `npx firebase-tools@15.36.0`; a global install is optional). A new project is made with `npx firebase-tools@15.36.0 projects:create`. If the project or the login is missing, hand over to `firebase-basics` first.
 
 2. **Know what a user is.** Firebase Auth supplies backend services, client SDKs and ready-made sign-in UI libraries. Every account has a `uid`, unique across all sign-in methods. Other fields can be absent depending on the provider: `email`, `displayName`, `photoURL`, and the boolean `emailVerified`. Never assume an email exists.
 
@@ -40,7 +43,7 @@ Neighbours:
        }
      }
      ```
-   - Editing the file does nothing by itself. Run `npx -y firebase-tools@latest deploy --only auth` so the backend applies it and creates the OAuth clients for your platforms. This changes a live project: say so and get a yes before running it.
+   - Editing the file does nothing by itself. Run `npx firebase-tools@15.36.0 deploy --only auth` so the backend applies it and creates the OAuth clients for your platforms. This changes a live project: say so and get a yes before running it.
    - Every other provider is enabled by hand in the console, under Authentication, then Sign-in method: open your project, switch on the provider, save.
 
 6. **Authorized domains.** If a Google popup opens and closes at once with `unauthorized-domain`, the page's host is not on the allowed list. Add `localhost` (for local runs) in the console under Authentication settings, or, if your installed CLI accepts it, an `authorizedDomains` list in the `auth` block of `firebase.json` (the CLI's provider page does not list that key: check the vendor's current documentation, and treat the console route as the sure one). Enter the bare host only: `localhost`, never `http://localhost:9090`.

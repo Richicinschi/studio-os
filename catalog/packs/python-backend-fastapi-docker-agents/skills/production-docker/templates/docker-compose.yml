@@ -4,7 +4,8 @@
 services:
   # the application
   api:
-    image: shopapi:${APP_VERSION:-latest}
+    # APP_VERSION is the short commit hash the image was built from (git rev-parse --short HEAD).
+    image: shopapi:${APP_VERSION:?set APP_VERSION to the short commit hash}
     build:
       target: runtime
       dockerfile: Dockerfile

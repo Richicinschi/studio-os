@@ -15,7 +15,7 @@ import { loadManifest, hubInventory } from './manifest.mjs';
 import { loadDenyList, loadOwnerName, loadLocalRewrites, STUDIO_REWRITES } from './rules.mjs';
 import { buildKit } from './build.mjs';
 import { resolvePacks } from './packs.mjs';
-import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, isLocalOnly } from './gates.mjs';
+import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateRisky, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, isLocalOnly } from './gates.mjs';
 import { parseTriage } from './scan.mjs';
 import { itemHashes, diffItems, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
 import { lintKit } from './lint-content.mjs';
@@ -96,6 +96,7 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       secrets: [...gateSecrets(stage), ...(noGitleaks ? [] : gitleaks(stage))],
       privacy: gatePrivacy(stage, deny),
       paths: gatePaths(stage),
+      risky: gateRisky(stage),
       accounting: [...gateAccounting(stage, { written: built.written, notices: built.notices, manifest }), ...gateDiagramUrls(stage)],
       links: gateLinks(stage),
       cards: gateCards(stage, manifest),

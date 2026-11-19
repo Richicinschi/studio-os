@@ -1,7 +1,10 @@
 ---
 id: godot-tweening
 title: Godot 4 tweening
-description: Programmatic animation in Godot 4 with Tween: tween_property, tween_callback, easing functions (EASE_IN_OUT, TRANS_CUBIC), parallel tweens, chaining, interpolation, UI animations and effects, camera movements, procedural movement, juice, lifecycle management.
+description: >-
+  Programmatic animation in Godot 4 with Tween: tween_property, tween_callback, easing functions
+  (EASE_IN_OUT, TRANS_CUBIC), parallel tweens, chaining, interpolation, UI animations and effects,
+  camera movements, procedural movement, juice, lifecycle management.
 requires: [Godot]
 ---
 

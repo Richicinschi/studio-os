@@ -1,6 +1,6 @@
 ---
 name: marketing-plans-offers-pricing-launches
-description: Use when the user wants a marketing plan or ideas, an offer or pricing, a product launch, a referral or PR push, a competitor study, customer interviews or surveys, ads, or social and community posts.
+description: "Use when the user wants a marketing plan or ideas, an offer or pricing, a product launch, a referral or PR push, a competitor study, customer interviews or surveys, ads, or social and community posts."
 ---
 
 # Marketing: plans, offers, pricing and launches

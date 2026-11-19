@@ -1,6 +1,10 @@
 ---
 name: site-architecture
-description: Use when planning or restructuring a website: "sitemap", "site structure", "page hierarchy", "information architecture", "website planning", "breadcrumbs", "how should I organize my site", "URL structure", "site navigation", "internal linking strategy", "navigation design", "what pages do I need".
+description: >-
+  Use when planning or restructuring a website: "sitemap", "site structure", "page hierarchy",
+  "information architecture", "website planning", "breadcrumbs", "how should I organize my site",
+  "URL structure", "site navigation", "internal linking strategy", "navigation design", "what pages
+  do I need".
 metadata:
   version: 2.0.0
   category: marketing

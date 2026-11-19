@@ -17,26 +17,35 @@ service firebase.storage {
     // the size caps below are example values, a starting point, not measured values
     function smallerThanMB(n) { return request.resource.size < n * 1024 * 1024; }
 
-    // per-user folder: any signed-in user reads, only the owner writes
+    // per-user folder: only the owner reads and writes
     match /users/{uid}/{rest=**} {
-      allow read: if signedIn();
+      allow read: if me(uid);
       // a delete request carries no incoming file, so size and type checks sit on create and update only
       allow create, update: if me(uid) && smallerThanMB(10);
       allow delete: if me(uid);
     }
 
     // avatars: public to read, owner uploads an image under 5 MB
-    match /profiles/{uid}/avatar.{ext} {
+    // a path segment is a whole variable, so the file name is checked with matches()
+    match /profiles/{uid}/{fileName} {
       allow read: if true;
       allow create, update: if me(uid) && isImage() && smallerThanMB(5)
-                            && ext.matches('jpg|jpeg|png|gif|webp');
+                            && fileName.matches('avatar[.](jpg|jpeg|png|gif|webp)');
       allow delete: if me(uid);
     }
 
-    // shared public files
+    // shared public files: anyone reads; the uploader tags the file with metadata.owner,
+    // only images under 10 MB, and only that owner replaces it.
+    // An upload over an existing file is a create, so create checks the existing owner too;
+    // update covers metadata changes only.
     match /public/{rest=**} {
       allow read: if true;
-      allow create, update: if signedIn() && smallerThanMB(10);
+      allow create: if signedIn() && isImage() && smallerThanMB(10)
+                    && request.resource.metadata.owner == request.auth.uid
+                    && (resource == null || resource.metadata.owner == request.auth.uid);
+      allow update: if signedIn() && isImage() && smallerThanMB(10)
+                    && resource.metadata.owner == request.auth.uid
+                    && request.resource.metadata.owner == request.auth.uid;
       allow delete: if isAdmin();
     }
 

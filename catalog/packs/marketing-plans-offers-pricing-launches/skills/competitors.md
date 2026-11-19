@@ -1,7 +1,11 @@
 ---
 id: competitors
 title: Competitor and alternative pages
-description: Use when the user mentions "how do we compare to X", an alternative page, vs page, competitor comparison, "[Product] vs [Product]", "[Product] alternative", battle card, competitor teardown or competitive landing pages. Four formats: singular and plural. Sales-only documents go to sales-enablement.
+description: >-
+  Use when the user mentions "how do we compare to X", an alternative page, vs page, competitor
+  comparison, "[Product] vs [Product]", "[Product] alternative", battle card, competitor teardown or
+  competitive landing pages. Four formats: singular and plural. Sales-only documents go to
+  sales-enablement.
 ---
 
 # Competitor and alternative pages

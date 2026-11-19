@@ -1,7 +1,7 @@
 ---
 id: merge-commit-only
 module: 06-git-and-guardrails
-checked: 2026-11-02
+checked: 2026-11-18
 ---
 
 # Merge commits only
@@ -22,7 +22,7 @@ Read-only and offline. The settings live on the server, so they are read in Step
 - Merge commits on each repository's main branch, counted: `git -C <repo> rev-list --count --merges <main branch>`. Zero in a repository whose work lands through PRs points to squash or rebase merges.
 - Whether your instruction files carry the rule, a count per file: `grep -ciE 'squash|merge commit' CLAUDE.md AGENTS.md 2>/dev/null`.
 - Whether an earlier run recorded the settings: `grep -c merge-commit-only adoption/decisions.md`.
-- A local guard: when [git-guardrails](git-guardrails.md) is in your setup, whether its script names squash: `grep -c squash .claude/hooks/block-dangerous-git.sh "$HOME/.claude/hooks/block-dangerous-git.sh" 2>/dev/null`.
+- A local guard: when [git-guardrails](git-guardrails.md) is in your setup, whether it refuses a squash merge. Claude sends the installed guard a fake one, which merges nothing: `echo '{"tool_name":"Bash","tool_input":{"command":"git merge --squash x"}}' | node <path to block-dangerous-git.mjs>; echo "exit $?"` (in PowerShell, `; "exit $LASTEXITCODE"` at the end). `exit 2` is yes; any other exit is no. The guard as shipped answers no. Version 1.4.0 is a bash script, `.claude/hooks/block-dangerous-git.sh` or `~/.claude/hooks/block-dangerous-git.sh`: there, `grep -c squash` on that file counts its squash patterns.
 - Your profiles, from `adoption/inventory.md`.
 
 The menu marks the item **have** when an instruction file carries the rule and `adoption/decisions.md` records each GitHub repository's settings as merge commit only; **partly** when only one of the two holds; and **not yet** otherwise.
@@ -67,8 +67,12 @@ The menu marks the item **have** when an instruction file carries the rule and `
    When step 2 printed `false` for the merge commit, it adds `-F allow_merge_commit=true`, so one method stays on. `-F` sends `true` and `false` as real yes-or-no values, where `-f` would send them as text; and Claude names the repository instead of gh's `{owner}/{repo}` placeholders ([docs/facts.md](../docs/facts.md), "GitHub: merge methods").
 4. **you:** where `gh` is missing or refused, the repository's Settings, "General", the "Pull Requests" section: leave merge commits allowed, and switch off squash merging and rebase merging. In a company repository, ask its administrator.
 5. **Claude:** writes the rule into your front door, in your words, and shows it before saving. A starting point: "Merge a pull request only with a merge commit (`gh pr merge <number> --merge`), never with a squash or a rebase. If a merge commit is truly impossible for one PR, ask me first, for that PR only, with the reason. When you create a repository for me on GitHub, switch squash and rebase merges off in its settings."
-6. **Claude:** when [git-guardrails](git-guardrails.md) is in your setup, offers to add squash and rebase merges to its blocked patterns (FOLD), for example `pr merge.*--squash`, `pr merge.*--rebase`, `merge --squash` and `pull --squash`, and shows the change first. A pattern list catches only the forms written in it.
-7. **Claude:** records the repositories, each one's settings before and after, and the undo in `adoption/decisions.md`.
+6. **Claude:** when [git-guardrails](git-guardrails.md) is in your setup, offers to make it refuse squash and rebase merges too (FOLD), and shows the change first:
+   - for git, a rule in `rules.mjs` for `git merge --squash` and `git pull --squash`: an entry under `merge` and `pull` in its table of git subcommands, which `refusal()` reads for git calls only;
+   - for `gh`, a check in `guard.mjs`, whose `decide()` sees every command: it refuses a `gh pr merge` that does not name `--merge` (or `-m`), which covers `--squash`, `--rebase`, their short forms `-s` and `-r`, and a merge that names no method.
+
+   Claude adds each refused form to the `block` list of `cases.json`, and `gh pr merge 12 --merge` to its `allow` list, then sends each to the guard with Check step 1 of [git-guardrails](git-guardrails.md). A rule catches only the commands it reads: a merge made through `gh api` or on the web passes.
+7. **Claude:** records the repositories, each one's settings before and after, and the undo in `adoption/decisions.md`; with step 6, also the exact code it added to `rules.mjs` and `guard.mjs` and the lines it added to `cases.json`, so they can be applied again.
 
 ## Check
 
@@ -90,7 +94,7 @@ Any other output means the item is not done: the plan row stays unticked. A refu
 ## Undo
 
 - **Claude:** on your yes, puts each repository's settings back to the values step 2 recorded, for example `gh api -X PATCH repos/<owner>/<repo> -F allow_squash_merge=true -F allow_rebase_merge=true`; or **you:** switch them back on the web.
-- **Claude:** removes the rule from your front door, and the patterns it added to git-guardrails.
+- **Claude:** removes the rule from your front door, and the rules it added to git-guardrails (`rules.mjs`, `guard.mjs`, `cases.json`).
 - **Claude:** marks the row in `adoption/decisions.md` as undone.
 - Merges made in the meantime stay as they are; the settings change only how later PRs can land.
 
@@ -98,7 +102,8 @@ Any other output means the item is not done: the plan row stays unticked. A refu
 
 - **Your company's rule comes first.** If your company squashes by policy, follow it and record that as your decision; a setting in your own repositories does not touch theirs.
 - **The setting covers the server only.** A squash made on your own machine and pushed is not stopped by it. The studio enforces the rule twice: by the setting, and by a local guard on Claude's commands ([a recorded yes before a merge](../examples/grant-before-merge.md)).
-- **A pattern list cannot say "only with `--merge`".** The studio's guard also refuses a `gh pr merge` that names no method ([module 06](../modules/06-git-and-guardrails/README.md#the-mechanism)); blocking `--squash` and `--rebase` by pattern leaves that form open.
+- **Name the method you allow, not the ones you refuse.** A check that refuses `--squash` and `--rebase` leaves open a `gh pr merge` that names no method, and the short forms `-s` and `-r` unless it lists them; the studio's guard refuses a `gh pr merge` that names no method too ([module 06](../modules/06-git-and-guardrails/README.md#the-mechanism)). So the check in step 6 refuses every `gh pr merge` without `--merge`.
+- **Re-installing or updating git-guardrails replaces these rules.** The install copies its whole `scripts/` folder, `rules.mjs`, `guard.mjs` and `cases.json` among them, so the additions of step 6 are gone after a re-install or an update. Claude applies them again from `adoption/decisions.md` (step 7) and runs Detect's fake squash merge to see `exit 2` again.
 - **What `gh pr merge --squash` does on a repository with squash switched off** is not documented as of 2026-11-02 ([docs/facts.md](../docs/facts.md)). The setting is documented as preventing the method; Check step 1 is what confirms it is set.
 - **A new repository has its own settings.** The rule's last sentence covers repositories Claude creates; one you create on the web needs step 3 or 4 as well.
 - **The one exception.** When a merge commit is truly impossible for one PR, the studio switches the method on for that repository, for that one merge, after a recorded yes with the reason, and switches it off again right after ([a recorded yes before a merge](../examples/grant-before-merge.md)).

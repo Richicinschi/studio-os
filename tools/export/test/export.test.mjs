@@ -90,6 +90,19 @@ test('a menu item without its adoption card fails the export, and so does a card
   } finally { s.done(); }
 });
 
+test('a shipped skill with a risky pattern fails the export at the risky gate', () => {
+  const s = setup();
+  try {
+    const at = ['allowed', 'tools'].join('-');
+    writeFileSync(path.join(s.hub, '.claude/skills/beta/SKILL.md'), `---\nname: beta\ndescription: Use when beta.\n${at}: Bash Read\n---\n# beta\n`);
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /risky: FAIL \(1\)/);
+    assert.match(out, /catalog\/skills\/beta\/SKILL\.md:\d+ bare Bash in allowed-tools/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
 test('a hub item whose name must never ship is classified private from the local file, not the manifest', () => {
   const s = setup();
   try {

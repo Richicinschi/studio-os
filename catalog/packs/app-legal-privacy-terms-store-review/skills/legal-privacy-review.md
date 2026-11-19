@@ -1,9 +1,9 @@
 ---
 name: legal-privacy-review
 description: >-
-  Use when reviewing or signing off a mobile-app Privacy Policy / privacy notice
-  under GDPR/AVG (Dutch eenmanszaak, EU/NL-first). Triggers on "review privacy
-  policy", "sign off PP", "privacy notice audit", "check the privacy policy",
+  Use when reviewing a mobile-app Privacy Policy / privacy notice, or checking it is
+  ready to ship, under GDPR/AVG (Dutch eenmanszaak, EU/NL-first). Triggers on "review
+  privacy policy", "sign off PP", "privacy notice audit", "check the privacy policy",
   "PP compliance". Walks the GDPR Art. 13 twelve-point mandatory-disclosure
   completeness checklist (each item PRESENT or explicit N/A-with-reason), then
   reconciles every (data-type, recipient-entity) flow the app actually performs
@@ -22,15 +22,15 @@ metadata:
   jurisdiction: NL-primary, EU, with Apple/Google platform overlays
 ---
 
-# legal-privacy-review — Privacy Policy sign-off
+# legal-privacy-review — Privacy Policy review
 
 Operates under `legal-guardrails` — load its constitution + the references listed below.
 
-This skill adjudicates whether an app's **Privacy Policy** (privacy notice) may ship. It is de-facto counsel: it decides and signs, reserving only the §5 carve-outs for a Dutch advocaat. The subject is the person's app: its Privacy Policy file(s), version and languages, and its facts (publisher, SDKs, data model) come from the orchestrator's Step 0 fact sheet; run alone, read them from the project and ask only for the rest.
+This skill gives a firm verdict on whether an app's **Privacy Policy** (privacy notice) is ready to ship (SHIP / FIX FIRST / BLOCKED), each finding tied to its clause and rule. It is an automated review, not legal advice: a lawyer signs off; it gives no verdict on the §5 carve-outs; they need a lawyer or a registration first. Its Art. 13 checklist is GDPR law: when the app is offered only outside the Netherlands and the EU, skip it and give no verdict on law; when it is offered in EU states but not the Netherlands, the GDPR items count and the AP-guidance and UAVG points are 🟡 notes only (`legal-guardrails.md` §9). The subject is the person's app: its Privacy Policy file(s), version and languages, and its facts (publisher, SDKs, data model) come from the orchestrator's Step 0 fact sheet; run alone, read them from the project and ask only for the rest.
 
 ## Load these references (by path; do NOT inline their contents)
 
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — the constitution (severity, tiers, finding format, verdict bands, authority footer).
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — the constitution (severity, tiers, staleness, finding format, verdicts, review footer).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/attribution-tiering.md` · `finding-format.md` · `verdict-model.md` · `disclosure-grading.md` — output discipline + the 5-grade flow rubric.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md` — **the Art. 13 12-point checklist (load-bearing)**, Art. 6 basis map, Art. 7 consent, Art. 8 age-16, **Art. 9 health judgement**, Art. 12/15–22 rights + 1-month SLA, Art. 33/34 breach.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/transfers-dpf-scc.md` — Art. 44–49 transfers, EU-US DPF, SCC (2021), which Firebase/RC/Apple streams are US.
@@ -43,7 +43,7 @@ This skill adjudicates whether an app's **Privacy Policy** (privacy notice) may 
 2. **COMPLETENESS (Art. 13 12-point gate — the Verify stage).** Walk the 12 mandatory disclosures in order (table below). Each is **PRESENT**, **N/A-with-reason** (explicitly stated, e.g. "no DPO appointed"), or a **gap finding**. Missing any one = incomplete notice (🟠 minimum). Mandate a stated lawful basis **per purpose** (Art. 13(1)(c)) with precise citation ("Art. 6(1)(b)", not "we have a legitimate interest").
 3. **DISCLOSURE RECONCILIATION (code-faithfulness).** Take the flow set from `legal-flow-grader` / `legal-data-surface-scan` if available; else build it from `taxonomy/sdk-data-map.md`. Grade **each (data-type, recipient-entity, on/off-device)** flow against the PP using the 5-grade entity-aware rubric in `disclosure-grading.md`. Under-disclosure (app does X, PP silent/denies) is the dangerous direction.
 4. **EN/NL PARITY.** Re-run the same grading against `privacy.nl.md`. A flow disclosed in EN but not NL grades **omitted for the NL doc**, because an NL reader relies on the NL text alone. Substantive content must be identical; flag any section in EN absent/weaker in NL.
-5. **REPORT.** Emit findings (🔴→🟠→🟡), a confirmed-good 🟢 list (including reasoned decisions), a code-faithfulness summary, a per-document Privacy **letter grade**, the verdict band, and the authority footer.
+5. **REPORT.** Emit findings (🔴→🟠→🟡), a confirmed-good 🟢 list (including reasoned decisions), a code-faithfulness summary, a per-document Privacy **letter grade**, the verdict, and the review footer.
 
 ## Stage 2 — Art. 13 twelve-point completeness checklist
 
@@ -71,7 +71,7 @@ Also confirm 13(3) (notify before a new-purpose use) and that the 1-month rights
 Apply against the live PP. Each maps to a flow or an Art. 13 element; cite the provision in the finding. The section numbers (§3, §4 …) follow a common policy layout (data collected, not collected, recipients, transfers, retention, rights); map each check to the matching section of the person's policy. The examples assume the example app's Firebase + RevenueCat stack (`legal-guardrails.md` §8); swap in the app's own SDKs.
 
 - **§3 categories + basis.** Every data category in §3 lists a purpose **and one Art. 6 basis** (core delivery = 6(1)(b); Analytics/Crashlytics = 6(1)(a) consent, **never** 6(1)(f) — ePrivacy 5(3) bites first). Flag any analytics/crash line resting on "legitimate interest".
-- **§3.7 Art. 9 health.** The "no health inference → not special-category data" conclusion must be **reasoned and present** (general-wellness posture, no score/mood/stress label). If any scoring/inference exists in the data model or copy → Art. 9(2)(a) explicit separate consent required → 🔴/🟠. Record the reasoned decision as 🟢 if absent. `[low-confidence — fact-specific; the crux of the sign-off]`
+- **§3.7 Art. 9 health.** The "not special-category data" conclusion must be **reasoned and present**, against the CJEU test (data capable of revealing health status by collation or deduction, whatever the source; `data-category-ontology.md` §3). If any of the four triggers exists in the data model or copy — a technique or program framed around a condition, mood or symptoms the user enters, a physiological measurement, or an inference/score/label — → Art. 9(2)(a) explicit separate consent required → 🔴/🟠. Record the reasoned decision as 🟢 if absent. `[low-confidence — fact-specific; the crux of the review]`
 - **§4 do-not-collect honesty.** Cross-check every "we do not collect X" against the SDK map. An affirmative "we never collect/share X" contradicted by an SDK = **incorrect** = 🔴.
 - **§6 recipients NAMED.** Each processor named (Apple, Google/Firebase, RevenueCat, Cloudflare). Any absolute **"we do not share data with third parties"** line is false (RevenueCat receives the purchase token + app user ID; Crashlytics receives crash logs) → 🔴.
 - **§7 transfers.** US streams (Firebase Auth, Analytics/Crashlytics are global/US by architecture) named with the mechanism (EU-US DPF and/or SCC 2021). Do not let a blanket "all data in the EU" sentence stand — incorrect for Auth + Analytics. See `transfers-dpf-scc.md`.
@@ -86,7 +86,7 @@ Use the suite report skeleton (`verdict-model.md`). Findings in the standard sha
 ```
 [PP-<n>] <emoji> <one-line title>
   Location:   privacy.md §<n> (+ privacy.nl.md §<n> if parity)
-  Basis:      <Art. 13(x)/Art. 6/9 …> [tier]   e.g. Art. 13(1)(e) [settled — verified 2026-06-06]
+  Basis:      <Art. 13(x)/Art. 6/9 …> [tier]   e.g. Art. 13(1)(e) [settled — verified 2026-11-18]
   Issue:      <missing / vague / omitted / incorrect / ambiguous — name the flow + entity>
   Redline:    <exact replacement text; name the entity + the data it receives>
   Confidence: high | medium | low
@@ -96,7 +96,7 @@ End the report with:
 - **Art. 13 completeness table** — 12 rows, PRESENT / N/A-with-reason / GAP.
 - **Code-faithfulness flow table** — `| data-type | entity | on/off | EN grade | NL grade | severity |`.
 - **Confirmed-good (🟢) + reasoned decisions** — incl. the Art. 9 "not health data" reasoning.
-- **Verdict** — SIGN-OFF / FIX-THEN-SIGN-OFF / BLOCK · **Privacy <letter grade>**.
-- **Authority footer** (constitution §5) — reserving the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` fills, native-NL legal-idiom review, and any `[low-confidence]` item for a Dutch advocaat.
+- **Verdict** — SHIP / FIX FIRST / BLOCKED · **Privacy <letter grade>**.
+- **Review footer** (constitution §5: what was checked, against which law, each source's verified date) — listing the §5 carve-outs (the `[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]` values, native-NL legal-idiom review, any `[low-confidence]` item), which get no verdict; they need a lawyer or a registration first.
 
 **No silent supplement:** if a question outside the Art. 13 checklist arises (e.g. a US-state-law section, a children's-design-code consideration), surface it as a 🟡 note — do not act on it silently or omit it.

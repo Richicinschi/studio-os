@@ -1,6 +1,6 @@
 ---
 name: mobile-apps-flutter-firebase
-description: Use when the user builds a Flutter app or uses Firebase: screens and layouts, tests, JSON, routing, translations, sign-in, databases, remote settings, crash reports, hosting and security rules.
+description: "Use when the user builds a Flutter app or uses Firebase: screens and layouts, tests, JSON, routing, translations, sign-in, databases, remote settings, crash reports, hosting and security rules."
 ---
 
 # Mobile apps: Flutter and Firebase

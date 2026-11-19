@@ -31,11 +31,11 @@ End every file with a match on everything that denies. Rules are not filters: a 
 
 ## Storage rules
 
-Gate by folder (`users/{uid}/...`), file size (`request.resource.size < 5 * 1024 * 1024`), type (`contentType.matches('image/.*')` or an allow list), file extension through a path variable, and custom metadata such as `uploadedBy`. Uploads that only a backend should delete get `allow delete: if false`.
+Gate by folder (`users/{uid}/...`), file size (`request.resource.size < 5 * 1024 * 1024`), type (`contentType.matches('image/.*')` or an allow list), file name by a whole-segment path variable checked with `matches()` (`match /profiles/{uid}/{fileName}` with a `fileName.matches(...)` test, as in `assets/storage.rules.template`; a partial segment such as `avatar.{ext}` does not compile), and custom metadata such as `uploadedBy`. Uploads that only a backend should delete get `allow delete: if false`.
 
 ## Testing rules
 
-Use the rules testing library against the Firestore emulator: `initializeTestEnvironment({ projectId: "demo-test", firestore: { rules } })`, then `unauthenticatedContext()` or `authenticatedContext("uid", { admin: true })`, and wrap calls in `assertSucceeds` or `assertFails`. Seed data with `withSecurityRulesDisabled`. Cover at least: signed out is refused, owner is allowed, another user is refused, admin claim is allowed, a create missing a required field fails. Run with `firebase emulators:exec --only firestore "npm test"`. Deploy with `firebase deploy --only firestore:rules` or `--only storage`.
+Start from `assets/rules.test.template.mjs`: copy it to `rules.test.mjs` next to `firestore.rules` and `storage.rules`; its header lists the packages to install. It uses the rules testing library against the Firestore and Storage emulators: `initializeTestEnvironment({ projectId: "demo-rules", firestore: { rules }, storage: { rules } })`, then `unauthenticatedContext()` or `authenticatedContext("uid", { admin: true })`, with calls wrapped in `assertSucceeds` or `assertFails` and data seeded with `withSecurityRulesDisabled`. Add a case for every rule you change, and cover at least: signed out is refused, owner is allowed, another user is refused, admin claim is allowed, a create missing a required field fails. Run with `npx firebase-tools@15.36.0 emulators:exec --only firestore,storage --project demo-rules "node --test rules.test.mjs"`; the `demo-` project id keeps the run off every real project. Deploy with `npx firebase-tools@15.36.0 deploy --only firestore:rules` or `--only storage`.
 
 ## Client sign-in
 

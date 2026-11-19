@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -374,8 +374,8 @@
           "importance": "recommended",
           "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
           "loads": "every-session",
-          "everySessionTokens": 75,
-          "onDemandTokens": 1323,
+          "everySessionTokens": 64,
+          "onDemandTokens": 2808,
           "heavy": false,
           "card": "cards/git-guardrails.md"
         },
@@ -441,7 +441,7 @@
           "why": "When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own.",
           "loads": "every-session",
           "everySessionTokens": 33,
-          "onDemandTokens": 1932,
+          "onDemandTokens": 2225,
           "heavy": false,
           "card": "cards/finishing-a-development-branch.md"
         },
@@ -457,7 +457,7 @@
           "why": "When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any.",
           "loads": "every-session",
           "everySessionTokens": 46,
-          "onDemandTokens": 2344,
+          "onDemandTokens": 2575,
           "heavy": false,
           "card": "cards/git-cleanup.md"
         },
@@ -593,7 +593,7 @@
           "why": "Sets up a separate worktree for a branch, so parallel work never switches branches under another session.",
           "loads": "every-session",
           "everySessionTokens": 57,
-          "onDemandTokens": 1637,
+          "onDemandTokens": 1688,
           "heavy": false,
           "card": "cards/using-git-worktrees.md"
         },
@@ -1042,7 +1042,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 53,
-      "indexTokens": 1194,
+      "indexTokens": 1200,
       "card": "cards/pack-app-legal-privacy-terms-store-review.md"
     },
     {

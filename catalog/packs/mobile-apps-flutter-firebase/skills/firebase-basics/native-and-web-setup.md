@@ -1,6 +1,6 @@
 # Native Android, native iOS and web
 
-Always use the CLI form `npx -y firebase-tools@latest`. Sign in first (`login`, or `login --no-localhost` on a remote shell). Creating a project or app changes the user's cloud account, so say so and get a yes before running those commands.
+Always use the CLI form `npx firebase-tools@15.36.0`. Sign in first (`login`, or `login --no-localhost` on a remote shell). Creating a project or app changes the user's cloud account, so say so and get a yes before running those commands.
 
 ## Android
 

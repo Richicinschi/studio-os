@@ -1,7 +1,11 @@
 ---
 id: cold-email
 title: Cold email
-description: Use for cold outreach, prospecting email, outbound email, campaigns, SDR emails: "follow-up email sequence," "sales email," "nobody's replying to my emails," "reach out to prospects," "email to leads," "how do I write a cold email." Subject lines, opening, CTAs, personalization, multi-touch, copy.
+description: >-
+  Use for cold outreach, prospecting email, outbound email, campaigns, SDR emails: "follow-up email
+  sequence," "sales email," "nobody's replying to my emails," "reach out to prospects," "email to
+  leads," "how do I write a cold email." Subject lines, opening, CTAs, personalization, multi-touch,
+  copy.
 ---
 
 ## When to use

@@ -1,7 +1,9 @@
 ---
 id: firebase-hosting-basics
 title: Firebase Hosting basics
-description: Use for Firebase Hosting (Classic): deploy static web apps, Single Page Apps (SPAs) or simple microservices, set firebase.json, previews, emulation. Do NOT use for Firebase App Hosting.
+description: >-
+  Use for Firebase Hosting (Classic): deploy static web apps, Single Page Apps (SPAs) or simple
+  microservices, set firebase.json, previews, emulation. Do NOT use for Firebase App Hosting.
 ---
 
 ## When to use
@@ -20,7 +22,7 @@ Typical wordings: "deploy my site to Firebase", "host this SPA", "add a redirect
 4. Test locally before deploying:
 
 ```bash
-npx -y firebase-tools@latest emulators:start --only hosting
+npx firebase-tools@15.36.0 emulators:start --only hosting
 ```
 
 The app is then served at `http://localhost:5000` unless the port is changed.

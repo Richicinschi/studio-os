@@ -46,7 +46,8 @@ Boundaries. Ask first, and refuse if the answer is no:
 
 9. **Build a kill switch that does not depend on the agent.** Provide at least two ways to stop it:
    - A control outside the agent: a hardware button combination, a notification action, or turning off the accessibility service in system settings.
-   - From the computer, `adb shell am force-stop <package-name>` stops the agent app, and `adb shell settings put secure accessibility_enabled 0` switches accessibility services off on many Android versions. Check the effect on the device, since vendors differ.
+   - From the computer, `adb shell am force-stop <package-name>` stops the agent app. Before switching accessibility off, record the current values so you can put them back: `adb shell settings get secure accessibility_enabled` and `adb shell settings get secure enabled_accessibility_services`. Then `adb shell settings put secure accessibility_enabled 0` switches accessibility services off on many Android versions. Check the effect on the device, since vendors differ.
+   - To restore, put the recorded values back: `adb shell settings put secure enabled_accessibility_services "<recorded list>"` and `adb shell settings put secure accessibility_enabled <recorded value>`. If a value read back as `null`, it was not set: clear it with `adb shell settings delete secure <name>` instead of writing the word `null`.
    - Test it on the spare phone while the agent is busy.
 
 10. **Practise a dry run.** For each new task, first run it in observe-only mode: the agent states which taps it would make without making them. Then run it live on the spare phone several times and count successes. Only then move to the real phone.

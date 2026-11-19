@@ -25,7 +25,7 @@ const longDate = (iso: string) =>
 
 <BaseLayout
   title={`Plumbing Advice and News | ${business.name}`}
-  description="Maintenance guides, how-tos and local news from Riverbend Plumbing Co for homeowners in Fairmont and Harlan County, TX."
+  description={`Maintenance guides, how-tos and local news from ${business.name} for homeowners in ${business.serviceRadius}.`}
 >
   <Breadcrumbs crumbs={[{ label: 'Blog' }]} />
 

@@ -16,7 +16,7 @@ Web and Node client: `getFirestore(app)`. Server code (Admin SDK, which ignores 
 - `updateDoc` changes named fields and fails if the document is missing. Dotted paths reach inside maps (`"address.city"`).
 - Field helpers: `serverTimestamp()`, `increment(n)`, `arrayUnion(x)`, `arrayRemove(x)`, `deleteField()`.
 - Read one document with `getDoc` and check `exists()`. Read a set with `getDocs(query)`.
-- `deleteDoc` removes one document only. Its subcollections stay. To clear a tree use the CLI `firebase firestore:delete <path> --recursive` (ask first).
+- `deleteDoc` removes one document only. Its subcollections stay. To clear a tree use the CLI `npx firebase-tools@15.36.0 firestore:delete <path> --recursive` (ask first).
 
 ## Queries
 
@@ -42,7 +42,7 @@ Firestore has server-side aggregation queries: `count()`, `sum()` and `average()
 
 ## Indexes
 
-Every single field is indexed automatically. A query on several fields, or with an inequality plus an order on another field, needs a composite index. Declare indexes in `firestore.indexes.json` (each has `collectionGroup`, `queryScope` of COLLECTION or COLLECTION_GROUP, and `fields` with an order) and use `fieldOverrides` to switch off indexing on big text fields. Deploy with `firebase deploy --only firestore:indexes`. A failing query prints a link that creates the missing index.
+Every single field is indexed automatically. A query on several fields, or with an inequality plus an order on another field, needs a composite index. Declare indexes in `firestore.indexes.json` (each has `collectionGroup`, `queryScope` of COLLECTION or COLLECTION_GROUP, and `fields` with an order) and use `fieldOverrides` to switch off indexing on big text fields. Deploy with `npx firebase-tools@15.36.0 deploy --only firestore:indexes`. A failing query prints a link that creates the missing index.
 
 ## Offline
 

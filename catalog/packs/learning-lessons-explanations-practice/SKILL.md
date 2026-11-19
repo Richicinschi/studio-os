@@ -1,6 +1,6 @@
 ---
 name: learning-lessons-explanations-practice
-description: Use when the user wants to learn something from zero: lesson by lesson teaching, patterns, spaced rechecks and practice, before any test or mock.
+description: "Use when the user wants to learn something from zero: lesson by lesson teaching, patterns, spaced rechecks and practice, before any test or mock."
 ---
 
 # Learning: lessons and explanations from zero

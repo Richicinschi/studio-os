@@ -4,15 +4,20 @@
 // WHY: Exodus statically detects ad/analytics TRACKERS and permissions baked
 // into a built APK — the off-device truth that complements the source scan.
 // This wrapper RUNS it when Docker + an APK are available, and otherwise
-// DEGRADES GRACEFULLY with setup instructions (never crashes the sign-off).
+// DEGRADES GRACEFULLY with setup instructions (never crashes the review run).
 //
 // Usage:  node run_exodus.mjs --apk <path-to.apk>
 //         (no --apk: prints how to produce one + skips)
-// Requires: Docker with image `exodusprivacy/exodus-standalone` (auto-pulled on first run).
+// Requires: Docker with the image pinned in IMAGE below (auto-pulled on first run).
 
 import { execFileSync, execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
+
+// Pinned by digest so a moved tag cannot swap the scanner. Tag v1.5.0,
+// digest sha256:a6531be9a6b666a8ffb6aec98b409cf6faf65536c5b9597e5b99195ca9422b88, read 2026-11-18
+// from Docker Hub (docker buildx imagetools inspect). Update tag and digest together.
+const IMAGE = 'exodusprivacy/exodus-standalone:v1.5.0@sha256:a6531be9a6b666a8ffb6aec98b409cf6faf65536c5b9597e5b99195ca9422b88';
 
 const args = process.argv.slice(2);
 const apkIdx = args.indexOf('--apk');
@@ -28,7 +33,7 @@ const result = { tool: 'exodus-standalone', available: dockerOk, ran: false };
 if (!dockerOk) {
   result.skipped = true;
   result.reason = 'Docker not found on PATH.';
-  result.howToInstall = 'Install Docker Desktop, then: docker pull exodusprivacy/exodus-standalone';
+  result.howToInstall = `Install Docker Desktop, then: docker pull ${IMAGE}`;
   console.log(JSON.stringify(result, null, 2));
   process.exit(0);
 }
@@ -49,7 +54,7 @@ try {
   // No shell: the APK path travels as one argument, so a path holding & or $( ) cannot become a command.
   const raw = execFileSync(
     'docker',
-    ['run', '--rm', '-v', `${dir}:/data`, 'exodusprivacy/exodus-standalone', '-j', `/data/${file}`],
+    ['run', '--rm', '-v', `${dir}:/data:ro`, IMAGE, '-j', `/data/${file}`],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }
   );
   let report;

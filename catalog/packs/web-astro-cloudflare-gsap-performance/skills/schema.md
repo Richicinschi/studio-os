@@ -83,7 +83,7 @@ Put them in one `@graph` array under one `@context`, and link entities with `@id
 ## Where the script goes
 
 - **Static site:** put the JSON-LD in the HTML template and move repeated parts into a partial.
-- **Framework site (React, Next.js and similar):** write a component that takes data and prints the script tag, rendered on the server so crawlers get it in the first HTML. When you serialize with `JSON.stringify`, also replace every `<` with `<`, so a string containing `</script>` cannot end the tag early.
+- **Framework site (React, Next.js and similar):** write a component that takes data and prints the script tag, rendered on the server so crawlers get it in the first HTML. When you serialize with `JSON.stringify`, also replace every `<` with `\u003c` (not `&lt;`: a script tag does not decode entities, so the data would change), so a string containing `</script>` cannot end the tag early.
 - **CMS or WordPress:** use a plugin (Yoast, Rank Math, Schema Pro), edit the theme, or map custom fields onto the markup.
 
 ## What to hand back

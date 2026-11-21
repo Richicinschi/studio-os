@@ -29,19 +29,19 @@ One brand lives in one markdown file, `docs/brand-guidelines.md`. This skill kee
 
 Print the brand as a prompt block, or as JSON:
 ```bash
-node brand/scripts/inject-brand-context.cjs
-node brand/scripts/inject-brand-context.cjs --json
+node skills/brand/scripts/inject-brand-context.cjs
+node skills/brand/scripts/inject-brand-context.cjs --json
 ```
 
 Check one asset's name, format, size and manifest entry:
 ```bash
-node brand/scripts/validate-asset.cjs <asset-path>
+node skills/brand/scripts/validate-asset.cjs <asset-path>
 ```
 
 List the palette, or get the steps for pulling colours out of an image:
 ```bash
-node brand/scripts/extract-colors.cjs --palette
-node brand/scripts/extract-colors.cjs <image-path>
+node skills/brand/scripts/extract-colors.cjs --palette
+node skills/brand/scripts/extract-colors.cjs <image-path>
 ```
 
 `inject-brand-context` and `extract-colors` read `docs/brand-guidelines.md` from the current folder unless you pass another path (`--brand-file` for `extract-colors`). `validate-asset` reads `.assets/manifest.json` instead.
@@ -51,9 +51,9 @@ node brand/scripts/extract-colors.cjs <image-path>
 ```bash
 # 1. Change docs/brand-guidelines.md (by hand, or through the update subcommand)
 # 2. Push the colours into the tokens
-node brand/scripts/sync-brand-to-tokens.cjs
+node skills/brand/scripts/sync-brand-to-tokens.cjs
 # 3. Confirm the guidelines still parse
-node brand/scripts/inject-brand-context.cjs --json | head -20
+node skills/brand/scripts/inject-brand-context.cjs --json | head -20
 ```
 
 Three files stay in step:
@@ -61,7 +61,9 @@ Three files stay in step:
 - `assets/design-tokens.json` holds the token definitions.
 - `assets/design-tokens.css` holds the CSS variables generated from them.
 
-`sync-brand-to-tokens` reads those fixed paths from the project root and takes no path argument.
+`sync-brand-to-tokens` reads those fixed paths from the project root and takes no path argument. It adds the guideline colours to the palette in `design-tokens.json` and keeps the keys already there.
+
+The CSS step needs a token generator at `.claude/skills/design-system/scripts/generate-tokens.cjs` in the project, which the script runs as `node <generator> --config assets/design-tokens.json -o assets/design-tokens.css`. This domain does not ship that generator. Without it, or when it fails, the script writes `design-tokens.json`, then stops with exit 1 and "CSS not regenerated": `design-tokens.css` still holds the old colours. Then either put a generator that takes those two flags at that path and run the sync again, or copy the new colour values from `design-tokens.json` into the matching variables in `design-tokens.css` by hand.
 
 ## Subcommands
 
@@ -94,11 +96,11 @@ Open the one that matches the question.
 
 | Script | Job |
 |--------|-----|
-| `brand/scripts/inject-brand-context.cjs` | Turn the guidelines into a prompt block or JSON |
-| `brand/scripts/sync-brand-to-tokens.cjs` | Copy guideline colours into `design-tokens.json` and regenerate the CSS |
-| `brand/scripts/validate-asset.cjs` | Check an asset's filename, format, size and manifest entry (it does not measure dimensions or colours) |
-| `brand/scripts/extract-colors.cjs` | Show the palette; for an image, print how to extract and compare colours |
-| `brand/scripts/self-check.cjs` | Feeds the four scripts malformed input (bad manifests, empty or garbage guidelines) and fails on any crash; Node only |
+| `skills/brand/scripts/inject-brand-context.cjs` | Turn the guidelines into a prompt block or JSON |
+| `skills/brand/scripts/sync-brand-to-tokens.cjs` | Copy guideline colours into `design-tokens.json`, then regenerate the CSS when a token generator is present (exits 1 without one; see Sync workflow) |
+| `skills/brand/scripts/validate-asset.cjs` | Check an asset's filename, format, size and manifest entry (it does not measure dimensions or colours) |
+| `skills/brand/scripts/extract-colors.cjs` | Show the palette; for an image, print how to extract and compare colours |
+| `skills/brand/scripts/self-check.cjs` | Feeds the four scripts malformed input (bad manifests, empty or garbage guidelines) and fails on any crash; Node only |
 
 ## Templates
 

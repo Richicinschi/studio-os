@@ -5,7 +5,7 @@ checked: 2026-11-09
 tokens:
   light: 43
   standard: 43
-  full: 82
+  full: 43
 ---
 
 # Domain: dependency supply-chain risk checks
@@ -27,8 +27,9 @@ Read-only: presence and versions, never your files' contents.
 - Which package files your project has, by name only: `ls package.json pubspec.yaml requirements.txt pyproject.toml 2>/dev/null`.
 - Another skill that already checks dependencies, from its front matter only:
   `awk 'FNR==1{n=0} /^---[[:space:]]*$/{n++; next} n==1 && /^(name|description):/{p=1; print FILENAME": "$0; next} n==1 && p && /^[[:space:]]/{print FILENAME": "$0; next} {p=0}' .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md 2>/dev/null | grep -iE 'dependenc|supply.chain|vulnerab|package'`
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/dependency-supply-chain-risk-checks/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already checks dependencies and the pack is absent; and **not yet** otherwise.
+The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already checks dependencies and the pack is absent; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -43,7 +44,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
    - Not sure: this project only.
    - Default when skipped: this project only.
 3. **"Take the one-word command?"** (only on a yes)
-   - Yes: the stub `supply-chain-risk-auditor`, which sends Claude into the pack's skill when you call it by name. About 39 tokens at most (estimate). Recommended when you will run the audit before each release.
+   - Yes: the stub `supply-chain-risk-auditor`, which sends Claude into the pack's skill. You start it by name: Claude cannot start it itself, so its description never loads and it costs 0 tokens every session. Recommended when you will run the audit before each release.
    - No: Claude finds the skill through the pack's entry. Recommended when you will run it rarely.
    - Not sure: yes.
    - Default when skipped: no.
@@ -77,7 +78,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 
 ## Watch out
 
-- **The entry is the one cost every session:** about 43 tokens (estimate). Its index, about 199 tokens (estimate), loads when a dependency task comes up, and the skill only when it is used. Figures are bytes divided by 4.
+- **The entry is the one cost every session:** about 43 tokens (estimate). Its index, about 176 tokens (estimate), loads when a dependency task comes up, and the skill only when it is used. Figures are bytes divided by 4.
 - **It is not a vulnerability scanner.** The skill says to use `npm audit`, `pip-audit` or similar for live scanning, and it does not check licences. It flags risk factors; it does not prove a package is safe or hostile.
 - **The wording names the author's own apps.** The skill says "across our apps and Python tools"; read that as your own projects.
 - **Package names leave your machine.** Claude sends the repository names it looks up to GitHub through `gh`, and what Claude reads in your project is session content that goes over the network ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"). Check your company's data rules before you audit a private project.

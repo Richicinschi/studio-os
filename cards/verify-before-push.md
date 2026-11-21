@@ -28,7 +28,7 @@ Read-only, for each repository in `adoption/inventory.md`. Manifests and CI work
   - Makefile targets: `grep -oE '^[A-Za-z0-9_-]+:' <repo>/Makefile`.
 - Hosted CI: workflow files counted, `ls <repo>/.github/workflows/*.y*ml 2>/dev/null | wc -l`, and the ones that run on a push, `grep -lE '^on:.*push|^ +push:' <repo>/.github/workflows/*.y*ml 2>/dev/null`. Claude reads their steps: a step that no local command runs is a gap.
 - Whether the front door tells Claude to run it: `grep -ci 'verify' AGENTS.md CLAUDE.md 2>/dev/null`.
-- The shell the script needs: `bash --version | head -1` (on Windows it comes with Git for Windows).
+- The shell the script needs: `bash --version | head -1` (on Windows it comes with Git for Windows). On Windows, also which `bash` a PowerShell window of yours finds. Claude's own shell has Git's folders on its PATH, and a PowerShell started from it inherits them and always finds Git's bash, so Claude asks with the PATH a new window gets, the machine's then the user's, set inside that one PowerShell process and nowhere else: `powershell.exe -NoProfile -Command '$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User"); (Get-Command bash -ErrorAction SilentlyContinue).Source'`; where Claude's shell tool is PowerShell, the part inside the single quotes runs there as it is. When it prints a path ending in `System32\bash.exe`, in any mix of capitals, that is the launcher for the Windows Subsystem for Linux (WSL), not Git's bash, and `bash verify.sh` typed in PowerShell runs the script there; Claude says so, and the PowerShell form below calls Git's bash by its full path.
 
 The menu marks the item **have** when a script, or an entry in the repository's task runner, runs every test and lint the repository has, and, where Claude pushes for you, the front door says to run it first; **partly** when tests exist but run only in hosted CI or one at a time, or the script misses a step the workflow files run; and **not yet** otherwise.
 
@@ -72,12 +72,12 @@ Light takes steps 1 to 4 and 6; standard takes all six; full takes all six, with
    - Before any push, run `bash verify.sh` and quote its last line. Never push while it fails; if you could not run it, say so.
    ```
 
-   It is 125 bytes, about 32 tokens every session (estimate).
+   It is about 32 tokens every session (estimate). Claude runs it in its Bash tool, which on Windows is Git Bash. Typed in PowerShell, the same run is `& (Join-Path (Split-Path (Split-Path (Split-Path (git --exec-path)))) 'bin\bash.exe') verify.sh`: `git --exec-path` names Git's own folder, three levels below where Git is installed, so this finds Git's bash for an install in your user folder too.
 6. **Claude:** records the decision, the size, the repositories, the steps the script runs and the undo in `adoption/decisions.md`.
 
 ## Check
 
-1. **you:** `! bash "<repo>/verify.sh"; echo "exit $?"`. Expected: a header for each step, then the script's last line saying every step passed, then `exit 0`.
+1. **you:** `! bash "<repo>/verify.sh"; echo "exit $?"`. In your own PowerShell terminal: `& (Join-Path (Split-Path (Split-Path (Split-Path (git --exec-path)))) 'bin\bash.exe') "<repo>/verify.sh"; "exit $LASTEXITCODE"`. Expected: a header for each step, then the script's last line saying every step passed, then `exit 0`.
 2. **Claude:** on your yes, makes one step fail on purpose, for example with a temporary test that expects 1 to equal 2. It runs the script and shows a non-zero exit, with that step's header the last one printed. Then it removes the temporary test, runs the script again, shows `exit 0`, and shows that `git -C <repo> status --short` lists nothing left over from the test.
 3. **you:** for standard and full, start a new session and ask, as the first message, "What do you run before a push?" Expected: Claude names the script and says it quotes the last line, from the front door, without opening a file.
 
@@ -97,6 +97,6 @@ If step 1 does not end in `exit 0`, the failing step's header is the next thing 
 - **Keep it in step with the build.** When a change removes an output or renames a step the script checks, the script fails for a reason that is not a bug, and a script that is always red gets ignored. Change the script in the same commit as the build.
 - **Slow tests.** With full, `--fast` is for while you work; a push gets the full run.
 - **Output costs tokens.** When Claude runs the script, everything it prints enters the conversation. A test run that prints thousands of lines fills the context; keep the output to a header per step, plus the failures.
-- **Windows:** the script runs in Git Bash, and the tools each step calls must be on that shell's PATH. Without Git for Windows, Claude Code's shell tool is PowerShell, and `bash` may not be there at all.
+- **Windows:** the script runs in Git Bash, and the tools each step calls must be on that shell's PATH. Git for Windows puts `git` on PowerShell's PATH, not its `bash`, so `bash` typed in PowerShell can be `C:\Windows\system32\bash.exe`, the WSL launcher: the script then fails with "No such file or directory" or "node: command not found" while it passes in Git Bash. In PowerShell, call Git's bash by its full path, found from `git` wherever Git is installed: `& (Join-Path (Split-Path (Split-Path (Split-Path (git --exec-path)))) 'bin\bash.exe') verify.sh`. Without Git for Windows, Claude Code's shell tool is PowerShell, and Git's bash is not there at all.
 - **Company repositories.** A committed script is a file the whole team sees; ask before you add it, or keep it in your setup and point it at the repository.
-- **Token cost.** Light loads nothing. Standard and full load one line, 125 bytes, about 32 tokens every session (estimate, bytes divided by 4). The script itself runs outside Claude's context.
+- **Token cost.** Light loads nothing. Standard and full load one line, about 32 tokens every session (estimate, bytes divided by 4). The script itself runs outside Claude's context.

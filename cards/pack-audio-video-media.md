@@ -25,8 +25,9 @@ Read-only: presence and versions, never the media itself. Tools some of the skil
 - The pack, at project and user level: `ls -d .claude/skills/audio-video-media "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/audio-video-media 2>/dev/null`.
 - Another skill that already handles video or audio, from its front matter only:
   `for f in .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md; do [ -f "$f" ] && sed -n '2,/^---$/p' "$f" | grep -qiE 'video|audio|podcast|transcri|subtitle' && echo "$f"; done`
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/audio-video-media/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already handles media and the pack is absent; and **not yet** otherwise.
+The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already handles media and the pack is absent; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -41,19 +42,20 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
    - Not sure: this project only.
    - Default when skipped: this project only.
 3. **"Take the reviewer agent?"** (only on a yes; Claude Code only)
-   - Yes: `media-critic`, which reviews a rendered video or audio file from frames and measurements. About 56 tokens every session (estimate). Recommended when you publish what you make.
+   - Yes: `media-critic`, which reviews a rendered video or audio file from frames and measurements: about 56 tokens every session (estimate). Recommended when you publish what you make.
    - No. Recommended when you only analyse recordings.
    - Not sure: yes.
    - Default when skipped: no.
 
 ## Needs
 
-- `ffmpeg` for most skills. Two skills need other tools: `yt-dlp` (optional, for fetching a video that is yours), and a text-to-speech or speech-to-text tool where a skill names one. Each skill lists what it needs and carries a "Without local tools" section for claude.ai, so a missing tool narrows what Claude does and stops nothing.
+- What each skill needs, as the entry's table lists it: `ffmpeg` for eight of the thirteen. Beyond it, clipping shorts takes `yt-dlp` (optional, for fetching a video that is yours), transcribing a speech-to-text tool, a narrated video a text-to-speech tool, getting media ready to post a GIF optimiser such as `gifsicle` (optional), a motion video a browser, an AI-generated video a generation service, and working inside a video editor a connection to that editor. Editing a video well and turning a story into a short film need none. Each skill that needs a tool carries a "Without local tools" section for claude.ai, so a missing tool narrows what Claude does and stops nothing.
+- `node` for the four scripts the pack ships, one in each of four skills: `edit-list.mjs` (`cut-spoken-recording`, proposes cuts from word timings and never touches media), `loudness-report.mjs` (`judge-media-by-measurement`, measures loudness with `ffmpeg`), `size-fit-ladder.mjs` (`publish-ready-media`, prints the steps for shrinking a GIF) and `safe-swap.mjs` (`video-editor-bridge`, replaces a project file after a numbered backup, and only reports what it would do unless given `--apply`).
 - SkillSpector for the scan, row 1 of your plan ([SkillSpector](skillspector.md)).
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on `catalog/packs/audio-video-media/`: scans it with SkillSpector (`skillspector scan catalog/packs/audio-video-media --no-llm`), triages the findings, and recommends the decision. Most skills run commands on your computer (`ffmpeg`, a browser for the motion-video skill, an optional download); `vet-and-adopt` reads those lines with you.
+1. **Claude:** runs `vet-and-adopt` on `catalog/packs/audio-video-media/`: scans it with SkillSpector (`skillspector scan catalog/packs/audio-video-media --no-llm`), triages the findings, and recommends the decision. Most skills run commands on your computer (`ffmpeg`, four Node scripts, a browser for the motion-video skill, an optional download); `vet-and-adopt` reads those lines with you.
 2. **Claude:** copies the entry `SKILL.md` and the `skills/` folder to `<where>/skills/audio-video-media/`, and, on a yes to question 3, `agents/media-critic.md` to `<where>/agents/`. It shows the list first and saves on your yes.
 3. **you:** install `ffmpeg` if Detect did not find it. A command that installs software is handed to you to type; Claude does not run it.
 4. **Claude:** records the decision, the scope, the tools found and the undo in `adoption/decisions.md`.

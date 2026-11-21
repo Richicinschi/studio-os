@@ -21,7 +21,7 @@ tokens:
 
 Read-only, in your setup folder and in each repository in `adoption/inventory.md`. Names and counts; no entry's text is printed.
 
-- A decision log already, names only: `find <folder> -maxdepth 3 \( -iname '*decision*' -o -iname 'adr*' \) -not -path '*/node_modules/*' 2>/dev/null`. ("ADR", architecture decision record, is a common name for the same idea.)
+- A decision log already, names only: `find <folder> -maxdepth 3 \( -iname '*decision*' -o -iname 'adr*' \) -not -path '*/node_modules/*' -not -path '<folder>/adoption/*' 2>/dev/null`. ("ADR", architecture decision record, is a common name for the same idea.) The kit's own `adoption/decisions.md`, which records what you adopted, is left out: it is not a log of how you work.
 - In a log that exists, dated entries counted, and how many state a reason: `grep -cE '^## [0-9]{4}-[0-9]{2}-[0-9]{2}' <log>` and `grep -c '^\*\*Why:\*\*' <log>`.
 - Whether the front door names it: `grep -c 'DECISIONS.md' AGENTS.md CLAUDE.md 2>/dev/null`.
 - Whether the front door imports it, which loads all of it into every session: `grep -cE '^@.*DECISIONS' CLAUDE.md AGENTS.md 2>/dev/null`.
@@ -61,7 +61,7 @@ Light takes steps 1, 2, 4 and 6; standard takes steps 1 to 4 and 6; full takes a
    - Decisions: `DECISIONS.md` holds one dated entry per decision, with its reason. Read it when a question touches an earlier decision; when we decide something that changes how we work, offer an entry.
    ```
 
-   It is 201 bytes, about 51 tokens every session (estimate). It is a pointer, not an `@` import: an import would load the whole log into every session.
+   It is about 51 tokens every session (estimate). It is a pointer, not an `@` import: an import would load the whole log into every session.
 4. **you:** log your first decision: "Log this decision: <something you decided this week, and why>." Claude asks for the reason if you left it out, and shows the entry before saving it.
 5. **Claude:** for full, goes through your front door and memory files, finds the rules that carry no reason, and asks about one per message: "Why this rule?" Each answer becomes an entry, dated the day you made the decision when you know it, otherwise today with "decided before this log began" in its Context. You can answer `skip` to any of them.
 6. **Claude:** records the decision, the size, where the log lives and the undo in `adoption/decisions.md`.
@@ -82,7 +82,7 @@ If step 1 prints `0`, or an entry has an empty Why, or in step 2 Claude answers 
 ## Watch out
 
 - **Never delete an entry; supersede it.** A decision that changes gets a new entry, and the old one's Status becomes `superseded by <date> <title>`. A rewritten entry loses the reason it once held ([the vault](vault.md) keeps the same rule for memory).
-- **Point to it; never import it.** The empty template is 702 bytes, about 176 tokens (estimate) whenever it is opened, and each entry adds a few hundred bytes more. Named in the front door, it costs tokens only when Claude opens it; imported with `@`, all of it loads into every session.
+- **Point to it; never import it.** The empty template, `DECISIONS.md`, is about 176 tokens (estimate) whenever it is opened, and it grows with each entry. Named in the front door, it costs tokens only when Claude opens it; imported with `@`, all of it loads into every session.
 - **What belongs in it.** A choice that changes how you work: a tool chosen, a rule made or reversed. A fact a later session needs is a memory file; a day's progress is a handoff note. The studio's own entries also name who decided and point to the evidence the reason rests on, such as a measurement, a commit or a report.
 - **A log that nothing prompts falls behind.** At the light size nothing reminds Claude to offer an entry, so a decision made in a chat stays in that chat unless you say "log this". The standard size adds the reminder.
 - **A long log:** Claude can list the dated headings (`grep -n '^## [0-9]' DECISIONS.md`) and open the one entry it needs, instead of reading the whole file.

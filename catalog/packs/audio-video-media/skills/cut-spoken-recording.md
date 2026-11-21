@@ -1,7 +1,7 @@
 ---
 id: cut-spoken-recording
 title: Clean up a spoken recording
-requires: [ffmpeg]
+requires: [ffmpeg, Node]
 ---
 
 ## When to use

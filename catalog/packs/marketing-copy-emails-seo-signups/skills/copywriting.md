@@ -94,4 +94,4 @@ Avoid: Submit, Sign Up, Learn More, Click Here, Get Started. Prefer: Start Free 
 - No jargon an outsider would trip on, no sentence carrying two jobs, no passive constructions, no exclamation marks, no buzzwords without substance.
 - One primary action for the page, and the button text says what happens.
 - Headline and button have alternatives with reasons.
-- English only; no em or en dashes in the output.
+- Write in the languages the project supports; no em or en dashes in the output.

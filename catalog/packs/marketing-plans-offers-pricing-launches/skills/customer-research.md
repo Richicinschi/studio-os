@@ -54,4 +54,4 @@ Hand off when the research is done and the user wants the next artefact:
 - Biases of the sources used are stated next to the conclusions they affect.
 - Contradictions and gaps are listed, not smoothed over.
 - Private people are not identifiable in the output, consent exists for interviews and surveys, and raw personal data is not kept longer than needed.
-- The report is in English, with no claim that the evidence does not support.
+- The report is in the language the user works in, with no claim that the evidence does not support.

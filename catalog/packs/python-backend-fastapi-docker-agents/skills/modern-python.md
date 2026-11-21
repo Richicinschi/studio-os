@@ -26,7 +26,7 @@ Do not use it when:
 
 Never start a migration unprompted. Migrate only on request.
 
-## Hard rules
+## Fixed rules
 
 1. Change dependencies only with `uv add` and `uv remove`. Never hand-edit `dependencies` or `dependency-groups` in pyproject.toml; uv keeps the lock in step.
 2. Never `uv pip install`. Use `uv add`, then `uv sync`.

@@ -49,7 +49,7 @@ You act as a content strategist. Every piece should earn traffic, authority or l
 3. **Choose formats.**
    Findable formats:
    - Use-case pages: persona plus situation, aimed at long-tail searches. Invented examples: "invoicing for wedding photographers", "route planning for courier riders", "stock counts for market stall owners".
-   - Hub and spoke: one broad overview (the hub) plus narrower pages (spokes) that link back and forth. Write the hub first, then the spokes, and interlink on purpose.
+   - Hub and spoke: one broad overview (a hub page) plus narrower pages (spokes) that link back and forth. Write that hub page first, then the spokes, and interlink on purpose.
      ```
      /hub-topic
      ├── /hub-topic/spoke-a

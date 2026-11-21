@@ -3,9 +3,9 @@ id: pack-learning-lessons-explanations-practice
 module: domains
 checked: 2026-11-09
 tokens:
-  light: 37
-  standard: 37
-  full: 53
+  light: 30
+  standard: 30
+  full: 30
 ---
 
 # Domain: learning something from zero
@@ -25,8 +25,9 @@ Read-only: presence only, never your notes. `"${CLAUDE_CONFIG_DIR:-$HOME/.claude
 - Whether a course folder already exists here (names only): `ls MISSION.md GLOSSARY.md RESOURCES.md lessons learning-records 2>/dev/null`.
 - Another skill that already teaches, from its front matter only:
   `for f in .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md; do [ -f "$f" ] && sed -n '2,/^---$/p' "$f" | grep -qiE 'teach|tutor|lesson|learn|course|flashcard' && echo "$f"; done`
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/learning-lessons-explanations-practice/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already teaches and the pack is absent; and **not yet** otherwise.
+The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already teaches and the pack is absent; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -41,7 +42,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
    - Not sure: this project only.
    - Default when skipped: this project only.
 3. **"Take the `teach` command stub?"** (only on a yes)
-   - Yes: a one-line skill `teach`, marked user only in the pack, which you start yourself and which sends Claude into the pack. About 16 tokens every session (estimate). Recommended, because it is how you start a course on purpose.
+   - Yes: a one-line skill `teach`, marked user only in the pack, which sends Claude into the pack. You start it by name: Claude cannot start it itself, so its description never loads and it costs 0 tokens every session. Recommended, because it is how you start a course on purpose.
    - No: the entry still reaches the skill when you ask to learn something.
    - Not sure: yes.
    - Default when skipped: yes.
@@ -74,7 +75,7 @@ The pack has no agents.
 
 ## Watch out
 
-- **The entry is the one cost every session:** about 37 tokens (estimate, bytes divided by 4). Its index, about 131 tokens (estimate), loads when a task reaches the pack, and the `teach` skill only when it is used.
+- **The entry is the one cost every session:** about 30 tokens (estimate, bytes divided by 4). Its index, about 131 tokens (estimate), loads when a task reaches the pack, and the `teach` skill only when it is used.
 - **It writes many files into your folder.** A course adds a mission file, a glossary, a source list, lessons and records. Start it in a folder meant for that subject, not inside a project you ship.
 - **Sources decide the quality.** The skill is told not to teach from memory; check the source list it builds before you trust the lessons, and expect it to go to the web.
 - **What you tell it is session content.** Your goals and answers go over the network like any other session content ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes").

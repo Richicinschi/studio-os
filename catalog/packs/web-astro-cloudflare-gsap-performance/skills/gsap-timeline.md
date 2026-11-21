@@ -25,7 +25,6 @@ Defaults and behaviours below (tweens added to the end of the timeline unless a 
 
 - One tween, or choosing an ease: **gsap-core**.
 - Tying a timeline to scrolling: **gsap-scrolltrigger**.
-- Using GSAP inside React: **gsap-react**.
 
 ## Build one
 

@@ -42,7 +42,7 @@ Reference files, open the one you need:
 - No unconditional discard used as a speed trick, no exact float equality, no runtime toggles built from preprocessor defines.
 - If the target is Godot 4.3 or later and the shader draws a full-screen quad, it uses the reversed-Z form of POSITION from `patterns-screen-and-gpu.md`.
 - First-use compile stutter was considered (warm-up) if the effect appears mid-game.
-- Ask before uploading or publishing anything; never put keys or secrets in the repo; write all text in English.
+- Ask before uploading or publishing anything; never put keys or secrets in the repo; write text in the languages the project supports.
 
 ## Without local tools
 

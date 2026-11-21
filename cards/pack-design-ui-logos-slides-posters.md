@@ -5,7 +5,7 @@ checked: 2026-11-09
 tokens:
   light: 74
   standard: 74
-  full: 181
+  full: 124
 ---
 
 # Domain: design, UX and accessibility
@@ -26,8 +26,9 @@ Read-only: presence and versions, never your designs or files. `"${CLAUDE_CONFIG
 - Tools some of the skills use, printed as found or not found: `node --version 2>/dev/null`, `python --version 2>/dev/null`, and a browser (`google-chrome --version 2>/dev/null || chromium --version 2>/dev/null`; on Windows or macOS say which browser you use).
 - Another skill that already does design work, from its front matter only:
   `for f in .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md; do [ -f "$f" ] && sed -n '2,/^---$/p' "$f" | grep -qiE 'logo|design|slides|poster|accessib|brand' && echo "$f"; done`
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/design-ui-logos-slides-posters/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already handles design and the pack is absent; and **not yet** otherwise.
+The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already handles design and the pack is absent; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -42,12 +43,12 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
    - Not sure: this project only.
    - Default when skipped: this project only.
 3. **"Take the reviewer agent?"** (only on a yes; Claude Code only)
-   - Yes: `design-critic`, which reviews a rendered design from screenshots alone. About 50 tokens every session (estimate). Recommended when you publish what you make.
+   - Yes: `design-critic`, which reviews a rendered design from screenshots alone: about 50 tokens every session (estimate). Recommended when you publish what you make.
    - No. Recommended when you only want the procedures.
    - Not sure: yes.
    - Default when skipped: no.
 4. **"Take the two animation stubs?"** (only on a yes)
-   - Yes: `review-animations` and `motion-dev-animations`, one-line skills that send Claude into the pack. About 57 tokens every session together (estimate). Recommended when you write animation code.
+   - Yes: `review-animations` and `motion-dev-animations`, one-line skills that send Claude into the pack. You start them by name: Claude cannot start them itself, so their descriptions never load and they cost 0 tokens every session. Recommended when you write animation code.
    - No. Recommended otherwise; the entry still reaches both skills.
    - Not sure: no.
    - Default when skipped: no.
@@ -60,7 +61,7 @@ The menu marks the domain **have** when the pack's folder exists; **partly** whe
 ## Steps
 
 1. **Claude:** runs `vet-and-adopt` on `catalog/packs/design-ui-logos-slides-posters/`: scans it with SkillSpector (`skillspector scan catalog/packs/design-ui-logos-slides-posters --no-llm`), triages the findings, and recommends the decision. Your own scan is the one that decides.
-2. **Claude:** reads with you the scripts the pack ships, found in these skill folders: `accessibility-review` (`contrast.mjs`), `design-system-capture` (`merge-colors.mjs`), `logo-design` (`svg-audit.mjs`), `motion-dev-animations` (two `.py` checkers), `platform-formatted-document` (`check-pasteable-html.mjs`) and `visual-qa-gate` (`page-checks.js`). It says what each does before anything is saved.
+2. **Claude:** reads with you the 12 scripts the pack ships, found in these skill folders: `accessibility-review` (`contrast.mjs`), `brand` (five in `scripts/`: `extract-colors.cjs`, `inject-brand-context.cjs`, `self-check.cjs`, `sync-brand-to-tokens.cjs`, which rewrites your `assets/design-tokens.json`, and `validate-asset.cjs`), `design-system-capture` (`merge-colors.mjs`), `logo-design` (`svg-audit.mjs`), `motion-dev-animations` (two Python checkers, `selfcheck_validator.py` and `validate_motion_config.py`), `platform-formatted-document` (`check-pasteable-html.mjs`) and `visual-qa-gate` (`page-checks.js`). It says what each does before anything is saved.
 3. **Claude:** copies the entry `SKILL.md` and the `skills/` folder to `<where>/skills/design-ui-logos-slides-posters/`; on a yes to question 4, `catalog/packs/design-ui-logos-slides-posters/stubs/review-animations/SKILL.md` to `<where>/skills/review-animations/SKILL.md` and `catalog/packs/design-ui-logos-slides-posters/stubs/motion-dev-animations/SKILL.md` to `<where>/skills/motion-dev-animations/SKILL.md`; and on a yes to question 3, `agents/design-critic.md` to `<where>/agents/`. It shows the list first and saves on your yes.
 4. **you:** install a browser or `node` if Detect did not find one you need. A command that installs software is handed to you to type; Claude does not run it.
 5. **Claude:** records the decision, the scope, the tools found and the undo in `adoption/decisions.md`.

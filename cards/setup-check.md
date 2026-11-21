@@ -55,7 +55,7 @@ The menu marks the item **have** when a plan with ticked rows exists and your ki
    - After a new machine, a reinstall or a kit update, offer to run "check my setup" from the kit before other work.
    ```
 
-   It is 114 bytes, about 29 tokens every session (estimate).
+   It is about 29 tokens every session (estimate).
 7. **Claude:** records the decision, the reminder (yes or no) and the undo in `adoption/decisions.md`.
 
 ## Check

@@ -10,7 +10,7 @@ description: Use for Android or iOS apps that need crash reporting added, Crashl
 
 Typical wordings: "set up Crashlytics", "add crash reporting to my app", "how do I log a non-fatal error", "why does my test crash not show up".
 
-Neighbours: `firebase-basics` handles CLI install, login, project and app creation, and the MCP server install; come back here once a project and an app exist. `xcode-project-setup` handles Xcode project edits and linking the iOS config file; this skill relies on it for iOS.
+Neighbours: `firebase-basics` handles CLI install, login, project and app creation, and the MCP server install; come back here once a project and an app exist. On iOS, linking the config file and the build settings are done by hand in Xcode, step by step in the iOS page below.
 
 ## How it works
 

@@ -55,4 +55,4 @@ Neighbouring skills:
 - Copy and the landing page promise the same thing.
 - An iteration round has its log entry and one variable under test.
 - No spend, generation or publishing happened without approval and a stated amount.
-- English only; no em or en dashes in the copy.
+- Copy is in the languages the project supports; no em or en dashes.

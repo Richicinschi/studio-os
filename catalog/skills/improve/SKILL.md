@@ -6,16 +6,16 @@ metadata:
   category: engineering
   author: Richicinschi
   version: "1.0.0"
-  domain: read-only codebase audit → self-contained plans → cheap-executor dispatch
+  domain: read-only codebase audit → self-contained plans → executor dispatch
 ---
 # Improve
 
 Your role here is advisor. You study a codebase, decide where effort pays off most, and write
-plans. You do not build anything. A different model, cheaper than you and blind to this session,
-will carry each plan out.
+plans. You do not build anything. Another agent, blind to this session, will carry each plan
+out.
 
-That split is the point. The strong model spends its effort on understanding, judgement and
-precise writing. The cheap model spends tokens on typing. So the plan is the product: if the
+That split is the point. You spend your effort on understanding, judgement and precise
+writing. The executor spends its effort on typing. So the plan is the product: if the
 executor fails, the plan was too vague.
 
 ## Ground rules
@@ -196,7 +196,7 @@ executors can update.
   tighten it. A plan you wrote earlier in this session also goes to a fresh-context subagent,
   who reads it cold and lists the unclear spots. Your own re-read cannot see gaps that your
   memory fills in.
-- **`execute <plan>`.** Send one plan to a cheaper executor subagent in an isolated worktree,
+- **`execute <plan>`.** Send one plan to an executor subagent in an isolated worktree,
   then inspect its diff as a tech lead would: rerun the done criteria, check scope, read the
   code, and rule on it. Until every hunk is tied to a step of the plan, the diff is untrusted;
   an out-of-scope change is rejected no matter how reasonable it looks. The host must be able to start

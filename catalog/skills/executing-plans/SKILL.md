@@ -260,8 +260,8 @@ taking MERGE_BASE as the commit where the branch began (`git merge-base main
 HEAD` finds it). Read the file it prints.
 
 **Subagent tool present.** Dispatch the `linus-reviewer` agent and leave the
-model out, so it uses the model of your own session
-(`.claude/agents/AGENTS.md`). Hand it:
+model out: a subagent then uses the model of the session that started it, your
+own. Hand it:
 
 - the reviewer prompt file `../requesting-code-review/code-reviewer.md`,
   from the requesting-code-review skill, as its instructions;

@@ -25,10 +25,11 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Does the word at `offset` start a sentence, a list item or a paragraph? Leading markup (bold, quotes,
 // a parenthesis, a backtick) is looked through; a line wrapped in mid-sentence is not a start.
-function startsSentence(str, offset) {
+export function startsSentence(str, offset) {
   const lineStart = str.lastIndexOf('\n', offset - 1) + 1;
   const core = str.slice(lineStart, offset).replace(/[*_"'`(“‘]+$/, '');
-  if (/[.!?]\s+$/.test(core)) return true;
+  // Closing markup may sit between the full stop and the space ("skills.** ", 'stop." ', "(Done.) ").
+  if (/[.!?]["')*_`”’]*\s+$/.test(core)) return true;
   if (/^\s*(?:[-*+>]|\d+[.)]|#{1,6})\s+$/.test(core)) return true;
   if (!/^\s*$/.test(core)) return false;
   const before = str.slice(0, Math.max(0, lineStart - 1)).replace(/\r$/, '');
@@ -71,6 +72,62 @@ export function rewriteText(text, { owner } = {}) {
     });
   }
   return { text: out, hits };
+}
+
+// Studio-only blocks: hub text the studio keeps for itself, between a line `<!-- studio-only -->` and a
+// line `<!-- /studio-only -->`, both included, is cut from every shipped Markdown file before the
+// rewrites run. Markers are whole lines (whitespace around them allowed); a marker that shares its line,
+// is misspelt, is nested, has no open or is never closed stops the build at that file and line, so a
+// slip never cuts to the end of a file. Line endings are kept as they are. The marker word lives here,
+// in the one file the gates exempt, so the leftover gate can look for it everywhere else.
+export const STUDIO_ONLY = 'studio-only';
+const MARKER_OPEN = `<!-- ${STUDIO_ONLY} -->`;
+const MARKER_CLOSE = `<!-- /${STUDIO_ONLY} -->`;
+// Any spelling of a marker in its comment form: a space, an underscore or nothing for the hyphen, any case.
+// Only the comment form, so prose that says "studio only" is not a marker.
+const MARKER_ANY = /<!--\s*\/?\s*studio[\s_-]*only\s*-->/i;
+
+export function cutStudioOnly(text, file) {
+  const kept = [];
+  let open = 0; // the line of the open marker, inside a block
+  text.split(/(?<=\n)/).forEach((line, i) => {
+    const n = i + 1;
+    const bare = line.trim();
+    if (bare === MARKER_OPEN) {
+      if (open) throw new Error(`${file}:${n} ${STUDIO_ONLY} block opened inside the block opened on line ${open}; close that one first`);
+      open = n;
+    } else if (bare === MARKER_CLOSE) {
+      if (!open) throw new Error(`${file}:${n} ${STUDIO_ONLY} block closed, but none is open`);
+      open = 0;
+    } else if (MARKER_ANY.test(line)) {
+      throw new Error(`${file}:${n} ${STUDIO_ONLY} block marker shares its line with other text, or is misspelt; write ${MARKER_OPEN} or ${MARKER_CLOSE} on a line of its own`);
+    } else if (!open) kept.push(line);
+  });
+  if (open) throw new Error(`${file}:${open} ${STUDIO_ONLY} block opened here is never closed`);
+  return kept.join('');
+}
+
+// What the build did not cut: any line still holding the marker word, in any case, or a marker comment in
+// any spelling (a Markdown block the build never saw, a marker in a script or a data file, a --note bound
+// for the changelog).
+export const findStudioMarkers = (text) => text.split(/\r?\n/)
+  .flatMap((line, i) => (line.toLowerCase().includes(STUDIO_ONLY) || MARKER_ANY.test(line) ? [{ reason: `${STUDIO_ONLY} marker left in shipped text`, line: i + 1 }] : []));
+
+// Words that only make sense inside the studio: its hub, its numbered rules and gates, its one machine,
+// the owner's yes. Matched as whole words ("Hard rules" counts, "G60" and "PG6" do not), the words in any
+// case and G1 to G8 in capitals only ("g6" is not a gate), one finding per marker per line, and only in
+// files under catalog/: the cards, modules and docs speak to the maintainer and may say "the hub". A false
+// hit goes on MARKERS_ALLOW, never out of this list.
+const MARKERS = [
+  ...['the hub', 'this machine', 'his yes'].map((m) => ({ m, re: new RegExp(`\\b${m.replace(' ', '\\s+')}\\b`, 'i') })),
+  ...['hard rule', 'studio rule'].map((m) => ({ m, re: new RegExp(`\\b${m.replace(' ', '\\s+')}s?\\b`, 'i') })),
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({ m: `G${n}`, re: new RegExp(`\\bG${n}\\b`) })),
+];
+
+export function findMarkers(text, file) {
+  if (!String(file).replace(/\\/g, '/').startsWith('catalog/')) return [];
+  return text.split(/\r?\n/).flatMap((line, i) => MARKERS.filter(({ re }) => re.test(line))
+    .map(({ m }) => ({ line: i + 1, reason: `studio marker "${m}"` })));
 }
 
 export const SECRET_PATTERNS = [
@@ -144,8 +201,6 @@ export const PATH_PATTERNS = [
 // build stops on an entry that no longer matches. Specific entries come before generic ones, since a
 // file's entries apply in this order. Code files are never touched.
 export const STUDIO_REWRITES = [
-  { file: 'catalog/skills/handoff/SKILL.md', pattern: '\\[\\[feedback_peer_requests_need_\\w+_word\\]\\]', replacement: 'the rule that a request from another session needs the owner\'s own word', why: 'a memory note whose name carries a person\'s name' },
-  { file: 'catalog/skills/handoff/SKILL.md', phrase: '[[feedback_memory_vault]]', replacement: 'the vault rule', why: 'a studio memory note' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'node .studio/guardrails/session-hygiene.mjs', replacement: 'node <your setup>/hooks/session-end-check.mjs', why: 'the studio\'s Stop hook; the kit ships its own (cards/session-end-check.md)' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'node .studio/guardrails/studio-doctor.mjs', replacement: 'node <your setup check, if you keep one>', why: 'the studio\'s own machine check, not in the kit' },
   { file: 'catalog/skills/handoff/SKILL.md', phrase: 'If he is merely pausing', replacement: 'If they are merely pausing', why: 'the owner, by pronoun' },
@@ -154,18 +209,14 @@ export const STUDIO_REWRITES = [
   { file: 'catalog/skills/handoff/SKILL.md', phrase: '- anything he did not name.', replacement: '- anything they did not name.', why: 'the owner, by pronoun' },
   { file: 'catalog/packs/advisor-council-for-big-decisions/skills/council.md', phrase: '⚠ Subagents can\'t talk to each other directly (they\'re isolated, one-shot)', replacement: '⚠ The seats are dispatched one-shot and never answer each other here', why: 'the kit\'s facts say a subagent can message another agent; the skill\'s point is that the chair runs the rounds' },
   { file: '*', phrase: 'hard rule 11', replacement: 'the rule that each risky act needs a recorded yes', why: 'a studio rule number' },
-  { file: '*', phrase: '(studio hard rule 14)', replacement: '(`vet-and-adopt`)', why: 'a studio rule number; in the kit, vetting an outside item is vet-and-adopt' },
   { file: '*', pattern: '<!-- Generated by tools/library/build\\.mjs[^\\n]*-->\\n', replacement: '', why: 'the hub\'s pack generator, a path the kit does not have' },
   {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "This page lists only what exists in the studio:[^\\n]*\\n",replacement: "This page lists the skills this kit ships in `.claude/skills/`, the skills inside any domain you installed, and Claude Code's built-in slash commands.\n",why: "the studio's skill index and sync files, which the kit does not ship"},
   {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "A name followed by \"pack X\" lives inside that pack\\. Read `library/X/SKILL\\.md`, find the skill in its table, open the file it names and follow it\\.",replacement: "A name followed by \"pack X\" lives inside the domain X you installed. Read `.claude/skills/X/SKILL.md`, find the skill in its table, open the file it names and follow it.",why: "the studio's library folder"},
   {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "- When no row fits, read[^\\n]*\\n- Keep this page true\\.[^\\n]*\\n",replacement: "- When no row fits, list `.claude/skills/` and read the descriptions.\n",why: "the studio's skill index, library index and sync script"},
-  {file: "catalog/skills/using-agent-skills/SKILL.md",phrase: "For an outside skill: `vet-external-skill`, then `writing-great-skills`",replacement: "For an outside skill: `vet-and-adopt`, then `writing-great-skills`",why: "the studio's vetting skill; the kit's is vet-and-adopt"},
+  {file: "catalog/skills/using-agent-skills/SKILL.md",phrase: "For an outside skill: `vet-external-skill`, then `writing-great-skills`",replacement: "For an outside skill: vet it with the kit's `vet-and-adopt` (run from the kit folder), then `writing-great-skills`",why: "the studio's vetting skill; the kit's is vet-and-adopt"},
   {file: "catalog/packs/web-astro-cloudflare-gsap-performance/skills/site-architecture.md",phrase: "\"see how [reminders](/features/reminders) work\"",replacement: "\"see how reminders work\", linked to the reminders page",why: "an example link to a page of an imagined site; the kit cannot resolve a site path"},
   { file: '*', phrase: '.studio/rules/hard-rules.md', replacement: 'your rules file', why: 'a studio path' },
-  { file: '*', phrase: '.studio/rules/coding-guidelines.md', replacement: 'your coding guidelines', why: 'a studio path' },
   { file: '*', phrase: '.studio/registry/projects.md', replacement: 'your project registry', why: 'a studio path' },
-  { file: '*', phrase: '.studio/runtime/runtimes.json', replacement: 'the studio\'s list of runtimes (not in this kit)', why: 'a studio path' },
-  { file: '*', phrase: '.studio/memory/', replacement: 'your memory folder', why: 'a studio path' },
   { file: '*', phrase: '.studio/guardrails/skills-primer.mjs', replacement: 'a start-up hook of your own (the studio\'s is not in this kit)', why: 'a studio script' },
   { file: '*', phrase: 'memory `feedback_workflow_concurrency_cap`', replacement: 'a studio note on how many agents run at once', why: 'a studio memory note' },
   { file: '*', phrase: '`feedback_workflow_concurrency_cap`', replacement: 'the same note', why: 'a studio memory note' },
@@ -273,6 +324,52 @@ export function findRisky(text, file = '') {
 // that is real; fix it at its source in the hub.
 export const RISKY_ALLOW = [
   { file: 'catalog/packs/python-backend-fastapi-docker-agents/skills/production-docker.md', phrase: '| `FROM python:latest` | Builds change without warning | Pin version and digest |', why: 'a row of the anti-patterns table, warning against the floating tag' },
+];
+
+// Kit text that names the block marker on purpose (a maintainer note on how blocks work). Matched like
+// PATHS_ALLOW: that phrase on the flagged line, in that file. Never allow a block the build failed to cut.
+export const STUDIO_ALLOW = [
+  { file: 'docs/MAINTAINING.md', phrase: '**Studio blocks.** A rule the studio relies on but the kit must not ship stays in the hub, inside a block:', why: 'the maintainer guide explains how a block is written and what stops the build' },
+];
+
+// Shipped catalog text where a studio marker means something else (a regulator's guideline G6, a heading
+// "Hard rules" in an upstream skill). Matched like PATHS_ALLOW: that phrase on the flagged line, in that file.
+const LEGAL = 'catalog/packs/app-legal-privacy-terms-store-review/skills';
+const AP = `${LEGAL}/legal-guardrails/references/nl-eu-law/ap-guidance.md`;
+const AP_WHY = 'the Dutch data protection authority\'s (AP) app guidelines, numbered G1 to G7 in this reference; not a studio gate';
+const REVIEW_SITE = 'G2, the business software review site, named beside Capterra and TrustRadius; not a studio gate';
+const LOCAL_PORT = 'the MobSF server\'s port is published on 127.0.0.1 only, so "this machine" is the reader\'s own computer, not the studio\'s';
+export const MARKERS_ALLOW = [
+  { file: `${LEGAL}/legal-analytics-consent.md`, phrase: 'AP §3 opt-IN position, G2 unbundling, G4 withdrawal', why: `${AP_WHY}; this line points at that reference` },
+  { file: `${LEGAL}/legal-analytics-consent.md`, phrase: 'AP G2 separate-consent-per-data-type', why: AP_WHY },
+  { file: `${LEGAL}/legal-data-surface-scan.md`, phrase: 'the port is bound to this machine only', why: LOCAL_PORT },
+  { file: `${LEGAL}/legal-data-surface-scan/scripts/run_mobsf.mjs`, phrase: '(port bound to this machine only)', why: LOCAL_PORT },
+  { file: AP, phrase: '| G1 | **Consent before reading from / placing data on the device** |', why: AP_WHY },
+  { file: AP, phrase: '| G2 | **Separate consent per data type (unbundling)** |', why: AP_WHY },
+  { file: AP, phrase: '| G3 | **Clear, fixed purposes** |', why: AP_WHY },
+  { file: AP, phrase: '| G4 | **Withdrawal of consent must be possible and as easy as giving it** |', why: AP_WHY },
+  { file: AP, phrase: '| G5 | **Data minimisation', why: AP_WHY },
+  { file: AP, phrase: '| G6 | **Readable / accessible privacy statement** |', why: AP_WHY },
+  { file: AP, phrase: '| G7 | **Don\'t change purposes / scope-creep** | (See G3.)', why: AP_WHY },
+  { file: AP, phrase: 'The withdrawal path (G4 / Art. 7(3)) must also exist.', why: AP_WHY },
+  { file: AP, phrase: 'the readability standard (G6) still applies generally', why: AP_WHY },
+  { file: AP, phrase: '**separate** consent (G2)', why: AP_WHY },
+  { file: AP, phrase: 'Distinct consumer/consent surface (G2)', why: AP_WHY },
+  { file: AP, phrase: '| **PP accessibility (G6)** |', why: AP_WHY },
+  { file: AP, phrase: 'withdrawal-ack each separate. [G2]', why: AP_WHY },
+  { file: AP, phrase: 'stops future processing. [G4 / Art. 7(3)]', why: AP_WHY },
+  { file: AP, phrase: 'free tier on-device. [G5]', why: AP_WHY },
+  { file: AP, phrase: 'lists every SDK/recipient. [G6]', why: AP_WHY },
+  { file: AP, phrase: 'material change triggers re-consent. [G3/G7]', why: AP_WHY },
+  { file: AP, phrase: '| G1–G7, §4 (C1–C4) |', why: `${AP_WHY}; a source row listing the guidelines it supports` },
+  { file: AP, phrase: '| G1–G7, C2–C4 (C3 wording) |', why: `${AP_WHY}; a source row listing the guidelines it supports` },
+  { file: AP, phrase: '| §1 cookie split, G6 |', why: `${AP_WHY}; a source row listing the guidelines it supports` },
+  { file: AP, phrase: 'legal-basis-of-consent | G2, G4 |', why: `${AP_WHY}; a source row listing the guidelines it supports` },
+  { file: AP, phrase: '| G1–G4 (informed consent) |', why: `${AP_WHY}; a source row listing the guidelines it supports` },
+  { file: 'catalog/packs/marketing-copy-emails-seo-signups/skills/ai-seo.md', phrase: 'review sites (G2, Capterra, TrustRadius for B2B software)', why: REVIEW_SITE },
+  { file: 'catalog/packs/marketing-plans-offers-pricing-launches/skills/competitors.md', phrase: 'public review sites (G2, Capterra, TrustRadius)', why: REVIEW_SITE },
+  { file: 'catalog/packs/marketing-plans-offers-pricing-launches/skills/customer-research.md', phrase: 'Reddit mining, G2 reviews', why: 'G2, the business software review site, in the skill\'s trigger list; not a studio gate' },
+  { file: 'catalog/packs/marketing-plans-offers-pricing-launches/skills/customer-research.md', phrase: '"mine Reddit and G2 for our category"', why: 'G2, the business software review site, in an example request; not a studio gate' },
 ];
 
 // Any IPv4 address is reported except unspecified, loopback, masks and the RFC 5737 documentation

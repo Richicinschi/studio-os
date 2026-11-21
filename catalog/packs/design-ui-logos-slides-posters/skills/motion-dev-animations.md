@@ -156,9 +156,9 @@ Reduced motion in React: `<MotionConfig reducedMotion="user">` disables transfor
 
 An animation spec can be written as JSON and checked:
 
-- Schema: `schema/motion-config.schema.json`; sample: `examples/example-config.json`.
-- Checker: `python scripts/validate_motion_config.py <file.json>` or `--all <dir>`. Needs `pip install jsonschema`.
-- Self-test of the checker: `python scripts/selfcheck_validator.py`.
+- Schema: `skills/motion-dev-animations/schema/motion-config.schema.json`; sample: `skills/motion-dev-animations/examples/example-config.json`.
+- Checker: `python skills/motion-dev-animations/scripts/validate_motion_config.py <file.json>` or `--all <dir>`. Needs `pip install jsonschema`.
+- Self-test of the checker: `python skills/motion-dev-animations/scripts/selfcheck_validator.py`.
 
 ## Facts
 

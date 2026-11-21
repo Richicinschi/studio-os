@@ -28,7 +28,7 @@ Three things go wrong in data work done with Claude:
 - an agent whose tool calls into an API or a database were never tested;
 - a package installed because a snippet needed it, with no look at who maintains it.
 
-The first is the expensive one. The studio's review of its own Claude usage, quoted in the `claim-auditor` skill, named unverified claims its most persistent kind of rework: cheap to check before shipping, expensive to retract after.
+The first is the expensive one. The studio's review of its own Claude usage named unverified claims its most persistent kind of rework: cheap to check before shipping, expensive to retract after.
 
 ## The mechanism
 

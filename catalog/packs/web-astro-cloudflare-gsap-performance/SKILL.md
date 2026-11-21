@@ -5,14 +5,16 @@ description: "Use for websites and Cloudflare Workers: Astro pages, deploying or
 
 # Websites: Astro, Cloudflare, animation and speed
 
-Find the skill that fits the task in the table, read its file in full before you start, and follow it. If a skill needs a local tool and you are on claude.ai without one, follow that skill's "Without local tools" section.
+Find the skill that fits the task in the table, read its file in full before you start, and follow it.
+
+Script paths in this domain start at this domain's folder, the base directory Claude Code names when it loads this skill.
 
 | Skill | What it does | When to use | File |
 |---|---|---|---|
 | Astro dev | Work on Astro sites: .astro and .mdx files, config, content collections, Tailwind v4, client directives. | Use when editing .astro or .mdx files, astro.config, content collections or client directives. | skills/astro-dev.md |
 | GSAP core | Core GSAP animation: tweens, from and to, easing, stagger and defaults. | Use when the user asks how to animate something with GSAP: a tween, easing, stagger or a from/to move. | skills/gsap-core.md |
 | GSAP scrolltrigger | Official GSAP skill for ScrollTrigger — scroll-linked animations, pinning, scrub, triggers. | Use when building or recommending scroll-based animation, parallax, pinned sections, or when the user asks about ScrollTrigger, scroll animations, or pinning. | skills/gsap-scrolltrigger.md |
-| GSAP timeline | Official GSAP skill for timelines — gsap.timeline(), position parameter, nesting, playback. | Use when sequencing animations, choreographing keyframes, or when the user asks about animation sequencing, timelines, or animation order (in GSAP or when recommending a library that supports… | skills/gsap-timeline.md |
+| GSAP timeline | Official GSAP skill for timelines — gsap.timeline(), position parameter, nesting, playback. | Use to sequence animations or choreograph keyframes; also when the user asks how to order or time animations, or when a library that supports timelines is being recommended. | skills/gsap-timeline.md |
 | Wrangler | Cloudflare Workers command line: deploy, develop and manage Workers, KV, R2, D1 and queues. | Use when deploying, running or managing a Cloudflare Worker with the wrangler command. | skills/wrangler.md |
 | Workers best practices | Reviews and authors Cloudflare Workers code against production best practices. | Use when writing or reviewing Cloudflare Worker code, or checking a Worker for common mistakes before production. | skills/workers-best-practices.md |
 | Web perf | Analyzes web performance using Chrome DevTools MCP. | Use when asked to audit, profile, debug, or optimize page load performance, Lighthouse scores, or site speed. | skills/web-perf.md |

@@ -13,7 +13,7 @@ This skill has two modes over one connection:
 - Mode A, read: turn the design into working UI that matches it.
 - Mode B, write: build or change things inside the design tool.
 
-Neighbours: for inventing a look from scratch with no file, use the visual design skills (the hub's frontend-design skill covers styling choices). For checking contrast or accessibility of the result, use the accessibility skill of this pack. For turning a finished design into a deployed site, hand over to the web build skills once Mode A is done. If the person only has screenshots and no connection, go to "Without local tools" below.
+Neighbours: for inventing a look from scratch with no file, use the visual design skills (the frontend-design skill of this domain covers styling choices). For checking contrast or accessibility of the result, use the accessibility skill of this pack. For turning a finished design into a deployed site, hand over to the web build skills once Mode A is done. If the person only has screenshots and no connection, go to "Without local tools" below.
 
 ## How it works
 

@@ -5,8 +5,10 @@ description: "Use when the user faces a real fork and wants a panel of different
 
 # Advisor council for big decisions
 
-Find the skill that fits the task in the table, read its file in full before you start, and follow it. If a skill needs a local tool and you are on claude.ai without one, follow that skill's "Without local tools" section.
+Find the skill that fits the task in the table, read its file in full before you start, and follow it.
+
+Script paths in this domain start at this domain's folder, the base directory Claude Code names when it loads this skill.
 
 | Skill | What it does | When to use | File |
 |---|---|---|---|
-| Council | Convene the Studio Council — a panel of the studio's persona-agents — to critique a decision, plan, or question from multiple viewpoints and return one… | Use when facing a real fork ("should we build X", "is this plan sound", "ship the paywall now?") and you want diverse, conflicting perspectives before deciding. | skills/council.md |
+| Council | Convene the Studio Council (the studio's persona-agents) to critique a decision, plan or question from several viewpoints and return one synthesized brief. | Use when facing a real fork ("should we build X", "is this plan sound", "ship the paywall now?") and you want diverse, conflicting perspectives before deciding. | skills/council.md |

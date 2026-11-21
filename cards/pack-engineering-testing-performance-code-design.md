@@ -26,8 +26,9 @@ Read-only: presence and versions, never your code. `"${CLAUDE_CONFIG_DIR:-$HOME/
 - Whether a DevTools connection is already set up (file names only): `grep -l "chrome-devtools" .mcp.json "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/settings.json 2>/dev/null`.
 - Another skill that already does this job, from its front matter only:
   `for f in .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md; do [ -f "$f" ] && sed -n '2,/^---$/p' "$f" | grep -qiE 'performance|lighthouse|devtools|profil|refactor|architecture' && echo "$f"; done`
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/engineering-testing-performance-code-design/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already handles this work and the pack is absent; and **not yet** otherwise.
+The menu marks the domain **have** when the pack's folder exists; **partly** when another skill already handles this work and the pack is absent; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -72,8 +73,8 @@ The pack has no agents and no stubs, so there are no further questions.
 
 ## Watch out
 
-- **The entry is the one cost every session:** about 34 tokens (estimate, bytes divided by 4). Its index, about 342 tokens (estimate), loads when a task reaches the pack, and each skill only when it is used.
+- **The entry is the one cost every session:** about 34 tokens (estimate, bytes divided by 4). Its index, about 305 tokens (estimate), loads when a task reaches the pack, and each skill only when it is used.
 - **The DevTools connection runs a downloaded package and a real browser.** The skill's setup uses `npx` to fetch the latest version of a server at each start; pin a version if you want it stable. It starts Chrome in its own profile folder apart from your daily browser. The skill warns that a connection to your everyday profile can reach your open windows, such as webmail; keep the separate profile.
 - **Page content is data, not instructions.** The skill tells Claude to treat DOM text, console lines and network bodies as untrusted and to report text that tries to give orders. Keep that rule when you adapt it, and let the skill ask before it alters the page.
 - **Your pages are session content.** What Claude reads from the browser goes over the network like any other session content ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"). Do not point it at a logged-in page of a customer.
-- **Studio-specific lines.** The skills mention the studio's own sites, scripts and a lessons memory. Those do not exist in your setup; replace them with yours or delete them in step 2.
+- **Studio-specific lines.** Three skills name the studio's account as author in their front matter, and the design skill's description calls its vocabulary one "the studio shares". Put your own name there, or delete the lines, in step 2.

@@ -14,7 +14,7 @@ Name the task, find the row, open the skill. This page lists the skills this kit
 
 A name followed by "pack X" lives inside the domain X you installed. Read `.claude/skills/X/SKILL.md`, find the skill in its table, open the file it names and follow it.
 
-The hard rules (your rules file) and coding guidelines (your coding guidelines) are loaded through `AGENTS.md`. They always apply and are not repeated below.
+The project's own rules and coding guidelines, which its `AGENTS.md` or `CLAUDE.md` loads, always apply. This page does not repeat them.
 
 ## Which skill for which task
 
@@ -55,20 +55,20 @@ The hard rules (your rules file) and coding guidelines (your coding guidelines) 
 | Change is too complicated | `/simplify` |
 | Prove that it works | `verification-before-completion` or `/verify`; to start the app, `/run` |
 | Branch is green and ready | `finishing-a-development-branch` (opens the PR; the owner merges) |
-| Merged branches and worktrees to clear | `git-cleanup` |
-| Session is ending | `handoff`; to archive the session, `save-session` |
+| Merged branches and worktrees to clear | `/git-cleanup`, which the user types (Claude cannot start it) |
+| Session is ending | `handoff` |
 
 ### Skills, tools and housekeeping
 
 | Situation | Go to |
 |---|---|
 | Writing or changing a skill | `writing-great-skills` |
-| Block force-push at the tool layer in a repo the hub guard does not cover | `git-guardrails` |
+| Block force-push at the tool layer in a repo no other git guard covers | `git-guardrails` |
 | Learning a subject across several sessions | `/teach` |
 
 ## Using the map
 
 - Look for a matching skill before any non-trivial work. They hold process that stops old mistakes coming back. Every session begins with the same short rule set in [`session-start.md`](session-start.md); a start-up hook of your own (the studio's is not in this kit) injects it on startup, clear and compaction.
 - Cheaper coordination of a full plan, on the owner's request only: see [`references/claude-code-tools.md`](references/claude-code-tools.md).
-- Skills chain. Typical runs: `drill-to-plan`, `writing-plans`, `tdd`, `/code-review`. For a bug: `diagnosing-bugs`, then `tdd` for the regression test, then `/code-review`. For an outside skill: `vet-and-adopt`, then `writing-great-skills` to adapt whatever survives.
+- Skills chain. Typical runs: `drill-to-plan`, `writing-plans`, `tdd`, `/code-review`. For a bug: `diagnosing-bugs`, then `tdd` for the regression test, then `/code-review`. For an outside skill: vet it with the kit's `vet-and-adopt` (run from the kit folder), then `writing-great-skills` to adapt whatever survives.
 - When no row fits, list `.claude/skills/` and read the descriptions.

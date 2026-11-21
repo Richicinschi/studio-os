@@ -10,7 +10,7 @@ Use when the user wants data pulled from websites or from a search service. Typi
 
 Neighbouring jobs:
 - Understanding one page the person pasted or opened themselves: just read it, no fetching job is needed.
-- Research that must cite and weigh sources: the `research-with-sources` skill takes over once the pages are in hand.
+- Research that must cite and weigh sources: this skill fetches the pages; weighing and citing them is a separate job once the pages are in hand.
 - Building the person's own API or service: `api-design-and-lint` and `secure-by-default-http` in this pack.
 
 Boundaries. This skill covers public pages only. Say no, and offer the official route or asking the site owner, when the person asks to:
@@ -33,11 +33,11 @@ A fetch that sends or buys something (a form post, an order, a paid search plan,
    Write which rung you reached and why the higher ones failed in `manifest.md`.
 
 3. **Read the rules of the site before the first page.** Fetch the robots file once (it lives at the site root under the name `robots.txt`) and read the site's terms page. Then run the checker that sits beside this skill:
-   `python robots_check.py --site <site root> --agent <your agent name> <url> [<url> ...]`
+   `python skills/web-scrape-and-search-api/robots_check.py --site <site root> --agent <your agent name> <url> [<url> ...]`
    On Windows, if `python` is not found, try `py`. The script is standard library only. It prints ALLOW or DENY per address and the stated crawl delay (crawl delay is a common extra, not part of the official robots standard, so a site may ignore or omit it). For a saved robots text use `--file` instead of `--site`; with `--site` every address must be on that host, and the robots file is always fetched from the site root, whatever path the site address carries. The checker follows the official standard (RFC 9309): the group naming your agent token wins over the `*` group (a `/version` after a token is ignored on both sides), the longest matching pattern wins, Allow wins a tie, and `*` and a final `$` work as wildcards. Sitemap and Crawl-delay lines do not split a group. The robots file must be valid UTF-8; UTF-16 or broken text is unparseable and counts as closed.
    - **The default checks a SET of agents, not one:** your declared name plus the AI-agent tokens sites use to refuse our class (ClaudeBot, Claude-User, Claude-SearchBot, Claude-Web, anthropic-ai, GPTBot, ChatGPT-User, OAI-SearchBot, CCBot, PerplexityBot, Google-Extended, Applebot-Extended). `--agents-only-declared` checks only the declared name; use it for diagnosing, never to clear a site.
    - Exit codes: 0 all allowed; 1 the declared agent is denied by a path rule; 2 a fault (missing file, address without a scheme, bad arguments); 3 refused, an AI-agent token is denied (the output names the token); 4 unreachable (network error, timeout, incomplete read); 5 unparseable robots file (treated as closed). Codes 1, 3, 4 and 5 all mean do not fetch.
-   - `python robots_check.py --self-test` runs built-in checks on made-up robots text, uses no network, and exits 0 when all pass. Run it once before relying on the checker in a new place.
+   - `python skills/web-scrape-and-search-api/robots_check.py --self-test` runs built-in checks on made-up robots text, uses no network, and exits 0 when all pass. Run it once before relying on the checker in a new place.
    - A DENY means do not fetch that address. Any AI-agent DENY (exit 3) is a refusal for the whole site, not an obstacle: no workaround, no renamed agent. Report it and offer the official route. A rule that names your agent class by name is the same.
    - **When a site refuses our class of agent, every other route to its pages is refused too.** Archives, caches, Common Crawl copies, text-extraction proxies and dataset dumps of that site's pages are the same act and are also refused. What is allowed is an independent third party's own publication of the same facts. A `Content-Signal: ai-train=no` line, or another machine-readable text-and-data-mining reservation, binds the use, whatever the route.
    - A robots file that cannot be read (forbidden or a server fault) is treated as closed. Only a missing file (404 or 410) means no stated rules. This is stricter than the standard, which lets a crawler proceed after a 4xx answer and requires full disallow only after a 5xx; the skill keeps the stricter rule on purpose, so a 401 or 403 is a stop.

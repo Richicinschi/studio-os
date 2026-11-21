@@ -41,7 +41,8 @@ Neighbouring skills take over for these jobs:
    - Mobile: responsive layout (not a separate m. site), tap targets, viewport tag, no sideways scroll, same content as desktop, ready for mobile-first indexing.
    - Security: HTTPS on every page, valid certificate, no mixed content, redirects from http, HSTS as a bonus.
    - URLs: readable, keywords where natural, consistent pattern, few parameters, lowercase with hyphens.
-7. **Multi-language or multi-region sites only.** Use [the international checks](seo-audit/references/international-seo.md): hreflang, locale canonicals, sitemaps, URL scheme, translation quality. Studio rule: the studio ships English only, so for its own sites treat any locale request as a decision to confirm first.
+7. **Multi-language or multi-region sites only.** Use [the international checks](seo-audit/references/international-seo.md): hreflang, locale canonicals, sitemaps, URL scheme, translation quality.
+   Check the languages the project supports, and treat a request for a new locale as a decision to confirm with the user first.
 8. **On-page.**
    - Titles: unique, primary keyword early, about 50 to 60 characters (a starting point; check truncation in the results), worth clicking, brand last. Faults: duplicates, truncation, too short, stuffing, missing.
    - Meta descriptions: unique, about 150 to 160 characters (a starting point; check truncation), keyword, a clear benefit, a call to action. Faults: duplicates, auto-generated filler, wrong length.

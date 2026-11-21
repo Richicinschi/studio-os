@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { rewriteText, findSecrets, findDenied, findPaths, findRisky, loadDenyList, loadOwnerName, loadLocalRewrites, fileKind } from '../rules.mjs';
+import { rewriteText, findSecrets, findDenied, findPaths, findRisky, loadDenyList, loadOwnerName, loadLocalRewrites, fileKind, cutStudioOnly, findStudioMarkers, findMarkers } from '../rules.mjs';
 import { gatePrivacy } from '../gates.mjs';
 
 // Studio paths, hostnames and addresses are assembled at runtime, so no kit file carries them as literals.
@@ -37,6 +37,10 @@ test('the owner name becomes "the owner", capitalized only where a sentence, ite
   assert.equal(r(`para one\n\n${OWNER} merges`), 'para one\n\nThe owner merges');
   assert.equal(r(`para one\r\n\r\n${OWNER} merges`), 'para one\r\n\r\nThe owner merges');
   assert.equal(r(`${OWNER}ian stays`), `${OWNER}ian stays`);
+  // Closing markup between the full stop and the space still ends the sentence.
+  assert.equal(r(`5. **Instructions outrank skills.** ${OWNER}'s words come first.`), "5. **Instructions outrank skills.** The owner's words come first.");
+  assert.equal(r(`He said "stop." ${OWNER} stopped. (Done.) ${OWNER} left.`), 'He said "stop." The owner stopped. (Done.) The owner left.');
+  assert.equal(r(`**bold** ${OWNER} stays`), '**bold** the owner stays');
   assert.equal(rewriteText(`Ask ${OWNER}.`).text, `Ask ${OWNER}.`, 'with no owner given the name is left for the privacy gate');
 });
 
@@ -210,4 +214,100 @@ test('image rule: a bare, registry or quoted image name is still flagged', () =>
   const yml = ['image: nginx', 'image: ghcr.io/x/y', 'image: "redis"', 'image: localhost:5000/app', 'image: redis:7'].join('\n');
   assert.deepEqual(findRisky(yml, 'docker-compose.yml').map((f) => f.line), [1, 2, 3, 4]);
   assert.deepEqual(findRisky(`${fence}yml\nimage: nginx\n${fence}\n`, 'a.md').map((f) => f.line), [2]);
+});
+
+// The block markers are assembled at runtime, so no kit file but rules.mjs carries them for the gate to find.
+const ONLY = ['studio', 'only'].join('-');
+const OPEN = `<!-- ${ONLY} -->`;
+const CLOSE = `<!-- /${ONLY} -->`;
+
+test(`${ONLY} blocks: a block is cut from its open to its close marker, both included; the lines around it stay`, () => {
+  assert.equal(cutStudioOnly(`before\n${OPEN}\none\ntwo\nthree\n${CLOSE}\nafter\n`, 'a.md'), 'before\nafter\n');
+  assert.equal(cutStudioOnly(`before\r\n  ${OPEN}  \r\none\r\n\t${CLOSE}\r\nafter\r\n`, 'a.md'), 'before\r\nafter\r\n', 'CRLF, and markers with whitespace around them');
+  assert.equal(cutStudioOnly(`before\n${OPEN}\none\n${CLOSE}`, 'a.md'), 'before\n', 'a close on the last line, with no newline after it');
+});
+
+test(`${ONLY} blocks: two blocks in one file are both cut`, () => {
+  const text = `a\n${OPEN}\nx\n${CLOSE}\nb\n${OPEN}\ny\nz\n${CLOSE}\nc\n`;
+  assert.equal(cutStudioOnly(text, 'a.md'), 'a\nb\nc\n');
+});
+
+test(`${ONLY} blocks: a block never closed stops the build at its open line, never cuts to the end`, () => {
+  assert.throws(() => cutStudioOnly(`a\nb\n${OPEN}\nc\nd\n`, 'skills/x/SKILL.md'), (e) => e.message.startsWith(`skills/x/SKILL.md:3 ${ONLY} block`));
+});
+
+test(`${ONLY} blocks: a marker that shares its line with other text stops the build`, () => {
+  assert.throws(() => cutStudioOnly(`a\ntext ${OPEN} more\nb\n`, 'x.md'), (e) => e.message.startsWith(`x.md:2 ${ONLY} block`));
+  assert.throws(() => cutStudioOnly(`${OPEN}\na\nend ${CLOSE}\n`, 'x.md'), (e) => e.message.startsWith(`x.md:3 ${ONLY} block`));
+});
+
+test(`${ONLY} blocks: a nested open, or a close with no open, stops the build`, () => {
+  assert.throws(() => cutStudioOnly(`${OPEN}\na\n${OPEN}\nb\n${CLOSE}\n${CLOSE}\n`, 'x.md'), (e) => e.message.startsWith(`x.md:3 ${ONLY} block`));
+  assert.throws(() => cutStudioOnly(`a\n${CLOSE}\n`, 'x.md'), (e) => e.message.startsWith(`x.md:2 ${ONLY} block`));
+});
+
+// Misspellings of the marker in its HTML-comment form: a space or an underscore for the hyphen, no hyphen, upper case.
+const MISSPELT = ['studio only', 'studio_only', 'studioonly', 'STUDIO ONLY', 'Studio -  only'];
+
+test(`${ONLY} blocks: a pair misspelt the same way at both ends stops the build, so the block never ships`, () => {
+  for (const word of MISSPELT) {
+    const text = `a\n<!-- ${word} -->\nsecret\n<!-- /${word} -->\nb\n`;
+    assert.throws(() => cutStudioOnly(text, 'x.md'), (e) => e.message.startsWith(`x.md:2 ${ONLY} block`), word);
+  }
+});
+
+test(`${ONLY} blocks: a misspelt marker alone on its line stops the build and says it is misspelt`, () => {
+  for (const word of MISSPELT) {
+    assert.throws(() => cutStudioOnly(`a\n  <!--${word}-->  \nb\n`, 'x.md'), (e) => e.message.startsWith(`x.md:2 ${ONLY} block`) && /misspelt/.test(e.message), word);
+    assert.throws(() => cutStudioOnly(`${OPEN}\na\n<!-- /${word} -->\n`, 'x.md'), (e) => e.message.startsWith(`x.md:3 ${ONLY} block`) && /misspelt/.test(e.message), `/${word}`);
+  }
+});
+
+test(`${ONLY} blocks: text with no markers comes back byte for byte, CRLF included`, () => {
+  for (const text of ['', 'one line', 'a\r\nb\r\n', 'a\nb\r\nc', '\n\n', `mentions ${ONLY} in prose\r\n`]) assert.equal(cutStudioOnly(text, 'x.md'), text);
+});
+
+test(`${ONLY} markers left over are found per line, in any case`, () => {
+  const reason = `${ONLY} marker left in shipped text`;
+  assert.deepEqual(findStudioMarkers(`ok\r\n${OPEN}\r\nstudio only\r\nA ${ONLY.toUpperCase()} note`), [{ reason, line: 2 }, { reason, line: 4 }]);
+  assert.deepEqual(findStudioMarkers('nothing here\n'), []);
+});
+
+test(`${ONLY} markers left over: a misspelt marker in its comment form is found too; prose without the comment is not`, () => {
+  const reason = `${ONLY} marker left in shipped text`;
+  const text = MISSPELT.map((w) => `<!-- ${w} -->`).join('\n');
+  assert.deepEqual(findStudioMarkers(text), MISSPELT.map((_, i) => ({ reason, line: i + 1 })));
+  assert.deepEqual(findStudioMarkers('studio only, not in this kit\n<!-- studio notes -->\n'), []);
+});
+
+const MARKERS = ['the hub', 'hard rule', 'studio rule', 'this machine', 'his yes', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8'];
+const marker = (m, line) => ({ line, reason: `studio marker "${m}"` });
+const CARD = 'catalog/skills/x/SKILL.md';
+
+test('studio markers: each marker is found once in a line as a whole word; word markers in any case, G1 to G8 in capitals only', () => {
+  for (const m of MARKERS) {
+    const gate = /^G\d$/.test(m);
+    assert.deepEqual(findMarkers(`clean\nsay ${m} here, ${m} again.\n`, CARD), [marker(m, 2)], m);
+    assert.deepEqual(findMarkers(`${m.toUpperCase()} first\n`, CARD), [marker(m, 1)], `${m} in upper case`);
+    assert.deepEqual(findMarkers(`${m.toLowerCase()} first\n`, CARD), gate ? [] : [marker(m, 1)], `${m} in lower case`);
+  }
+  assert.deepEqual(findMarkers('ask the hub, then this machine\r\nok\r\n', CARD), [marker('the hub', 1), marker('this machine', 1)], 'two markers on one line, two findings');
+  assert.deepEqual(findMarkers('nothing studio here\n', CARD), []);
+});
+
+test('studio markers: G6 is found, g6, G60, PG6, G6a, G0 and G9 are not; nor is a marker inside a longer word', () => {
+  assert.deepEqual(findMarkers('see G6.\n(g6)\n(G6)\n', CARD), [marker('G6', 1), marker('G6', 3)]);
+  assert.deepEqual(findMarkers('G60 PG6 G6a G0 G9 G6_x\n', CARD), []);
+  assert.deepEqual(findMarkers('bathe hub, the hubris, othis machine, this machinery, his yesterday, hard ruler\n', CARD), []);
+});
+
+test('studio markers: a "Hard rules" heading is found (a false hit goes on the allow-list, not out of the rule)', () => {
+  assert.deepEqual(findMarkers('# Intro\n\n## Hard rules\n', CARD), [marker('hard rule', 3)]);
+  assert.deepEqual(findMarkers('Studio rules apply.\n', CARD), [marker('studio rule', 1)]);
+});
+
+test('studio markers: only files under catalog/ are checked, Windows separators included', () => {
+  const text = 'ask the hub\n';
+  assert.deepEqual(findMarkers(text, 'catalog\\packs\\p\\skills\\a.md'), [marker('the hub', 1)]);
+  for (const file of ['docs/notes.md', 'cards/x.md', 'README.md', 'tools/catalog/x.md', 'catalogue/x.md']) assert.deepEqual(findMarkers(text, file), [], file);
 });

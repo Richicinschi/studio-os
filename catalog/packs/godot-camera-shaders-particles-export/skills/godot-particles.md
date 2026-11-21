@@ -98,7 +98,7 @@ The Godot manual section on particle systems (3D and 2D) at docs.godotengine.org
 - Trails use world space; no self-referencing sub-emitter.
 - Turbulence tested or tiered on mobile and web.
 - Run the scene and look at it in motion on the weakest target device you have.
-- Studio rules: ask before any upload or publish; no keys or secrets in the repo; English only.
+- Rules: ask before any upload or publish; no keys or secrets in the repo; text in the languages the project supports.
 
 ## Without local tools
 Without Godot installed you cannot see the effect. In claude.ai, ask for the full GDScript and `.gdshader` text as pasted code plus numbered editor steps: create the node, assign the material, attach the script. Then paste the result or a screenshot back, and adjust values from what you see. Property names may differ slightly between 4.x versions, so confirm in the inspector.

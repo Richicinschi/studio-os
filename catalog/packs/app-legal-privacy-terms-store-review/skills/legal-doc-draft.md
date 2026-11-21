@@ -1,8 +1,8 @@
 ---
 name: legal-doc-draft
 description: >-
-  Use when DRAFTING or UPDATING an app Privacy Policy or Terms of Service (not merely reviewing) —
-  authoring, editing, version-bumping, placeholder-filling, or translating legal text. Triggers:
+  Use when DRAFTING or UPDATING (not merely reviewing) an app Privacy Policy or Terms of Service:
+  authoring, editing, version bumps, placeholders, translation. Triggers:
   "draft privacy policy", "write PP", "write ToS", "update terms", "rewrite privacy section",
   "bump kTermsVersion", "fill KvK / BTW / registered address", "add a clause for a data flow",
   "sync the NL privacy policy", "make the privacy policy match the code". Audits the app from its
@@ -41,7 +41,7 @@ preserves sound wording and changes only what is wrong, missing, or stale.
 Other `nl-eu-law/*` (crd-withdrawal, bw-unfair-terms, eprivacy-cookiewet, transfers-dpf-scc, mdr-hbnr, adr-bodies, ap-guidance, dsa-trader) are pulled on demand when a draft touches that subject.
 
 ## App facts (inputs — from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest)
-| Input | Where to get it (example app value from `legal-guardrails.md` §8 in brackets) |
+| Input | Where to get it (the worked example's value, from `legal-guardrails/references/worked-example.md`, in brackets) |
 |---|---|
 | App name | the project / store listing — used as `<app name>` in the text, never an invented name |
 | Live docs | the Privacy Policy + Terms files in the project and the languages they ship in (example: `{privacy,terms}.md` in the app's assets, English-only) |
@@ -74,9 +74,9 @@ Other `nl-eu-law/*` (crd-withdrawal, bw-unfair-terms, eprivacy-cookiewet, transf
 
 ## Section maps (skeletons — fill from the audit, don't reproduce reference text)
 
-**Privacy Policy (GDPR Art. 13/14 backbone):** At-a-glance box · Controller identity (`[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]`, no DPO — eenmanszaak) · Data we collect (per-flow, per tier, e.g. free vs paid) · Recipients / processors (each one named, e.g. for a Firebase + RevenueCat app: Google-Firebase, RevenueCat Inc. US, Apple/Google billing, plus any DNS/email provider such as Cloudflare) · Lawful basis per purpose (incl. analytics consent / cookiewet flag) · International transfers (DPF/SCC, RC DPA `[verify]`) · Retention (per-flow; free = on-device, no server copy) · Your rights (access/erasure/object/withdraw/portability + AP supervisory authority) · Age (16+ checkbox, `ageConfirmedAt`) · Consent withdrawal (`withdrawalConsentAt`) · Security · Breach (Art. 33/34) · Changes + re-consent · Contact. → `gdpr-articles.md`, `sdk-data-map.md`, `data-category-ontology.md`.
+**Privacy Policy (GDPR Art. 13/14 backbone):** At-a-glance box · Controller identity (`[KVK]`/`[BTW]`/`[REGISTERED ADDRESS]`, no DPO — eenmanszaak) · Data we collect (per-flow, per tier, e.g. free vs paid) · Recipients / processors (each one named, e.g. for a Firebase + RevenueCat app: Google-Firebase, RevenueCat Inc. US, Apple/Google billing, plus any DNS/email provider such as Cloudflare) · Lawful basis per purpose (incl. analytics consent / cookiewet flag) · International transfers (DPF/SCC, RC DPA `[verify]`) · Retention (per-flow; free = on-device, no server copy) · Your rights (access/erasure/object/withdraw/portability + AP supervisory authority) · Age (16+ checkbox, with a confirmation timestamp) · Consent withdrawal (with a timestamp) · Security · Breach (Art. 33/34) · Changes + re-consent · Contact. → `gdpr-articles.md`, `sdk-data-map.md`, `data-category-ontology.md`.
 
-**Terms of Service:** At-a-glance box · Parties (app provider vs Apple/Google as **merchant of record/seller**) · Eligibility (16+) · Licence (Apple **Licensed-Application EULA minimum terms** — `apple-min-eula.md`) · Subscriptions (auto-renew, price/trial/VAT illustrative, billed by the store) · **Withdrawal** (14-day CRD + the **unticked-paywall-checkbox + `withdrawalConsentAt` immediate-delivery-waiver** mechanism — NOT "captured by the store") · Refunds (store-handled) · Acceptable use · Health disclaimer (for a wellness app: general wellness only, no medical claims) · Liability · Governing law (NL) + ADR (ConsuWijzer / Geschillencommissie — **never** the discontinued EU ODR) · Changes + re-consent (`kTermsVersion`) · Contact. → `apple-min-eula.md`, `crd-withdrawal.md`, `bw-unfair-terms.md`, `adr-bodies.md`.
+**Terms of Service:** At-a-glance box · Parties (app provider vs Apple/Google as **merchant of record/seller**) · Eligibility (16+) · Licence (Apple **Licensed-Application EULA minimum terms** — `apple-min-eula.md`) · Subscriptions (auto-renew, price/trial/VAT illustrative, billed by the store) · **Withdrawal** (14-day CRD + the **unticked-paywall-checkbox + consent-timestamp immediate-delivery-waiver** mechanism — NOT "captured by the store") · Refunds (store-handled) · Acceptable use · Health disclaimer (for a wellness app: general wellness only, no medical claims) · Liability · Governing law (NL) + ADR (ConsuWijzer / Geschillencommissie — **never** the discontinued EU ODR) · Changes + re-consent (`kTermsVersion`) · Contact. → `apple-min-eula.md`, `crd-withdrawal.md`, `bw-unfair-terms.md`, `adr-bodies.md`.
 
 ## Output format
 Emit, in order:

@@ -61,7 +61,7 @@ The menu marks the item **have** when an instruction file covers both commit mes
 ## Check
 
 1. **Claude:** `grep -ciE 'commit message|PR bod' <your front door>`. Expected: `1` or more.
-2. **Claude**, in front of you: in a throwaway repository in a temporary folder, it makes one small change (a function and its test), runs the test, and writes the commit message and the PR body it would use. Then it goes through them line by line, saying for each line which part of the rule it meets: the why, what changed, what was verified (with the command and its counts), what was left undone. A line that restates the diff, or a "tests pass" without the command and its counts, it marks as failing. Then it deletes the throwaway folder.
+2. **Claude**, in front of you: in a throwaway repository in a temporary folder (`git init`, then `git config user.name throwaway`, `git config user.email canary@example.invalid` and `git config commit.gpgsign false` inside it, so your own name, address and signing take no part), it makes one small change (a function and its test), runs the test, and writes the commit message and the PR body it would use. Then it goes through them line by line, saying for each line which part of the rule it meets: the why, what changed, what was verified (with the command and its counts), what was left undone. A line that restates the diff, or a "tests pass" without the command and its counts, it marks as failing. Then it deletes the throwaway folder.
 3. **you:** read the judgement, line by line, and say whether you agree.
 
 A failing line Claude did not mark, or a judgement you disagree with, means the item is not done: the plan row stays unticked, and the wording of the rule is the next thing to look at.

@@ -7,6 +7,8 @@ description: "Use when the user builds, reviews or looks over an Android app wit
 
 Find the skill that fits the task in the table, read its file in full before you start, and follow it. If a skill needs a local tool and you are on claude.ai without one, follow that skill's "Without local tools" section.
 
+Script paths in this domain start at this domain's folder, the base directory Claude Code names when it loads this skill.
+
 | Skill | What it does | When to use | File |
 |---|---|---|---|
 | Android screens in Compose and Play policy | Compose screens, R8 shrinking, edge-to-edge layout and the Play policy changes that block releases. (needs: Android Studio) | Use when the user builds or updates a native Android app or fixes a Play review issue. | skills/android-compose-and-play-policy.md |

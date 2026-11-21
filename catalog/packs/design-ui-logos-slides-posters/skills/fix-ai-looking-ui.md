@@ -9,7 +9,7 @@ Use this when a screen, page or app view already exists and the person says it l
 
 This skill starts from something that exists. Neighbours take over elsewhere:
 
-- Building new UI from scratch is the job of the hub skill `frontend-design`.
+- Building new UI from scratch is the job of `frontend-design` in this domain.
 - Looking up palettes, font pairings and named styles is `ui-styles-palettes-fonts`. Call it from pass 2 or 4 below if the person needs options; do not reproduce its data here.
 - Deciding the look before anything is built (mood, brand, references) is `design-direction`, in this same pack. If the screen has no identity at all and the person wants one invented from nothing, hand over to it first, then return here.
 - Accessibility audits, performance and bug fixing are other jobs. Fix a contrast problem you meet, but do not turn this into a compliance review.

@@ -25,8 +25,9 @@ Read-only. Names, descriptions, counts and versions only; no skill body is opene
   `for f in .claude/skills/*/SKILL.md "$HOME"/.claude/skills/*/SKILL.md; do sed -n '2,/^---/p' "$f" | grep -qiE 'merge|pull request|finish' && echo "$f"; done`.
 - Whether your instruction files say who merges, a count per file: `grep -ciw merge CLAUDE.md AGENTS.md identity/RELATIONSHIP.md 2>/dev/null`.
 - Whether the GitHub command line is there: `gh --version` (it may not be installed). Each repository's remote host is already in `adoption/inventory.md`.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/finishing-a-development-branch/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a skill of this name is present, in a project or in your user folder; **partly** when another skill or an instruction-file rule covers the end of a branch; and **not yet** otherwise.
+The menu marks the item **have** when a skill of this name is present, in a project or in your user folder; **partly** when another skill or an instruction-file rule covers the end of a branch; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -65,11 +66,11 @@ The menu marks the item **have** when a skill of this name is present, in a proj
 
 1. **Claude:** runs `vet-and-adopt` on the kit copy, `catalog/skills/finishing-a-development-branch/`: scans it with SkillSpector, triages the findings, compares it with what Detect found, and recommends SKIP, FOLD, ADAPT or ADOPT. The maintainers' latest scan result is in the skill's `SOURCE.md`; your own scan is the one that decides.
 2. **Claude:** on ADAPT, writes the skill into the place you chose and shows the diff before saving. It rewrites the studio-specific parts:
-   - **The studio rule in the skill's step 4** (merging is the person's act, through the PR, with a merge commit, citing the studio's rule numbers): replaced by your answer to question 2, in your words. If you allowed a local merge, it goes back on the menu as an option.
-   - **The local-merge section** (only on an explicit ask, after a row in the studio's own ledger, never in the studio's shared checkout): the explicit ask stays; the ledger becomes yours ([the grant ledger](grant-ledger.md)) or is dropped; the shared-checkout sentence names your own shared checkout, or is dropped.
+   - **The studio rule in the skill's step 4** (merging is the person's act, through the PR, with a merge commit, because a risky act needs their recorded yes): replaced by your answer to question 2, in your words. If you allowed a local merge, it goes back on the menu as an option.
+   - **The local-merge section** (only on an explicit ask, after a row in a grants ledger, never in a checkout other live sessions share): the explicit ask stays; the ledger becomes yours ([the grant ledger](grant-ledger.md)) or is dropped; the shared-checkout sentence stays if you run several sessions in one checkout, or is dropped.
    - **The cleanup in the skill's step 6** (a worktree is yours only if this session made it, because the studio's worktrees share one folder): kept, with your worktree folder named ([worktrees](worktrees.md)).
-   - **The signed commit** made when files are saved before a cleanup: kept only if you sign ([signed commits](signed-commits.md)); otherwise a plain commit.
-   - **The force-push row** that points at the studio's ledger: points at your yes-list or ledger.
+   - **The commit** made when files are saved before a cleanup: a plain `git commit` in the kit's copy; it signs if you took [signed commits](signed-commits.md), which signs every commit.
+   - **The force-push row**, which asks for a recorded grant row: points at your yes-list or ledger.
    - **Tests and PRs**: your test command; your server's command line, or the link it prints on a push.
    - **The front matter's author**: your own.
 3. **Claude:** records the decision, who merges and how, the scope and the undo in `adoption/decisions.md`, with the scan result.

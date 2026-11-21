@@ -16,34 +16,38 @@ import { join, resolve } from 'node:path';
 const DEFAULT_APP = '.'; // the current folder: run the scan from the app's root, or pass the path
 const appDir = resolve(process.argv[2] || DEFAULT_APP);
 
-// Curated registry: package -> data flow. recipient is the legal entity that
-// receives data OFF the device. offDevice=false means the package keeps data
-// local (no flow to disclose as "sharing"). Keep entity names specific.
+// Package registry: what each package does in general, in any app. It names no app's data:
+// which of these data types the app really sends, and on what lawful basis, is the app's to
+// answer (sdk-data-map.md holds the basis). recipient is the legal entity that receives data
+// OFF the device; offDevice=false means the package keeps its data on the device (no flow to
+// disclose as "sharing" unless the app sends it on). Keep entity names specific.
 const SDK_REGISTRY = {
-  firebase_auth: { recipient: 'Google/Firebase (Google Ireland Ltd / Google LLC)', dataTypes: ['email', 'user ID', 'auth tokens', 'federated sign-in ID'], offDevice: true, purpose: 'Account management', basis: '6(1)(b) contract' },
-  cloud_firestore: { recipient: 'Google/Firebase (EU region; FREE tier = on-device only)', dataTypes: ['account profile', 'session history (Pro)'], offDevice: true, purpose: 'App functionality', basis: '6(1)(b) contract', note: 'Free tier keeps history on-device; only Pro syncs.' },
-  firebase_analytics: { recipient: 'Google LLC', dataTypes: ['usage/app-activity events', 'app-instance ID (pseudonymous)'], offDevice: true, purpose: 'Analytics', basis: 'CONSENT required in NL (cookiewet) — NOT 6(1)(f)', note: 'AD_ID must be stripped; opt-in gate required in NL.' },
-  firebase_crashlytics: { recipient: 'Google LLC', dataTypes: ['crash logs', 'device/diagnostic data'], offDevice: true, purpose: 'Fraud prevention/security & app stability', basis: 'CONSENT (analyse vs strictly-necessary) — flag' },
-  firebase_messaging: { recipient: 'Google LLC', dataTypes: ['FCM push token', 'device ID'], offDevice: true, purpose: 'Developer communications', basis: '6(1)(a) consent (notifications)' },
-  cloud_functions: { recipient: 'Google/Firebase (backend)', dataTypes: ['server-side processing'], offDevice: true, purpose: 'App functionality', basis: '6(1)(b) contract' },
-  firebase_remote_config: { recipient: 'Google LLC', dataTypes: ['config fetch (pseudonymous instance ID)'], offDevice: true, purpose: 'App functionality', basis: '6(1)(f) legitimate interest' },
-  firebase_core: { recipient: 'Google/Firebase', dataTypes: [], offDevice: false, purpose: 'Platform init (no data on its own)', basis: 'n/a' },
-  purchases_flutter: { recipient: 'RevenueCat Inc. (US)', dataTypes: ['app user ID (= Firebase UID)', 'purchase token/receipt', 'subscription status'], offDevice: true, purpose: 'Account management / purchase processing', basis: '6(1)(b) contract', note: 'US transfer — verify DPF/SCC.' },
-  google_sign_in: { recipient: 'Google LLC', dataTypes: ['Google account email/profile', 'OAuth token'], offDevice: true, purpose: 'Account management', basis: '6(1)(b) contract', note: 'Pulls USE_BIOMETRIC/USE_FINGERPRINT perms transitively; no biometric data retained.' },
-  sign_in_with_apple: { recipient: 'Apple Inc.', dataTypes: ['Apple relay email/identifier', 'identity token'], offDevice: true, purpose: 'Account management', basis: '6(1)(b) contract' },
-  shared_preferences: { recipient: '(on-device)', dataTypes: ['settings', 'reminder time', 'free-tier history'], offDevice: false, purpose: 'On-device storage', basis: 'n/a (no flow)' },
-  flutter_local_notifications: { recipient: '(on-device)', dataTypes: ['local reminder schedule'], offDevice: false, purpose: 'On-device reminders', basis: 'n/a (no flow)' },
-  flutter_timezone: { recipient: '(on-device)', dataTypes: ['device timezone (local)'], offDevice: false, purpose: 'Reminder scheduling', basis: 'n/a' },
-  just_audio: { recipient: '(on-device)', dataTypes: [], offDevice: false, purpose: 'Audio playback', basis: 'n/a' },
-  audio_session: { recipient: '(on-device)', dataTypes: [], offDevice: false, purpose: 'Audio session config', basis: 'n/a' },
+  firebase_auth: { recipient: 'Google/Firebase (Google Ireland Ltd / Google LLC)', dataTypes: ['email or phone number used to sign in', 'user ID', 'auth tokens', 'federated sign-in ID'], offDevice: true, purpose: 'Sign-in and account management' },
+  cloud_firestore: { recipient: 'Google/Firebase (Google Ireland Ltd / Google LLC)', dataTypes: ['whatever the app writes to its database'], offDevice: true, purpose: 'Cloud database and sync', note: 'Check which collections the app writes and which hold personal data.' },
+  firebase_analytics: { recipient: 'Google LLC', dataTypes: ['usage/app-activity events', 'app-instance ID (pseudonymous)', 'device and OS attributes'], offDevice: true, purpose: 'Analytics', note: 'On Android it collects the advertising ID unless google_analytics_adid_collection_enabled is false; "no advertising ID" needs that flag and the AD_ID strip (sdk-data-map.md §3).' },
+  firebase_crashlytics: { recipient: 'Google LLC', dataTypes: ['crash logs', 'device/diagnostic data', 'installation ID'], offDevice: true, purpose: 'Crash reporting' },
+  firebase_messaging: { recipient: 'Google LLC', dataTypes: ['FCM registration token'], offDevice: true, purpose: 'Push messages' },
+  cloud_functions: { recipient: 'Google/Firebase (backend)', dataTypes: ['whatever the app sends to its functions'], offDevice: true, purpose: 'Server-side code' },
+  firebase_remote_config: { recipient: 'Google LLC', dataTypes: ['config fetch (pseudonymous installation ID)'], offDevice: true, purpose: 'Remote configuration' },
+  firebase_core: { recipient: 'Google/Firebase', dataTypes: [], offDevice: false, purpose: 'Platform init (no data on its own)' },
+  purchases_flutter: { recipient: 'RevenueCat Inc. (US)', dataTypes: ['app user ID (set by the app, or an anonymous RevenueCat ID)', 'purchase token/receipt', 'subscription status'], offDevice: true, purpose: 'In-app purchases and subscriptions', note: 'US transfer — verify DPF/SCC.' },
+  google_sign_in: { recipient: 'Google LLC', dataTypes: ['Google account email/profile', 'OAuth token'], offDevice: true, purpose: 'Sign-in with Google', note: 'Pulls USE_BIOMETRIC/USE_FINGERPRINT perms transitively; no biometric data retained.' },
+  sign_in_with_apple: { recipient: 'Apple Inc.', dataTypes: ['Apple ID identifier', 'name and email (or relay email) when the user shares them', 'identity token'], offDevice: true, purpose: 'Sign in with Apple' },
+  google_fonts: { recipient: 'Google LLC (Google Fonts)', dataTypes: ['IP address and user agent of each font download'], offDevice: true, purpose: 'Fetches fonts over the network at run time', note: 'No request when the fonts are bundled as assets and GoogleFonts.config.allowRuntimeFetching is false.' },
+  shared_preferences: { recipient: '(on-device)', dataTypes: ['whatever key-value data the app saves'], offDevice: false, purpose: 'On-device storage' },
+  flutter_local_notifications: { recipient: '(on-device)', dataTypes: ['scheduled notification content'], offDevice: false, purpose: 'Local notifications' },
+  flutter_timezone: { recipient: '(on-device)', dataTypes: ['device timezone (local)'], offDevice: false, purpose: 'Reads the device timezone' },
+  device_info_plus: { recipient: '(on-device)', dataTypes: ['device model, maker, OS version and hardware identifiers'], offDevice: false, purpose: 'Reads device data', note: 'Sends nothing itself; any of it the app sends off the device is a flow to disclose.' },
+  just_audio: { recipient: '(on-device)', dataTypes: [], offDevice: false, purpose: 'Audio playback' },
+  audio_session: { recipient: '(on-device)', dataTypes: [], offDevice: false, purpose: 'Audio session config' },
 };
 
 // Packages known to be pure UI/util with no data + no network — suppressed from "unknown".
 const KNOWN_BENIGN = new Set([
   'flutter', 'flutter_riverpod', 'riverpod', 'go_router', 'intl', 'flutter_localizations',
-  'cupertino_icons', 'google_fonts', 'flutter_markdown', 'markdown', 'path_provider',
+  'cupertino_icons', 'flutter_markdown', 'markdown', 'path_provider',
   'collection', 'meta', 'vector_math', 'characters', 'material_color_utilities',
-  'flutter_svg', 'url_launcher', 'package_info_plus', 'device_info_plus',
+  'flutter_svg', 'url_launcher', 'package_info_plus',
 ]);
 
 function parseLock(text) {

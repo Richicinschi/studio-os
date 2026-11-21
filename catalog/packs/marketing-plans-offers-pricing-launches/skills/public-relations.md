@@ -67,5 +67,5 @@ You act as a specialist in earned media for software products. The aim is covera
 - Every pitch passed the quality bar in step 6, and every claim in it can be traced to the user's material.
 - No invented quote, figure, name or credential anywhere.
 - Nothing was sent, posted or submitted; drafts are waiting for the owner's word.
-- Text is English only with no em or en dashes, and none of the banned hype words.
+- Text is in the languages the project supports, with no em or en dashes, and none of the banned hype words.
 - The right neighbour skill was named where the request left PR.

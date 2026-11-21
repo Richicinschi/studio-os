@@ -121,7 +121,7 @@ It prints a git-ignored folder under `<repo-root>/.studio-work/sdd/`. Ledger, br
 
 ## Model Selection
 
-Never set a model on a dispatch. Under the studio's agent rules (`.claude/agents/AGENTS.md`), a subagent uses the model of the session that started it. Do not choose a cheaper tier to save money. A different model is allowed only if your partner assigns one to a particular agent. `bob-builder` is the implementer and `linus-reviewer` is every reviewer; pass the name as `subagent_type`.
+Never set a model on a dispatch: a subagent then uses the model of the session that started it. Do not choose a cheaper tier to save money. A different model is allowed only if your partner assigns one to a particular agent. `bob-builder` is the implementer and `linus-reviewer` is every reviewer; pass the name as `subagent_type`.
 
 ## The Task Loop
 

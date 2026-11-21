@@ -9,7 +9,7 @@ metadata:
 
 # GSAP core
 
-Use this skill when writing, reviewing or explaining animation on the core engine: single tweens, eases, staggers, defaults and responsive setups. Other GSAP jobs have their own skills: **gsap-timeline** (sequences), **gsap-scrolltrigger** (scroll-linked motion), **gsap-react**, **gsap-plugins** (Flip, Draggable and kin), **gsap-utils** (clamp, mapRange and similar) and **gsap-performance**.
+Use this skill when writing, reviewing or explaining animation on the core engine: single tweens, eases, staggers, defaults and responsive setups. Two other GSAP jobs have their own skills: **gsap-timeline** (sequences) and **gsap-scrolltrigger** (scroll-linked motion).
 
 ## Should it be GSAP?
 

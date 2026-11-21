@@ -14,14 +14,18 @@ const scripts = path.join(root, 'catalog/skills/git-guardrails/scripts');
 const guard = path.join(scripts, 'block-dangerous-git.mjs');
 const cases = JSON.parse(readFileSync(path.join(scripts, 'cases.json'), 'utf8'));
 
-function exitFor({ tool, command }) {
+// `prefix` goes before the hook's JSON on stdin, as a byte order mark some shells add.
+function exitFor({ tool, command }, prefix = '') {
   const r = spawnSync(process.execPath, [guard], {
-    input: JSON.stringify({ tool_name: tool, tool_input: { command } }),
+    input: prefix + JSON.stringify({ tool_name: tool, tool_input: { command } }),
     encoding: 'utf8',
   });
   if (r.error) throw r.error;
   return r.status;
 }
+
+// Written as an escape, so no invisible character sits in this file.
+const BOM = '\uFEFF';
 
 test('the case table holds both lists, each case a tool and a command', () => {
   assert.ok(Array.isArray(cases.block) && cases.block.length > 0, 'block list');
@@ -40,4 +44,11 @@ test('the shipped guard refuses every command in the block list (exit 2)', () =>
 test('the shipped guard lets every command in the allow list run (exit 0)', () => {
   const refused = cases.allow.filter((c) => exitFor(c) !== 0);
   assert.deepEqual(refused, []);
+});
+
+test('a byte order mark before the hook\'s JSON changes nothing: git status runs (exit 0), a force-push is refused (exit 2)', () => {
+  assert.equal(BOM.length, 1);
+  assert.equal(BOM.charCodeAt(0), 0xfeff);
+  assert.equal(exitFor({ tool: 'Bash', command: 'git status' }, BOM), 0);
+  assert.equal(exitFor({ tool: 'Bash', command: 'git push --force origin main' }, BOM), 2);
 });

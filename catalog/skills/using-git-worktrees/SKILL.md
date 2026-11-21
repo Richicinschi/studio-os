@@ -21,11 +21,11 @@ Open by telling the user that this skill is running and that you are preparing a
 
 Do not work against the harness. It tracks its own worktrees, and it cannot see ones you add behind its back.
 
-## Studio rule: the shared checkout
+## A shared checkout
 
-The hub's shared checkout belongs to every live session at once (hard rules, "Multi-agent operating model"; `AGENTS.md` section 5). In it, never switch branches, stash, reset or commit. Your move would shift HEAD and the index under the other sessions.
+If your instructions say a checkout is shared by several live sessions, it belongs to all of them at once. In it, never switch branches, stash, reset or commit. Your move would shift HEAD and the index under the other sessions.
 
-Every change to tracked hub files goes through a worktree off `origin/main`. For hub work you have your answer to the consent question below already: make the worktree, do not ask.
+Every change to such a repo's tracked files goes through a worktree off `origin/main`. For that work you have your answer to the consent question below already: make the worktree, do not ask.
 
 ## 1. Am I already isolated?
 
@@ -56,7 +56,7 @@ Check your instructions for a stated worktree preference. If there is one, follo
 
 > "Shall I set up an isolated worktree? It keeps your current branch clear of my changes."
 
-If the answer is no, stay where you are and go to step 5, with one exception: in the hub's shared checkout, stop and tell the user. Never do hub work in the shared root.
+If the answer is no, stay where you are and go to step 5, with one exception: in a shared checkout, stop and tell the user. Never work in a shared checkout.
 
 ## 3. Create it: native tool first
 
@@ -94,7 +94,7 @@ cd "$path"
 
 Keep `--no-track`. Without it the new branch tracks `origin/main`, and a plain `git push` can land on main. The first push sets the branch's own upstream: `git push -u origin "$BRANCH_NAME"`.
 
-**If git refuses with a permission error**, the sandbox blocked it. Tell the user so, then do the setup and baseline run in the current directory. In the hub's shared checkout do not: stop and tell the user, because the shared root is never a place to work.
+**If git refuses with a permission error**, the sandbox blocked it. Tell the user so, then do the setup and baseline run in the current directory. In a shared checkout do not: stop and tell the user, because a shared checkout is never a place to work.
 
 ## 5. Project setup
 
@@ -137,7 +137,7 @@ Ready to implement <feature-name>
 | Both exist | `.worktrees/` |
 | Neither exists | Look in your instructions, else default to `.worktrees/` |
 | Location not git-ignored | Ignore it first and commit that change |
-| Create denied by the sandbox | Stay in the current directory; in the hub's shared checkout, stop and tell the user |
+| Create denied by the sandbox | Stay in the current directory; in a shared checkout, stop and tell the user |
 | Baseline red | Report, ask |
 | No manifest file | Skip the install |
 

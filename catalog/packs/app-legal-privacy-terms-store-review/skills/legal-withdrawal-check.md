@@ -7,7 +7,7 @@ description: >-
   express consent to immediate performance, acknowledgement of losing the right,
   and a durable-medium confirmation (Art. 8(7)). Confirms an unticked affirmative
   consent checkbox (separate from blanket ToS acceptance), that the app records
-  withdrawalConsentAt, that the Annex I(B) model withdrawal form is present, and
+  the consent with a timestamp, that the Annex I(B) model withdrawal form is present, and
   that the Terms point to the store's withdrawal route and say where the withdrawal
   function is (for store-billed sales the store contracts in its own name). Flags the durable-medium
   step and the digital-content-vs-digital-service classification for jurist review.
@@ -39,7 +39,7 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/disclosure-grading.md` — letter grade.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/crd-withdrawal.md` — **primary authority.** §4
   (Art. 16(m) three conditions), §4a (16(m) vs 16(a) classification), §5 (Art. 8(7) durable medium),
-  §6 (Art. 14(4)(b) invalid-waiver consequence), §7 (Annex I(B) form), §8 (worked application: example app),
+  §6 (Art. 14(4)(b) invalid-waiver consequence), §7 (Annex I(B) form), §8 (worked application of a paywall waiver checkbox),
   §9 (review checklist), §10 (jurist open items). Cite article numbers from here; never paraphrase
   the statute from memory.
 
@@ -49,15 +49,12 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
   (stores as merchants of record, or the publisher's own checkout); the ToS withdrawal section path
   (each language); the paywall consent copy and where the consent is recorded in code; and whether
   a trader-controlled durable-medium artefact is actually sent.
-- Worked case (the example app, `legal-guardrails.md` §8): trader = Dutch *eenmanszaak*;
-  subscriptions sold THROUGH Apple/Google (merchants of record) + RevenueCat + Firebase (EU); ToS
-  §6 in `terms.md` + `terms.nl.md`; the paywall consent screen records a `withdrawalConsentAt`
-  timestamp (e.g. via a `recordWithdrawalConsent` call).
+- Worked case: the worked example (`legal-guardrails/references/worked-example.md` §1 and §5).
 
 ## WORKFLOW
 
 1. **Locate.** Find (a) the paywall consent UI (the affirmative checkbox + its copy) and (b) the ToS
-   withdrawal section (in every language it ships; §6 in the example app). If either is absent, that absence is itself a
+   withdrawal section (in every language it ships). If either is absent, that absence is itself a
    finding (consent UI missing ⇒ 🔴; ToS disclosure missing ⇒ 🟠, re-opens Art. 10 12-month window).
 2. **Condition (i) — prior express consent.** Verify the consent is an **affirmative, UNTICKED-by-default**
    control, **separate from** blanket ToS acceptance, whose copy states consent to **begin immediate
@@ -69,7 +66,7 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
    (email or non-mutable exportable record — NOT a server-mutable in-app screen) reproducing the Art. 6(1)
    info + the recorded consent/acknowledgement is delivered **at the latest before the paid features unlock**.
    Apply the Art. 2(10) test (personally addressed · storable · unchanged reproduction). [Art. 16(m)(iii) / Art. 8(7)]
-   - Note `withdrawalConsentAt` is good **internal evidence** but is **not** the consumer-facing Art. 8(7)
+   - Note the consent timestamp is good **internal evidence** but is **not** the consumer-facing Art. 8(7)
      confirmation. Logging it does not satisfy (iii).
    - **Flag** [verify]: does the Apple/Google receipt suffice (it is store-sent and omits the consent
      language → probably NOT alone), or must the app send its own confirmation? If no trader-controlled
@@ -98,7 +95,7 @@ withdrawal section. It does NOT grade analytics consent, health claims, or gener
 | Annex I(B) model form / 14-day disclosure absent from ToS | 🟠 MATERIAL (Art. 10 exposure) |
 | Consent copy not mirrored in `.nl.md`, or limbs worded only for 16(m) not 16(a) | 🟡 MINOR |
 | Classification digital-content vs digital-service unresolved | 🟡 MINOR note → [low-confidence] jurist |
-| `withdrawalConsentAt` logged; all three conditions met with trader-sent durable artefact | 🟢 OK |
+| Consent timestamp logged; all three conditions met with trader-sent durable artefact | 🟢 OK |
 
 A 🔴 resting only on [verify]/[low-confidence] is emitted as a **hard condition** ("confirm X; if confirmed,
 blocker"), per verdict-model — never an outright BLOCKED verdict on unconfirmed law, never waved through.

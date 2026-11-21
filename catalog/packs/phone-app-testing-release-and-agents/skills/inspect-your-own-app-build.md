@@ -18,8 +18,8 @@ What this skill does not do, whatever the reason given:
 What it does: manifest and permission review, leaked secrets in a build, size breakdown, and comparing a release build against the source it should come from.
 
 Neighbouring jobs:
-- Testing the Firebase side (open databases, open signup, exposed cloud functions) and a wider secret sweep: the `firebase-apk-scanner` studio skill, in the pack `app-and-dependency-security-scans`, takes over. This skill only finds a Firebase config or key inside the build and hands it over; that skill tests what the backend allows, which means live requests to the person's backend, so it asks first.
-- Supply-chain checks on the source project's dependencies: the same security pack.
+- Testing the Firebase side (open databases, open signup, exposed cloud functions) and a wider secret sweep is a separate job. This skill only finds a Firebase config or key inside the build and hands it over; testing what the backend allows means live requests to the person's backend, so ask first.
+- Supply-chain checks on the source project's dependencies: the dependency-supply-chain-risk-checks domain.
 - Building, signing and releasing the app: other skills in this pack.
 
 ## How it works

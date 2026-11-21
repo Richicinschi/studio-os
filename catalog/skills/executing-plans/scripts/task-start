@@ -25,7 +25,9 @@ here=$(cd "$(dirname "$0")" && pwd)
 sdd_scripts="$here/../../subagent-driven-development/scripts"
 sdd_scripts=$(cd "$sdd_scripts" && pwd)
 
-report=$("$sdd_scripts/task-brief" "$plan_file" "$task_no")
+# Run the sibling through bash: unpacking a package with some tools drops the
+# executable bit.
+report=$("${BASH:-bash}" "$sdd_scripts/task-brief" "$plan_file" "$task_no")
 
 # task-brief reports "wrote <path>: <n> lines"; pull the path back out.
 brief_path=$(printf '%s\n' "$report" | sed -n 's/^wrote \(.*\): [0-9][0-9]* lines$/\1/p')

@@ -44,11 +44,14 @@ LABEL org.opencontainers.image.title="shopapi" \
       org.opencontainers.image.source="https://git.example.com/shopapi" \
       org.opencontainers.image.licenses="MIT"
 
-# Bring over the packages installed in the builder.
+# Bring over the packages installed in the builder. The distroless Python has no
+# site-packages folder on its import path, so name this one.
 COPY --from=builder /install/lib/python3.11/site-packages /usr/lib/python3.11/site-packages
+ENV PYTHONPATH=/usr/lib/python3.11/site-packages
 
 # App code is owned by the image's built-in nonroot account (UID 65532).
-COPY --chown=65532:65532 ./app /app
+# The package keeps its name: /app/app, so `python -m app.main` run from /app finds it.
+COPY --chown=65532:65532 ./app /app/app
 
 WORKDIR /app
 
@@ -60,7 +63,9 @@ EXPOSE 8000
 
 # curl and wget do not exist in distroless, so ask the Python stdlib.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
 
-# Exec form, so signals reach the app directly.
+# Exec form, so signals reach the app directly. app/main.py starts the server itself
+# under `if __name__ == "__main__":` with uvicorn.run(app, host="0.0.0.0", port=8000), as
+# production-fastapi/templates/main.py.template does.
 ENTRYPOINT ["python", "-m", "app.main"]

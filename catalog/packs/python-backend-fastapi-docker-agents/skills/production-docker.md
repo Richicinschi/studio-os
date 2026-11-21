@@ -1,6 +1,6 @@
 ---
 name: production-docker
-description: "Use when writing or hardening a Dockerfile, docker-compose file or .dockerignore, or containerizing an app: multi-stage builds, non-root users, distroless, BuildKit secrets, layer caching, Trivy scans, compose limits. Triggers on any Dockerfile, Docker, containers, images, or /production docker."
+description: "Use when writing or hardening a Dockerfile, docker-compose file or .dockerignore, or containerizing an app. Covers multi-stage builds, non-root users, distroless, BuildKit secrets, layer caching, Trivy scans, compose limits. Triggers on any Dockerfile, Docker, containers, images, or /production docker."
 metadata:
   category: backend
   author: Richicinschi
@@ -31,10 +31,12 @@ RUN pip install --no-cache-dir --no-compile --prefix=/install -r requirements.tx
 
 # tag nonroot (runs as 65532), digest read 2026-11-19 with docker buildx imagetools inspect
 FROM gcr.io/distroless/python3-debian12:nonroot@sha256:7d1042ce588ab97019fe95c24ffca7bc5a82ccdac572511d5e09bda4435c89c5
-COPY --from=builder /install /usr/local
-COPY --chown=65532:65532 ./app /app
+COPY --from=builder /install/lib/python3.11/site-packages /usr/lib/python3.11/site-packages
+ENV PYTHONPATH=/usr/lib/python3.11/site-packages
+COPY --chown=65532:65532 ./app /app/app
 WORKDIR /app
 USER 65532
+# app/main.py starts uvicorn under `if __name__ == "__main__":` (production-fastapi's main.py.template does)
 ENTRYPOINT ["python", "-m", "app.main"]
 ```
 
@@ -253,7 +255,7 @@ Python service:
 
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
 ```
 
 Node service:

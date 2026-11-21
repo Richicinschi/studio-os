@@ -1,6 +1,6 @@
 # GDPR / AVG — Backbone Article Reference (NL/EU, app-tailored)
 
-**Scope:** the load-bearing GDPR (EU 2016/679) / AVG articles a reviewer needs to adjudicate a mobile-app Privacy Policy + ToS for an EU/NL publisher. Worked examples use the **example app** (`legal-guardrails.md` §8; apply the rules to the app under review from its fact sheet) — a Flutter breathing/mindfulness app published by a **Dutch eenmanszaak** (sole proprietor = sole controller; **no employees, no DPO**), EU-first, auto-renewing subscriptions sold **through Apple/Google** (merchants of record) via **RevenueCat** + **Firebase** (Auth, Firestore, Analytics, Crashlytics, Cloud Functions, Hosting; region `europe-west`). General wellness, **no medical claims** ("supports / may help relax"). Free tier = **on-device data only**; Pro = **Firestore sync**.
+**Scope:** the load-bearing GDPR (EU 2016/679) / AVG articles a reviewer needs to adjudicate a mobile-app Privacy Policy + ToS for an EU/NL publisher. Worked examples use one app, the **worked example** (profile: `worked-example.md` §1); apply the rules to the app under review from its fact sheet.
 
 **Citation tiers used below:**
 - `[settled — <source>, verified <date>]` — confirmed against the source on that date (re-check: 2026-11-18).
@@ -14,7 +14,7 @@
 
 ## Quick-reference matrix
 
-| Art | Topic | The one rule (worked: example app) |
+| Art | Topic | The one rule (worked example) |
 |---|---|---|
 | 6 | Six lawful bases | Pick **ONE** basis per purpose. Core delivery = **6(1)(b)** contract. Analytics/crash = **consent** (6(1)(a)), not 6(1)(f) — ePrivacy 5(3) bites first. |
 | 7 | Consent conditions | Demonstrable, unbundled, plain-language, **as easy to withdraw as to give**, no pre-ticked boxes. |
@@ -50,7 +50,7 @@
   3. **Art 9 special-category (health) data** — Art 9 needs its **own** condition (9(2)(a) explicit consent); 6(1)(f) does not satisfy it. `[settled — GDPR Art 9(1)–(2) + Recital 51, verified 2026-11-18]`
 - **6(4)** purpose-compatibility test (for re-using data for a new purpose without fresh consent/legal authority) weighs: link between purposes; collection context + controller–subject relationship; nature of data (esp. special categories); consequences for subjects; safeguards (encryption/pseudonymisation). `[settled — GDPR Art 6(4) (EUR-Lex; gdpr-info.eu/art-6), verified 2026-11-18]`
 
-### Worked lawful-basis map (the model answer for the example app; build the same map for the app under review)
+### Worked lawful-basis map (the model answer for the worked example; build the same map for the app under review)
 
 | Purpose | Lawful basis | Notes |
 |---|---|---|
@@ -80,11 +80,11 @@
 - **No pre-ticked boxes.** Consent must be an unticked, **affirmative opt-in action** (a deliberate tick/tap). `[settled — Art 7 + Recital 32, verified 2026-11-18]`
 - **No bundling into ToS acceptance.** Each consent (analytics, crash, age, withdrawal-waiver) must be **separate** from blanket "I accept the Terms" acceptance. `[settled — Art 7(2)/(4), verified 2026-11-18]`
 - **Symmetric withdrawal.** If consent is granted with one tap, withdrawal must be ≈ one tap. `[settled — Art 7(3), verified 2026-11-18]`
-- **Log it.** Store timestamped proof (e.g. `ageConfirmedAt`, `withdrawalConsentAt`, analytics-toggle state). `[settled — Art 7(1), verified 2026-11-18]`
+- **Log it.** Store timestamped proof (e.g. an age-confirmation timestamp, a withdrawal-waiver timestamp, analytics-toggle state). `[settled — Art 7(1), verified 2026-11-18]`
 
-**Application (worked: example app):**
+**Application (worked example):**
 - Analytics/crash opt-**in** toggle (or opt-out clearly presented at first run) + Settings off-switch ⇒ satisfies 7(3) easy-withdrawal.
-- **16+ self-attestation checkbox** and **paywall withdrawal-waiver checkbox** must each be **unticked**, **separate** affirmative actions — *not* folded into the single ToS checkbox. The app's `ageConfirmedAt` / `withdrawalConsentAt` records satisfy the 7(1) demonstrability duty.
+- **16+ self-attestation checkbox** and **paywall withdrawal-waiver checkbox** must each be **unticked**, **separate** affirmative actions — *not* folded into the single ToS checkbox. A timestamped record of each tick, with the wording and version shown, satisfies the 7(1) demonstrability duty.
 - The right to withdraw must be stated **before** consent is taken (Art 7(3) + Art 13(2)(c)).
 
 ---
@@ -101,7 +101,7 @@
 
 The Dutch digital-consent age is **16, the top of the band**: the UAVG does not use the Art 8(1) option to lower it, so the GDPR's own 16 applies. UAVG art. 5(1) separately requires the legal representative's consent for under-16s where consent is the basis and Art 8 does not apply. There is **no lower Dutch carve-out**. `[settled — GDPR Art 8(1) (EUR-Lex); UAVG art. 5(1) (wetten.overheid.nl, version in force from 1 Sep 2026), verified 2026-11-18]`
 
-> **Reviewer rule:** for an NL-first publisher relying on any Art 6(1)(a) / Art 9(2)(a) consent, the sign-up + notice must enforce a **16+ gate**, not 13+. **A 13+ gate is non-compliant for an NL-first app.** A 16+ self-attestation checkbox (the example app's) is correctly calibrated; it is the pragmatic minimum (true under-16 targeting would require *verifiable parental consent* per 8(2), which an app that does not target children does not do and does not need).
+> **Reviewer rule:** for an NL-first publisher relying on any Art 6(1)(a) / Art 9(2)(a) consent, the sign-up + notice must enforce a **16+ gate**, not 13+. **A 13+ gate is non-compliant for an NL-first app.** A 16+ self-attestation checkbox is correctly calibrated; it is the pragmatic minimum (true under-16 targeting would require *verifiable parental consent* per 8(2), which an app that does not target children does not do and does not need).
 
 ---
 
@@ -115,13 +115,13 @@ Processing is **prohibited** of data revealing: racial/ethnic origin; political 
 
 "the data subject has given **explicit consent** to the processing of those personal data for **one or more specified purposes** …"
 
-(Other lifts 9(2)(b)–(j): employment/social-security; vital interests; non-profit activities; manifestly-public data; legal claims; substantial public interest; preventive/occupational medicine; public health; archiving/research/statistics. **None apply to a consumer wellness app like the example app** — only 9(2)(a) is realistically available.)
+(Other lifts 9(2)(b)–(j): employment/social-security; vital interests; non-profit activities; manifestly-public data; legal claims; substantial public interest; preventive/occupational medicine; public health; archiving/research/statistics. **None apply to a consumer wellness app** — only 9(2)(a) is realistically available.)
 
 ### The inference nuance (decide this explicitly in every review)
 
 - **Inferred health data is Art 9 data even if the inputs were not.** If usage/behavioural data is analysed to **estimate stress, anxiety, sleep, mood, or wellbeing**, the **output is health data** and Art 9 applies. `[verify — regulator/EDPB + commentary position; not a verbatim article rule]`
 - **Test (GDPR):** data are health data if they are capable of revealing health status, directly or by collation or deduction, even only with a certain probability; their source does not matter. `[settled — GDPR Art 4(15), Recital 35; CJEU C-21/23 paras 81, 83, 90; C-184/20 paras 123, 125, 127, verified 2026-11-19]` **Applied:** logs holding only technique, time, rounds and audio settings, with non-medical goals (calm/focus/reset), are not health data. They become Art 9 data — explicit consent, Art 9(2)(a) — if a technique or program is framed around a condition, the user enters mood or symptoms, the app measures a physiological signal, or the app infers a state. `[low-confidence — fact-specific; no CJEU or EDPB ruling on wellness-session logs; LEGAL REVIEW REQUIRED before relying on "not Art 9" if any trigger is present]`
-- **The no-medical-claims framing is load-bearing.** The general-wellness posture ("supports / may help relax"; never "treats / cures / diagnoses / prevents") is what keeps a wellness app (like the example app) **defensibly out of Art 9**. If the copy drifts into health claims or the data model adds scoring, the analysis flips. `[low-confidence — but this is the crux of the review]`
+- **The no-medical-claims framing is load-bearing.** The general-wellness posture ("supports / may help relax"; never "treats / cures / diagnoses / prevents") is what keeps a wellness app **defensibly out of Art 9**. If the copy drifts into health claims or the data model adds scoring, the analysis flips. `[low-confidence — but this is the crux of the review]`
 
 ### Art 9 review procedure (for a wellness app)
 
@@ -137,15 +137,15 @@ Processing is **prohibited** of data revealing: racial/ethnic origin; political 
 
 `[settled — GDPR Arts 12, 15–18, 20–22 (EUR-Lex; gdpr-info.eu/art-12), verified 2026-11-18]`
 
-| Art | Right | Operationalisation (worked: example app) |
+| Art | Right | Operationalisation (worked example) |
 |---|---|---|
 | 15 | **Access** | Provide account/session data on request (email + in-app). |
 | 16 | **Rectification** | Edit account fields. |
-| 17 | **Erasure** ("right to be forgotten") | **In-app account-deletion flow** (soft-delete + 30-day grace + `purgeExpiredDeletions` cron) — store-mandated anyway. |
+| 17 | **Erasure** ("right to be forgotten") | **In-app account-deletion flow** (soft-delete + 30-day grace + a scheduled purge job) — store-mandated anyway. |
 | 18 | **Restriction** | Stop processing on request (manual for an indie). |
 | 20 | **Portability** | Export of session history (machine-readable). |
 | 21 | **Object** | Honour objections to processing based on 6(1)(e) or (f) (e.g. server-side security logs) and to direct marketing (Art 21(1)–(2)). The analytics/crash off-switch is **consent withdrawal** under Art 7(3), not an Art 21 objection. |
-| 22 | **Automated individual decision-making / profiling** | An app that makes **no** such decisions (the example app) → state "not applicable / we do not carry out automated decision-making". |
+| 22 | **Automated individual decision-making / profiling** | An app that makes **no** such decisions → state "not applicable / we do not carry out automated decision-making". |
 
 **Response deadline (Art 12(3)):** act on a request "without undue delay and **in any event within one month**"; extendable by **two further months** for complexity/volume, with **notice to the subject within the first month** explaining the extension. `[settled — GDPR Art 12(3) (EUR-Lex; gdpr-info.eu/art-12), verified 2026-11-18]`
 
@@ -163,7 +163,7 @@ Processing is **prohibited** of data revealing: racial/ethnic origin; political 
 
 A privacy notice for data **collected from the data subject** MUST contain **all** of:
 
-| # | Ref | Required element | Content (worked: example app) |
+| # | Ref | Required element | Content (worked example) |
 |---|---|---|---|
 | 1 | 13(1)(a) | **Who the controller is and how to reach it** (and its representative, if it has one) | The eenmanszaak: owner name / trade name, **KvK number**, registered address, contact email. |
 | 2 | 13(1)(b) | **How to reach the DPO**, if one is appointed | **No DPO** (not required for a solo eenmanszaak) → state "no DPO appointed; contact the controller at …". `[verify — Art 37 trigger not met]` |
@@ -176,11 +176,11 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 | 9 | 13(2)(c) | **That consent can be withdrawn at any time**, where processing rests on it | Reference the analytics/crash off-switch. |
 | 10 | 13(2)(d) | **That the user can complain to the regulator** (a supervisory authority) | Name the **Autoriteit Persoonsgegevens** (autoriteitpersoonsgegevens.nl). |
 | 11 | 13(2)(e) | Whether the user is **obliged to give the data** (by law or by contract), and what follows if they don't | E.g. account data is contractually necessary to use the service. |
-| 12 | 13(2)(f) | **Whether decisions are automated or the user is profiled**, and if so the logic and its effect on the user | State **none** (Art 22 N/A). |
+| 12 | 13(2)(f) | **Whether decisions are automated or the user is profiled**, and if so the logic and its effect on the user | If the app makes none, state **none** (Art 22 N/A). |
 
 **Also:** **13(3)** — if data is later processed for a *new* purpose, inform the subject **beforehand**. **13(4)** — the duty falls away only insofar as the subject **already has** the information. `[settled — GDPR Art 13(3)–(4) (EUR-Lex; gdpr-info.eu/art-13), verified 2026-11-18]`
 
-> **Reviewer rule:** a privacy notice **missing any one of the 12** is incomplete. Grep the PP for each element; report gaps. (For data obtained *indirectly* the parallel checklist is **Art 14** — not needed by an app that collects directly from the user, as the example app does. `[verify]`)
+> **Reviewer rule:** a privacy notice **missing any one of the 12** is incomplete. Grep the PP for each element; report gaps. (For data obtained *indirectly* the parallel checklist is **Art 14** — not needed by an app that collects directly from the user. `[verify]`)
 
 ---
 
@@ -201,7 +201,7 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 
 **Supporting paras:** 28(1) controllers must use only processors giving sufficient guarantees; 28(2) no sub-processor without authorisation (general authorisation requires change-notice + right to object); 28(4) sub-processors bound by the **same** obligations, with the primary processor remaining **fully liable**. `[settled — GDPR Art 28(1), (2), (4) (EUR-Lex; gdpr-info.eu/art-28), verified 2026-11-18]`
 
-**Review (worked for the example app's processors; list the app's own):** for **each** sub-processor confirm a signed Art-28 DPA exists covering all of (a)–(h) **and** onward-transfer terms:
+**Review (worked for the processors of the worked example; list the app's own):** for **each** sub-processor confirm a signed Art-28 DPA exists covering all of (a)–(h) **and** onward-transfer terms:
 
 | Processor | DPA instrument | Status |
 |---|---|---|
@@ -225,7 +225,7 @@ A privacy notice for data **collected from the data subject** MUST contain **all
 
 > "The obligations … shall not apply to an enterprise or an organisation employing fewer than 250 persons **unless** the processing it carries out (i) **is likely to result in a risk to the rights and freedoms of data subjects**, (ii) **the processing is not occasional**, or (iii) **the processing includes special categories of data** as referred to in Article 9(1) or personal data relating to criminal convictions and offences referred to in Article 10."
 
-### Worked conclusion (example app): **RoPA is MANDATORY** (despite the publisher being one person)
+### Worked conclusion (worked example): **RoPA is MANDATORY** (despite the publisher being one person)
 
 - A one-person eenmanszaak is far under 250 — **but** a continuously-running app processes personal data **routinely, not occasionally**, so **carve-out (ii) "not occasional" defeats the exemption**. `[settled — Art 30(5) text + WP29 position paper on Art 30(5) (endorsed by the EDPB; footnote 1: "occasional" means not carried out regularly), verified 2026-11-18; the "continuous app ⇒ not occasional" application is verify]`
 - If **any Art 9 health inference** exists, **carve-out (iii)** independently requires a RoPA too.
@@ -255,7 +255,7 @@ DPIA required where processing (esp. using new technologies) **"is likely to res
 
 Also: **35(4)** each supervisory authority publishes its own DPIA-required list (the AP maintains a NL list — cross-check it `[verify]`); **35(10)** possible carve-out where a legal-basis impact assessment was already done.
 
-### Worked conclusion (example app): **likely no mandatory trigger — but record a screening memo**
+### Worked conclusion (worked example): **likely no mandatory trigger — but record a screening memo**
 
 - A single-developer wellness app with **no profiling / no decisions with legal-or-similar effect** (fails 35(3)(a)), **no large-scale Art 9 processing** (fails 35(3)(b) given the no-inference posture), and **no public-area monitoring** (fails 35(3)(c)) likely **does not** hit a mandatory 35(3) trigger. `[low-confidence — fact-specific conclusion]`
 - **But document WHY** in a short DPIA-**screening / threshold memo** rather than silently skipping it (defensibility), alongside the LIA/TIA. If **health inference at scale** is ever added, **35(3)(b)** can trigger a full DPIA.
@@ -269,7 +269,7 @@ Also: **35(4)** each supervisory authority publishes its own DPIA-required list 
 ### 33 — notify the supervisory authority (the AP) `[settled — GDPR Art 33(1), (3)–(5) (EUR-Lex; gdpr-info.eu/art-33), verified 2026-11-18]`
 
 - **33(1):** notify the AP **"without undue delay and, where feasible, not later than 72 hours after having become aware of it"** — **unless** the breach is **unlikely to result in a risk** to rights/freedoms. Delay beyond 72h must be reasoned.
-- **33(2):** a **processor** must inform the **controller** without undue delay on becoming aware. (For a Firebase + RevenueCat app such as the example app: rely on RevenueCat/Google breach-notice clauses in their DPAs to start your 72h clock; likewise for each of the app's own processors.) `[settled — GDPR Art 33(2) (EUR-Lex; gdpr-info.eu/art-33), verified 2026-11-18]`
+- **33(2):** a **processor** must inform the **controller** without undue delay on becoming aware. (For a Firebase + RevenueCat app: rely on RevenueCat/Google breach-notice clauses in their DPAs to start your 72h clock; likewise for each of the app's own processors.) `[settled — GDPR Art 33(2) (EUR-Lex; gdpr-info.eu/art-33), verified 2026-11-18]`
 - **33(3) notification content:** (a) nature of the breach incl. categories + approximate numbers of subjects and records; (b) DPO / contact-point details; (c) likely consequences; (d) measures taken / proposed (incl. mitigation).
 - **33(4):** may be provided **in phases**. **33(5):** **document all breaches** (facts, effects, remedial action) regardless of notification.
 
@@ -281,7 +281,7 @@ Also: **35(4)** each supervisory authority publishes its own DPIA-required list 
   - **(b)** subsequent measures ensure the high risk **"is no longer likely to materialise"**;
   - **(c)** direct notice would involve **disproportionate effort** → substitute a **public communication** "or similar measure whereby the data subjects are informed in an equally effective manner."
 
-### Application (worked: example app)
+### Application (worked example)
 
 - Bake the **72h clock** into the breach runbook (clock starts at *awareness*, including awareness via a processor's 33(2) notice).
 - High-risk breach → **also notify users** (in-app + email).

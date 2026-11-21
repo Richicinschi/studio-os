@@ -6,8 +6,8 @@ consistent simultaneously with (a) the app's actual behaviour + every bundled SD
 Policy (Review Guideline 5.1.1(i)), and (c) the merged `PrivacyInfo.xcprivacy`
 `NSPrivacyCollectedDataTypes`. A mismatch is the most common rejection/enforcement trigger for §5.1.
 
-The answer rows below are a **worked example**, filled in for the example app in
-`legal-guardrails.md` §8 (a Firebase + RevenueCat wellness app). Fill the "Your app" column from
+The answer rows below are a **worked example**, filled in for the app in
+`legal-guardrails/references/worked-example.md` (a Firebase + RevenueCat wellness app). Fill the "Your app" column from
 the fact sheet, then replace every answer row with the person's app's own answers. Re-run
 `legal-data-surface-scan` (iOS) + re-read `PrivacyInfo.xcprivacy` before every submit; the label
 reflects the **default/maximal** collection state, not the user's opted-out state.
@@ -21,9 +21,9 @@ crosswalk — map by *meaning*, never by category name).
 
 ## App facts (inputs — from the fact sheet)
 
-| Field | Your app | Example app (worked answers below) |
+| Field | Your app | Worked example (answers below) |
 |---|---|---|
-| App | `<app name>` | the example app |
+| App | `<app name>` | the worked example |
 | Auth | `<sign-in methods → account ID>` | Firebase Auth (email/password + Google Sign-In → UID) |
 | Subscriptions | `<who sells; purchase middleware>` | Apple as merchant of record + RevenueCat middleware (`app_user_id` = Firebase UID) |
 | Telemetry | `<analytics / crash SDKs; consent state>` | Firebase Analytics + Crashlytics (in-app opt-out; label = default state) |
@@ -46,8 +46,8 @@ crosswalk — map by *meaning*, never by category name).
 | Analytics usage | Usage Data (Product Interaction) |
 | Crash reporting | Diagnostics (Crash Data; Performance Data if shipped) |
 | Subscriptions / IAP | Purchases (Purchase History) |
-| Advertising | Identifiers (Device ID), Usage Data (Advertising Data) — **N/A for an app with no ads** (the example app) |
-| Location / Photos / Health | Location / Photos or Videos / Health & Fitness — **N/A for an app that reads none of these** (the example app); Health & Fitness also covers user-provided health data, so confirm it `[verify]` |
+| Advertising | Identifiers (Device ID), Usage Data (Advertising Data) — **N/A for an app with no ads** (the worked example) |
+| Location / Photos / Health | Location / Photos or Videos / Health & Fitness — **N/A for an app that reads none of these** (the worked example); Health & Fitness also covers user-provided health data, so confirm it `[verify]` |
 
 **Licence notice for this table.** The table is adapted from the "Privacy Nutrition Labels" table
 in `skills/legal/privacy-policy/SKILL.md` of
@@ -86,9 +86,9 @@ SOFTWARE.
 
 Per type, answer: **Collected?** (Yes/No) · **Linked?** (Linked/Not Linked) · **Track?**
 (Tracking/Not Tracking) · **Purpose(s)** (App Functionality / Analytics / Product Personalization /
-Developer Advertising / Third-Party Advertising / Other). For an app with no ads (the example app),
+Developer Advertising / Third-Party Advertising / Other). For an app with no ads,
 purposes are limited to **App Functionality** and **Analytics** — never any advertising purpose.
-The rows below are the example app's answers.
+The rows below are the worked example's answers.
 
 | Apple category → sub-type | Collected? | Source / SDK | Linked? | Track? | Purpose(s) | Notes |
 |---|---|---|---|---|---|---|
@@ -99,9 +99,9 @@ The rows below are the example app's answers.
 | Purchases → Purchase History | **Yes** | RevenueCat / App Store status | Linked | No | App Functionality | subscription/entitlement state |
 | Usage Data → Product Interaction | **Yes** | Firebase Analytics | Linked | No | Analytics | launches, screen views, taps |
 | Usage Data → Advertising Data | **No** | — | — | — | — | no ads |
-| Diagnostics → Crash Data | **Yes** | Crashlytics | _Linked vs Not-Linked — RESOLVE_ | No | App Functionality | **watch-list:** the example app's manifest says `Linked=false`; if UID-synced, set **Linked** |
+| Diagnostics → Crash Data | **Yes** | Crashlytics | _Linked vs Not-Linked — RESOLVE_ | No | App Functionality | **watch-list:** the worked example's manifest says `Linked=false`; if UID-synced, set **Linked** |
 | Diagnostics → Performance Data | _Yes only if shipped_ | Firebase Performance | Linked | No | App Functionality | declare only if Performance Monitoring SDK present |
-| User Content → Other User Content | **Yes (paid tier)** | Firestore session sync | Linked | No | App Functionality | paid-tier breathing logs; alt-classify as Usage Data — keep PP consistent |
+| User Content → Other User Content | **Yes (paid tier)** | Firestore session sync | Linked | No | App Functionality | paid-tier session logs; alt-classify as Usage Data — keep PP consistent |
 | Health & Fitness | **No** | — | — | — | — | Apple's Health type also covers user-provided health data, so no HealthKit/Motion does not settle it; bare session logs are not health or medical data (Health = No); Fitness is the developer's call `[verify — data-category-ontology.md §3]` |
 | Sensitive Info | **No** | — | — | — | — | Not Collected (keep consistent with PP GDPR Art. 9 section) |
 | Location (Precise / Coarse) | **No** | — | — | — | — | no location APIs |
@@ -129,7 +129,7 @@ does cross-app ad attribution, this flips and `AppTrackingTransparency` becomes 
    and Apple with the 5.1.1(i)(2) equal-protection assurance (not "third parties").
 2. **Label ⇄ `PrivacyInfo.xcprivacy`** — every `NSPrivacyCollectedDataTypes` entry maps to a declared
    label type with matching Linked/Tracking flags. (List what the app's manifest declares — the
-   example app's declares Email, Name, User ID, Product Interaction, Crash Data, Purchase History —
+   worked example's declares Email, Name, User ID, Product Interaction, Crash Data, Purchase History —
    confirm each against the answer table; resolve the Crash-Data Linked flag.)
 3. **Label ⇄ Play Data Safety** — same flows, consistent answers (Apple Linked/Not-Linked/Track maps
    loosely to Play collected/shared/purpose). Flag any divergence to `legal-cross-store`.

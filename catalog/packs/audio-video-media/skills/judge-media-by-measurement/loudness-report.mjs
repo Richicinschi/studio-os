@@ -1,5 +1,6 @@
 // Measures integrated loudness, true peak and loudness range of a media file with ffmpeg and prints a verdict per check.
 import { spawnSync } from "node:child_process";
+import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export const DEFAULTS = { target: -16, tolerance: 2, maxPeak: -1, maxLra: 15 };
@@ -73,4 +74,6 @@ function main() {
   process.exit(exitCodeFor(checks));
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+// Node loads a linked script from its real path, so both sides are compared as real paths.
+const realPath = (p) => { try { return realpathSync(p); } catch { return null; } };
+if (process.argv[1] && realPath(process.argv[1]) === realPath(fileURLToPath(import.meta.url))) main();

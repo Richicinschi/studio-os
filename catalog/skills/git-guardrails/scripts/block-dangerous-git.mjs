@@ -4,7 +4,8 @@
  * 0 to let it run. The logic is in guard.mjs; this file only runs it, every time node runs this
  * file. It fails closed: a hook that crashes lets the command run, so when guard.mjs cannot load
  * (this file copied without its folder) or anything else fails, it refuses a command that names
- * git, read as guard.mjs reads it: tool_input.command, or all of stdin when that is not JSON.
+ * git, read as guard.mjs reads it: tool_input.command, or all of stdin when that is not JSON (one
+ * leading byte-order mark, U+FEFF, dropped first).
  */
 let raw = '';
 try {
@@ -16,7 +17,7 @@ try {
 } catch (error) {
   let text = raw;
   try {
-    const command = JSON.parse(raw)?.tool_input?.command;
+    const command = JSON.parse(raw.startsWith('\uFEFF') ? raw.slice(1) : raw)?.tool_input?.command;
     text = typeof command === 'string' ? command : '';
   } catch { /* not JSON: read all of stdin */ }
   if (/\bgit\b|GIT_CONFIG/i.test(text)) {

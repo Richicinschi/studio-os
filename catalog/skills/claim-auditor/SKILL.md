@@ -12,11 +12,11 @@ metadata:
 
 ## Why this exists
 
-The 2026-07-28 usage report identified **unverified claims as the studio's most persistent rework class**: an "already licensed" assertion that was not true, live-deployment evidence that had to be stripped from a deliverable, figures that needed re-deriving after the fact. Each one was cheap to check *before* it shipped and expensive to retract *after*.
+**Unverified claims are a common and costly kind of rework**: an "already licensed" assertion that was not true, live-deployment evidence that had to be stripped from a deliverable, figures that needed re-deriving after the fact. Each one is cheap to check *before* it ships and expensive to retract *after*.
 
 A claim reaching a deliverable unverified is a defect, whether or not it happens to be correct.
 
-## Hard rule
+## The one rule
 
 **Never soften a finding to make a deliverable look better.** Not by downgrading RED to AMBER, not by omitting a claim you could not source, not by rewording a number into a vaguer form that no longer needs support. If a claim cannot be traced, that fact IS the finding. A report of "4 RED" that reflects reality is worth more than a clean one that does not.
 

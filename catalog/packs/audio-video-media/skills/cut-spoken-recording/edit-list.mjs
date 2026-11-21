@@ -1,7 +1,7 @@
 // Proposes cuts for a spoken recording from word timings and returns a keep-list; never touches media.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, realpathSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 export const DEFAULTS = { pass: 'silence', silenceSeconds: 0.55, padSeconds: 0.15, fillers: ['um', 'uh', 'erm', 'hmm'] };
 
@@ -102,4 +102,6 @@ function main(argv) {
   console.log(text);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main(process.argv.slice(2));
+// Node loads a linked script from its real path, so both sides are compared as real paths.
+const realPath = (p) => { try { return realpathSync(p); } catch { return null; } };
+if (process.argv[1] && realPath(process.argv[1]) === realPath(fileURLToPath(import.meta.url))) main(process.argv.slice(2));

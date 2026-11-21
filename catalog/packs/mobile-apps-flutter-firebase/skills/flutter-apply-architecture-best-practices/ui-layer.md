@@ -62,4 +62,4 @@ class AccountView extends StatelessWidget {
 Notes:
 - Add an error field to the ViewModel and a branch in the View, or the failure path goes silent.
 - Dispose the ViewModel with whatever created it.
-- Keep strings in the localization files in a real app, English only.
+- Keep strings in the localization files in a real app, one file per language the project supports.

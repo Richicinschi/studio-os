@@ -49,7 +49,7 @@ The base is the branch this work was cut from. Check the plan, the chat and the 
 
 ## 4. Offer the menu
 
-Studio rule (your rules file, rules 11 and 13): merging is for your human partner alone. The PR lands with a merge commit, via `gh pr merge N --merge`. No squash, no rebase. A local merge has no place on the menu.
+Merging is for your human partner alone: a risky act needs their recorded yes. The PR lands with a merge commit, via `gh pr merge N --merge`. No squash, no rebase. A local merge has no place on the menu.
 
 Named branch, in a plain repo or a worktree. Show exactly this:
 
@@ -88,7 +88,7 @@ Open the PR against the base branch. Use the forge CLI if there is one, otherwis
 
 Leave the worktree alone: PR feedback gets fixed there.
 
-Any commit you make on the way is signed: `git commit -S`, with the repo's own identity.
+Any commit you make on the way is a plain `git commit`, with the repo's own identity.
 
 ### Option 2: keep it
 
@@ -98,7 +98,7 @@ Say: "Branch <name> stays. Worktree kept at <path>."
 
 Do this only if they ask, for this branch, in so many words. First check that your grants ledger holds the grant row for it (the rule that each risky act needs a recorded yes). No row: stop, do not merge. A local merge happens in a project repo, where the before-tool guards do not run, so this check is yours and nothing else will catch a missing row.
 
-The hub's shared root is off limits here: other live sessions work in that checkout, and switching its branch or committing there would break them. Hub branches always go through their PR.
+A checkout that other live sessions share is off limits here: switching its branch or committing there would break them. Branches of such a repo always go through their PR.
 
 Inside a project repo:
 
@@ -193,7 +193,7 @@ Removal refused. These files were never committed:
 
 <file list>
 
-1. Commit them to <branch> first (signed: git commit -S)
+1. Commit them to <branch> first (git commit)
 2. Move them into <main repo root>
 3. Delete them (cannot be undone)
 
@@ -208,7 +208,7 @@ Do what they choose, then remove the worktree.
 |------|-------|------|---------------|----------------|
 | 1. PR | your partner, with `--merge` | yes | yes | no |
 | 2. Keep | none | no | yes | no |
-| Local merge (asked for, grant row present, not in the hub root) | `--no-ff` | no | no | yes, `-d` |
+| Local merge (asked for, grant row present, not in a shared checkout) | `--no-ff` | no | no | yes, `-d` |
 | Discard (asked for, typed `discard`) | none | no | no | yes, `-D` |
 
 ## Excuses that do not hold

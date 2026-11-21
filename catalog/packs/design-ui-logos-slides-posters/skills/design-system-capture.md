@@ -9,8 +9,8 @@ requires: [a browser]
 Use when the person likes how a website, an app screen or some reference images look and wants the colours, fonts and spacing saved as a reusable style guide. Typical words: "I love how this site looks, can we use that style", "pull the colours and fonts from this page", "make a style guide from these screenshots", "keep our new pages looking like this".
 
 Neighbours:
-- Designing a new look from nothing (no reference): the hub skills `frontend-design` or `ui-styles-palettes-fonts` take over.
-- Brand voice, logo rules and messaging: the hub skill `brand` takes over.
+- Designing a new look from nothing (no reference): `frontend-design` or `ui-styles-palettes-fonts` in this domain take over.
+- Brand voice, logo rules and messaging: `brand` in this domain takes over.
 - Checking contrast and accessibility of the captured colours in depth: use an accessibility-focused skill after capture.
 - Drawing or rebuilding an actual logo or illustration: a logo or illustration skill, not this one.
 

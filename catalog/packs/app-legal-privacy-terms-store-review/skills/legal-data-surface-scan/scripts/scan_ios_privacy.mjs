@@ -48,53 +48,98 @@ function findManifests(dir, acc = []) {
   return acc;
 }
 
-function boolAfter(block, key) {
-  // <key>KEY</key> followed by <true/> or <false/>
-  const m = block.match(new RegExp(`<key>${key}</key>\\s*<(true|false)\\/>`));
-  return m ? m[1] === 'true' : null;
+// Reads an XML plist into plain values (dict -> object, array -> list, true/false -> boolean,
+// integer/real -> number, string/date/data -> string), so every key is found by name, in any order.
+// Throws on markup it cannot read.
+function readPlist(text) {
+  const body = text.replace(/<\?[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>/g, '');
+  const tokens = body.match(/<[^>]*>|[^<]+/g) || [];
+  let i = 0;
+  const tagOf = (tok) => {
+    const m = /^<(\/?)([A-Za-z]+)\b[^>]*?(\/?)>$/.exec(tok || '');
+    return m && { closing: m[1] === '/', name: m[2], empty: m[3] === '/' };
+  };
+  const nextTag = () => {
+    while (i < tokens.length && !tokens[i].startsWith('<')) {
+      if (tokens[i].trim()) throw new Error(`text outside an element: "${tokens[i].trim().slice(0, 40)}"`);
+      i++;
+    }
+    if (i >= tokens.length) throw new Error('the plist ends early');
+    const tag = tagOf(tokens[i]);
+    if (!tag) throw new Error(`cannot read ${tokens[i]}`);
+    return tag;
+  };
+  const textUntil = (name) => {
+    let s = '';
+    while (i < tokens.length && tokens[i] !== `</${name}>`) s += tokens[i++];
+    if (i >= tokens.length) throw new Error(`no </${name}>`);
+    i++;
+    return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  };
+  const value = () => {
+    const tag = nextTag();
+    i++;
+    if (tag.closing) throw new Error(`unexpected </${tag.name}>`);
+    if (tag.name === 'plist') {
+      const v = value();
+      const end = nextTag();
+      if (!end.closing || end.name !== 'plist') throw new Error('more than one value in <plist>');
+      i++;
+      return v;
+    }
+    if (tag.name === 'true' || tag.name === 'false') {
+      if (!tag.empty) textUntil(tag.name);
+      return tag.name === 'true';
+    }
+    if (tag.name === 'dict') {
+      const dict = {};
+      for (let t = tag.empty ? null : nextTag(); t; t = nextTag()) {
+        i++;
+        if (t.closing && t.name === 'dict') return dict;
+        if (t.closing || t.name !== 'key') throw new Error(`<${t.name}> where a <key> belongs`);
+        const key = t.empty ? '' : textUntil('key');
+        dict[key] = value();
+      }
+      return dict;
+    }
+    if (tag.name === 'array') {
+      const list = [];
+      for (let t = tag.empty ? null : nextTag(); t; t = nextTag()) {
+        if (t.closing && t.name === 'array') { i++; return list; }
+        list.push(value());
+      }
+      return list;
+    }
+    const raw = tag.empty ? '' : textUntil(tag.name);
+    return tag.name === 'integer' || tag.name === 'real' ? Number(raw) : raw;
+  };
+  return value();
 }
 
-function arrayStringsAfter(block, key) {
-  const m = block.match(new RegExp(`<key>${key}</key>\\s*<array>([\\s\\S]*?)</array>`));
-  if (!m) return [];
-  return [...m[1].matchAll(/<string>([^<]+)<\/string>/g)].map((x) => x[1]);
-}
+const dictOf = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+const listOf = (v) => (Array.isArray(v) ? v : []);
+const boolOf = (v) => (typeof v === 'boolean' ? v : null);
+const stringsOf = (v) => listOf(v).filter((s) => typeof s === 'string' && s !== '');
 
 function parseManifest(text) {
-  const collected = [];
-  const collBlock = text.match(/<key>NSPrivacyCollectedDataTypes<\/key>\s*<array>([\s\S]*?)<\/array>\s*(?=<key>NSPrivacyAccessedAPITypes<\/key>|<\/dict>\s*<\/plist>)/);
-  if (collBlock) {
-    for (const d of collBlock[1].matchAll(/<dict>([\s\S]*?)<\/dict>/g)) {
-      const b = d[1];
-      const type = (b.match(/<key>NSPrivacyCollectedDataType<\/key>\s*<string>([^<]+)<\/string>/) || [])[1];
-      if (!type) continue;
-      collected.push({
-        type,
-        label: TYPE_LABELS[type] || type,
-        linked: boolAfter(b, 'NSPrivacyCollectedDataTypeLinked'),
-        tracking: boolAfter(b, 'NSPrivacyCollectedDataTypeTracking'),
-        purposes: arrayStringsAfter(b, 'NSPrivacyCollectedDataTypePurposes').map((p) => p.replace('NSPrivacyCollectedDataTypePurpose', '')),
-      });
-    }
-  }
-  const apis = [];
-  // NOTE: the accessed-API array contains a nested <array> of reason codes, so a
-  // non-greedy /<array>...<\/array>/ on the outer block stops at the inner array.
-  // Instead, take the region from the key onward and match each <dict>...</dict>
-  // (reason arrays hold no dicts, so dict-matching is safe).
-  const apiKeyIdx = text.indexOf('NSPrivacyAccessedAPITypes');
-  if (apiKeyIdx >= 0) {
-    const region = text.slice(apiKeyIdx);
-    for (const d of region.matchAll(/<dict>([\s\S]*?)<\/dict>/g)) {
-      const b = d[1];
-      const type = (b.match(/<key>NSPrivacyAccessedAPIType<\/key>\s*<string>([^<]+)<\/string>/) || [])[1];
-      if (!type) continue;
-      apis.push({ api: type.replace('NSPrivacyAccessedAPICategory', ''), reasons: arrayStringsAfter(b, 'NSPrivacyAccessedAPITypeReasons') });
-    }
-  }
+  const root = dictOf(readPlist(text));
+  const collected = listOf(root.NSPrivacyCollectedDataTypes)
+    .map(dictOf)
+    .filter((d) => typeof d.NSPrivacyCollectedDataType === 'string' && d.NSPrivacyCollectedDataType !== '')
+    .map((d) => ({
+      type: d.NSPrivacyCollectedDataType,
+      label: TYPE_LABELS[d.NSPrivacyCollectedDataType] || d.NSPrivacyCollectedDataType,
+      linked: boolOf(d.NSPrivacyCollectedDataTypeLinked),
+      tracking: boolOf(d.NSPrivacyCollectedDataTypeTracking),
+      purposes: stringsOf(d.NSPrivacyCollectedDataTypePurposes).map((p) => p.replace('NSPrivacyCollectedDataTypePurpose', '')),
+    }));
+  const apis = listOf(root.NSPrivacyAccessedAPITypes)
+    .map(dictOf)
+    .filter((d) => typeof d.NSPrivacyAccessedAPIType === 'string' && d.NSPrivacyAccessedAPIType !== '')
+    .map((d) => ({ api: d.NSPrivacyAccessedAPIType.replace('NSPrivacyAccessedAPICategory', ''), reasons: stringsOf(d.NSPrivacyAccessedAPITypeReasons) }));
   return {
-    tracking: boolAfter(text, 'NSPrivacyTracking'),
-    trackingDomains: arrayStringsAfter(text, 'NSPrivacyTrackingDomains'),
+    tracking: boolOf(root.NSPrivacyTracking),
+    trackingDomains: stringsOf(root.NSPrivacyTrackingDomains),
     collected,
     accessedApis: apis,
   };
@@ -108,13 +153,25 @@ if (!existsSync(iosDir)) {
 
 const manifestPaths = findManifests(iosDir);
 const manifests = manifestPaths.map((p) => {
-  const parsed = parseManifest(readFileSync(p, 'utf8'));
+  let parsed;
+  try {
+    parsed = parseManifest(readFileSync(p, 'utf8'));
+  } catch (err) {
+    // The manifest entry says it could not be read; nothing is guessed from it.
+    parsed = { error: `could not read this plist: ${err.message}`, tracking: null, trackingDomains: [], collected: [], accessedApis: [] };
+  }
   return { path: p.replace(/\\/g, '/'), isAppManifest: /Runner[\\/]PrivacyInfo/.test(p), ...parsed };
 });
 
+// A manifest that could not be read declares nothing we know of: its data types and tracking are
+// unknown, not absent. Each one is listed here, and tracking stays unknown unless another says true.
+const notChecked = manifests
+  .filter((mf) => mf.error)
+  .map((mf) => `${mf.path}: ${mf.error} (convert it with \`plutil -convert xml1\` and re-run)`);
+
 // Union of collected types across app + pods, for label reconciliation.
 const allTypes = {};
-let anyTracking = false;
+let anyTracking = notChecked.length > 0 ? null : false;
 const healthDeclared = [];
 for (const mf of manifests) {
   if (mf.tracking) anyTracking = true;
@@ -135,6 +192,7 @@ const out = {
   healthOrFitnessDeclared: [...new Set(healthDeclared)],
   collectedDataTypes: Object.entries(allTypes).map(([label, v]) => ({ label, linked: v.linkedAnywhere, purposes: [...v.purposes] })),
   manifests,
-  reconcile: "Map collectedDataTypes -> Apple App Privacy label answers and -> Privacy Policy §3. healthOrFitnessDeclared non-empty is a condition to confirm, not a blocker: Apple's Health and Fitness types turn on the data, not on HealthKit. anyTracking should be false (no ATT).",
+  notChecked,
+  reconcile: "Map collectedDataTypes -> Apple App Privacy label answers and -> Privacy Policy §3. healthOrFitnessDeclared non-empty is a condition to confirm, not a blocker: Apple's Health and Fitness types turn on the data, not on HealthKit. anyTracking should be false (no ATT). Each notChecked line is a manifest that could not be read: what it collects and whether it tracks are unknown, not absent, so collectedDataTypes may be missing types and anyTracking is null unless a readable manifest declares tracking.",
 };
 console.log(JSON.stringify(out, null, 2));

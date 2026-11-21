@@ -4,7 +4,7 @@ Readers and detectors spot text that reads as machine-made. When you write fixes
 
 ## Dashes
 
-Long dashes are the most reliable tell. Studio rule: use none at all, long or short. Swap in a comma, a colon, parentheses or a new sentence. Number ranges use the word "to" (50 to 60 characters).
+Long dashes are the most reliable tell. The rule here: use none at all, long or short. Swap in a comma, a colon, parentheses or a new sentence. Number ranges use the word "to" (50 to 60 characters).
 
 ## Words to swap
 

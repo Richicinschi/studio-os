@@ -1,11 +1,8 @@
 # Google Play Data Safety — Reference (form spec + CSV schema)
 
 Authoritative reference for encoding, verifying, and **emitting** the Google Play
-**Data safety** form for a Dutch/EU mobile app. Worked applications use the **example
-app** (`legal-guardrails.md` §8: Flutter breathing/mindfulness app; Dutch eenmanszaak;
-GDPR/AVG; subscriptions sold through Apple/Google as merchants of record via RevenueCat;
-Firebase backend in EU `europe-west`; no medical claims; free tier = on-device only,
-paid tier = Firestore sync). Build the declaration for the app under review from its fact
+**Data safety** form for a Dutch/EU mobile app. Worked applications use one app, the
+**worked example** (profile: `worked-example.md` §1). Build the declaration for the app under review from its fact
 sheet and data-surface scan; the §5 matrix is a worked pattern, not its answer.
 
 **Primary sources (fetched and checked 2026-11-18 unless noted):**
@@ -42,7 +39,7 @@ The two quoted definitions are Google's (Play Console Help 10787469, https://sup
 - **User-initiated action or prominent disclosure + user consent** — a transfer on a specific user-initiated action where the user reasonably expects the data to be shared, or on a prominent in-app disclosure and consent that meets the User Data policy. [settled — Help 10787469, verified 2026-11-18]
 - **Fully anonymized data** — not linkable to a user/device. [settled — Help 10787469, verified 2026-11-18]
 
-> **Application of the SDK rule (worked: example app):** Firebase Analytics, Crashlytics, Firebase
+> **Application of the SDK rule (worked example):** Firebase Analytics, Crashlytics, Firebase
 > Auth/Firestore, Cloud Functions, and RevenueCat all transmit off-device → all count
 > as **collection** and must be reflected in the form. Firebase/RevenueCat act as
 > **processors on instructions** → treated as **service providers**, so they are
@@ -101,17 +98,17 @@ For **each data type** you declare as collected/shared, the form asks: [settled 
 
 Identical list for **collection** and **sharing** purposes. Multi-select. [settled — Help 10787469, verified 2026-11-18]
 
-| Purpose | Typical trigger (worked: example app) |
+| Purpose | Typical trigger (worked example) |
 |---|---|
 | **App functionality** | Auth (email/UID), Firestore sync (paid tier), subscription entitlement, account management plumbing |
 | **Analytics** | Firebase Analytics — product-interaction / session events |
 | **Developer communications** | Transactional/verification email (Firebase Auth custom sender) |
-| **Advertising or marketing** | **Not used** — the example app runs no ads, strips AD_ID |
+| **Advertising or marketing** | **Not used** — the worked example runs no ads, strips AD_ID |
 | **Fraud prevention, security, and compliance** | Crashlytics diagnostics for stability/abuse; security logging |
-| **Personalization** | (Generally not used by the example app) |
+| **Personalization** | (Generally not used by the worked example) |
 | **Account management** | Account create / delete / restore; entitlement state |
 
-> **Note for an app with no ads (the example app):** never select **Advertising or marketing**. Selecting it
+> **Note for an app with no ads:** never select **Advertising or marketing**. Selecting it
 > contradicts the AD_ID strip (`tools:node="remove"`) and the "no advertising ID"
 > posture in the Privacy Policy. [verify — app-specific]
 
@@ -121,13 +118,13 @@ Identical list for **collection** and **sharing** purposes. Multi-select. [settl
 
 Asked once for the whole app, not per type. [settled — Help 10787469, verified 2026-11-18]
 
-| Declaration | What the form asks (summary) | Answer (worked: example app) |
+| Declaration | What the form asks (summary) | Answer (worked example) |
 |---|---|---|
 | **Encryption in transit** | Whether all user data the app collects is encrypted in transit (yes/no) | **YES** — all Firebase/RevenueCat traffic is HTTPS/TLS. [verify — confirm no plaintext egress via traffic capture] |
-| **Deletion mechanism** | Whether users have a way to ask for their data to be deleted (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day scheduled purge) **and** a public web deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). [worked example — the example app's state; confirm the app's own] |
+| **Deletion mechanism** | Whether users have a way to ask for their data to be deleted (yes/no) | **YES** — in-app DELETE flow (soft-delete + 30-day scheduled purge) **and** a public web deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). [worked example — its state; confirm the app's own] |
 
 **Optional security badges** (not required; do not claim unless true): [settled — Help 10787469, verified 2026-11-18]
-- **Independent security review** — third-party validation against **OWASP MASVS** via the **MASA** (App Defense Alliance) program. **Do not claim** it unless the app has passed one (the example app has not).
+- **Independent security review** — third-party validation against **OWASP MASVS** via the **MASA** (App Defense Alliance) program. **Do not claim** it unless the app has passed one.
 - **"Committed to follow the Play Families Policy"** badge — only for apps with children as a target audience that have reviewed their compliance with the Families policy.
 - **UPI** badge — India Unified Payments Interface apps only.
 
@@ -138,11 +135,11 @@ Asked once for the whole app, not per type. [settled — Help 10787469, verified
 > that names the app or developer as on the store listing, and deleting an account must
 > delete the user data associated with it (some data may be kept for security, fraud
 > prevention or regulatory compliance, and users must be told, for example in the privacy
-> policy). The example app satisfies both; check the app under review for each. [settled — Help 13327111, verified 2026-11-18]
+> policy). Check the app under review for each. [settled — Help 13327111, verified 2026-11-18]
 
 ---
 
-## 5. The recommended declaration matrix (worked for the example app; derive the app's own the same way)
+## 5. The recommended declaration matrix (worked for the worked example; derive the app's own the same way)
 
 Derive from actual data flows (Firebase Auth, Firestore, Analytics, Crashlytics,
 Cloud Functions, RevenueCat). Reconcile this 1:1 with Privacy §3/§4, the Apple App
@@ -158,21 +155,21 @@ Privacy label, and the SDK/subprocessor inventory.
 | App info & performance → **Diagnostics** | YES | NO | Crashlytics / Analytics | Fraud prevention, security, and compliance; Analytics | Optional | No |
 | Device or other IDs → **Device or other IDs** | YES | NO | Firebase (installation/instance IDs) | Analytics; Fraud prevention, security, and compliance | Optional | No |
 
-**Breathing-session data → declared under App activity, not Health & fitness, in this worked example.** [verify — see the trap note below: Google's Fitness info type covers "exercise or other physical activity", so whether synced breathing sessions belong there is for the reviewer]
-- For **free** users, sessions are **on-device only** → **not collected** at all (no row). [worked example — the example app's state; confirm the app's own]
+**Session data → declared under App activity, not Health & fitness, in this worked example.** [verify — see the trap note below: Google's Fitness info type covers "exercise or other physical activity", so whether synced sessions belong there is for the reviewer]
+- For **free** users, sessions are **on-device only** → **not collected** at all (no row). [worked example — its state; confirm the app's own]
 - For **paid-tier** users, sessions sync to Firestore. Map them to **App activity → Other actions** (or App interactions). [verify — exact App-activity sub-type is a judgment call]
 
 > **OVER-DECLARATION TRAP (the #1 wellness-app pitfall):** Google defines the two types by
 > the data, not by the API it comes from: **Health info** is "Information about a user's
 > health, such as medical records or symptoms"; **Fitness info** is "Information about a
 > user's fitness, such as exercise or other physical activity". [settled — Help 10787469, verified 2026-11-18]
-> This suite's worked answer for the example app (no Health Connect, no fitness API):
-> breathing logs are user-generated app activity, so Health and fitness stays unmarked `[verify]`.
+> This suite's worked answer for the worked example (no Health Connect, no fitness API):
+> session logs are user-generated app activity, so Health and fitness stays unmarked `[verify]`.
 > Marking it would (a) misrepresent the data, (b) likely pull the app into the **Health
 > apps declaration** scrutiny, and (c) diverge from the Apple label and the Art. 9 GDPR
 > analysis. An app that does read health or fitness data declares it. [verify — the Health
-> Connect / fitness-API test is the suite's reading, not Google's; check synced breathing
-> sessions against the Fitness info definition]
+> Connect / fitness-API test is the suite's reading, not Google's; check synced session
+> logs against the Fitness info definition]
 >
 > **UNDER-DECLARATION TRAP:** Every off-device SDK counts. Forgetting Crashlytics
 > diagnostics or RevenueCat purchase history is an omitted disclosure. Cross-check the
@@ -196,7 +193,7 @@ shown** in the public Data safety card as "collected." [settled — Help 1078746
   profiles **cannot** count as ephemeral; declare it as collected or shared.
   [settled — Help 10787469, verified 2026-11-18]
 
-> **Worked (example app):** persisted Firestore sessions, Analytics events, and Crashlytics reports
+> **Worked example:** persisted Firestore sessions, Analytics events, and Crashlytics reports
 > are **stored** beyond the request → **NOT ephemeral**. Mark ephemeral = No across the
 > matrix in §5. [verify — app-specific]
 
@@ -261,7 +258,7 @@ POST https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{p
 
 ## 9. Review checklist (PASS/FAIL gates)
 
-Use to adjudicate the app's Data safety declaration (the items name the example app's SDKs; substitute the app's own). Severity: 🔴 blocker · 🟠 must-fix · 🟡 review.
+Use to adjudicate the app's Data safety declaration (the items name the worked example's SDKs; substitute the app's own). Severity: 🔴 blocker · 🟠 must-fix · 🟡 review.
 
 1. **Hard condition — Health & fitness answer confirmed.** For an app with no Health Connect / fitness API,
    confirm whether Health info and Fitness info are collected or shared; a declaration is not by itself a
@@ -305,7 +302,7 @@ Use to adjudicate the app's Data safety declaration (the items name the example 
 - The **"April 2025" Android-ID reclassification** date: not found on Help 10787469 on
   2026-11-18 (§1). The CSV import-overwrite behaviour and the Console menu path were
   confirmed on the page that day (§7).
-- Whether synced breathing sessions fall under Google's **Fitness info** type (§5, §9 item 1).
+- Whether synced session logs fall under Google's **Fitness info** type (§5, §9 item 1).
 - All **app-specific** mappings in §5 (esp. RevenueCat/Firebase **service-provider
   vs sharing** framing, and the App-activity sub-type for synced sessions) need
   confirmation against the current DPAs and the actual code/data flows.

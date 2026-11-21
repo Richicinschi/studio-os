@@ -45,7 +45,8 @@ How your product works with another. Needs: real setup steps, concrete use cases
 Definitions of field terms. Needs: a precise definition, examples, links to related terms, more depth than a dictionary entry. URL: `/glossary/[term]/`.
 
 ## Translations
-Your pages in other languages. Needs: human-quality translation with local adaptation, correct hreflang tags, review by a native speaker. URL: `/[lang]/[page]/`. Studio note: the studio ships English only unless a law or platform forces otherwise, so use this family only for a market you have decided to serve.
+Your pages in other languages. Needs: human-quality translation with local adaptation, correct hreflang tags, review by a native speaker. URL: `/[lang]/[page]/`.
+Use this family only for a market the project has decided to serve.
 
 ## Directory
 Broad listings of a category. Needs: wide coverage, filtering and sorting, real detail on each listing, regular refreshes. URL: `/directory/[category]/`.

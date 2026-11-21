@@ -91,6 +91,9 @@ references:
   - https://github.com/NVIDIA/SkillSpector/tags
   - https://code.claude.com/docs/en/permissions
   - https://code.claude.com/docs/en/sandboxing
+  - https://code.claude.com/docs/en/plugins/loading
+  - https://code.claude.com/docs/en/plugins-reference
+  - https://code.claude.com/docs/en/plugins/cli-reference
 ---
 
 # Facts the kit depends on
@@ -145,6 +148,22 @@ These change. Every fact here has its source and the date it was checked; the ex
 - Auto memory loads the first 200 lines or 25 KB of its `MEMORY.md` at the start of each session. ([source](https://code.claude.com/docs/en/memory))
 - The user folder is `~/.claude` on macOS and Linux and `%USERPROFILE%\.claude` on Windows. ([source](https://code.claude.com/docs/en/claude-directory))
 - `CLAUDE_CONFIG_DIR` moves that folder, with all settings, session history and plugins. ([source](https://code.claude.com/docs/en/env-vars))
+- A skill's own folder, checked 2026-11-20. The documented way is `${CLAUDE_SKILL_DIR}`: "The directory containing the skill's `SKILL.md` file. For plugin skills, this is the skill's subdirectory within the plugin, not the plugin root." Claude Code substitutes it in the skill's Markdown and in Bash rules of its `allowed-tools`. ([source](https://code.claude.com/docs/en/skills)) Separately, a skill's loaded content began with the line `Base directory for this skill: <the skill's folder>` in Claude Code sessions observed on 2026-11-20; that line is not in the documentation. The domain entries rely on the observed line: they say "Script paths in this domain start at this domain's folder, the base directory Claude Code names when it loads this skill." `${CLAUDE_SKILL_DIR}` is the documented fallback; it names the same folder for an entry, since the entry is that folder's `SKILL.md`.
+
+## Claude Code: installed plugins and their skills
+
+Checked 2026-11-20.
+
+- Claude Code keeps plugin files under a plugins root, `~/.claude/plugins`, "unless you set `CLAUDE_CODE_PLUGIN_CACHE_DIR`". Despite its name, that variable "sets the parent directory, not the cache itself". `CLAUDE_CONFIG_DIR` moves `~/.claude`, plugins included. ([source](https://code.claude.com/docs/en/plugins/loading), [source](https://code.claude.com/docs/en/env-vars))
+- An installed marketplace plugin is copied to `cache/<marketplace>/<plugin>/<version>/` under that root, one folder per installed version; `${CLAUDE_PLUGIN_ROOT}` points there. `installed_plugins.json`, in the root, records each install with its `scope`, `installPath` and `version`. ([source](https://code.claude.com/docs/en/plugins/loading))
+- A plugin's skills sit in its `skills/` folder, "One `<name>/SKILL.md` per skill". So an installed plugin's skill is at `<plugins root>/cache/<marketplace>/<plugin>/<version>/skills/<name>/SKILL.md`, and its agents at `.../agents/<name>.md`. A plugin's manifest can add other skill folders (`skills` key), and a plugin with a `SKILL.md` at its root and no `skills/` loads as one skill. ([source](https://code.claude.com/docs/en/plugins-reference))
+- Plugins synced from a claude.ai account are under `~/.claude/plugins/synced/`, which stays there even when `CLAUDE_CODE_PLUGIN_CACHE_DIR` is set. What is inside that folder is not documented as of 2026-11-20. ([source](https://code.claude.com/docs/en/plugins/loading))
+- Not copied into the cache: a `--plugin-dir` or `CLAUDE_CODE_PLUGIN_DIRS` plugin, a plugin folder with `.claude-plugin/plugin.json` saved under `~/.claude/skills/` or `.claude/skills/`, and a relative-path plugin in a marketplace added from a local path; these load from where they are. `marketplaces/<name>/` holds a whole marketplace's clone, plugins you did not install included. ([source](https://code.claude.com/docs/en/plugins/loading))
+- After an update or an uninstall, the previous version's folder gets an `.orphaned_at` marker and is removed 14 days later. ([source](https://code.claude.com/docs/en/plugins/loading))
+- A plugin skill loads as `/<plugin>:<skill>`. With a personal or project skill of the same name, "Both load, because plugin skills are namespaced", so two skills answer the same request. ([source](https://code.claude.com/docs/en/skills))
+- Agents too: Claude Code "namespaces every component" under the plugin's name, "so an agent `reviewer` in plugin `deploy-tools` appears as `deploy-tools:reviewer`". A skill that starts an agent by its bare name does not reach a plugin's copy. ([source](https://code.claude.com/docs/en/plugins-reference))
+- `claude plugin list --json` prints "an array with one object per installation", each with `id` (`name@marketplace`, or `name@synced`, `name@inline`, `name@skills-dir`), `scope`, `enabled` ("Whether the plugin is enabled in your merged settings") and `installPath` ("Directory the plugin loads from"); a plugin loaded in place from its marketplace's folder has `readFromFolder`, "the plugin's source directory inside that folder", and a `project` or `local` install has `projectPath`. ([source](https://code.claude.com/docs/en/plugins/cli-reference))
+- Observed with Claude Code 2.1.329 on 2026-11-20, in a throwaway config folder: `enabled` is worked out for the folder the command runs in. A plugin installed with `--scope project` for one repository showed `"enabled": true` there and `"enabled": false` in another repository; a user-scope plugin showed `true` in both. `installPath` named the current version's folder under `cache/`, and for a plugin from a marketplace added from a local folder, `readFromFolder` named the folder in that marketplace. The cards' plugin check therefore reads this list, run from the project folder, instead of searching the plugin folders, which also hold old versions, disabled plugins and other repositories' installs.
 
 ## Claude Code: MCP servers
 

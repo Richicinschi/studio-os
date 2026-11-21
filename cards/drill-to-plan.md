@@ -24,8 +24,9 @@ Read-only: names, descriptions and counts. No skill body is opened, and nothing 
 - Another skill doing the same job: the front matter only (the lines between the first two `---`) of every `SKILL.md` at both levels, looking for a description about interviews, requirements or specs. The kit's [brainstorming](brainstorming.md) counts as the lighter cousin.
 - Where specs live today, counts only: `ls docs/specs/*.md specs/*.md 2>/dev/null | wc -l`, and any spec-folder rule in `CLAUDE.md` or `AGENTS.md`.
 - Your commit rules, which replace the skill's own: `grep -n -i 'commit' CLAUDE.md AGENTS.md 2>/dev/null`.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/drill-to-plan/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a `drill-to-plan` skill exists at either level, **partly** when only a lighter design skill such as brainstorming covers the job, and **not yet** otherwise.
+The menu marks the item **have** when a `drill-to-plan` skill exists at either level, **partly** when only a lighter design skill such as brainstorming covers the job, and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -56,7 +57,7 @@ The menu marks the item **have** when a `drill-to-plan` skill exists at either l
    - the project folders it explores first, which name the studio's own projects and its project registry: "the repository you are in", or your projects;
    - where it saves specs, which are the studio's project folders and a dated file in `docs/specs/`: your folder;
    - its commit step, written for the studio's signing and authorship rules, a push that leaves the merge to the studio, and a worktree rule for its root folder: your commit rules, or "leave the spec uncommitted for me to review";
-   - "Honour the studio rules", which points at the studio's own rules file and coding guidelines: your instruction file;
+   - "Honour the project's rules", which points at the rules and coding guidelines your `AGENTS.md` or `CLAUDE.md` loads: kept, or pointed at the instruction file you use;
    - the names `brainstorming` and `writing-plans`, which the copy now gives bare, as the kit ships them (in `SKILL.md` and in the spec template's last line): kept when you take the kit's [brainstorming](brainstorming.md) and [writing-plans](writing-plans.md); otherwise the names you use (your own design and planning skills). If you have no planner, the hand-off becomes "give me the approved spec";
    - in `templates/spec-skeleton.md` and `references/question-bank.md`, the example answers drawn from the studio's own stack and products: examples from your stack, or none;
    - the author line in the front matter, which names the studio, to yours.
@@ -85,6 +86,6 @@ If any check fails, the item is not done: the plan row stays unticked.
 - **You control the length.** `skip` takes its default for one branch, `draft` writes the spec now with the rest marked open, and `stop` or "I'm done" ends the drill and still writes a draft, so the answers are not lost.
 - **"Sounds good" is not a yes.** It keeps asking about the parts you hesitate on until you approve the restated design.
 - **One question per turn** makes a long drill many turns. Plan time for it, or use `draft` early.
-- **Cost:** its name and description are the longest of the planning skills, about 72 tokens in every session (an estimate, bytes divided by 4); the full skill, about 2,100 tokens (estimate), loads only when it is used. Past the budget for skill descriptions, the least-used ones are dropped first (docs/facts.md).
+- **Cost:** its name and description are the longest of the planning skills, about 72 tokens in every session (an estimate, bytes divided by 4); the body, about 1,800 tokens (estimate), loads only when it is used. Past the budget for skill descriptions, the least-used ones are dropped first (docs/facts.md).
 - **Someone else's ask** may carry internal detail. Save the spec where your company's rules allow, not in a personal repository.
 - **claude.ai:** it works there as an uploaded custom skill, after `vet-and-adopt` (docs/facts.md, "claude.ai: custom skills and the built-in document skills").

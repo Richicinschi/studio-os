@@ -73,7 +73,7 @@ Run these in order, with credentials read from secrets and never written into a 
 
 ### 8. Command line and automation
 1. Flags: `--headless` (no editor window), `--export-release`, `--export-debug`, and `--export-pack` (pack only, for patching). The arguments after the flag are the preset name and the output path, for example `godot --headless --export-release "Web" build/web/index.html`. Add `--path <project folder>` when you do not run from the project root, and remember that a relative output path is resolved against the folder holding `project.godot`, not your shell's current folder.
-2. Single-platform shell helper: take platform and version arguments, create a versioned output folder, rewrite the version line in the project file, run the headless release export, then optionally sign the Windows binary (certificate path and password from the environment) and optionally push to itch.io with `butler push`. Leave signing and upload commented out until you have asked (see the studio rules below).
+2. Single-platform shell helper: take platform and version arguments, create a versioned output folder, rewrite the version line in the project file, run the headless release export, then optionally sign the Windows binary (certificate path and password from the environment) and optionally push to itch.io with `butler push`. Leave signing and upload commented out until you have asked (see the rules in section 11).
 3. Multi-platform pipeline: make sure the build folder exists, loop over the preset names (Windows, Linux, Web), make a folder per preset, run the headless release export, stop with the failing exit code on the first failure, announce success at the end.
 4. Universal export manager: load `export_presets.cfg`, and for every preset section read `name` and `export_path`, run the editor binary headless, with `--path` set to the project folder, and the release flag through `OS.execute` (find it with `OS.get_executable_path()`), report success or push an error with the exit code per preset, and abort with an error if the file cannot be loaded.
 5. Post-export hook: an `EditorExportPlugin` whose `_get_name` names it and whose `_export_end` callback reads the export path and runs post tasks (zip, manifest, notify) through `OS.execute`. Registering it in an editor plugin gives the whole team one export workflow.
@@ -87,11 +87,11 @@ Run these in order, with credentials read from secrets and never written into a 
 ### 10. Patching without a full reinstall
 Mount an external pack at runtime with `ProjectSettings.load_resource_pack(path, true)`. The second argument replaces existing files, so same-path resources override the base pack. This suits downloadable content, translated asset sets and quick fixes shipped after release. Check with `FileAccess.file_exists` first and report success or failure. A loader may point at a CDN download that is already saved in `user://`, but it must never download on its own; the caller decides. Build the pack with `--export-pack`.
 
-### 11. Store upload and studio rules
-1. Steam: automate with `steamcmd` (`+login`, `+run_app_build`, `+quit`), credentials from `STEAM_USER` and `STEAM_PASS`, and a `.vdf` manifest that defines app ID, branch (for example beta) and content folders. Keep the manifest generic so it is safe to version. The studio keeps its upload tooling in its tooling backlog, not in this skill.
+### 11. Store upload and house rules
+1. Steam: automate with `steamcmd` (`+login`, `+run_app_build`, `+quit`), credentials from `STEAM_USER` and `STEAM_PASS`, and a `.vdf` manifest that defines app ID, branch (for example beta) and content folders. Keep the manifest generic so it is safe to version. This skill ships no upload script: write one for the project from these pieces.
 2. Ask before any upload or publish: Steam, itch.io, a store, a CDN or a release page.
 3. Keys, keystores (`.keystore`), certificates, passwords and tokens never go in the repo. Use environment variables or a secret store. A signing helper may set process-scoped variables only, and must never contain a real password.
-4. English only, in every surface: strings, logs, scripts and docs.
+4. Text in every surface (strings, logs, scripts and docs) is in the languages the project supports.
 5. For the wider engine picture, use the general Godot skills in this pack. The official exporting tutorials are at docs.godotengine.org, under "Exporting".
 
 ## Checks before done

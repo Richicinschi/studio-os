@@ -137,7 +137,7 @@ Expected: PASS
 
 ```bash
 git add tests/test_duration.py duration.py
-git commit -S -m "feat: parse duration strings into seconds"
+git commit -m "feat: parse duration strings into seconds"
 ```
 ````
 

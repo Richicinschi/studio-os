@@ -25,7 +25,7 @@ The counts in this playbook are starting points, not measured values.
 3. Offer real benefits: exclusive access, swag, a revenue share, or public recognition. "Early access to features" alone is thin.
 4. Equip them: referral links, shareable assets, talking points, a private channel.
 5. Track referral traffic, signups and engagement per ambassador, keep what works, cut what does not.
-6. Studio rule: ambassadors disclose their relationship when they promote, never post from fake or duplicate accounts, and follow each platform's rules on promotion. Outreach goes out only with the owner's word.
+6. Rule: ambassadors disclose their relationship when they promote, never post from fake or duplicate accounts, and follow each platform's rules on promotion. Outreach goes out only with the owner's word.
 
 ## Community-led support
 

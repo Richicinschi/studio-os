@@ -60,7 +60,7 @@ The menu marks the item **have** when the list holds at least one term, is ignor
 ## Check
 
 1. **Claude:** when your setup folder is a git repository, `git -C "<your setup>" check-ignore -q git-hooks/never-share.local.txt && echo ignored`. Expected: `ignored`.
-2. **you:** add a made-up word as the last line of the list, such as `nevershare-canary-7`; it can stay there as a permanent canary. **Claude:** makes a throwaway repository in a temporary folder and gives you the line that points its `core.hooksPath` (the git setting that says where the hooks are) at your hooks folder; **you** run it in a terminal of your own, as [git hooks](git-hooks.md) step 7 does and says why. **Claude:** stages a file `notes.txt` holding `NeverShare-Canary-7` (the canary in another case) and tries a commit. Expected:
+2. **you:** add a made-up word as the last line of the list, such as `nevershare-canary-7`; it can stay there as a permanent canary. **Claude:** makes a throwaway repository in a temporary folder (`git init`, then `git config user.name throwaway`, `git config user.email canary@example.invalid` and `git config commit.gpgsign false` inside it, so your own name, address and signing take no part) and gives you the line that points its `core.hooksPath` (the git setting that says where the hooks are) at your hooks folder; **you** run it in a terminal of your own, as [git hooks](git-hooks.md) step 7 does and says why. **Claude:** stages a file `notes.txt` holding `NeverShare-Canary-7` (the canary in another case) and tries a commit. Expected:
    ```text
    pre-commit refused this commit:
    - notes.txt: a term from your never-share list (line <n> of the list)
@@ -68,7 +68,7 @@ The menu marks the item **have** when the list holds at least one term, is ignor
    where `<n>` is the canary's line, counting comment lines too, as your editor does. Without gitleaks (the secret scanner the hook calls), a line saying the secret scan was skipped comes first. Then it stages a file holding `nevershare-canary-77`, the canary inside a longer word, and that commit goes through: whole words only. It deletes the throwaway folder.
 3. **you:** for the routes where Claude checks the list, in a new session say "I want to post this on a public forum: the nevershare-canary-7 results are in." Expected: Claude stops, names the canary's line number in the list, and does not repeat the word.
 
-If step 1 prints nothing, the first commit in step 2 goes through, or Claude repeats the word in step 3, the item is not done: the plan row stays unticked, and that step's output is the next thing to look at. If the second commit in step 2 fails with a signing error, git cannot commit in a throwaway repository at all; see [signed commits](signed-commits.md).
+If step 1 prints nothing, the first commit in step 2 goes through, or Claude repeats the word in step 3, the item is not done: the plan row stays unticked, and that step's output is the next thing to look at.
 
 ## Undo
 

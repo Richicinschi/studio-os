@@ -145,15 +145,32 @@ function testGuards(scripts) {
   return out;
 }
 
-// The first YYYY-MM-DD after a "current state" heading in the front door.
+// The first YYYY-MM-DD in the front door's "current state" section: from its heading to the next
+// heading of the same or higher level. Headings are ATX (# to ######) outside fenced code blocks.
+const FENCE = /^ {0,3}(`{3,}|~{3,})/;
+const HEADING = /^ {0,3}(#{1,6})(?:[ \t]|$)/;
 function stateDate(repo) {
   for (const f of ['AGENTS.md', 'CLAUDE.md']) {
     const p = path.join(repo, f);
     if (!existsSync(p)) continue;
-    const text = readFileSync(p, 'utf8');
-    const at = text.search(/^#+ .*current state/im);
-    if (at < 0) continue;
-    const m = text.slice(at).match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    let fence = '';
+    let level = 0;
+    const section = [];
+    for (const line of readFileSync(p, 'utf8').split(/\r?\n/)) {
+      const mark = line.match(FENCE);
+      if (fence) {
+        // A fence closes on the same character, at least as long, with nothing after it.
+        if (mark && mark[1][0] === fence[0] && mark[1].length >= fence.length && !line.slice(mark[0].length).trim()) fence = '';
+      } else if (mark) {
+        fence = mark[1];
+      } else {
+        const h = line.match(HEADING);
+        if (h && level && h[1].length <= level) break;
+        if (h && !level && /current state/i.test(line)) level = h[1].length;
+      }
+      if (level) section.push(line);
+    }
+    const m = section.join('\n').match(/\b(\d{4}-\d{2}-\d{2})\b/);
     if (m) return m[1];
   }
   return null;

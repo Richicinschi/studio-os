@@ -1,7 +1,7 @@
 ---
 id: judge-media-by-measurement
 title: Check audio and video by numbers
-requires: [ffmpeg]
+requires: [ffmpeg, Node]
 ---
 
 ## When to use

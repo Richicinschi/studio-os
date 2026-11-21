@@ -47,7 +47,7 @@ This skill gives a firm verdict on whether an app's **Privacy Policy** (privacy 
 
 ## Stage 2 — Art. 13 twelve-point completeness checklist
 
-Full rule text + worked model answers (example app) live in `gdpr-articles.md` (§Article 13). Walk all twelve; report the specific gap, not "improve disclosures".
+Full rule text + worked model answers (the worked example) live in `gdpr-articles.md` (§Article 13). Walk all twelve; report the specific gap, not "improve disclosures".
 
 | # | Art. 13 ref | Element | Present? |
 |---|---|---|---|
@@ -68,7 +68,7 @@ Also confirm 13(3) (notify before a new-purpose use) and that the 1-month rights
 
 ## Stage 3 — app-specific reconciliation checks
 
-Apply against the live PP. Each maps to a flow or an Art. 13 element; cite the provision in the finding. The section numbers (§3, §4 …) follow a common policy layout (data collected, not collected, recipients, transfers, retention, rights); map each check to the matching section of the person's policy. The examples assume the example app's Firebase + RevenueCat stack (`legal-guardrails.md` §8); swap in the app's own SDKs.
+Apply against the live PP. Each maps to a flow or an Art. 13 element; cite the provision in the finding. The section numbers (§3, §4 …) follow a common policy layout (data collected, not collected, recipients, transfers, retention, rights); map each check to the matching section of the person's policy. The examples assume the worked example's Firebase + RevenueCat stack (`legal-guardrails/references/worked-example.md`); swap in the app's own SDKs.
 
 - **§3 categories + basis.** Every data category in §3 lists a purpose **and one Art. 6 basis** (core delivery = 6(1)(b); Analytics/Crashlytics = 6(1)(a) consent, **never** 6(1)(f) — ePrivacy 5(3) bites first). Flag any analytics/crash line resting on "legitimate interest".
 - **§3.7 Art. 9 health.** The "not special-category data" conclusion must be **reasoned and present**, against the CJEU test (data capable of revealing health status by collation or deduction, whatever the source; `data-category-ontology.md` §3). If any of the four triggers exists in the data model or copy — a technique or program framed around a condition, mood or symptoms the user enters, a physiological measurement, or an inference/score/label — → Art. 9(2)(a) explicit separate consent required → 🔴/🟠. Record the reasoned decision as 🟢 if absent. `[low-confidence — fact-specific; the crux of the review]`

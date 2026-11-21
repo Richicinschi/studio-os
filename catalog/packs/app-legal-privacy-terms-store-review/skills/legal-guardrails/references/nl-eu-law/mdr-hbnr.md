@@ -1,6 +1,6 @@
 # Health-App Classification Gates — EU MDR (medical device) & US FTC HBNR (health breach)
 
-**Scope.** Reference for adjudicating whether a health, wellness or fitness app is (a) a **medical device** under EU MDR 2017/745, and (b) a **PHR vendor** under the US FTC Health Breach Notification Rule. Worked examples use the **example app** (`legal-guardrails.md` §8: a breathing/mindfulness app; Dutch *eenmanszaak*; EU/NL-first; auto-renewing subs sold through Apple/Google; RevenueCat + Firebase `europe-west`; **no medical claims**, general-wellness framing only); apply each gate to the app under review from its fact sheet. Both gates pivot on the same firewall a wellness app has to enforce — **no medical-purpose claims** and **no multi-source health-data import** — but they must be *ruled on and recorded*, not assumed.
+**Scope.** Reference for adjudicating whether a health, wellness or fitness app is (a) a **medical device** under EU MDR 2017/745, and (b) a **PHR vendor** under the US FTC Health Breach Notification Rule. Worked examples use one app, the worked example (`worked-example.md` §1 has its profile, §4 its decision); apply each gate to the app under review from its fact sheet. Both gates pivot on the same firewall a wellness app has to enforce — **no medical-purpose claims** and **no multi-source health-data import** — but they must be *ruled on and recorded*, not assumed.
 
 **This is not legal advice.** It supports a clause/scope review; a Dutch jurist (MDR) and US counsel (HBNR) make the binding determination. Each [settled] tag carries the date its source was last checked (last re-check: **2026-11-18**).
 
@@ -10,11 +10,11 @@
 
 ---
 
-## 0. Decision (worked for the example app; record the app's own decision in the review output)
+## 0. Decision (record the app's own decision in the review output; one app's decision: `worked-example.md` §4)
 
-> **EU MDR — OUT OF SCOPE.** The example app is **not a medical device**: it serves a *lifestyle/well-being* purpose, makes **no medical claim** (diagnosis/prevention/monitoring/prediction/prognosis/treatment/alleviation of disease), and its software functions do not go beyond delivering breathing exercises + logging sessions. The no-medical-claims guardrail ("supports / may help relax", never "treats/cures/diagnoses/prevents") IS the MDR firewall. Reasoning recorded per §1–2.
+> **EU MDR.** Record whether the app is a medical device: whether it serves a *lifestyle/well-being* purpose, makes any **medical claim** (diagnosis/prevention/monitoring/prediction/prognosis/treatment/alleviation of disease), and whether its software functions go beyond delivering its content + logging sessions. The no-medical-claims guardrail ("supports / may help relax", never "treats/cures/diagnoses/prevents") IS the MDR firewall. Reasoning recorded per §1–2.
 >
-> **US FTC HBNR — NOT A PHR VENDOR.** The example app lacks the **"technical capacity to draw information from multiple sources"** that defines a *personal health record*: it imports **no** external health data (no HealthKit, no Google Fit, no wearable, no third-party health API). On the current self-contained design it is outside the HBNR's "vendor of personal health records" definition. Reasoning recorded per §3–4.
+> **US FTC HBNR.** Record whether the app has the **"technical capacity to draw information from multiple sources"** that defines a *personal health record*: whether it imports any external health data (HealthKit, Google Fit, a wearable, a third-party health API). Reasoning recorded per §3–4.
 >
 > **Both determinations are CONDITIONAL on the current design.** Re-run this gate on any change to: (a) marketing/in-app/store/PP/ToS copy introducing a medical-purpose verb (→ MDR risk); or (b) integration of HealthKit / Google Fit / a wearable / any external health-data import (→ HBNR PHR-vendor risk). See §5 trigger lists.
 
@@ -26,21 +26,21 @@
 
 A product is a **medical device** only if the manufacturer assigns it an intended **MEDICAL PURPOSE**. MDR Art. 2(1) lists the medical purposes in four indents (the others cover injury or disability; investigation, replacement or modification of the anatomy or of a physiological or pathological process or state; and in vitro examination of specimens). The first indent, the one a wellness app is most likely to touch, is:
 
-| Medical purpose (Art. 2(1), 1st indent) | In the example app? |
+| Medical purpose (Art. 2(1), 1st indent) | In the app under review? (one app's answers: `worked-example.md` §4) |
 |---|---|
-| diagnosis | No |
-| prevention | No |
-| monitoring | No (session logging ≠ monitoring of a disease/physiological process for medical purpose) |
-| prediction | No |
-| prognosis | No |
-| treatment | No |
-| alleviation of disease | No |
+| diagnosis | |
+| prevention | |
+| monitoring | (session logging ≠ monitoring of a disease/physiological process for medical purpose) |
+| prediction | |
+| prognosis | |
+| treatment | |
+| alleviation of disease | |
 
-The third indent of Art 2(1) — "investigation, replacement or modification of the anatomy or of a physiological or pathological process or state" — is the one a breathing app is closest to: paced breathing modifies respiration. It scopes in only with a medical purpose; a wellness aim ("relax", "focus") stays outside (Recital 19). [settled — MDR Art 2(1) third indent, Art 2(12), Art 7(d), verified 2026-11-19]
+The third indent of Art 2(1) — "investigation, replacement or modification of the anatomy or of a physiological or pathological process or state" — is the one an app that guides a physiological process (paced respiration, for example) is closest to. It scopes in only with a medical purpose; a wellness aim ("relax", "focus") stays outside (Recital 19). [settled — MDR Art 2(1) third indent, Art 2(12), Art 7(d), verified 2026-11-19]
 
 `[settled — MDCG 2019-11 Rev.1 §3.1 / MDR Art. 2(1), verified 2026-11-18]` Software qualifies as a medical device (**MDSW**) only where it has one of these medical purposes; absent a medical purpose it is excluded regardless of healthcare context.
 
-**Application:** an app that markets relaxation/general wellbeing and never names a disease or a clinical outcome (the example app) → **no medical purpose → not a device.** A single claim like *"reduces your anxiety disorder"*, *"treats insomnia"*, *"lowers your blood pressure"*, *"prevents panic attacks"* would assign a medical purpose and could pull it into MDR scope. `[settled — MDR Art. 2(1) + Recital 19, verified 2026-11-18]`
+**Application:** an app that markets relaxation/general wellbeing and never names a disease or a clinical outcome → **no medical purpose → not a device.** A single claim like *"reduces your anxiety disorder"*, *"treats insomnia"*, *"lowers your blood pressure"*, *"prevents panic attacks"* would assign a medical purpose and could pull it into MDR scope. `[settled — MDR Art. 2(1) + Recital 19, verified 2026-11-18]`
 
 ## 2. The lifestyle/well-being carve-out (Recital 19) + the "mere processing" rule
 
@@ -52,7 +52,7 @@ MDCG 2019-11 Rev.1 §3.1 names **wellness or fitness apps** among software for n
 
 `[settled — MDCG 2019-11 Rev.1 §3.1 and §3.3 decision step 3, verified 2026-11-18]` **Functional-limitation exclusion:** software whose action is limited to **storage, archival, communication, simple search, or lossless compression** is **NOT** MDSW (Rev.1 adds that a search feature counts as more than "simple search" when it contributes to a medical purpose). **Merely processing health information does not make software MDSW** unless it serves a medical purpose: Rev.1 §3.1 says software that processes, analyses, interprets, calculates, creates or modifies medical information may be MDSW where that is governed by a medical intended purpose.
 
-**Application:** the example app (a) is squarely "lifestyle and well-being"; (b) its data handling = storing/logging session metadata locally (free tier) or syncing to Firestore (paid tier) → storage/communication only, not a medical-purpose computation. Both prongs keep it out.
+**Application:** an app that (a) is squarely "lifestyle and well-being" and (b) whose data handling is storing/logging session metadata locally or syncing it to a backend (storage/communication only, not a medical-purpose computation) is kept out by both prongs.
 
 ## 3. MDCG 2019-11 qualification decision steps
 
@@ -60,11 +60,11 @@ MDCG 2019-11 Rev.1 §3.1 names **wellness or fitness apps** among software for n
 
 1. **Is it software?** (a set of instructions processing input → output). Yes for any app.
 2. **Is it an MDR Annex XVI device, an accessory, or software driving or influencing a medical device?** No.
-3. **Does it perform an action on data beyond storage/archival/communication/simple search/lossless compression?** The example app: essentially no (it presents timed breathing visuals + logs). 
+3. **Does it perform an action on data beyond storage/archival/communication/simple search/lossless compression?**
 4. **Is the action for the benefit of *individual* patients?**
 5. **Is it MDSW under the definition, i.e. does it have a *medical purpose* (Art. 2(1))?** **No** → exits as **not MDSW**.
 
-If it is MDSW, it is then classified under Annex VIII Rule 11 (Rev.1 §4). The example app exits at step 5 at the latest (no medical purpose) → **not MDSW**.
+If it is MDSW, it is then classified under Annex VIII Rule 11 (Rev.1 §4). An app with no medical purpose exits at step 5 at the latest → **not MDSW**.
 
 ## 4. Annex VIII Rule 11 (what would happen IF it qualified)
 
@@ -84,9 +84,9 @@ Scan **store listings, in-app copy, PP, ToS, the health disclaimer, and all mark
 
 - **Banned verbs:** *treats · cures · heals · diagnoses · prevents · monitors · screens · detects · reduces/relieves [a named disorder] · clinically proven · therapeutic · medically prevents · prognoses* `[settled — MDR Art. 2(1) names diagnosis, prevention, monitoring, prediction, prognosis, treatment and alleviation of disease, verified 2026-11-18; the other verbs are a scanner heuristic, not Art. 2(1) terms]`
 - **Banned condition pairings:** anxiety **disorder**, panic **disorder**, clinical depression, insomnia (as a diagnosis), hypertension / blood pressure, PTSD, ADHD, asthma/COPD, arrhythmia.
-- **Physiological-process claims:** respiration or heart-rate claims tied to a health outcome ("lowers blood pressure", "regulates breathing for [condition]"); evidence notes that cite clinical outcomes in a condition population. Respiration is a vital physiological parameter in MDCG 2019-11 Rev.1, so such a claim would also raise the Rule 11 class. [settled — MDCG 2019-11 Rev.1 §4.2.1, verified 2026-11-18; MDR Art 2(1), verified 2026-11-19]
+- **Physiological-process claims:** respiration or heart-rate claims tied to a health outcome ("lowers blood pressure", "regulates breathing/respiration for [condition]"); evidence notes that cite clinical outcomes in a condition population. Respiration is a vital physiological parameter in MDCG 2019-11 Rev.1, so such a claim would also raise the Rule 11 class. [settled — MDCG 2019-11 Rev.1 §4.2.1, verified 2026-11-18; MDR Art 2(1), verified 2026-11-19]
 - **Limit of the out-of-scope verdict:** it holds only while no copy assigns a medical purpose. Once any copy does, MDR qualification and class are for a lawyer and a notified body: `[low-confidence — LEGAL REVIEW REQUIRED]`; the suite gives no verdict on them (`legal-guardrails.md` §5).
-- **SAFE wellness framing (keep):** "supports relaxation", "may help you relax / unwind / feel calmer", "general wellbeing", "a mindfulness/breathing practice", "not a medical device", "not a substitute for professional medical advice — consult a doctor". `[settled — MDR Recital 19, verified 2026-11-18]`
+- **SAFE wellness framing (keep):** "supports relaxation", "may help you relax / unwind / feel calmer", "general wellbeing", "a `<app category>` practice" (e.g. mindfulness), "not a medical device", "not a substitute for professional medical advice — consult a doctor". `[settled — MDR Recital 19, verified 2026-11-18]`
 - **Output:** `MDR out-of-scope — wellness framing intact` OR a list of offending phrases + which surface they appear on.
 
 > **Cross-reference (platform):** Apple Guideline **1.4.1** (medical claims must be substantiated or are rejected) and Google Play **Health Content & Services** policy reinforce the same firewall. Keeping clean of MDR also keeps clean of these. See `references/app-stores/` for those.
@@ -109,7 +109,7 @@ Scan **store listings, in-app copy, PP, ToS, the health disclaimer, and all mark
 
 `[settled — FTC 2024 Final Rule, 89 FR 47028 (FR doc. 2024-10855), background section, verified 2026-11-18]` The FTC explains: because the statute requires a PHR to be "an electronic record … that can be **drawn from multiple sources**", **health apps likely qualify as PHRs covered by the Rule *if they are capable of drawing information from multiple sources*.** This capability is the hinge.
 
-**Application (worked: example app):** the example app records breathing-session data the **user generates inside the app only**. It does **not** import from HealthKit, Google Fit, a wearable, or any external health source. → It lacks the "technical capacity to draw information from **multiple sources**" → it is **not a "personal health record"** → its publisher is **not a "vendor of personal health records"** → **HBNR does not apply.** `[low-confidence]` on the ultimate classification — this is a fact-specific call US counsel should confirm; the FTC has read "multiple sources" broadly (e.g., app + device APIs + user input can together count), so the *absence of any external health integration* is what carries the conclusion. Record the integration inventory as evidence.
+**Application:** an app that records session data the **user generates inside the app only**, and does **not** import from HealthKit, Google Fit, a wearable, or any external health source, lacks the "technical capacity to draw information from **multiple sources**" → it is **not a "personal health record"** → its publisher is **not a "vendor of personal health records"** → **HBNR does not apply.** `[low-confidence]` on the ultimate classification — this is a fact-specific call US counsel should confirm; the FTC has read "multiple sources" broadly (e.g., app + device APIs + user input can together count), so the *absence of any external health integration* is what carries the conclusion. Record the integration inventory as evidence.
 
 ## 7. 2024 final-rule amendments (why wellness apps are now on the radar)
 
@@ -138,20 +138,20 @@ Scan **store listings, in-app copy, PP, ToS, the health disclaimer, and all mark
 
 ---
 
-## 10. Classification output template (shown with the example app's outcome; fill in the app's own)
+## 10. Classification output template (fill in the app's own; one app's filled-in block: `worked-example.md` §4)
 
 ```
 HEALTH-APP CLASSIFICATION GATE — <app name> — <date>
 
-EU MDR 2017/745:  OUT OF SCOPE
-  - No medical purpose (Art. 2(1)); lifestyle/well-being carve-out (Recital 19).
+EU MDR 2017/745:  OUT OF SCOPE | AT RISK → ESCALATE
+  - Medical purpose (Art. 2(1)): none | <phrase>; lifestyle/well-being carve-out (Recital 19): applies | does not apply
   - Claim-scan result: [PASS — wellness framing intact] / [FAIL — phrases: ...]
-  - Software functions limited to delivery + storage/sync (not MDSW).
+  - Software functions limited to delivery + storage/sync (not MDSW): yes | no
   - If scoped-in: likely Class IIa (Annex VIII Rule 11) → CE marking. ESCALATE.
 
-US FTC HBNR (16 CFR 318):  NOT A PHR VENDOR
-  - No "technical capacity to draw from multiple sources":
-    HealthKit? NO. Google Fit? NO. Wearable/3P health API? NO.
+US FTC HBNR (16 CFR 318):  NOT A PHR VENDOR | AT RISK → ESCALATE
+  - "Technical capacity to draw from multiple sources": none | <source>
+    HealthKit? <yes/no>. Google Fit? <yes/no>. Wearable/3P health API? <yes/no>.
   - Integration inventory attached as evidence.
   - Conditional: adding any external health import → re-run; HBNR may apply
     (60-day individual notice; FTC at the same time if 500+; penalty up to $53,088/violation).
@@ -166,6 +166,6 @@ Adjudicated by: <skill/agent> — binding determination deferred to: jurist (MDR
 
 - **Closed 2026-11-18:** MDCG 2019-11 Rev.1 (June 2025) read on the EC site: §3.1 names wellness or fitness apps as non-MDSW and keeps the "processing ≠ MDSW without a medical purpose" point; Figure 1 has five decision steps (§3.3). The life-style carve-out is MDR Recital 19's own wording, not MDCG's.
 - **Closed 2026-11-18:** pins added: MDCG Rev.1 §§3.1, 3.3, 4.2.1; Rule 11 = MDR Annex VIII §6.3 (MDCG sub-rules 11a–11c); §318.2 "covered health care provider", "health care services or supplies" and the access-presumption sentence of "breach of security".
-- `[low-confidence]` Ultimate **HBNR PHR-vendor** classification for a self-contained wellness app (the example app) — the "multiple sources" test is fact-specific and the FTC reads it broadly; US counsel should confirm a purely self-contained app stays out.
+- `[low-confidence]` Ultimate **HBNR PHR-vendor** classification for a self-contained wellness app — the "multiple sources" test is fact-specific and the FTC reads it broadly; US counsel should confirm a purely self-contained app stays out.
 - **Closed 2026-11-18:** no 2026 adjustment; the FTC keeps the 2025 figure of $53,088 (FR doc. 2026-18853).
 - `[low-confidence]` Whether "per violation" multiplies per-individual/per-day for HBNR penalties.

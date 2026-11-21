@@ -9,7 +9,9 @@
 # one working tree share it.
 #
 # A task section starts at a heading like "### Task 4: ..." and ends at the
-# next "Task <number>" heading. Headings inside fenced code are ignored.
+# next heading of its own level or higher ("### Task 5", "## Rollout notes");
+# a deeper subheading ("#### Notes") stays in. Headings inside fenced code
+# are ignored.
 set -euo pipefail
 
 if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
@@ -36,9 +38,19 @@ fi
 
 awk -v want="$task_no" '
   /^```/ { fenced = !fenced }
-  !fenced && /^#+[ \t]+Task[ \t]+[0-9]+/ {
-    # The requested label is used as a pattern, so "4a" and "1.5" work too.
-    inside = ($0 ~ ("^#+[ \t]+Task[ \t]+" want "([^0-9]|$)"))
+  !fenced && /^#+([ \t]|$)/ {
+    level = match($0, /[^#]/) ? RSTART - 1 : length($0)
+    if (inside && level <= start_level) inside = 0
+    if (!inside) {
+      # The label is compared as text, not as a pattern, so "1" never takes
+      # "Task 10", "Task 1.5" or "Task 1a"; it must end at ":", a blank or
+      # the end of the line (a "\r" there is the end of a CRLF line).
+      label = $0
+      if (sub(/^#+[ \t]+Task[ \t]+/, "", label) && index(label, want) == 1) {
+        rest = substr(label, length(want) + 1)
+        if (rest == "" || rest ~ /^[: \t\r]/) { inside = 1; start_level = level }
+      }
+    }
   }
   inside { print }
 ' "$plan_file" > "$brief"

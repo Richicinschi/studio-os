@@ -72,6 +72,7 @@ Quality bar:
 Avoid:
 - Tactic lists with no sequence; moves the current team cannot run; paid spend before money exists; skipping uncomfortable metrics such as churn; generic phrases ("build community", "improve SEO"); ignoring voice; padding with skills or ideas the client does not need; forgetting past work.
 
-Tone: write for sharp, busy, skeptical founders as a thoughtful colleague. Direct claims, named tradeoffs, stated assumptions. The executive summary reads in 60 seconds. English only; no em or en dashes in the plan text. Sending or publishing the plan to anyone outside the user's own files needs an explicit yes first.
+Tone: write for sharp, busy, skeptical founders as a thoughtful colleague. Direct claims, named tradeoffs, stated assumptions. The executive summary reads in 60 seconds. Sending or publishing the plan to anyone outside the user's own files needs an explicit yes first.
+Write the plan in the language the user works in; no em or en dashes in the plan text.
 
 Worked illustration of depth and tone: [worked-example.md](marketing-plan/references/worked-example.md) (invented scenario).

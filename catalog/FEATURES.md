@@ -5,7 +5,7 @@
 Every item you can adopt from this kit, by module, with two flags:
 
 - **Importance:** `core` means the rest of the adoption depends on it; `recommended` fixes a problem most people have; `optional` fixes a problem only some have. The Why column says which problem.
-- **Context cost:** `none` runs outside Claude, like a git hook; `on demand` loads only when it is used, like a skill's body; `every session` loads before your first message, like an instruction file or a skill's description. Token counts are estimates (the size in bytes divided by 4), and an item at 1,000 tokens or more every session is marked heavy.
+- **Context cost:** `none` runs outside Claude, like a git hook; `on demand` loads only when it is used, like a skill's body; `every session` loads before your first message, like an instruction file or a skill's description; `you start it by name` is a skill Claude cannot start itself, so its description never loads and it costs nothing every session. Token counts are estimates (the size in bytes divided by 4), and an item at 1,000 tokens or more every session is marked heavy.
 
 Tick whole modules, or pick single items from any module. `drill-to-adopt` asks you and writes your answers to `adoption/features.md` in your setup. Each item has an adoption card, `cards/<item>.md`: how it is detected, what you are asked, what it needs, the steps, the check, the undo and what to watch out for.
 
@@ -16,14 +16,14 @@ The kit's own skills, `drill-to-adopt`, `vet-and-adopt` and `setup-workspace`, a
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
 | front-door | practice: The front-door instruction file | recommended | Without one file every session reads first, each session guesses who you are, what the rules are and what to load. | every session | 358 |
-| handoff | skill | recommended | A new day starts from zero; the handoff note, and the skill that writes it, let the next session start where you stopped. | description every session, body on demand (about 1,816) | 73 |
+| handoff | skill | recommended | A new day starts from zero; the handoff note, and the skill that writes it, let the next session start where you stopped. | description every session, body on demand (about 1,595) | 76 |
 | memory-index | practice: The memory folder with its index | recommended | Chat history is not memory; one fact per file and a one-line index let the next session find what was learned. | every session | 55 |
 | session-end-check | practice: A check before a session ends | recommended | Work left uncommitted or unpushed at the end of a session is found days later, or never; this names it before you stop. | none | 0 |
 | vault | practice: The memory vault | recommended | Shortening memory to make room loses it; the vault keeps the full text word for word and leaves a pointer behind. | on demand | 0 |
 | decision-log | practice: A decision log | optional | A decision whose reason was never written gets argued again months later; one dated entry per decision keeps the why. | every session | 51 |
 | session-start-status | practice: A status line at the start of a session | optional | Unpushed work, stale branches and an outdated front door show up at the start, in at most ten lines. | every session | 200 |
 
-Every session for this module: about 737 tokens (estimate).
+Every session for this module: about 740 tokens (estimate).
 
 ## Context and models (`02-context-and-models`)
 
@@ -38,11 +38,11 @@ Every session for this module: about 89 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| brainstorming | skill | recommended | Building starts before anyone says what "done" means; this turns an idea into a design you approve first. | description every session, body on demand (about 3,520) | 67 |
+| brainstorming | skill | recommended | Building starts before anyone says what "done" means; this turns an idea into a design you approve first. | description every session, body on demand (about 3,517) | 67 |
 | setup-check | practice: Check my setup | recommended | Adopted items drift: a hook switched off, a tool uninstalled; one command re-runs every check from your adoption plan. | none | 0 |
-| writing-plans | skill | recommended | An approved design becomes small tasks, each with its own check, so progress can be seen and resumed. | description every session, body on demand (about 2,537) | 49 |
+| writing-plans | skill | recommended | An approved design becomes small tasks, each with its own check, so progress can be seen and resumed. | description every session, body on demand (about 2,528) | 49 |
 | coding-guidelines | practice: Coding guidelines for Claude | optional; recommended for software, ml, data | Four short rules that stop Claude guessing, overbuilding and tidying code you did not mention. | on demand | 0 |
-| drill-to-plan | skill | optional | For a vague, big ask: it interviews you one question at a time until the spec leaves no decision open. | description every session, body on demand (about 1,801) | 72 |
+| drill-to-plan | skill | optional | For a vague, big ask: it interviews you one question at a time until the spec leaves no decision open. | description every session, body on demand (about 1,749) | 72 |
 | executing-plans | skill | optional | Claude carries out a written plan task by task in one session, with a ledger that survives forgetting and one review at the end. | description every session, body on demand (about 4,127) | 53 |
 | verification-before-completion | skill | optional; recommended for software, ml, data | A passing check is often a broken check; nothing is called done until the command that proves it has run. | description every session, body on demand (about 1,087) | 58 |
 | verify-before-push | practice: One local check before every push | optional; recommended for software, ml, data | A push that breaks the build is found by someone else; one script that runs every test and lint first finds it on your machine. | every session | 32 |
@@ -54,9 +54,9 @@ Every session for this module: about 331 tokens (estimate).
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
 | dispatching-parallel-agents | skill | optional | When work splits into independent parts, they run at the same time instead of one after another. | description every session, body on demand (about 1,463) | 54 |
-| improve | skill | optional | Reads a whole codebase and writes ranked, self-contained plans for other sessions to carry out; it changes nothing itself. | description every session, body on demand (about 3,184) | 74 |
+| improve | skill | optional | Reads a whole codebase and writes ranked, self-contained plans for other sessions to carry out; it changes nothing itself. | description every session, body on demand (about 3,173) | 74 |
 | long-jobs-in-containers | practice: Long jobs in named containers | optional; recommended for ml | A long job in a background shell dies unseen; a named container survives, can be watched, and keeps heavy work off your main machine. | every session | 77 |
-| subagent-driven-development | skill | optional | Runs a plan's independent tasks through subagents, with one review at the end, while the main thread keeps deciding. | description every session, body on demand (about 4,171) | 63 |
+| subagent-driven-development | skill | optional | Runs a plan's independent tasks through subagents, with one review at the end, while the main thread keeps deciding. | description every session, body on demand (about 4,155) | 63 |
 
 Every session for this module: about 268 tokens (estimate).
 
@@ -66,7 +66,7 @@ Every session for this module: about 268 tokens (estimate).
 |---|---|---|---|---|---|
 | skillspector | outside tool: SkillSpector with the scan-first rule | core | A copied skill can carry a prompt injection or send data out; every later item is scanned with it before it is installed. | none | 0 |
 | writing-great-skills | skill | recommended | Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable. | description every session, body on demand (about 2,045) | 74 |
-| using-agent-skills | skill | optional | Once you lose track of your skills: one router that names each skill and when to reach for it. | description every session, body on demand (about 1,207) | 56 |
+| using-agent-skills | skill | optional | Once you lose track of your skills: one router that names each skill and when to reach for it. | description every session, body on demand (about 994) | 56 |
 
 Every session for this module: about 130 tokens (estimate).
 
@@ -74,22 +74,22 @@ Every session for this module: about 130 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 2,809) | 64 |
+| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 2,799) | 64 |
 | git-hooks | practice: The git hook templates | recommended | Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands. | none | 0 |
 | sensitive-file-deny-rules | practice: Deny rules for secret files | recommended | A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files. | none | 0 |
 | commit-and-pr-writing | practice: Commit messages and PR bodies that say why | optional; recommended for software, ml, data | A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does. | every session | 69 |
-| finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 2,225) | 33 |
-| git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | description every session, body on demand (about 2,575) | 46 |
+| finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 2,230) | 33 |
+| git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | you start it by name, body on demand (about 2,581) | 0 |
 | git-identity-per-folder | practice: One git identity per folder | optional; recommended for software, ml, data | Company work committed under a personal address, or the reverse, is hard to undo; each folder picks its own address. | none | 0 |
 | grant-ledger | practice: The grant ledger for risky acts | optional; recommended for software, ml, data | One recorded yes per force-push, merge, tag or hook skip, so a vague "clean up" never covers an act you did not name. | every session | 101 |
 | merge-commit-only | practice: Merge commits only | optional; recommended for software, ml, data | A squash folds a branch into one commit and a rebase rewrites every one; a merge commit keeps the full history. | every session | 78 |
 | never-share-list | practice: A never-share list | optional; recommended for software, ml, data | Client names and internal terms leak through commits and posts; a private list the pre-commit checks refuses them first. | every session | 61 |
 | rules-audit | practice: The periodic rules audit | optional; recommended for software, ml, data | Rules drift from what enforces them; a read-only session every few months finds contradictions and gaps. | on demand | 0 |
 | signed-commits | practice: Signed commits | optional; recommended for software, ml, data | A signature proves a commit came from you; some companies require it, and a server shows signed commits as verified. | none | 0 |
-| using-git-worktrees | skill | optional; recommended for software, ml, data | Sets up a separate worktree for a branch, so parallel work never switches branches under another session. | description every session, body on demand (about 1,688) | 57 |
+| using-git-worktrees | skill | optional; recommended for software, ml, data | Sets up a separate worktree for a branch, so parallel work never switches branches under another session. | description every session, body on demand (about 1,674) | 57 |
 | worktrees | practice: One worktree per parallel session | optional; recommended for software, ml, data | Two sessions in one checkout switch branches under each other; a worktree each keeps their work apart. | none | 0 |
 
-Every session for this module: about 509 tokens (estimate).
+Every session for this module: about 463 tokens (estimate).
 
 ## Identity and contract (`07-identity-and-contract`)
 
@@ -106,21 +106,21 @@ Every session for this module: about 303 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| bob-builder | agent | optional | Builds a planned feature test-first in its own worktree, so the main thread keeps planning. | description every session, body on demand (about 302) | 55 |
-| linus-reviewer | agent | optional; recommended for software, ml, data | Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line. | description every session, body on demand (about 369) | 51 |
+| bob-builder | agent | optional | Builds a planned feature test-first in its own worktree, so the main thread keeps planning. | description every session, body on demand (about 317) | 55 |
+| linus-reviewer | agent | optional; recommended for software, ml, data | Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line. | description every session, body on demand (about 354) | 51 |
 | receiving-code-review | skill | optional; recommended for software, ml, data | Review feedback taken on trust, or argued away, both go wrong; this checks each point before acting on it. | description every session, body on demand (about 1,533) | 64 |
 | requesting-code-review | skill | optional; recommended for software, ml, data | A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges. | description every session, body on demand (about 705) | 49 |
-| sherlock-researcher | agent | optional | Deep research across many sources, with every claim cited, for questions one search will not settle. | description every session, body on demand (about 356) | 57 |
+| sherlock-researcher | agent | optional | Deep research across many sources, with every claim cited, for questions one search will not settle. | description every session, body on demand (about 320) | 45 |
 
-Every session for this module: about 276 tokens (estimate).
+Every session for this module: about 264 tokens (estimate).
 
 ## Data work (`09-data-work`)
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| claim-auditor | skill | optional; recommended for data, ml | A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships. | description every session, body on demand (about 1,069) | 74 |
+| claim-auditor | skill | optional; recommended for data, ml | A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships. | description every session, body on demand (about 1,035) | 74 |
 | diagnosing-bugs | skill | optional; recommended for software, ml, data | For a hard bug or a slowdown: it builds a feedback loop that can fail before it guesses at a cause. | description every session, body on demand (about 2,563) | 60 |
-| drawio-diagrams | skill | optional | Turns a system or data flow into an editable diagram file, kept on your machine. | description every session, body on demand (about 2,113) | 74 |
+| drawio-diagrams | skill | optional | Turns a system or data flow into an editable diagram file, kept on your machine. | description every session, body on demand (about 2,175) | 74 |
 | tdd | skill | optional; recommended for software, ml, data | Agent tool calls that were never tested fail in front of users; this builds features test-first, red then green. | description every session, body on demand (about 1,969) | 65 |
 
 Every session for this module: about 273 tokens (estimate).
@@ -161,26 +161,26 @@ A domain is a set of skills for one kind of job, installed together as a pack. E
 | Domain | What it is | Skills | Agents | Tokens every session | Index, on demand |
 |---|---|---|---|---|---|
 | advisor-council-for-big-decisions | Advisor council for big decisions: A panel of eight viewpoints (founder, skeptic, designer, architect, counsel, treasurer, user advocate, operator) for a real fork. | 1 | 8 | 49 | about 171 |
-| android-swiftui-react-native-app-building | Building phone apps: Android, SwiftUI and React Native: Build or review an Android, iPhone or React Native app, and fix a store rejection. | 3 | 0 | 57 | about 299 |
-| app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,200 |
-| audio-video-media | Audio, video and media: Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos. | 13 | 1 | 69 | about 1,112 |
-| dependency-supply-chain-risk-checks | Dependency supply-chain risk checks: The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities. | 1 | 0 | 43 | about 176 |
-| design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 18 | 1 | 74 | about 1,343 |
-| django-flask-laravel-shops-and-chat | Web back ends: Django, Flask, Laravel, shops, chat and jobs: Django, Flask and Laravel projects: shops, content back ends, live chat and updates, retrying background jobs. | 3 | 0 | 45 | about 273 |
-| engineering-testing-performance-code-design | Engineering: browser testing, performance and code design: Test a web page in a real browser, speed up slow code or pages, and shape the structure of a codebase. | 3 | 0 | 34 | about 319 |
-| games-design-prototype-playtest-assets | Games: design, prototype, playtest, art and ports: Make a game in any engine: the idea, a first playable, playtesting, art, screens and balancing numbers. | 8 | 0 | 56 | about 657 |
-| godot-camera-shaders-particles-export | Godot games: camera, shaders, particles, export and audit: Godot games: cameras, shaders, particle effects, tweening and animation, exporting builds, and a project audit. | 10 | 0 | 58 | about 865 |
-| learning-lessons-explanations-practice | Learning: lessons and explanations from zero: Learn something from zero: lesson by lesson, with spaced rechecks and practice before any test. | 1 | 0 | 37 | about 131 |
-| marketing-copy-emails-seo-signups | Marketing: copy, emails, search, signups and tests: Web and sales copy, emails and cold outreach, search optimisation, signup and onboarding, paywalls, A/B tests and analytics. | 16 | 0 | 57 | about 1,073 |
-| marketing-plans-offers-pricing-launches | Marketing: plans, offers, pricing and launches: A marketing plan, an offer and its pricing, a product launch, referrals, ads, competitor and customer studies, social posts. | 16 | 0 | 50 | about 1,010 |
-| mobile-apps-flutter-firebase | Mobile apps: Flutter and Firebase: Flutter apps and Firebase: screens, tests, routing, translations, sign-in, databases, crash reports, hosting and security rules. | 18 | 0 | 49 | about 1,252 |
-| phone-app-testing-release-and-agents | Phone apps: testing, release checks, crash reports, agents and adb: Try an app on a phone, read crash reports, prepare a store release, and let an AI agent use a phone. | 8 | 0 | 57 | about 649 |
-| python-backend-fastapi-docker-agents | Python back ends: FastAPI, Docker and AI agents: Set up a Python project, build a FastAPI service, harden a Docker image, or build an AI agent in Python. | 4 | 0 | 36 | about 435 |
-| stock-research-backtests-trading-safety | Stocks, backtests, trading safety and budgets: Research a company, test a trading rule without fooling yourself, and set trading limits. No buy or sell advice. | 10 | 0 | 58 | about 779 |
-| unity-editor-scripts-prefabs-builds | Unity games: editor, scripts, prefabs, tests and builds: Unity games: C# scripts, scenes and prefabs, testing in the editor, profiling and builds for PC and phones. | 6 | 0 | 48 | about 466 |
-| web-api-security-login-and-graphql | Web back ends: API design, security, sign-in and GraphQL: Design or review a web API, check a server's security headers, add sign-in and roles, build GraphQL. | 4 | 0 | 45 | about 309 |
-| web-astro-cloudflare-gsap-performance | Websites: Astro, Cloudflare, animation and speed: Astro sites, Cloudflare Workers, GSAP animation, site structure, structured data, speed and local business sites. | 10 | 0 | 59 | about 739 |
-| web-search-and-scraping-into-files | Searching the web and pulling page data into files, lawfully: Pull data from web pages or search results into a file or spreadsheet, and check whether a site allows it. | 1 | 0 | 52 | about 165 |
+| android-swiftui-react-native-app-building | Building phone apps: Android, SwiftUI and React Native: Build or review an Android, iPhone or React Native app, and fix a store rejection. | 3 | 0 | 57 | about 330 |
+| app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,171 |
+| audio-video-media | Audio, video and media: Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos. | 13 | 1 | 69 | about 1,119 |
+| dependency-supply-chain-risk-checks | Dependency supply-chain risk checks: The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities. | 1 | 0 | 43 | about 170 |
+| design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 18 | 1 | 74 | about 1,344 |
+| django-flask-laravel-shops-and-chat | Web back ends: Django, Flask, Laravel, shops, chat and jobs: Django, Flask and Laravel projects: shops, content back ends, live chat and updates, retrying background jobs. | 3 | 0 | 45 | about 274 |
+| engineering-testing-performance-code-design | Engineering: browser testing, performance and code design: Test a web page in a real browser, speed up slow code or pages, and shape the structure of a codebase. | 3 | 0 | 34 | about 305 |
+| games-design-prototype-playtest-assets | Games: design, prototype, playtest, art and ports: Make a game in any engine: the idea, a first playable, playtesting, art, screens and balancing numbers. | 8 | 0 | 56 | about 658 |
+| godot-camera-shaders-particles-export | Godot games: camera, shaders, particles, export and audit: Godot games: cameras, shaders, particle effects, tweening and animation, exporting builds, and a project audit. | 10 | 0 | 58 | about 854 |
+| learning-lessons-explanations-practice | Learning: lessons and explanations from zero: Learn something from zero: lesson by lesson, with spaced rechecks and practice before any test. | 1 | 0 | 30 | about 132 |
+| marketing-copy-emails-seo-signups | Marketing: copy, emails, search, signups and tests: Web and sales copy, emails and cold outreach, search optimisation, signup and onboarding, paywalls, A/B tests and analytics. | 16 | 0 | 57 | about 1,074 |
+| marketing-plans-offers-pricing-launches | Marketing: plans, offers, pricing and launches: A marketing plan, an offer and its pricing, a product launch, referrals, ads, competitor and customer studies, social posts. | 16 | 0 | 50 | about 1,011 |
+| mobile-apps-flutter-firebase | Mobile apps: Flutter and Firebase: Flutter apps and Firebase: screens, tests, routing, translations, sign-in, databases, crash reports, hosting and security rules. | 18 | 0 | 49 | about 1,253 |
+| phone-app-testing-release-and-agents | Phone apps: testing, release checks, crash reports, agents and adb: Try an app on a phone, read crash reports, prepare a store release, and let an AI agent use a phone. | 8 | 0 | 57 | about 650 |
+| python-backend-fastapi-docker-agents | Python back ends: FastAPI, Docker and AI agents: Set up a Python project, build a FastAPI service, harden a Docker image, or build an AI agent in Python. | 4 | 0 | 36 | about 398 |
+| stock-research-backtests-trading-safety | Stocks, backtests, trading safety and budgets: Research a company, test a trading rule without fooling yourself, and set trading limits. No buy or sell advice. | 10 | 0 | 58 | about 780 |
+| unity-editor-scripts-prefabs-builds | Unity games: editor, scripts, prefabs, tests and builds: Unity games: C# scripts, scenes and prefabs, testing in the editor, profiling and builds for PC and phones. | 6 | 0 | 48 | about 497 |
+| web-api-security-login-and-graphql | Web back ends: API design, security, sign-in and GraphQL: Design or review a web API, check a server's security headers, add sign-in and roles, build GraphQL. | 4 | 0 | 45 | about 310 |
+| web-astro-cloudflare-gsap-performance | Websites: Astro, Cloudflare, animation and speed: Astro sites, Cloudflare Workers, GSAP animation, site structure, structured data, speed and local business sites. | 10 | 0 | 59 | about 735 |
+| web-search-and-scraping-into-files | Searching the web and pulling page data into files, lawfully: Pull data from web pages or search results into a file or spreadsheet, and check whether a site allows it. | 1 | 0 | 52 | about 196 |
 
 ## Not in this version
 

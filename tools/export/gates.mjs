@@ -1,14 +1,16 @@
 // tools/export/gates.mjs
-// The export gates (secrets incl. gitleaks, privacy, paths, risky, accounting, links) plus the --note and
-// diagram-link checks. Each returns findings; any finding fails the export. Privacy findings name the
-// deny-list position, never the term.
+// The export gates (secrets incl. gitleaks, privacy, paths, risky, studio blocks, studio markers, dangling names, JSON, accounting, links) plus
+// the --note and diagram-link checks. Each returns findings; any finding fails the export. Privacy findings
+// name the deny-list position, never the term.
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { closeSync, existsSync, mkdtempSync, openSync, readdirSync, readFileSync, readSync, rmSync, statSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { inflateRawSync } from 'node:zlib';
-import { findSecrets, findDenied, findPaths, findRisky, fileKind, PATHS_ALLOW, RISKY_ALLOW } from './rules.mjs';
+import { findSecrets, findDenied, findPaths, findRisky, fileKind, PATHS_ALLOW, RISKY_ALLOW, findStudioMarkers, STUDIO_ALLOW, findMarkers, MARKERS_ALLOW } from './rules.mjs';
 import { isMenuItem } from './manifest.mjs';
+
+export { MARKERS_ALLOW };
 
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
 // The rule source itself spells out the patterns it looks for; every other file is checked.
@@ -80,11 +82,102 @@ export const gatePaths = (root, allow = PATHS_ALLOW) => gateLines(root, findPath
 
 export const gateRisky = (root, allow = RISKY_ALLOW) => gateLines(root, findRisky, allow);
 
+// The build cuts the studio's own blocks from shipped Markdown; any marker word still in a text file fails.
+export const gateStudioBlocks = (root, allow = STUDIO_ALLOW) => gateLines(root, findStudioMarkers, allow);
+
+// Studio words (the hub, hard rule, G1 to G8 …) in any text file under catalog/; findMarkers skips the rest.
+export const gateMarkers = (root, allow = MARKERS_ALLOW) => gateLines(root, findMarkers, allow);
+
+// Names from outside the studio that a shipped file may use although the studio has an item of that name:
+// { file, name, why }. An entry passes only that name, only in that file.
+export const NAMES_ALLOW = [];
+
+// The inline-code spans of one line: a run of n backticks up to the next run of exactly n; a run with no
+// partner is plain text. Each span's content is trimmed.
+function codeSpans(line) {
+  const spans = [];
+  const runs = [...line.matchAll(/`+/g)];
+  for (let i = 0; i < runs.length; i++) {
+    const j = runs.findIndex((r, k) => k > i && r[0].length === runs[i][0].length);
+    if (j < 0) continue;
+    const start = runs[i].index + runs[i][0].length;
+    spans.push({ from: runs[i].index, to: runs[j].index + runs[j][0].length, text: line.slice(start, runs[j].index).trim() });
+    i = j;
+  }
+  return spans;
+}
+
+// The names one line of Markdown cites: inline code whose whole content (a leading / dropped, as in a slash
+// command) is a name, and each [[name]] or [[name|label]] outside inline code.
+function citedNames(line) {
+  const spans = codeSpans(line);
+  let prose = line;
+  for (const s of [...spans].reverse()) prose = `${prose.slice(0, s.from)} ${prose.slice(s.to)}`;
+  return {
+    code: spans.map((s) => s.text.replace(/^\//, '')),
+    linked: [...prose.matchAll(/\[\[([^\]\n]+?)\]\]/g)].map((m) => m[1].split('|')[0].trim()),
+  };
+}
+
+// A name the studio has but the kit does not ship, cited in inline code or [[linked]], points the adopter at
+// nothing; so does any [[linked]] name the kit does not ship. Checked in every .md file under catalog/,
+// fenced blocks (``` and ~~~) skipped; one finding per name per line. A private name (names.private) is
+// reported without the name, which only the privacy list may hold, and no allow entry passes it.
+export function gateNames(root, names, allow = NAMES_ALLOW) {
+  const studio = new Set(names.studio);
+  const shipped = new Set(names.shipped);
+  const priv = new Set(names.private || []);
+  const findings = [];
+  for (const r of kitFiles(root).filter((f) => f.startsWith('catalog/') && /\.md$/i.test(f))) {
+    let fence = null;
+    read(root, r).split(/\r?\n/).forEach((line, i) => {
+      const f = line.match(/^\s*(`{3,}|~{3,})(.*)$/);
+      if (fence) { if (f && f[1][0] === fence[0] && f[1].length >= fence.length && !f[2].trim()) fence = null; return; }
+      // A backtick fence's info string holds no backtick: ```name``` on its own is inline code.
+      if (f && !(f[1][0] === '`' && f[2].includes('`'))) { fence = f[1]; return; }
+      const { code, linked } = citedNames(line);
+      const found = [...code.filter((n) => (studio.has(n) || priv.has(n)) && !shipped.has(n)), ...linked.filter((n) => !shipped.has(n))];
+      for (const n of new Set(found)) {
+        if (priv.has(n)) findings.push(`${r}:${i + 1} names a private studio item (on the private list, private.local.txt, or in a hub pack whose pack.json says public: false)`);
+        else if (!allow.some((a) => a.file === r && a.name === n)) findings.push(`${r}:${i + 1} names ${n}, which the kit does not ship`);
+      }
+    });
+  }
+  return findings;
+}
+
+// Every .json file the kit ships parses. A leading byte order mark is a finding too: JSON.parse refuses it,
+// and the parser message would print the invisible character, so it gets its own message.
+export function gateJson(root) {
+  return kitFiles(root).filter((r) => r.endsWith('.json')).flatMap((r) => {
+    const text = read(root, r);
+    if (text.startsWith('\uFEFF')) return [`${r}: not valid JSON (starts with a byte order mark, U+FEFF)`];
+    try { JSON.parse(text); return []; } catch (e) { return [`${r}: not valid JSON (${e.message})`]; }
+  });
+}
+
+// The files under each of dirs (a folder or a single file; one that is missing is skipped) whose first two
+// bytes are #!, relative to root with /, sorted. Only those two bytes are read.
+export function shebangFiles(root, dirs) {
+  const head = Buffer.alloc(2);
+  const starts = (r) => {
+    const fd = openSync(path.join(root, r), 'r');
+    try { return readSync(fd, head, 0, 2, 0) === 2 && head[0] === 0x23 && head[1] === 0x21; } finally { closeSync(fd); }
+  };
+  const under = (d) => {
+    if (!existsSync(path.join(root, d))) return [];
+    return statSync(path.join(root, d)).isDirectory() ? walkFiles(root, d) : [d];
+  };
+  return dirs.flatMap(under).filter(starts).sort();
+}
+
+// A note becomes changelog text after the gates have run, so it is held to the same rules first.
 export function gateNotes(notes, deny) {
   return notes.flatMap((n, i) => [
     ...findDenied(n, deny).map((f) => `--note ${i + 1}: ${term(deny, f)}`),
     ...findPaths(n).map((f) => `--note ${i + 1}: ${f.reason}`),
     ...findSecrets(n).map((f) => `--note ${i + 1}: ${f.reason}`),
+    ...findStudioMarkers(n).map((f) => `--note ${i + 1}: ${f.reason}`),
   ]);
 }
 

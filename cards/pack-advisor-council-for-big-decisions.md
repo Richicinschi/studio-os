@@ -6,6 +6,8 @@ tokens:
   light: 49
   standard: 49
   full: 560
+other_figures:
+  - 190
 ---
 
 # Domain: a council of viewpoints for big decisions
@@ -25,8 +27,9 @@ Read-only: names, descriptions and counts, never a skill's or an agent's instruc
 - How many agent files exist at each level: `ls .claude/agents/*.md 2>/dev/null | wc -l` and `ls "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/agents/*.md 2>/dev/null | wc -l`.
 - Another skill or agent that already runs a panel (a "board", "panel", "second opinion" or "debate" in its description). Print each file's `name` and `description` lines and nothing below them:
   `awk 'FNR==1{n=0} /^---[[:space:]]*$/{n++; next} n==1 && /^(name|description):/{p=1; print FILENAME": "$0; next} n==1 && p && /^[[:space:]]/{print FILENAME": "$0; next} {p=0}' .claude/skills/*/SKILL.md .claude/agents/*.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/agents/*.md 2>/dev/null`
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/advisor-council-for-big-decisions/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the domain **have** when the pack's folder and the `council` skill exist and at least three seats are in place; **partly** when only some of that is true, or another skill already runs a panel; and **not yet** otherwise.
+The menu marks the domain **have** when the pack's folder and the `council` skill exist and at least three seats are in place; **partly** when only some of that is true, or another skill already runs a panel; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -70,7 +73,7 @@ The menu marks the domain **have** when the pack's folder and the `council` skil
 
 ## Watch out
 
-- **Every seat's description loads every session.** All eight cost about 540 tokens (estimate) together with the entry; three cost about 190. The council's instructions load only when it runs.
+- **Every seat's description loads every session.** All eight cost about 540 tokens every session (estimate) together with the entry; three cost about 190. The council's instructions load only when it runs.
 - **A debate costs about seats times rounds.** Four seats over two rounds are eight subagent runs.
 - **Parallel agents have a rate cost of their own.** Many seats at once can reach a session limit; a cap per round is cheap insurance.
 - **A brief that reads like agreement has lost its point.** If it shows no conflict, ask for the disagreements again.

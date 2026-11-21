@@ -24,13 +24,14 @@ Read-only: folder names, the front matter of skills and agents (their name and d
 - A skill of the same name: `ls -d .claude/skills/drawio-diagrams "$U/skills/drawio-diagrams" 2>/dev/null`.
 - Another skill or agent doing the same job, read from front matter only (the lines between the first two `---`); it prints the matching file names:
   `for f in .claude/skills/*/SKILL.md "$U"/skills/*/SKILL.md .claude/agents/*.md "$U"/agents/*.md; do awk '/^---$/{n++; next} n==1' "$f" 2>/dev/null | grep -qiE 'diagram|draw\.?io|flowchart|mermaid|excalidraw' && echo "$f"; done`
-- What the skill can use on this machine: `command -v python3 py uv dot drawio` prints a path for each one found. `py` is the Windows Python launcher; `uv` runs the scripts the way the kit copy writes them outside Windows (`uv run python`); `dot` is Graphviz; `drawio` is the draw.io desktop app's command line.
+- What the skill can use on this machine: `command -v python3 py dot drawio` prints a path for each one found. The kit copy runs Python as `python3`; `py` is the Windows Python launcher, which it uses as `py -3` where there is no `python3`; `dot` is Graphviz; `drawio` is the draw.io desktop app's command line.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/drawio-diagrams/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a skill named `drawio-diagrams` exists, or another skill writes `.drawio` files; **partly** when another diagram skill exists for a different format (Mermaid or Excalidraw, for example); **not yet** otherwise.
+The menu marks the item **have** when a skill named `drawio-diagrams` exists, or another skill writes `.drawio` files; **partly** when another diagram skill exists for a different format (Mermaid or Excalidraw, for example); **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
-1. **"Take drawio-diagrams?"** (ADOPT as it is is not offered: its description's examples name the studio's own projects.)
+1. **"Take drawio-diagrams?"** (ADOPT as it is is not offered: its front matter names the studio as category and author, and its planning step speaks of "a project in this workspace", the studio's.)
    - ADAPT: the kit copy with your examples, your Python command and the delivery you choose below. Recommended when Detect says **not yet** and you document systems or data flows.
    - FOLD: the write-then-validate step into the diagram skill you have, if it also writes `.drawio` files. Recommended when Detect says **have** through another skill.
    - Skip. Recommended when Detect says **have** with this same skill, or **partly** and that other format serves you, or you do not draw diagrams.
@@ -52,11 +53,8 @@ The menu marks the item **have** when a skill named `drawio-diagrams` exists, or
 
 ## Needs
 
-- Python 3, to run the script Claude writes for each diagram, the structure check and the link script; the kit's scripts use only Python's standard library. The kit copy calls `py -3.13` on Windows and `uv run python` elsewhere. Installing Python is not documented in docs/facts.md as of 2026-11-02.
-- uv, only if you keep the `uv run python` form ([docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux"):
-  - Windows: `! powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`;
-  - macOS and Linux: `! curl -LsSf https://astral.sh/uv/install.sh | sh`.
-- Microsoft Edge or Google Chrome, for the render check: the kit copy takes a screenshot of the SVG with the browser's headless mode (run without a window), `msedge.exe --headless=new --screenshot=<png> ...` in its example. Those flags come from the skill's SKILL.md, not from docs/facts.md as of 2026-11-02.
+- Python 3, to run the script Claude writes for each diagram, the structure check and the link script; the kit's scripts use only Python's standard library. The kit copy runs it as `python3`, and as `py -3` on Windows, which often has no `python3`. Installing Python is not documented in docs/facts.md as of 2026-11-02.
+- Microsoft Edge or Google Chrome, for the render check: the kit copy takes a screenshot of the SVG with the browser's headless mode (run without a window), `chrome.exe --headless=new --window-size=W,H --user-data-dir=<scratch dir> --screenshot=<png> ...` in its example, with Edge's `msedge.exe` taking the same flags. Those flags come from the skill's SKILL.md, not from docs/facts.md as of 2026-11-02.
 - Optional, Graphviz, for automatic layout of large diagrams (more than about 15 shapes): its `dot` command on the PATH. Without it, Claude places the shapes by hand. Its install is not documented in the skill's SKILL.md or in docs/facts.md as of 2026-11-02.
 - Optional, the draw.io desktop app, for PNG, SVG and PDF export:
   - macOS: `! brew install --cask drawio` (as SKILL.md gives it);
@@ -68,20 +66,19 @@ The menu marks the item **have** when a skill named `drawio-diagrams` exists, or
 1. **Claude:** runs `vet-and-adopt` on the kit copy, `catalog/skills/drawio-diagrams/`: `skillspector scan catalog/skills/drawio-diagrams --no-llm` (on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows). Expect DO_NOT_INSTALL; Claude shows each finding with its reading of it, and continues only when you have read them and say so (Watch out has the studio's triage).
 2. **you:** install what your answer to question 2 needs, if Detect did not find it: the draw.io desktop app for exports, and Graphviz if you want automatic layout.
 3. **Claude:** on your yes, writes the copy for your setup and shows you the change before it saves it:
-   - the description's examples rewritten with your own systems in place of the studio's project names, and its routing line to Excalidraw and Mermaid kept only for tools you have;
-   - the section that says the draw.io command line is "not installed here" rewritten for what Detect found on your machine, with your Python command for each system you use;
+   - the description's list of diagram kinds trimmed to the ones you draw, and its routing line to Excalidraw and Mermaid kept only for tools you have;
+   - the "Check which tools exist" section, which checks for the draw.io command line, Graphviz, Inkscape, rsvg-convert and Python before Claude picks a route: kept, with your Python command where it is neither `python3` nor `py -3`;
    - the delivery step set to your answer to question 2;
-   - "the owner" rewritten as you; the line that cites the studio's style rule and the day a link-only diagram broke it dropped, its reason kept in your words if you like; and the "house style to copy" pointer, which names a diagram file in the studio's own repository, pointed at a diagram of yours or dropped;
-   - the render check's browser command set to the browser you have, as your system starts it (the copy's example names Edge, `msedge.exe`);
-   - "for a workspace project, read its AGENTS.md first" pointed at your own instruction file;
+   - the render check's browser command set to the browser you have, as your system starts it (the copy's example names Chrome, `chrome.exe`, and Edge, `msedge.exe`);
+   - "When the diagram describes a project in this workspace, read that project's `AGENTS.md` first" pointed at your own instruction file;
    - nothing to drop in the references: the kit copy already says that its icon fetcher and code importers are not included (the studio removed the fetcher because it used the network);
-   - the front matter's author and the studio's notes dropped; the upstream source line kept; `LICENSE` (MIT, per the `LICENSE` file itself, the kit's only source for it) and `data/SHAPE-INDEX-NOTICE.md` kept with the shape index.
+   - the front matter's category and author set to yours; `data/SHAPE-INDEX-NOTICE.md` kept with the shape index.
 4. **Claude:** records the decision, the scope, the delivery, the scan result and its triage, and the undo in `adoption/decisions.md`.
 
 ## Check
 
 1. **you:** in a new session, ask "draw a diagram of <three parts of your system> and how data moves between them".
-2. Expected: a `.drawio` file, with the local SVG beside it when you kept that delivery, both named by full path; and the structure check run on it, `uv run python <skill folder>/scripts/validate.py <name>.drawio` (on Windows, `py -3.13`, or the Python command you set), ending in a line that starts with `0 error(s)`. Warnings may remain.
+2. Expected: a `.drawio` file, with the local SVG beside it when you kept that delivery, both named by full path; and the structure check run on it, `python3 <skill folder>/scripts/validate.py <name>.drawio` (on Windows, `py -3` in place of `python3`, or the Python command you set), ending in a line that starts with `0 error(s)`. Warnings may remain.
 3. **you:** open the diagram the way you chose in question 2 (the SVG in a browser, for the default). Expected: the three parts and their arrows, readable, and the same parts as the `.drawio` shows in draw.io.
 
 If the check reports errors, or the diagram does not open, the item is not done: the plan row stays unticked.
@@ -97,7 +94,7 @@ If the check reports errors, or the diagram does not open, the item is not done:
 
 - **The scan says DO_NOT_INSTALL, and the studio kept it.** The build of SkillSpector that reports 2.2.3 rated the kit copy 100/100 from 8 findings ([the kit's scan triage](../tools/export/scan-triage.md#drawio-diagrams-do_not_install-100100-8-findings), the run of 2026-11-09). The studio read each one: running Graphviz's `dot` locally, with a list of arguments and no shell (by design: automatic layout needs it); two lines of advice on saving a style preset to `~/.drawio-skill/styles/`, written only after you say "save" (by design); byte patterns inside the compressed shape index read as `rm` (four false positives); and a missing permissions line, though the front matter does declare its capabilities (false positive). By hand: the link script builds a link and makes no request itself, and the other scripts read and write local files only.
 - **The optional link loads a web page.** The diagram travels in the part of the link after `#`, which the browser does not send to the server, but opening it still loads the diagrams.net viewer from the web. Where internal designs must stay off outside websites, keep to the files.
-- **A link alone may go unopened.** The kit copy delivers a local SVG beside the `.drawio` file and a link only on request. Its SKILL.md gives the reason: a link handed back alone is not opened, a style rule the studio broke once and then wrote down.
+- **A link alone may go unopened.** The kit copy delivers a local SVG beside the `.drawio` file and a link only on request. Its SKILL.md gives the reason: the user may not open a hosted link, and a local file works offline.
 - **The SVG does not follow later edits.** It is drawn by the script, not exported from the `.drawio`. Change the diagram in the draw.io app and the SVG falls behind: change the script and run it again, or export a fresh SVG from the app.
 - **Context cost:** the description loads every session, about 74 tokens, one of the longer descriptions; when the list of descriptions outgrows its budget, Claude Code drops the least-used ones first ([docs/facts.md](../docs/facts.md), "Claude Code: measuring context and asking multiple choice"). The body, about 1,990 tokens, loads when the skill runs. Estimates (bytes divided by 4).
 - **Files outside the project.** Saving a style preset writes to `~/.drawio-skill/styles/`, and building one writes temporary files under `/tmp`. The render check writes its screenshot and a throwaway browser profile to the scratch folder it is given.

@@ -56,7 +56,7 @@ code itself — the flow set is an INPUT from `legal-data-surface-scan`.
 7. **Tag every legal proposition** with an attribution tier; cite the forcing provision at pinpoint where a grade rests on law (Art. 13(1)(e), Play User Data, ePrivacy 5(3)); outside the Netherlands and the EU, cite only the store rules (§9). Prefer the primary-source facts in `sdk-data-map.md` over paraphrase.
 8. **Emit** the flow-to-policy table + FLOW-n findings for every non-🟢 row, then a one-paragraph code-faithfulness summary. Surface anything outside this checklist as a MINOR "no silent supplement" note.
 
-## Entity-aware grading checklist (a Firebase + RevenueCat stack, the example app's in `legal-guardrails.md` §8 — facts in `sdk-data-map.md`)
+## Entity-aware grading checklist (a Firebase + RevenueCat stack, the worked example's in `legal-guardrails/references/worked-example.md` — facts in `sdk-data-map.md`)
 Grade each SDK the app actually ships, in every language the PP ships; for an SDK not listed here, build the same row from `sdk-data-map.md` or the SDK's own privacy docs. Severity floor = the higher when this overlaps another skill.
 - **Firebase Auth** (Google) — email, UID, tokens, **IP**; **US-only by architecture** → a blanket "EU region" PP line is **incorrect** 🔴 for this flow; needs US transfer + DPF/SCC named.
 - **Cloud Firestore** (Google) — profile, consent timestamps, **Pro** session history (off-device), **subscription mirror**. **FREE tier = on-device only** → a PP implying server-side history for all users is **incorrect** 🔴 for free users. EU `europe-west`.

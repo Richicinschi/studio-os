@@ -9,6 +9,7 @@ tokens:
 other_figures:
   - 30000
   - 1000
+  - 14
 ---
 
 # Rules loaded only when needed
@@ -35,9 +36,9 @@ The menu marks the item **have** when such a table exists, every file it names e
 ## Ask
 
 1. **"Size?"**
-   - Light: a table of two rows, for the two kinds of task whose rules you need most, each rule file written new from what you tell Claude. About 63 tokens every session (estimate). Recommended for a first adoption, and when Detect puts the front door and its imports under 1,000 tokens (estimate).
-   - Standard: a row for each kind of task that has rules of its own, each file written new; nothing in the front door moves. About 89 tokens with four rows (estimate), about 13 more for each further row.
-   - Full: standard, plus the task-only sections and `@` imports already in your front door moved into rule files word for word, each becoming a row. About 114 tokens with six rows (estimate), and the front door loses what moved: the saving is the moved text's bytes divided by 4. Recommended when Detect puts the front door and its imports at 1,000 tokens or more (estimate), the point at which the kit's menu calls an item heavy, and finds sections in it that apply to one kind of task only.
+   - Light: a table of two rows, for the two kinds of task whose rules you need most, each rule file written new from what you tell Claude. Light costs about 63 tokens every session (estimate). Recommended for a first adoption, and when Detect puts the front door and its imports under 1,000 tokens (estimate).
+   - Standard: a row for each kind of task that has rules of its own, each file written new; nothing in the front door moves. Standard costs about 89 tokens with four rows (estimate), about 14 more for each further row.
+   - Full: standard, plus the task-only sections and `@` imports already in your front door moved into rule files word for word, each becoming a row. Full costs about 114 tokens with six rows (estimate), and the front door loses what moved: the saving is the moved text's bytes divided by 4. Recommended when Detect puts the front door and its imports at 1,000 tokens or more (estimate), the point at which the kit's menu calls an item heavy, and finds sections in it that apply to one kind of task only.
    - Not sure: the size recommended above for what Detect found: full when it puts the front door and its imports at 1,000 tokens or more and finds sections that apply to one kind of task only; light otherwise.
    - Skip for now: leave it open; nothing is set, and it comes back in a later wave.
    - Default when skipped: nothing.
@@ -73,19 +74,20 @@ Light and standard take steps 1 to 4 and 6; full takes all six.
    | a message to a client | `rules/client-writing.md` |
    ```
 
-   The two rows are examples; yours replace them. This block is 250 bytes, about 63 tokens every session (estimate).
+   The two rows are examples; yours replace them. This block is about 63 tokens every session (estimate).
 5. **Claude:** for full, moves each task-only section of the front door, word for word, into its rule file, and turns each `@` import of a task-only file into a row. It shows both sides of every move, never shortens text while moving it, and measures the front door before and after with `wc -c` (bytes divided by 4, an estimate). What Claude must never do, and what needs your OK, stay in the front door.
 6. **Claude:** records the decision, the size, the rows, the front door's size before and after, and the undo in `adoption/decisions.md`.
 
 ## Check
 
-1. **Claude:** checks that every rule file the table names exists:
+1. **Claude:** checks that every `.md` file the table names exists, wherever it lives (in `rules/`, beside a repository's front door, or anywhere else), written in backticks or as a link, with or without a `#section` after the file name (the section is dropped before the test):
 
    ```bash
-   grep -oE '`rules/[^`]+\.md`' AGENTS.md | tr -d '`' | while read -r f; do [ -f "$f" ] && echo "ok $f" || echo "missing $f"; done
+   grep -E '^\|' AGENTS.md | grep -oE '`[^`]+\.md`|\]\([^)#]+\.md(#[^)]*)?\)' | sed -E 's/^(`|\]\()//; s/(`|\))$//; s/#.*$//' |
+     while read -r f; do [ -f "$f" ] && echo "ok $f" || echo "missing $f"; done
    ```
 
-   Expected: one `ok` line per row, and no `missing` line.
+   Expected: one `ok` line per row, and no `missing` line. It reads every table line of the front door, so a `.md` file named in another table there gets a line too.
 2. **you:** start a new session and say, as the first message: "I am about to <the task in your first row>. What do you read first?" Expected: Claude names the file from that row and opens it (a file read appears) before it says anything about the task.
 3. **Claude:** for full, `wc -c AGENTS.md` now prints less than the size recorded in step 5, by about the size of what moved.
 
@@ -104,5 +106,5 @@ A `missing` line, or Claude answering without opening the file, means the item i
 - **After a compaction** (Claude Code summarizing a long conversation to free room), the project-root `CLAUDE.md` is read again from disk, but only up to five recently read files are. A rule file opened early in a long session may be gone from context, so Claude opens it again when the task comes back ([docs/facts.md](../docs/facts.md), "Claude Code: context commands, subagents, extra folders").
 - **Imports load every session.** A line starting with `@` loads its file at launch, up to four imports deep ([docs/facts.md](../docs/facts.md), "Claude Code: measuring context and asking multiple choice"). A rule file belongs in a row, not in an import.
 - **Claude Code's own rule files.** docs/facts.md mentions "unscoped rules" only in passing, as something read again after a compaction; how Claude Code's own rule files load is not documented there as of 2026-11-02. This card uses a plain table, which any runtime reads.
-- **Token cost.** The table with two example rows is 250 bytes, about 63 tokens every session; each further row adds about 50 bytes, about 13 tokens (estimates, bytes divided by 4). A rule file costs tokens only when it is opened.
+- **Token cost.** The table with two example rows is about 63 tokens every session; each further row adds about 14 tokens (estimates, bytes divided by 4). A rule file costs tokens only when it is opened.
 - **claude.ai:** put the rule files in the Project's knowledge and the table in its instructions. Whether a Project reads its knowledge files only when needed is not documented in docs/facts.md as of 2026-11-02, so the saving there is unknown.

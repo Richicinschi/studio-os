@@ -24,8 +24,9 @@ Read-only: names, descriptions, versions and counts, never a skill's or an agent
 - The reviewer it would start: `ls .claude/agents/linus-reviewer.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents/linus-reviewer.md" 2>/dev/null`, the name recorded for that seat in `adoption/decisions.md`, and any other reviewer agent or review skill. This reader prints each file's `name` and `description` lines and nothing below them:
   `awk 'FNR==1{n=0} /^---[[:space:]]*$/{n++; next} n==1 && /^(name|description):/{p=1; print FILENAME": "$0; next} n==1 && p && /^[[:space:]]/{print FILENAME": "$0; next} {p=0}' .claude/agents/*.md .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/agents/*.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md 2>/dev/null`
 - Git: `git --version`.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/requesting-code-review/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a skill of this name exists at either level; **partly** when another review skill exists, or only a reviewer agent; and **not yet** otherwise.
+The menu marks the item **have** when a skill of this name exists at either level; **partly** when another review skill exists, or only a reviewer agent; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -79,7 +80,7 @@ If Claude reviews the diff in the main thread, or reports that the reviewer it n
 
 ## Watch out
 
-- **Its description loads every session:** about 49 tokens (its 107 bytes divided by 4, an estimate). Its instructions, about 754 tokens, and the brief template, about 1,624 tokens (estimates), load only when it runs.
+- **Its description loads every session:** about 49 tokens (an estimate). Its body (its instructions), about 705 tokens, and the brief template `code-reviewer.md`, about 1,680 tokens (estimates), load only when it runs.
 - **Two copies answer the same request.** If you also have another skill that does the same job, both descriptions load and two skills fit "request a review". Keep one.
 - **One review at the end, for routine work.** The studio stopped a run of near-identical implement-then-review rounds as too repetitive: the early, risky tasks had gained from their reviews, the later routine ones had not ([module 04, The mechanism](../modules/04-delegation/README.md#the-mechanism)). That is why its "Mandatory" list no longer says "after each task".
 - **Two output formats can meet.** The brief asks for "Ready to merge?", while the `linus-reviewer` seat's own instructions ask for APPROVE or CHANGES REQUESTED. Which wins is not documented; pick one when you adapt, so every review reads the same.

@@ -1,7 +1,7 @@
 ---
 id: publish-ready-media
 title: Get media ready to post
-requires: [ffmpeg]
+requires: [ffmpeg, Node]
 ---
 
 ## When to use

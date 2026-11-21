@@ -52,16 +52,16 @@ The menu marks the item **have** when the vault file exists and the front door o
 
 1. **Claude:** runs `vet-and-adopt` for this item. It ships one text template, `templates/memory/vault/MEMORY-VAULT.md`, which `vet-and-adopt` scans like any shipped file; then it compares it with what Detect found and recommends one of the options above.
 2. **Claude:** writes `memory/vault/MEMORY-VAULT.md` in your words: one line on what it holds, your tags, and the shape of each move: a heading with the date and why the entries moved, then the entries word for word, newest at the bottom. Shown before saving.
-3. **Claude:** writes the rule where every session reads it, in the front door's memory section and in the index's comment, unless it is there already: never shorten or delete a line; copy it word for word into the vault first, check it landed, then leave a pointer. A merge, with the diff shown.
+3. **Claude:** writes the rule where every session reads it, in the front door's memory section and in the index's comment, as this line, word for word, unless that exact line is there already: `Vault rule: never shorten or delete a memory line; copy it word for word into memory/vault/MEMORY-VAULT.md first, check it landed, then leave a pointer.` Your own words can go around it; the line itself stays as it is, so the Check can find it. A merge, with the diff shown.
 4. **you:** choose when the index counts as too big: a number of lines or of tokens. The [memory index](memory-index.md) card gives about 33 tokens per line (estimate). **Claude** writes your number next to the rule.
 5. **Claude:** records the decision, the scope (the vault in your setup's `memory/` folder), the tags, the limit and the undo in `adoption/decisions.md`.
 
 ## Check
 
-1. **Claude:** `ls memory/vault/MEMORY-VAULT.md` prints the path, and `grep -ci 'vault' AGENTS.md` prints at least `1`.
+1. **Claude:** `ls memory/vault/MEMORY-VAULT.md` prints the path, and `grep -cF 'Vault rule: never shorten or delete a memory line; copy it word for word into memory/vault/MEMORY-VAULT.md first, check it landed, then leave a pointer.' AGENTS.md memory/MEMORY.md` prints `AGENTS.md:1` and `memory/MEMORY.md:1`. The kit's own templates already name the vault, so a count of the word `vault` passes before step 3 has run; this line is not in them.
 2. **you:** in a new session, say "The memory index is too long, make room." Expected: Claude proposes to move whole lines, word for word, into the vault under a dated heading with your tags, to leave one pointer line in the index, and to remove a line only after finding its text in the vault. It never proposes to shorten, summarize or delete a line. Then decline, or let it move one test line you made for the purpose.
 
-If Claude proposes to shorten or summarize anything, the rule is not where sessions read it: the item is not done, and the plan row stays unticked.
+If step 1 prints `0` for either file, or Claude proposes to shorten or summarize anything, the rule is not where sessions read it: the item is not done, and the plan row stays unticked.
 
 ## Undo
 
@@ -70,7 +70,7 @@ If Claude proposes to shorten or summarize anything, the rule is not where sessi
 
 ## Watch out
 
-- **Keep it out of the every-session load.** The vault loads only when a session opens it: the blank file is 210 bytes, about 53 tokens (estimate, bytes divided by 4), and it grows with each move. Never import it from the front door with `@`: it would then load into every session and undo its own purpose.
+- **Keep it out of the every-session load.** The vault loads only when a session opens it: the blank file, `MEMORY-VAULT.md`, is about 53 tokens (estimate, bytes divided by 4), and it grows with each move. Never import it from the front door with `@`: it would then load into every session and undo its own purpose.
 - **Moving is allowed; cutting is not.** Moving text and leaving a pointer is vaulting. Cutting words is lossy shortening. A long single entry follows the same rule: its full detail moves to the vault or to its own file, and a short pointer stays.
 - **Tags make a vault usable.** Without them it is a pile nobody searches. Use the same few tags every time.
 - **The vault is not a hiding place.** It usually lives in git with the rest. A secret or customer data that reached memory is removed, and the secret replaced, not moved to the vault.

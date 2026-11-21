@@ -2,6 +2,8 @@
 id: real-data-seed
 module: 12-experiments-and-evaluation
 checked: 2026-11-02
+other_figures:
+  - 19
 ---
 
 # A small real-data seed
@@ -86,5 +88,5 @@ If the test passes or skips while the seed is away, the item is not done: the pl
 - **An old result that must still reproduce** is a cheap check, written in advance, that can catch what a large suite cannot. The studio's unit mismatch was found that way, and a fingerprint check over a small sample, which never reached the broken code, stayed unchanged across the fix.
 - **Personal or confidential data:** the kit cannot judge your organization's rules. The data's owner decides, and "no seed" is a correct answer.
 - **Windows line endings:** how git treats a seed's line endings on Windows is not documented in docs/facts.md as of 2026-11-02. Compare the seed's size before the commit and in a fresh clone; a real seed stays byte for byte what the source sent.
-- **Token cost:** the rule loads every session. The starting-point line was 201 bytes, about 51 tokens; the no-seed line 76 bytes, about 19 tokens (estimates, bytes divided by 4). The seed itself loads nothing.
+- **Token cost:** the rule loads every session. The starting-point line was about 51 tokens every session; the no-seed line about 19 tokens (estimates, bytes divided by 4). The seed itself loads nothing.
 - **claude.ai:** upload only what your rules allow. With code execution turned on ([docs/facts.md](../docs/facts.md), "claude.ai: custom skills and the built-in document skills"), ask Claude to run your transformation on the uploaded slice; what code execution can run there is not in docs/facts.md as of 2026-11-02, so compare its result with a run of your own. Keep the slice out of the Project's knowledge unless the rules allow that copy too.

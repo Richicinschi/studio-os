@@ -284,8 +284,10 @@ time, so the newest file wins.
 
 ## Shutting down
 
+The stop script takes the session folder, the one that holds `state_dir`:
+
 ```bash
-bash scripts/stop-server.sh $SESSION_DIR
+bash scripts/stop-server.sh "$(dirname "$STATE_DIR")"
 ```
 
 A `--project-dir` session keeps its mockups in `.studio-work/brainstorm/`

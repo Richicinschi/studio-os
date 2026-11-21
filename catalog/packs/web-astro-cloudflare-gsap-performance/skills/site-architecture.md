@@ -248,7 +248,7 @@ Hub: /blog/cash-flow-guide (long overview)
 └── Spoke: /blog/forecasting (links back to hub)
 ```
 
-The hub lists every spoke, each spoke links back to the hub, and spokes link to one another when the topics touch.
+A hub page lists every spoke, each spoke links back to its hub, and spokes link to one another when the topics touch.
 
 ### Link audit
 

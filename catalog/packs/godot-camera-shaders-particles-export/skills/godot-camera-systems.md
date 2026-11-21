@@ -85,7 +85,7 @@ Required first step: before you build any behaviour below, open the matching fil
 - No `look_at` without the straight-up guard; `SpringArm3D` has a mask.
 - Sub-viewports have an explicit update mode; only one has the 2D audio listener.
 - Every 3D follow logic runs in the physics step when the target is physics driven.
-- Helper files were opened before use; no keys or network calls in scripts; ask before any upload or publish; all text English.
+- Helper files were opened before use; no keys or network calls in scripts; ask before any upload or publish; text in the languages the project supports.
 
 ## Without local tools
 

@@ -36,7 +36,8 @@ Neighbours:
 7. **Set timing and frequency.** Show after activation or at a real limit. Never during onboarding, never mid-flow, never again right after a dismissal. Cap prompts per session, wait days (not hours) after a dismiss, and watch for annoyance signals such as quick closes or support complaints.
 8. **Smooth the purchase.** Few steps, stay in context, prefill what is known. After paying: access at once, a confirmation and receipt, and a pointer to what is now unlocked.
 9. **Test.** Vary one thing at a time: trigger timing, copy, price display, trial length, which feature leads, layout. Track impressions, click-through to upgrade, completed purchases, revenue per user and churn after upgrade. Idea bank: [experiments](paywalls/references/experiments.md).
-10. **Run the avoid list.** Dark patterns (hidden close control, muddled plan choice, guilt copy, fake countdowns) are out. Also avoid asking before value, prompting too often, blocking critical flows and long upgrade paths. Prices, trial rules, and store billing and review rules change, so check the current store rules (and the legal pages for your market) before shipping, and state that in the hand-off. All copy in English.
+10. **Run the avoid list.** Dark patterns (hidden close control, muddled plan choice, guilt copy, fake countdowns) are out. Also avoid asking before value, prompting too often, blocking critical flows and long upgrade paths. Prices, trial rules, and store billing and review rules change, so check the current store rules (and the legal pages for your market) before shipping, and state that in the hand-off.
+    All copy in the languages the project supports.
 
 ## Checks before done
 

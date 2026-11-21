@@ -54,7 +54,7 @@ Files are in `godot-tweening/`.
 - Parallel blocks end with an explicit `chain()` where later steps must wait.
 - Interruptible effects (shake, recoil) end at their rest value.
 - If the game uses `Engine.time_scale = 0`, UI tweens use `set_ignore_time_scale(true)` and the scale is restored.
-- No keys or secrets in the repo, and ask before any upload or publish. Text in English only.
+- No keys or secrets in the repo, and ask before any upload or publish. Text in the languages the project supports.
 
 ## Without local tools
 Without Godot, give the person the GDScript from the pattern file, adapted to their node names, and tell them to run the scene and watch for flicker or a frozen editor. Ask them to paste any error text. State which Godot 4 minor version you assume, since a few Tween methods (such as `tween_subtween`, `set_ignore_time_scale`) arrived in later 4.x releases.

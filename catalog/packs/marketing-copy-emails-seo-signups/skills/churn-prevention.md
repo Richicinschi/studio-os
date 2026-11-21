@@ -19,7 +19,7 @@ Neighbours:
 - In-app upgrade moments and trial-end screens: the paywalls skill.
 - Plan structure and annual discounts: the pricing skill. Activation work that stops early churn: onboarding. Churn events and dashboards: analytics. Statistically sound tests of flow variants: ab-testing.
 
-Studio rule for everything here: cancelling must stay easy and honest. No hidden buttons, no guilt copy, no fake countdowns, no extra steps meant to wear people down.
+The rule for everything here: cancelling must stay easy and honest. No hidden buttons, no guilt copy, no fake countdowns, no extra steps meant to wear people down.
 
 ## How it works
 
@@ -101,5 +101,5 @@ Studio rule for everything here: cancelling must stay easy and honest. No hidden
 - Grace behaviour and data retention after cancel are stated to the customer.
 - The metrics list names how a "save" is counted (still paying after the window you fixed in advance).
 - Hand-offs are noted: win-back to emails, upgrade screens to paywalls, tests to ab-testing.
-- All customer-facing copy is in English.
+- All customer-facing copy is in the languages the project supports.
 - Anything that spends money or sends mail to customers has been confirmed with the owner first.

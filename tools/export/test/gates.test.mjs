@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { deflateRawSync } from 'node:zlib';
-import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage, gateRisky } from '../gates.mjs';
+import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage, gateRisky, gateStudioBlocks, gateMarkers, MARKERS_ALLOW, gateNames, NAMES_ALLOW, gateJson, shebangFiles } from '../gates.mjs';
 
 function kit(files) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-gates-'));
@@ -103,6 +103,67 @@ test('risky: scoped tools, other tags, prose about the tag and narrow trust list
     'catalog/packs/p/skills/proxy.md': `--${FWD}=192.0.2.1\n${TRUSTED}=["192.0.2.1"]\n`,
   });
   try { assert.deepEqual(gateRisky(root, []), []); } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// The block marker word, assembled at runtime, so this file carries no marker for the gate to find.
+const only = ['studio', 'only'].join('-');
+
+test('studio blocks: a marker left in any shipped text file is found, in any case; only rules.mjs is exempt', () => {
+  const root = kit({
+    'catalog/skills/a/SKILL.md': `ok\n<!-- ${only} -->\n`,
+    'catalog/skills/a/scripts/run.py': `# <!-- /${only} -->\r\nprint(1)\r\n`,
+    'docs/notes.md': `fine\nA ${only.toUpperCase()} note\n`,
+    'catalog/skills/a/clean.md': 'studio only, not in this kit\n',
+    'tools/export/rules.mjs': `const m = '${only}';\n`,
+  });
+  try {
+    assert.deepEqual(gateStudioBlocks(root), [
+      `catalog/skills/a/SKILL.md:2 ${only} marker left in shipped text`,
+      `catalog/skills/a/scripts/run.py:1 ${only} marker left in shipped text`,
+      `docs/notes.md:2 ${only} marker left in shipped text`,
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('studio blocks: an allowed phrase passes only in its own file, and only on its line', () => {
+  const allow = [{ file: 'docs/MAINTAINING.md', phrase: `wrap it in <!-- ${only} -->`, why: 'the maintainer guide names the marker' }];
+  const root = kit({
+    'docs/MAINTAINING.md': `To keep a rule, wrap it in <!-- ${only} --> lines.\nA bare ${only} here.\n`,
+    'docs/other.md': `To keep a rule, wrap it in <!-- ${only} --> lines.\n`,
+  });
+  try {
+    assert.deepEqual(gateStudioBlocks(root, allow), [`docs/MAINTAINING.md:2 ${only} marker left in shipped text`, `docs/other.md:1 ${only} marker left in shipped text`]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('studio markers: found in catalog/ text, code comments included; files outside catalog/ and rules.mjs pass', () => {
+  const root = kit({
+    'catalog/skills/a/SKILL.md': 'ok\n## Hard rules\nAsk the hub and G6.\n',
+    'catalog/skills/a/scripts/run.py': '# bound to this machine only\r\nprint(1)\r\n',
+    'cards/a.md': 'the hub speaks to the maintainer\n',
+    'docs/notes.md': 'his yes, G1\n',
+    'tools/export/rules.mjs': "const m = 'the hub';\n",
+  });
+  try {
+    assert.deepEqual(gateMarkers(root), [
+      'catalog/skills/a/SKILL.md:2 studio marker "hard rule"',
+      'catalog/skills/a/SKILL.md:3 studio marker "the hub"',
+      'catalog/skills/a/SKILL.md:3 studio marker "G6"',
+      'catalog/skills/a/scripts/run.py:1 studio marker "this machine"',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('studio markers: an allowed phrase passes only in its own file, and only on its line', () => {
+  const allow = [{ file: 'catalog/packs/p/skills/law.md', phrase: 'guideline G6', why: 'a regulator guideline number' }];
+  const root = kit({
+    'catalog/packs/p/skills/law.md': 'Read guideline G6 first.\nThen G6 again.\n',
+    'catalog/packs/p/skills/other.md': 'Read guideline G6 first.\n',
+  });
+  try {
+    assert.deepEqual(gateMarkers(root, allow), ['catalog/packs/p/skills/law.md:2 studio marker "G6"', 'catalog/packs/p/skills/other.md:1 studio marker "G6"']);
+    assert.ok(Array.isArray(MARKERS_ALLOW) && MARKERS_ALLOW.every((a) => a.file && a.phrase && a.why), 'MARKERS_ALLOW entries are { file, phrase, why }');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test('risky: an allowed phrase passes only in its own file, and only on its line', () => {
@@ -204,6 +265,10 @@ test('notes: a --note is checked for denied terms, paths and secrets before anyt
   ]);
 });
 
+test('notes: a --note naming the block marker fails, since the changelog it lands in is shipped and gated', () => {
+  assert.deepEqual(gateNotes(['Fine.', `Hub text in ${only.toUpperCase()} blocks is cut.`], []), [`--note 2: ${only} marker left in shipped text`]);
+});
+
 const scanOf = (recommendation, score, findings) => ({ recommendation, score, ...(findings === undefined ? {} : { findings }), version: 'v2.2.3', date: '2026-11-09' });
 const readOf = (recommendation, score, findings, fp, byDesign, other = 0) => ({ recommendation, score, findings, fp, byDesign, other, anchor: 'a' });
 
@@ -256,6 +321,128 @@ test('diagram links: the payload must decode to the .drawio beside it', () => {
     assert.deepEqual(gateDiagramUrls(root), [
       'docs/none.url.txt: no #R payload, or no docs/none.drawio beside it',
       'docs/old.url.txt: payload differs from docs/old.drawio; regenerate the link',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+const NAMES = { studio: ['claude-md-curator', 'handoff', 'save-session', 'teach'], shipped: ['handoff', 'teach'] };
+const FENCE3 = '`'.repeat(3);
+
+test('names: a studio name the kit does not ship, in whole inline code or in [[brackets]], is found in catalog/ Markdown outside fences', () => {
+  const root = kit({
+    'catalog/skills/a/SKILL.md': [
+      'Run `save-session` at the end.',
+      'Then `handoff`, keep `handoff-notes.md` and `save-session-notes.md`, the `teacher` and `teach`.',
+      'See [[claude-md-curator]], [[handoff]] and [[handoff|the handoff skill]].',
+      'Use `` /save-session `` and [[outside-thing|a label]]; `[[claude-md-curator]]` is the syntax.',
+      FENCE3, '`save-session` and [[claude-md-curator]] in a fence', FENCE3,
+      '~~~md', '`save-session`', '~~~',
+      '`save-session` after, and `save-session` twice.',
+      `${FENCE3}save-session${FENCE3} is inline code, not a fence.`,
+      '`save-session` still seen.',
+    ].join('\r\n'),
+    'catalog/skills/a/scripts/run.py': '# `save-session`\n',
+    'cards/a.md': 'Run `save-session` and [[claude-md-curator]].\n',
+  });
+  try {
+    assert.deepEqual(gateNames(root, NAMES), [
+      'catalog/skills/a/SKILL.md:1 names save-session, which the kit does not ship',
+      'catalog/skills/a/SKILL.md:3 names claude-md-curator, which the kit does not ship',
+      'catalog/skills/a/SKILL.md:4 names save-session, which the kit does not ship',
+      'catalog/skills/a/SKILL.md:4 names outside-thing, which the kit does not ship',
+      'catalog/skills/a/SKILL.md:11 names save-session, which the kit does not ship',
+      'catalog/skills/a/SKILL.md:12 names save-session, which the kit does not ship',
+      'catalog/skills/a/SKILL.md:13 names save-session, which the kit does not ship',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('names: an allow entry passes only its own name in its own file', () => {
+  const allow = [{ file: 'catalog/a.md', name: 'save-session', why: 'an outside tool of the same name' }];
+  const root = kit({
+    'catalog/a.md': 'Run `save-session`, then [[claude-md-curator]].\n',
+    'catalog/b.md': 'Run `save-session`.\n',
+  });
+  try {
+    assert.deepEqual(gateNames(root, NAMES, allow), [
+      'catalog/a.md:1 names claude-md-curator, which the kit does not ship',
+      'catalog/b.md:1 names save-session, which the kit does not ship',
+    ]);
+    assert.ok(Array.isArray(NAMES_ALLOW) && NAMES_ALLOW.every((a) => a.file && a.name && a.why), 'NAMES_ALLOW entries are { file, name, why }');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('names: a private studio name, in whole inline code or in [[brackets]], is found without printing it; an allow entry never passes it', () => {
+  const names = { ...NAMES, private: ['quiet-job', 'quiet-pack'] };
+  const allow = [{ file: 'catalog/a.md', name: 'quiet-job', why: 'never honoured for a private name' }];
+  const root = kit({
+    'catalog/a.md': [
+      'Run `quiet-job`, or `` /quiet-job ``.',
+      'See [[quiet-pack]], then [[quiet-pack|a label]] and [[save-session]].',
+      'Keep `quiet-job-notes.md`, and quiet-job in prose.',
+      FENCE3, '`quiet-job` and [[quiet-pack]]', FENCE3,
+    ].join('\n'),
+  });
+  try {
+    const found = gateNames(root, names, allow);
+    assert.deepEqual(found, [
+      'catalog/a.md:1 names a private studio item (on the private list, private.local.txt, or in a hub pack whose pack.json says public: false)',
+      'catalog/a.md:2 names a private studio item (on the private list, private.local.txt, or in a hub pack whose pack.json says public: false)',
+      'catalog/a.md:2 names save-session, which the kit does not ship',
+    ]);
+    assert.ok(!found.join('\n').includes('quiet'), 'a private name is never printed');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('json: a file that parses passes; node_modules and local-only files are not read', () => {
+  const root = kit({
+    'catalog/skills/a/config.json': '{\n  "say": "hi \\"there\\""\n}\n',
+    'package.json': '{"name": "x"}\n',
+    'node_modules/dep/package.json': '{ not json',
+    'tools/export/rewrites.local.json': '{ not json',
+  });
+  try { assert.deepEqual(gateJson(root), []); } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('json: an unescaped quote fails with the parser message', () => {
+  const root = kit({ 'catalog/skills/a/bad.json': '{"say": "hi "there""}\n', 'docs/ok.json': '[]\n' });
+  try {
+    const found = gateJson(root);
+    assert.equal(found.length, 1, found.join('\n'));
+    assert.match(found[0], /^catalog\/skills\/a\/bad\.json: not valid JSON \(.+\)$/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('json: a leading byte order mark fails, and the finding names it without printing it', () => {
+  const root = kit({ 'catalog/features.json': '\uFEFF{"a": 1}\n' });
+  try {
+    const found = gateJson(root);
+    assert.equal(found.length, 1, found.join('\n'));
+    assert.match(found[0], /^catalog\/features\.json: not valid JSON \(.*U\+FEFF.*\)$/);
+    assert.ok(!found[0].includes('\uFEFF'), 'the invisible character is never printed');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('shebangFiles: files under the given folders whose first two bytes are #!, sorted, relative with /', () => {
+  const root = kit({
+    'catalog/skills/b/scripts/run.sh': '#!/bin/sh\necho ok\n',
+    'catalog/skills/a/scripts/tool': '#!/usr/bin/env node\n',
+    'catalog/skills/a/scripts/lib.mjs': 'export const x = 1;\n',
+    'catalog/skills/a/notes.md': ' #! not first\n',
+    'catalog/skills/a/node_modules/dep/cli.js': '#!/usr/bin/env node\n',
+    'catalog/.git/hooks/pre-commit': '#!/bin/sh\n',
+    'templates/git-hooks/commit-msg': '#!/bin/sh\n',
+    'docs/NOTICES.md': '#!not a dir, but listed\n',
+    'tools/x.sh': '#!/bin/sh\n',
+    'catalog/empty': '',
+    'catalog/one': '#',
+  });
+  try {
+    assert.deepEqual(shebangFiles(root, ['catalog', 'templates', 'docs/NOTICES.md', 'missing']), [
+      'catalog/skills/a/scripts/tool',
+      'catalog/skills/b/scripts/run.sh',
+      'docs/NOTICES.md',
+      'templates/git-hooks/commit-msg',
     ]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

@@ -8,7 +8,7 @@
 - Apple Standard EULA (applies when no custom EULA is provided) — https://www.apple.com/legal/internet-services/itunes/dev/stdeula/ [settled — Apple stdeula page; ADPLA Schedule 2 §4.2; App Store Connect Help *Provide a custom license agreement*, verified 2026-11-18]
 - Apple Developer Program License Agreement (ADPLA) — https://developer.apple.com/support/terms/apple-developer-program-license-agreement/ (Schedules 2 and 3 last updated 13 October 2026) [settled — ADPLA Schedule 2 §§3.8(b), 4.2, verified 2026-11-18]
 
-**Worked example (the example app, `legal-guardrails.md` §8):** Dutch eenmanszaak, sole controller, EU/NL-first, no medical claims. Subscriptions sold through Apple as merchant of record (RevenueCat + Firebase backend, europe-west). Free = on-device only; paid tier = Firestore sync. Apply each term to the app under review from its fact sheet.
+**Worked example:** one app, profiled in `worked-example.md` §1. Apply each term to the app under review from its fact sheet.
 
 ---
 
@@ -18,7 +18,7 @@ Two paths. (1) **No custom EULA:** Apple's Standard EULA applies and no licence-
 
 Limit of this rule: which licence binds the consumer if a deficient custom EULA ships is contract formation under Dutch law (BW 6:231 ff.), not something Apple's agreement decides. [low-confidence — LEGAL REVIEW REQUIRED; no verdict given (`legal-guardrails.md` §5). It arises only if the 🔴 is ignored.]
 
-> When an app ships a custom ToS (the example app does, because it must also satisfy GDPR/AVG, EU consumer law, the Apple Licensed-Application EULA insertion, and the withdrawal/age mechanisms), **all 10 minimum terms below are MANDATORY** and each is a checklist gate. [settled — minterms applies whenever a custom EULA is used (ADPLA Schedule 2 §4.2), verified 2026-11-18]
+> When an app ships a custom ToS (the worked example does, because it must also satisfy GDPR/AVG, EU consumer law, the Apple Licensed-Application EULA insertion, and the withdrawal/age mechanisms), **all 10 minimum terms below are MANDATORY** and each is a checklist gate. [settled — minterms applies whenever a custom EULA is used (ADPLA Schedule 2 §4.2), verified 2026-11-18]
 
 **Cross-platform note:** These 10 terms are **Apple-only**. Google Play mandates no equivalent EULA, but requires a Privacy Policy, a Data Safety form, and in-app account deletion. A ToS that satisfies Apple's minterms does **not** automatically satisfy Play — keep the Apple clause clearly scoped ("This section applies only to the version downloaded from the Apple App Store"). [verify — Play has no mandated-EULA equivalent]
 
@@ -28,9 +28,9 @@ Limit of this rule: which licence binds the consumer if a deficient custom EULA 
 
 Each row is a gate. "Present?" = the clause must appear (verbatim-equivalent substance) in the ToS's Apple section. All ten are sourced from the minterms page; the "Required substance" column is this suite's summary of each term, and §2 quotes the operative words. [settled — Apple minterms page, verified 2026-11-18]
 
-| # | Minimum Term | Required substance | Application (worked: example app) |
+| # | Minimum Term | Required substance | Application (worked example) |
 |---|---|---|---|
-| 1 | **Acknowledgement** | The EULA is a contract **between the developer and the user only; Apple is not a party**. The developer alone, not Apple, answers for the app and its content. | ToS must name `<publisher>` (for the example app, the eenmanszaak) as the sole counterparty and state Apple is not a party. Most-missed by indies. |
+| 1 | **Acknowledgement** | The EULA is a contract **between the developer and the user only; Apple is not a party**. The developer alone, not Apple, answers for the app and its content. | ToS must name `<publisher>` (for the worked example, the eenmanszaak) as the sole counterparty and state Apple is not a party. Most-missed by indies. |
 | 2 | **Scope of License** | The user gets a licence they **cannot transfer**, for **Apple-branded devices they own or control**, within the Usage Rules of the Apple Media Services Terms; Family Sharing and volume-purchase accounts may also use it. | State the licence is personal, non-transferable, device-limited per Apple's Usage Rules. |
 | 3 | **Maintenance and Support** | Maintenance and support are **the developer's job alone**; **Apple owes none at all**. | Give the developer's support contact (`<contact email>`); state Apple provides no support for `<app name>`. |
 | 4 | **Warranty** | Every warranty, express or implied by law and not validly disclaimed, is **the developer's alone**. If the app fails a warranty, **the user may tell Apple, and Apple refunds the price paid** (if any); beyond that, as far as the law allows, **Apple owes no warranty duty at all**. | State the developer bears warranty responsibility; Apple's sole obligation is to refund the purchase price. Do not purport to make Apple a warrantor. |
@@ -64,13 +64,13 @@ Use these as the evidentiary anchors when scoring a clause as present. Each is a
 
 These are NOT minterms but co-occur in EULA/ToS review; flag them alongside.
 
-| Guideline | Rule | Application (worked: example app) |
+| Guideline | Rule | Application (worked example) |
 |---|---|---|
 | **3.1.1 In-App Purchase** | IAP-unlockable content must use Apple IAP; subscriptions sold through Apple. (The Terms of Use (EULA) link is not a 3.1.1 rule: ADPLA Schedule 2 §3.8(b), which 3.1.2(c) points to, requires links to the Privacy Policy and Terms of Use inside the app.) | The paid tier sold via Apple IAP (RevenueCat is middleware, not a payment bypass). [settled — guidelines §3.1.1, verified 2026-11-18] |
 | **3.1.2 Auto-Renewable Subscriptions** | Before subscribing, "clearly describe what the user will get for the price" (Apple, App Store Review Guidelines 3.1.2, https://developer.apple.com/app-store/review/guidelines/); meet the disclosure requirements in **Schedule 2 of the Apple Developer Program License Agreement**. | Paywall + ToS §5 must state price, period, auto-renewal, and how to cancel; keep price/trial illustrative. [settled — guidelines §3.1.2(c), verified 2026-11-18] |
-| **1.4.1 Medical / Health** | Apps that could diagnose/treat get greater scrutiny; accuracy claims must be substantiated; remind users to consult a doctor. | A wellness app makes **no medical claims** — "supports / may help relax", never "treats/cures/diagnoses/prevents". Keep its health disclaimer (for the example app, breathing exercises only). [settled — guidelines §1.4.1, verified 2026-11-18] |
+| **1.4.1 Medical / Health** | Apps that could diagnose/treat get greater scrutiny; accuracy claims must be substantiated; remind users to consult a doctor. | A wellness app makes **no medical claims** — "supports / may help relax", never "treats/cures/diagnoses/prevents". Keep its health disclaimer, scoped to the app category the person gives. [settled — guidelines §1.4.1, verified 2026-11-18] |
 | **5.1.1(i) Privacy Policy** | Must link to a PP in ASC metadata AND in-app; PP must identify data collected, uses, third-party equal-protection, and **retention/deletion + how to revoke consent / request deletion**. | Check the PP covers this; the Apple section of the ToS should cross-reference the PP. [settled — guidelines §5.1.1(i), verified 2026-11-18] |
-| **5.1.1(v) Account Deletion** | If the app supports account creation, it **must offer in-app account deletion**. | The app must ship in-app deletion (the example app: soft-delete + 30-day grace + hard purge). Mandatory; do not regress. [settled — guidelines §5.1.1(v), verified 2026-11-18] |
+| **5.1.1(v) Account Deletion** | If the app supports account creation, it **must offer in-app account deletion**. | The app must ship in-app deletion (the worked example: soft-delete + 30-day grace + hard purge). Mandatory; do not regress. [settled — guidelines §5.1.1(v), verified 2026-11-18] |
 
 ---
 

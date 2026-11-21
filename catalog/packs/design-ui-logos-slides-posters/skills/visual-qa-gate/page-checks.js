@@ -113,17 +113,25 @@
     if (r.width < MIN_TAP_PX || r.height < MIN_TAP_PX) faults.smallTapTargets.push({ el: describe(el), size: [Math.round(r.width), Math.round(r.height)] });
   }
 
-  // Layout shift: sum of shifts the browser already recorded for this page load.
+  // Layout shift: sum of shifts the browser recorded for this page load. Chrome keeps them out of
+  // performance.getEntriesByType, so read them through a buffered PerformanceObserver: observe()
+  // copies the recorded shifts into the observer at once, and takeRecords() hands them over without
+  // waiting for a callback. Anything short of that is reported as not measured, never as 0.
   try {
-    const entries = performance.getEntriesByType("layout-shift");
-    if (entries.length || "PerformanceObserver" in window) {
-      const total = entries.filter((e) => !e.hadRecentInput).reduce((sum, e) => sum + e.value, 0);
+    const PO = typeof PerformanceObserver === "function" ? PerformanceObserver : null;
+    if (PO && (PO.supportedEntryTypes || []).includes("layout-shift")) {
+      const observer = new PO(() => {});
+      observer.observe({ type: "layout-shift", buffered: true });
+      const entries = observer.takeRecords().filter((e) => !e.hadRecentInput);
+      observer.disconnect();
+      const total = entries.reduce((sum, e) => sum + e.value, 0);
       faults.layoutShift = { total: Math.round(total * 1000) / 1000, limit: 0.1, entries: entries.length };
+    } else {
+      notMeasured.push("layout shift: not measured (this browser does not report layout shifts)");
     }
   } catch (e) {
-    notMeasured.push("layoutShift (not supported by this browser)");
+    notMeasured.push("layout shift: not measured (" + e.message + ")");
   }
-  if (faults.layoutShift === null) notMeasured.push("layoutShift (no data; reload and measure after load)");
 
   const counts = {};
   let total = 0;

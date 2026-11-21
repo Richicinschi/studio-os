@@ -7,6 +7,8 @@ description: "Use when the user builds a Unity game: C# scripts, scenes and pref
 
 Find the skill that fits the task in the table, read its file in full before you start, and follow it. If a skill needs a local tool and you are on claude.ai without one, follow that skill's "Without local tools" section.
 
+Script paths in this domain start at this domain's folder, the base directory Claude Code names when it loads this skill.
+
 | Skill | What it does | When to use | File |
 |---|---|---|---|
 | Work the Unity edit-run loop | Compile, hot-reload, run code in the editor and read results without leaving the loop. (needs: Unity) | Use when the user is editing a Unity project and wants changes compiled, run and checked. | skills/unity-editor-loop.md |

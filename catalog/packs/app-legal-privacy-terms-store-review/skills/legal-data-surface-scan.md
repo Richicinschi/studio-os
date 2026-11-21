@@ -2,7 +2,7 @@
 name: legal-data-surface-scan
 description: >-
   Use when verifying an app's privacy CLAIMS against what the code ACTUALLY collects (code-faithful
-  verification) — the truth-source that feeds legal-flow-grader and legal-cross-store. Runs the bundled
+  verification). It is the truth-source that feeds legal-flow-grader and legal-cross-store. Runs the bundled
   scanners (pubspec.lock → SDK data map, merged AndroidManifest perms + AD_ID strip check, iOS
   PrivacyInfo.xcprivacy collected-types) and optionally Exodus + MobSF on a built binary, then NORMALIZES
   every output into one canonical flow set {data-type, recipient-entity, on/off-device, purpose, basis} with
@@ -43,7 +43,7 @@ Policy, Terms, and the two store labels. Garbage-in here poisons every grader, s
 | `appDir` | the root of the person's app (the scripts default to the current folder) |
 | Built APK | for a Flutter app, `build/app/outputs/flutter-apk/app-release.apk` (after `flutter build apk --release`, plus whatever build flags the project uses) |
 | Built IPA + pod manifests | **macOS only** (`flutter build ipa` / a Mac build after `pod install`) — Windows runs see only the app's own `Runner/PrivacyInfo.xcprivacy` |
-| Stack | the SDKs and backend the scan finds, plus the hosting region from the project's backend config; ask about services configured outside the repo (example app stack: `legal-guardrails.md` §8) |
+| Stack | the SDKs and backend the scan finds, plus the hosting region from the project's backend config; ask about services configured outside the repo (the worked example's stack: `legal-guardrails/references/worked-example.md` §1) |
 
 Run from the app root, or pass `appDir` as the first positional arg to point the scripts at another folder.
 
@@ -60,15 +60,15 @@ gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never cra
 
 ### 2. `scan_android_manifest.mjs` — permissions + AD_ID strip
 - **Why:** SDKs auto-merge permissions; `firebase_analytics` silently injects `com.google.android.gms.permission.AD_ID` and collects the GAID by default — a silent contradiction of any "no advertising ID" claim.
-- **Command:** `node legal-data-surface-scan/scripts/scan_android_manifest.mjs [appDir]`
-- **Reads:** the **merged** manifest (preferred: `build/app/intermediates/merged_manifest/release/.../AndroidManifest.xml`) else the source manifest. **Output:** `permissions[]` (with `stripped` + sensitivity note), `sensitivePermissions[]`, `targetSdk`, and `advertisingId.{presentInMerged, strippedInSource, verdict}`.
-- **Degrades:** no merged manifest → falls back to source manifest and sets `isMerged:false` (build the app for a true picture); no manifest at all → `{error}`.
+- **Command:** `node legal-data-surface-scan/scripts/scan_android_manifest.mjs [appDir]` (`appDir` is a Flutter project root or a native Android project root)
+- **Reads:** the **merged** manifest, else the source manifest. Merged, release first: Flutter's `build/app/intermediates/merged_manifest/<variant>/process<Variant>MainManifest/AndroidManifest.xml`, then, if Flutter's is absent, the native `app/build/intermediates/merged_manifest/<variant>/process<Variant>MainManifest/AndroidManifest.xml`, `app/build/intermediates/merged_manifests/<variant>/process<Variant>Manifest/AndroidManifest.xml`, or the older `app/build/intermediates/merged_manifests/<variant>/AndroidManifest.xml` and `app/build/intermediates/merged_manifest/<variant>/AndroidManifest.xml`. Source manifest and Gradle file (for the AD_ID strip, `targetSdk` and Firebase Analytics): `android/app/src/main/AndroidManifest.xml` and `android/app/build.gradle(.kts)`, else the native `app/src/main/AndroidManifest.xml` and `app/build.gradle(.kts)`. **Output:** `permissions[]` (with `stripped` + sensitivity note), `sensitivePermissions[]`, `targetSdk`, `sourceManifest`, `gradleFile`, `advertisingId.{presentInMerged, strippedInSource, firebaseAnalytics, consistentWithNoAdvertisingId, verdict}`, and `notChecked[]`.
+- **Degrades:** no merged manifest → falls back to source manifest and sets `isMerged:false` (build the app for a true picture); no manifest at all → `{error}`. A check whose file is missing is listed in `notChecked[]` and its value is `null` (`targetSdk`, `strippedInSource`, `firebaseAnalytics`, and then `consistentWithNoAdvertisingId`): a gap to close, never a pass. SDKs such as Firebase Analytics add AD_ID only at merge, so with no merged manifest and no strip in the source, `presentInMerged` and `consistentWithNoAdvertisingId` are `null` and `notChecked[]` says to build the app and re-run.
 
 ### 3. `scan_ios_privacy.mjs` — PrivacyInfo.xcprivacy collected types
 - **Why:** the iOS analog of the Android manifest + App Privacy label; app + each pod manifest together declare collected types, tracking, and required-reason APIs.
 - **Command:** `node legal-data-surface-scan/scripts/scan_ios_privacy.mjs [appDir]`
-- **Reads:** every `PrivacyInfo.xcprivacy` under `ios/` (skips build dirs). **Output:** `collectedDataTypes[]` (label, linked, purposes), `anyTracking`, `healthOrFitnessDeclared[]`, `accessedApis[]`, per-manifest detail, `appManifestPresent`.
-- **Degrades:** `manifestCount ≤ 1` → note "only the app manifest found — pod manifests appear after `pod install` / a macOS build; re-run on the Mac for full third-party coverage." Treat partial coverage as **partial**, not clean.
+- **Reads:** every `PrivacyInfo.xcprivacy` under `ios/` (skips build dirs). **Output:** `collectedDataTypes[]` (label, linked, purposes), `anyTracking`, `healthOrFitnessDeclared[]`, `accessedApis[]`, per-manifest detail, `appManifestPresent`, `notChecked[]`.
+- **Degrades:** `manifestCount ≤ 1` → note "only the app manifest found — pod manifests appear after `pod install` / a macOS build; re-run on the Mac for full third-party coverage." Treat partial coverage as **partial**, not clean. A manifest the parser cannot read (CDATA, a binary plist) is listed in `notChecked[]`; its data types are unknown, not absent, and `anyTracking` is `null` unless a readable manifest declares tracking.
 
 ### 4. `run_exodus.mjs` — Android tracker/permission scan on a built APK (OPTIONAL)
 - **Why:** Exodus statically matches APK bytecode against a tracker-signature DB (advertising/analytics/crash incl. Google Firebase Analytics, Crashlytics, RevenueCat) — off-device truth the source scan can miss. Exodus (`exodus-standalone`) is **AGPL-3.0: invoked as an external CLI via Docker, never linked.**
@@ -90,14 +90,14 @@ gracefully** (print `skipped` + a `reason`/`howTo…` and exit 0; they never cra
 4. **Normalize → one canonical flow set.** For every distinct flow, enrich/reconcile against `sdk-data-map.md` and assign a canonical data-category from `data-category-ontology.md`. Each flow record:
    `{ data-type (canonical), recipient-entity (named legal entity), on/off-device, purpose, lawful-basis (tier-tagged), data-location, transfer-safeguard, source-scanner(s), tier }`.
    - **De-dupe across scanners by (data-type, recipient).** The pubspec map is authoritative for Dart-level flows; Exodus/MobSF corroborate native trackers; iOS manifest corroborates Apple-declared types.
-   - **On-device flows are NOT recipient flows** — free-tier breathing history (SharedPreferences / local Firestore cache) leaves the device for no one; tag `on-device`, recipient `(none)`.
+   - **On-device flows are NOT recipient flows** — free-tier session history (SharedPreferences / local Firestore cache) leaves the device for no one; tag `on-device`, recipient `(none)`.
    - **Entity-name every recipient** (Google LLC / Google Ireland (Firebase), RevenueCat Inc. (US), Apple Distribution International, Google Commerce/Payment) — never "third parties."
    - **Carry the tier** from the SDK map; downgrade to `[verify]` for anything a skipped scanner would have confirmed.
 5. **Reconcile signals into SCAN findings.** Emit a finding (per `finding-format.md`) for each material discrepancy or load-bearing fact:
    - `advertisingId.consistentWithNoAdvertisingId` ≠ `true` → 🔴/🟠 (contradicts the "no advertising ID" PP §4 / Data-Safety answer). It is `true` only when the merged manifest has AD_ID absent or stripped **and**, when Firebase Analytics ships (`advertisingId.firebaseAnalytics`), `google_analytics_adid_collection_enabled=false` — the flag is required when Firebase Analytics ships (`sdk-data-map.md` §3); for such an app a strip without the flag is not enough.
    - A scanner-detected tracker/recipient with **no entry in the SDK map** → 🟠 (unmapped flow; extend the map + check the PP discloses it).
    - `unrecognisedDirectDeps[]` non-empty → 🟡 (direct dep not profiled — could be an undisclosed flow).
-   - `anyTracking:true` for a no-ATT app → 🔴.
+   - `anyTracking:true` for a no-ATT app → 🔴. `anyTracking:null` → a manifest in `notChecked[]` could not be read: convert it (`plutil -convert xml1`) and re-run before calling tracking clean.
    - iOS `healthOrFitnessDeclared` non-empty for a no-HealthKit wellness app → a **hard condition**, not a 🔴: confirm whether the app's data is health or fitness data under Apple's definition, which does not turn on HealthKit; a declared Health type is not by itself a defect `[verify]`.
    - A sensitive permission (location, contacts, mic, `QUERY_ALL_PACKAGES`) present with no plausible purpose → 🟠.
    - **No-silent-supplement:** any data behaviour you observe that isn't in the SDK map or the ontology → surface as a 🟡 MINOR note so a human can confirm it belongs.
@@ -124,7 +124,7 @@ Coverage verdict: <FULL | PARTIAL — iOS pods + binary scans pending macOS buil
 | Email, UID, tokens | Google/Firebase Auth (Google LLC/Ireland) | off | Account mgmt | 6(1)(b) [verify] | US-only | DPF+SCC | pubspec | [settled …] |
 | Usage events, app-instance ID (no AD_ID) | Google LLC (Analytics) | off | Analytics | 6(1)(a) consent — cookiewet [verify-pinpoint] | global/US | DPF+SCC | pubspec+exodus | [settled …] |
 | App User ID(=UID), receipts, sub status | RevenueCat Inc. (US) | off | Purchase processing | 6(1)(b) [verify] | US (AWS) | DPA→SCC [verify] | pubspec+mobsf | [settled …] |
-| Free-tier breathing history | (none — on-device) | on | On-device storage | n/a | device | n/a | pubspec | [settled …] |
+| Free-tier session history | (none — on-device) | on | On-device storage | n/a | device | n/a | pubspec | [settled …] |
 
 ### Deliberate non-collection
 - Google Advertising ID (AD_ID/GAID) + AdServices — STRIPPED via tools:node="remove" + the flag (google_analytics_adid_collection_enabled=false) when Firebase Analytics ships → verdict: <…>

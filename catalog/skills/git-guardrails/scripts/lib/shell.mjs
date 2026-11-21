@@ -1,5 +1,5 @@
 /**
- * How the before-tool guards (G1, G2, G5, G6, G7, G8) read a command line: as the simple commands it
+ * How the before-tool guards read a command line: as the simple commands it
  * RUNS. A quoted argument stays an argument, so `git commit -m "gh pr merge"` merges nothing (the
  * rule `deQuoted` kept, 2026-07-28); the body of `bash -c`, `pwsh -Command` or -EncodedCommand,
  * `cmd /c`, `eval` and `iex` is read as commands too, in its own shell's rules (audit C-02), and so

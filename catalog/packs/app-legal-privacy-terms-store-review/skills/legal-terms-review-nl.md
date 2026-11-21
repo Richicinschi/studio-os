@@ -44,7 +44,7 @@ carve-outs; they need a lawyer or a registration first.
 
 ## App profile (inputs — from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest)
 
-Gather these for the person's app; the bracketed values are the example app's (`legal-guardrails.md` §8), the worked case the references use.
+Gather these for the person's app; the bracketed values are the worked example's (`legal-guardrails/references/worked-example.md`), the case the references use.
 - Trader: the publisher's legal form and size (example: Dutch **eenmanszaak**, sole proprietor, no DPO). Consumers = `natuurlijk persoon, niet handelend in beroep/bedrijf` → **both BW lists apply in full** (the 6:235 large-party exclusion concerns the counterparty, so it is N/A for consumers).
 - How it is sold (example: subscriptions **through Apple/Google as merchants of record**; **RevenueCat** middleware; **Firebase** backend — Auth, Firestore, Analytics, Crashlytics, Functions, Hosting; EU `europe-west`).
 - Health stance and tiers (example: no medical claims, "supports / may help relax"; free tier on-device only, paid tier Firestore sync).

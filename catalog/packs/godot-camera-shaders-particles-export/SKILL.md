@@ -5,11 +5,13 @@ description: "Use when the user works on a Godot game: GDScript errors and typed
 
 # Godot games: camera, shaders, particles, export and audit
 
-Find the skill that fits the task in the table, read its file in full before you start, and follow it. If a skill needs a local tool and you are on claude.ai without one, follow that skill's "Without local tools" section.
+Find the skill that fits the task in the table, read its file in full before you start, and follow it.
+
+Script paths in this domain start at this domain's folder, the base directory Claude Code names when it loads this skill.
 
 | Skill | What it does | When to use | File |
 |---|---|---|---|
-| Godot audit | Audit a Godot 4.x / GDScript project for code quality, project-structure, performance, and — uniquely — progression and currency ECONOMY health. | Use when reviewing a Godot game's code before merge, when a game's progression "feels off" (maxes too fast, currency snowballs, grind dead-zones), or when asked to "audit / review the Godot… | skills/godot-audit.md |
+| Godot audit | Audit a Godot 4.x / GDScript project for code quality, project-structure, performance, and — uniquely — progression and currency ECONOMY health. | Use when reviewing a Godot game's code before merge, or when its progression "feels off" (maxes too fast, currency snowballs, grind dead-zones). | skills/godot-audit.md |
 | Godot camera systems | Build Godot 4 2D and 3D cameras: follow, smoothing, limits, trauma shake, zoom, split screen, SpringArm3D, cinematics. (needs: Godot) | Use when a Godot 4 game needs a camera that follows, shakes, zooms, frames several targets, avoids walls or plays a cutscene. | skills/godot-camera-systems.md |
 | Godot export builds | Export a Godot game to many platforms: templates, presets, headless CLI, signing, notarization, feature tags, size cuts, patching. (needs: Godot) | Use when exporting a Godot game for Windows, Linux, macOS, Android, iOS or Web, signing it, shrinking it, or scripting builds. | skills/godot-export-builds.md |
 | Godot particles | Build GPU particle effects in Godot 4: bursts, trails, weather, sub-emitters, custom particle shaders, pooling and performance tiers. (needs: Godot) | Use when adding or tuning Godot particle VFX such as explosions, trails, rain, impacts or magic, or writing a particles shader. | skills/godot-particles.md |

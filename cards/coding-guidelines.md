@@ -6,6 +6,9 @@ tokens:
   light: 95
   standard: 445
   full: 445
+other_figures:
+  - 15
+  - 20
 ---
 
 # The coding guidelines
@@ -42,7 +45,7 @@ The menu marks the item **have** when all four rules are in a file that loads ev
    The item is recommended for the `software`, `ml` and `data` profiles and optional for `general`; a `general` profile that rarely writes code can skip it.
 2. **"Where does it go?"**
    - Your front door, so every session reads it. Recommended for the `software`, `ml` and `data` profiles, where most sessions change code.
-   - A file of its own, which one line in your front door tells Claude to read before it writes or changes code. The rules then load only when code is about to change; the line costs about 15 tokens in every session, an estimate. Recommended for the `general` profile.
+   - A file of its own, which one line in your front door tells Claude to read before it writes or changes code. The rules then load only when code is about to change; the line costs about 15 to 20 tokens in every session, an estimate. Recommended for the `general` profile.
    - FOLD into coding rules you already keep: Claude adds only the rules they lack, at the size you chose. Recommended when Detect says **partly**.
    - Not sure: the option recommended above: FOLD when Detect says **partly**, a file of its own for the `general` profile, otherwise your front door.
    - Default when skipped: your front door.
@@ -65,7 +68,7 @@ The menu marks the item **have** when all four rules are in a file that loads ev
 
 1. **Claude:** `grep -ciE 'ask before you build|smallest change|touch only what|define done' <the file it went into>`. Expected: `4` (the wording you chose may differ; Claude checks the four headings instead and says so).
 2. **Claude:** for a file of its own, `grep -c '<that file name>' <your front door>`. Expected: `1` or more.
-3. **you:** in a new session, in a throwaway repository in a temporary folder holding one small function, say "add input validation to this function". Expected: before its first edit, Claude says what it assumes and how the change will be checked (for example, a test with an invalid input), and the diff touches that function and its test only. With a file of its own, Claude reads that file before it edits.
+3. **you:** in a new session, in a throwaway repository in a temporary folder (`git init`, then `git config user.name throwaway`, `git config user.email canary@example.invalid` and `git config commit.gpgsign false` inside it, so your own name, address and signing take no part) holding one small function, committed (`git add -A`, then `git commit -m "one small function"`), so the diff has something to compare with. Say "add input validation to this function". Expected: before its first edit, Claude says what it assumes and how the change will be checked (for example, a test with an invalid input); afterwards `git add -A` and `git diff --cached --stat` list that function's file and its test only (`--cached` after `git add -A` also lists a new test file, which a plain `git diff` leaves out). With a file of its own, Claude reads that file before it edits.
 
 If step 1 prints anything but `4`, step 2 prints `0`, or Claude edits before it says what it assumes, the item is not done: the plan row stays unticked, and the wording of the rules, or of the pointer line, is the next thing to look at.
 
@@ -82,4 +85,4 @@ If step 1 prints anything but `4`, step 2 prints `0`, or Claude edits before it 
 - **They trade speed for caution** and leave trivial tasks to judgement. On a one-line fix, a plan and a check can cost more than the fix.
 - **Where they load.** An instruction file loads for sessions started in its folder or below it ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). A repository beside your setup folder does not see your setup's front door; give it its own copy or pointer line.
 - **A company repository:** put them in your own local file, `CLAUDE.local.md`, which you add to `.gitignore` yourself, rather than in the shared front door, unless your team agrees. Where the repository's front door is an `AGENTS.md`, start that local file with the line `@AGENTS.md`: a `CLAUDE.local.md` stops Claude Code from reading `AGENTS.md` there by default ([docs/facts.md](../docs/facts.md), "Claude Code: the ! prefix, /init and local files").
-- **Token cost,** estimates (bytes divided by 4), in every session from your front door, with the which-wins line: short about 95, full about 445. In a file of its own: about 15 for the pointer line, and the size's cost only when Claude reads the file.
+- **Token cost,** estimates (bytes divided by 4), in every session from your front door, with the which-wins line: short about 95, full about 445. In a file of its own: about 15 to 20 for the pointer line, and the size's cost only when Claude reads the file.

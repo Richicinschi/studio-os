@@ -3,10 +3,8 @@
 Reference for adjudicating Privacy Policy + Terms of Service clauses against the App Store
 Review Guidelines that Apple's reviewers enforce. Scoped to the guidelines that *gate legal
 documents* (privacy, account deletion, IAP/subscription disclosure, health claims). Worked
-verdicts use the **example app** (`legal-guardrails.md` §8: Flutter breathing/mindfulness app;
-Dutch eenmanszaak sole-controller publisher; auto-renewing subscriptions sold through Apple as
-merchant of record via RevenueCat + Firebase `europe-west`; general-wellness, no medical claims,
-no HealthKit). Adjudicate the app under review from its fact sheet and its actual build.
+applications use one app, the worked example; its profile and its verdicts are in
+`worked-example.md` §1 and §3. Adjudicate the app under review from its fact sheet and its actual build.
 
 **Primary source:** App Store Review Guidelines — https://developer.apple.com/app-store/review/guidelines/
 **Last verified against primary source:** 2026-11-18 (the page shows "Last Updated: October 16, 2026").
@@ -31,22 +29,22 @@ no HealthKit). Adjudicate the app under review from its fact sheet and its actua
 ## Quick gate list (PASS/FAIL summary)
 
 Adjudicate the doc set against these. "Gate" = a reviewer-enforced condition the PP/ToS/paywall
-must satisfy. "Worked verdict" is the example app's outcome, shown as a pattern; derive the app
-under review's own verdict from its actual build + App Store Connect at review time.
+must satisfy. Derive the app under review's verdict on each gate from its actual build + App Store
+Connect at review time; one app's verdicts are in `worked-example.md` §3, as a pattern only.
 
-| # | Guideline | Gate (what the docs/app must show) | Worked verdict (example app) |
-|---|---|---|---|
-| 1 | 5.1.1(i) | PP link present in **App Store Connect metadata** field **and** in-app (easily accessible). | PASS — in-app `/legal/*` routes ship; confirm ASC metadata field is populated. |
-| 2 | 5.1.1(i) | PP enumerates **all** data collected, how, and every use. | PASS if PP inventory matches actual Firebase/RC/Crashlytics flows — cross-check. |
-| 3 | 5.1.1(i) | PP confirms every **third party with data access** (analytics, SDKs, affiliates) gives **equal protection**. | VERIFY — PP must name Firebase/Google, RevenueCat, Crashlytics + equal-protection clause. |
-| 4 | 5.1.1(i) | PP explains **retention/deletion** + **how to revoke consent / request deletion**. | PASS if present — the example app has soft-delete + 30-day purge cron; PP must describe it. |
-| 5 | 5.1.1(v) | **In-app account deletion** exists (deactivation alone fails). | PASS — type-`DELETE` soft-delete → 30-day grace → hard purge. |
-| 6 | 5.1.1(ii) | Explicit consent for data collection; **paid features not conditioned** on data access; withdraw-consent path exists. | VERIFY — the paid tier (Firestore sync) must not gate on analytics consent. |
-| 7 | 5.1.2(i) | No share of personal data without permission; third parties (incl. third-party AI) disclosed. | PASS — no third-party AI in the example app; PP discloses processors. |
-| 8 | 5.1.3 | Health-context data not used for ads/marketing/data-mining; no health data in iCloud. | N/A-PASS — no HealthKit, no iCloud health storage. |
-| 9 | 3.1.1 | All feature unlocks via Apple IAP (no external unlock mechanism). | PASS — RevenueCat over StoreKit; Apple is merchant of record. |
-| 10 | 3.1.2 | Paywall discloses **title, length, price/period, content per period, auto-renew terms, cancel/manage path**; functional **EULA + PP** links. | VERIFY — confirm paywall surfaces all six + both links. |
-| 11 | 1.4.1 | No medical/diagnostic/treatment claims; "consult a doctor" reminder; general-wellness framing. | PASS — "supports / may help relax"; breathing-only disclaimer. |
+| # | Guideline | Gate (what the docs/app must show) |
+|---|---|---|
+| 1 | 5.1.1(i) | PP link present in **App Store Connect metadata** field **and** in-app (easily accessible). |
+| 2 | 5.1.1(i) | PP enumerates **all** data collected, how, and every use. |
+| 3 | 5.1.1(i) | PP confirms every **third party with data access** (analytics, SDKs, affiliates) gives **equal protection**. |
+| 4 | 5.1.1(i) | PP explains **retention/deletion** + **how to revoke consent / request deletion**. |
+| 5 | 5.1.1(v) | **In-app account deletion** exists (deactivation alone fails). |
+| 6 | 5.1.1(ii) | Explicit consent for data collection; **paid features not conditioned** on data access; withdraw-consent path exists. |
+| 7 | 5.1.2(i) | No share of personal data without permission; third parties (incl. third-party AI) disclosed. |
+| 8 | 5.1.3 | Health-context data not used for ads/marketing/data-mining; no health data in iCloud. |
+| 9 | 3.1.1 | All feature unlocks via Apple IAP (no external unlock mechanism). |
+| 10 | 3.1.2 | Paywall discloses **title, length, price/period, content per period, auto-renew terms, cancel/manage path**; functional **EULA + PP** links. |
+| 11 | 1.4.1 | No medical/diagnostic/treatment claims; "consult a doctor" reminder; general-wellness framing. |
 
 ---
 
@@ -70,7 +68,7 @@ In this suite's words, the privacy policy must state clearly:
 3. **How long data is kept and how it is deleted, and how a user withdraws consent or asks for
    deletion.**
 
-**Application (worked: example app):**
+**Application (worked example):**
 - **Placement (two links):** verify the ASC "Privacy Policy URL" metadata field is set
   (e.g. a Firebase Hosting page such as `https://<your-domain>/<app>/privacy`) **and** the in-app
   `/legal/privacy` route is reachable pre-auth. Both are mandatory; one alone fails.
@@ -93,7 +91,7 @@ In this suite's words, the privacy policy must state clearly:
   collection.
 - **"Paid functionality must not be dependent on or require a user to grant access to this
   data."** (Apple, App Store Review Guidelines 5.1.1(ii),
-  https://developer.apple.com/app-store/review/guidelines/) → For an app with a paid tier (the example app: Firestore sync), the paid features must **not** be gated on granting analytics consent.
+  https://developer.apple.com/app-store/review/guidelines/) → For an app with a paid tier (in the worked example, Firestore sync), the paid features must **not** be gated on granting analytics consent.
 - Must provide an **easily accessible, understandable way to withdraw consent**.
 - Purpose strings must clearly/completely describe data use.
 - Apps relying on **GDPR legitimate interest** without consent must comply with **all** terms of
@@ -106,7 +104,8 @@ In this suite's words, the privacy policy must state clearly:
 
 Request only data relevant to **core functionality**; collect/use only what's required. Prefer
 out-of-process pickers / share sheets over full access to protected resources (Photos, Contacts).
-**Worked (example app):** a breathing app should request near-zero device permissions; any permission prompt
+**Application:** an app whose core feature, in the app category the person gives, needs no device
+data should request near-zero device permissions; any permission prompt
 (e.g. notifications for reminders) must map to a stated PP purpose.
 
 ### 5.1.1(iv) Access
@@ -114,7 +113,7 @@ out-of-process pickers / share sheets over full access to protected resources (P
 
 Respect permission settings; do not manipulate/trick/force consent to unnecessary access; do not
 require unrelated permissions; provide alternatives when a user declines. Low relevance for an
-app that asks for almost no permissions (the example app), but the "no dark-pattern consent" rule informs paywall + consent-checkbox UX review.
+app that asks for almost no permissions, but the "no dark-pattern consent" rule informs paywall + consent-checkbox UX review.
 
 ### 5.1.1(v) Account Sign-In / **Account Deletion** (mandatory)
 `[settled — App Store Review Guidelines 5.1.1(v), verified 2026-11-18]`
@@ -130,9 +129,10 @@ app that asks for almost no permissions (the example app), but the "no dark-patt
 **Effective dates:** Apple announced the in-app account-deletion requirement on **2022-06-30**,
 with enforcement beginning **2023-01-31** (originally 2022-06-30, extended). `[verify-pinpoint]`
 
-**Application (worked: example app) — PASS:** in-app delete flow (type `DELETE` → soft-delete sets
-`deletionRequestedAt` → 30-day restore window → `purgeExpiredDeletions` cron hard-deletes
-Firestore + Auth + RevenueCat). **Deactivation-only would FAIL.** A scheduled deletion that
+**Application:** look for an in-app delete flow that ends in deletion (for example a soft-delete, a
+restore window, then a scheduled hard delete of every store holding the account; one app's flow and
+verdict: `worked-example.md` §3).
+**Deactivation-only would FAIL.** A scheduled deletion that
 defers final purge (e.g. to honor an active subscription term) is acceptable, but the user-facing
 action must be *deletion*, not suspension, and the PP (5.1.1(i) clause 3) must describe the
 deletion-request mechanism. `[verify]`
@@ -142,15 +142,15 @@ deletion-request mechanism. `[verify]`
 ## 5.1.2 — Data Use and Sharing
 `[settled — App Store Review Guidelines 5.1.2, verified 2026-11-18]`
 
-| Sub | Rule | Relevance (worked: example app) |
+| Sub | Rule | Relevance (worked example) |
 |---|---|---|
 | (i) | No use/transmit/share of personal data without permission; disclose all third-party sharing **including third-party AI**; obtain explicit permission. Tracking requires App Tracking Transparency (ATT). May not require system features (push, location, tracking) to access functionality or compensation. | No AI (hard project rule). No cross-app tracking → likely no ATT prompt required, but confirm SDKs aren't classified as tracking. |
 | (ii) | Data collected for one purpose may not be repurposed without further consent. | PP purpose-limitation must mirror GDPR Art. 5(1)(b). |
 | (iii) | No surreptitious profiling; may not re-identify "anonymized"/"aggregated" data. | Wellness analytics must stay aggregate. |
-| (iv) | No contact databases from Contacts/Photos; no collecting which other apps are installed for analytics/ads. | N/A for an app that reads neither (the example app). |
-| (v) | No unsolicited contact via Contacts/Photos data; no "Select All"/default-selected contacts. | N/A. |
-| (vi) | Data from HomeKit, **HealthKit**, Clinical Health Records, MovementDisorder, ClassKit, depth/facial-mapping APIs **may not be used for marketing, advertising, or use-based data mining**, including by third parties. | N/A for an app that uses none of these APIs (the example app). |
-| (vii) | Apple Pay data sharing limited to delivery/service improvement. | N/A. |
+| (iv) | No contact databases from Contacts/Photos; no collecting which other apps are installed for analytics/ads. | N/A for an app that reads neither. |
+| (v) | No unsolicited contact via Contacts/Photos data; no "Select All"/default-selected contacts. | N/A for an app that reads neither Contacts nor Photos. |
+| (vi) | Data from HomeKit, **HealthKit**, Clinical Health Records, MovementDisorder, ClassKit, depth/facial-mapping APIs **may not be used for marketing, advertising, or use-based data mining**, including by third parties. | N/A for an app that uses none of these APIs. |
+| (vii) | Apple Pay data sharing limited to delivery/service improvement. | N/A for an app without Apple Pay. |
 
 **Sanction (for risk framing):** an app that shares user data without consent, or otherwise
 breaks data-privacy law, can be removed from sale, and the developer can be removed from the
@@ -168,8 +168,8 @@ Apple Developer Program. `[settled — 5.1.2(i), verified 2026-11-18]`
 | (iii) | Health-related human-subject research requires informed consent (parent/guardian for minors) covering nature/purpose/duration, procedures/risks/benefits, confidentiality + data-sharing, contact, withdrawal. |
 | (iv) | Such research requires independent ethics-review-board approval; proof on request. |
 
-**Application (worked: example app) — N/A-PASS:** the example app does **not** use HealthKit, Clinical Health Records,
-Motion & Fitness, or any medical-research API, and stores no health data in iCloud. Whether breathing
+**Application:** for an app that does **not** use HealthKit, Clinical Health Records,
+Motion & Fitness, or any medical-research API, and stores no health data in iCloud: whether its
 session logs are special-category health data turns on what the data can reveal, not on the API
 (`data-category-ontology.md` §3) — confirm the PP's Art. 9 GDPR section is consistent (i.e. it does
 not over-declare health data). The 5.1.3 restrictions mostly don't bite; the operative health gate for such an app is **1.4.1**
@@ -189,7 +189,7 @@ not over-declare health data). The 5.1.3 restrictions mostly don't bite; the ope
 - All Pro-feature unlocking must go through **Apple IAP** (StoreKit); RevenueCat is permitted
   middleware *on top of* StoreKit, not a bypass. `[verify]`
 - Purchased credits/currencies may not expire; restorable purchases need a **restore mechanism**
-  (check the app surfaces "Restore Purchases"; the example app does — PASS).
+  (check the app surfaces "Restore Purchases").
 - **Apple is the merchant of record** for IAP — the ToS must say cancellation/refunds run through
   the **Store**, not the developer. `[verify]`
 
@@ -207,7 +207,7 @@ requirements described in Schedule 2 of the Apple Developer Program License Agre
 
 **Pre-purchase paywall must disclose (checklist):** items 1–3 and 6 are ADPLA Schedule 2 §3.8(b) (title; length; price, and price per unit if appropriate; links to the Privacy Policy and Terms of Use accessible within the app; Schedules 2 and 3 last updated 13 October 2026, verified 2026-11-18). Item 4 is 3.1.2(c). Item 5 is in neither Apple text `[verify]`; placing the links on the paywall itself is this suite's practice.
 
-| # | Required disclosure | Check (worked: example app) |
+| # | Required disclosure | Check (worked example) |
 |---|---|---|
 | 1 | **Subscription title/name** | e.g. "`<app name>` Pro" |
 | 2 | **Length of the subscription period** (billing cycle) | monthly / annual |
@@ -222,9 +222,9 @@ non-subscription trials); the subscription must last **at least 7 days** and be 
 all the user's devices; must provide **ongoing value**; no bait-and-switch. `[settled — 3.1.1 /
 3.1.2(a), verified 2026-11-18]`
 
-**Application (worked: example app):** confirm the paywall surfaces all six items + the dynamic trial-length
+**Application:** confirm the paywall surfaces all six items + the dynamic trial-length
 copy and the post-trial price. The unticked withdrawal/immediate-delivery checkbox
-(`withdrawalConsentAt`) is an **EU consumer-law** mechanism (Directive 2011/83 Art. 16(m)), **not**
+(and the consent timestamp it records) is an **EU consumer-law** mechanism (Directive 2011/83 Art. 16(m)), **not**
 an Apple requirement — Apple does not mandate or prohibit it. Do not conflate the two: Apple 3.1.2
 governs *disclosure*, the CRD governs the *14-day withdrawal waiver*. `[verify]`
 
@@ -249,9 +249,9 @@ treat patients. In this suite's words, the rule's three prongs:
   alone.
 - An app with **regulatory clearance** submits a link to that documentation.
 
-**Application (worked: example app) — PASS (firewall to maintain):**
-- The example app makes **no health measurements** and **no diagnostic/treatment claims**, so the
-  measurement-validation prong does not bite.
+**Application (the firewall to maintain):**
+- An app that makes **no health measurements** and **no diagnostic/treatment claims** is outside
+  the measurement-validation prong.
 - Enforce one copy rule across **PP, ToS, store listing, and in-app text**: use
   "supports / may help relax"; **never** "treats / cures / diagnoses / prevents / clinically
   proven." This is the Apple-side mirror of the EU-MDR wellness carve-out and the FTC HBNR
@@ -260,7 +260,7 @@ treat patients. In this suite's words, the rule's three prongs:
   the doctor-reminder prong). `[verify]`
 
 > 1.4.1 is the *claim-language* gate; the *data-handling* gate for any health-adjacent data is
-> 5.1.3. For a wellness app with no health data sources (the example app), 1.4.1 is the live one and 5.1.3 is N/A.
+> 5.1.3. For a wellness app with no health data sources, 1.4.1 is the live one and 5.1.3 is N/A.
 
 ---
 
@@ -271,7 +271,7 @@ These are not single-clause gates but reviewer cross-checks the legal docs must 
 1. **App Privacy "nutrition label" ⇄ PP must reconcile.** The App Store Connect App Privacy
    declarations (15 data categories plus "Other Data") must match what the PP says is collected. A mismatch is a
    common enforcement/rejection trigger. `[settled — App Privacy Details + 5.1.1, verified 2026-11-18]`
-   For the example app: declare Identifiers (User ID; **Device ID = Yes, Linked (via `setUserId`),
+   For the worked example: declare Identifiers (User ID; **Device ID = Yes, Linked (via `setUserId`),
    not tracking, Analytics**, whenever Firebase Analytics ships enabled for any user — Firebase
    Analytics collects the IDFV and app-instance ID; the IDFA reads as zeros without ATT `[settled —
    App Privacy Details; Firebase Analytics config (Apple platforms); Apple advertisingIdentifier docs,
@@ -291,7 +291,7 @@ These are not single-clause gates but reviewer cross-checks the legal docs must 
 
 ---
 
-## eenmanszaak publisher notes for the reviewer (the example app's profile)
+## eenmanszaak publisher notes for the reviewer (a sole-trader publisher, as in the worked example)
 
 - **Sole controller, no DPO, no employees:** Apple does not require a DPO; GDPR Art. 37 likely
   doesn't either for this profile. The PP must still name the controller with a real contact. A

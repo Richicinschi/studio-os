@@ -114,9 +114,9 @@ Use this as a scan list while reading code.
 
 It handles Workers practices and Workers code review. For neighbours:
 
-- Durable Objects: load the `durable-objects` skill.
+- Durable Objects: outside this domain; use Cloudflare's Durable Objects documentation.
 - Workflows: read the Workflows rules page (Cloudflare's "Rules of Workflows" under the Workflows docs).
-- Wrangler commands: load the `wrangler` skill.
+- Wrangler commands: the `wrangler` skill in this domain.
 
 ## Working principles
 

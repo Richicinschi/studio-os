@@ -37,7 +37,7 @@ This item is optional for every kind of work (data, ml, software or general), an
 1. **"Size?"** What every session loads when the file is imported, measured on a sample file written for each size (bytes divided by 4, an estimate):
    - Light: the template's three lines (values, what a good result looks like, what it must never pretend), each answered in a short phrase: about 68 tokens. Recommended for a first adoption.
    - Standard: a short page: a few lines under each of the three, plus what Claude refuses to become (for example, a yes-machine): about 276 tokens. Recommended when a habit you named comes from a value rather than a rule, such as a smooth answer that hid what was not checked.
-   - Full: the standard page, plus a header (who owns the file, how often it may change, its approval, and what does not belong in it) and a closing note of what it was drafted from: about 356 tokens. Recommended when the same file serves several setups or Projects.
+   - Full: the standard page, plus a header (who owns the file, how often it may change, its approval, and what does not belong in it) and a closing note of what it was drafted from: the full page comes to about 356 tokens. Recommended when the same file serves several setups or Projects.
    - Not sure: the size recommended above for the problem you named: standard when a habit you named comes from a value rather than a rule; full when the same file serves several setups or Projects; light otherwise. Claude offers to grow it after a week.
    - Default when skipped: light.
 

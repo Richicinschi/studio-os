@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -28,8 +28,8 @@
           "importance": "recommended",
           "why": "A new day starts from zero; the handoff note, and the skill that writes it, let the next session start where you stopped.",
           "loads": "every-session",
-          "everySessionTokens": 73,
-          "onDemandTokens": 1816,
+          "everySessionTokens": 76,
+          "onDemandTokens": 1595,
           "heavy": false,
           "card": "cards/handoff.md"
         },
@@ -157,7 +157,7 @@
           "why": "Building starts before anyone says what \"done\" means; this turns an idea into a design you approve first.",
           "loads": "every-session",
           "everySessionTokens": 67,
-          "onDemandTokens": 3520,
+          "onDemandTokens": 3517,
           "heavy": false,
           "card": "cards/brainstorming.md"
         },
@@ -183,7 +183,7 @@
           "why": "An approved design becomes small tasks, each with its own check, so progress can be seen and resumed.",
           "loads": "every-session",
           "everySessionTokens": 49,
-          "onDemandTokens": 2537,
+          "onDemandTokens": 2528,
           "heavy": false,
           "card": "cards/writing-plans.md"
         },
@@ -214,7 +214,7 @@
           "why": "For a vague, big ask: it interviews you one question at a time until the spec leaves no decision open.",
           "loads": "every-session",
           "everySessionTokens": 72,
-          "onDemandTokens": 1801,
+          "onDemandTokens": 1749,
           "heavy": false,
           "card": "cards/drill-to-plan.md"
         },
@@ -289,7 +289,7 @@
           "why": "Reads a whole codebase and writes ranked, self-contained plans for other sessions to carry out; it changes nothing itself.",
           "loads": "every-session",
           "everySessionTokens": 74,
-          "onDemandTokens": 3184,
+          "onDemandTokens": 3173,
           "heavy": false,
           "card": "cards/improve.md"
         },
@@ -318,7 +318,7 @@
           "why": "Runs a plan's independent tasks through subagents, with one review at the end, while the main thread keeps deciding.",
           "loads": "every-session",
           "everySessionTokens": 63,
-          "onDemandTokens": 4171,
+          "onDemandTokens": 4155,
           "heavy": false,
           "card": "cards/subagent-driven-development.md"
         }
@@ -358,7 +358,7 @@
           "why": "Once you lose track of your skills: one router that names each skill and when to reach for it.",
           "loads": "every-session",
           "everySessionTokens": 56,
-          "onDemandTokens": 1207,
+          "onDemandTokens": 994,
           "heavy": false,
           "card": "cards/using-agent-skills.md"
         }
@@ -375,7 +375,7 @@
           "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
           "loads": "every-session",
           "everySessionTokens": 64,
-          "onDemandTokens": 2809,
+          "onDemandTokens": 2799,
           "heavy": false,
           "card": "cards/git-guardrails.md"
         },
@@ -441,7 +441,7 @@
           "why": "When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own.",
           "loads": "every-session",
           "everySessionTokens": 33,
-          "onDemandTokens": 2225,
+          "onDemandTokens": 2230,
           "heavy": false,
           "card": "cards/finishing-a-development-branch.md"
         },
@@ -455,9 +455,9 @@
             "data": "recommended"
           },
           "why": "When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any.",
-          "loads": "every-session",
-          "everySessionTokens": 46,
-          "onDemandTokens": 2575,
+          "loads": "by-name",
+          "everySessionTokens": 0,
+          "onDemandTokens": 2581,
           "heavy": false,
           "card": "cards/git-cleanup.md"
         },
@@ -593,7 +593,7 @@
           "why": "Sets up a separate worktree for a branch, so parallel work never switches branches under another session.",
           "loads": "every-session",
           "everySessionTokens": 57,
-          "onDemandTokens": 1688,
+          "onDemandTokens": 1674,
           "heavy": false,
           "card": "cards/using-git-worktrees.md"
         },
@@ -696,7 +696,7 @@
           "why": "Builds a planned feature test-first in its own worktree, so the main thread keeps planning.",
           "loads": "every-session",
           "everySessionTokens": 55,
-          "onDemandTokens": 302,
+          "onDemandTokens": 317,
           "heavy": false,
           "card": "cards/bob-builder.md"
         },
@@ -712,7 +712,7 @@
           "why": "Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line.",
           "loads": "every-session",
           "everySessionTokens": 51,
-          "onDemandTokens": 369,
+          "onDemandTokens": 354,
           "heavy": false,
           "card": "cards/linus-reviewer.md"
         },
@@ -754,8 +754,8 @@
           "importance": "optional",
           "why": "Deep research across many sources, with every claim cited, for questions one search will not settle.",
           "loads": "every-session",
-          "everySessionTokens": 57,
-          "onDemandTokens": 356,
+          "everySessionTokens": 45,
+          "onDemandTokens": 320,
           "heavy": false,
           "card": "cards/sherlock-researcher.md"
         }
@@ -776,7 +776,7 @@
           "why": "A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships.",
           "loads": "every-session",
           "everySessionTokens": 74,
-          "onDemandTokens": 1069,
+          "onDemandTokens": 1035,
           "heavy": false,
           "card": "cards/claim-auditor.md"
         },
@@ -803,7 +803,7 @@
           "why": "Turns a system or data flow into an editable diagram file, kept on your machine.",
           "loads": "every-session",
           "everySessionTokens": 74,
-          "onDemandTokens": 2113,
+          "onDemandTokens": 2175,
           "heavy": false,
           "card": "cards/drawio-diagrams.md"
         },
@@ -1015,7 +1015,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 57,
-      "indexTokens": 299,
+      "indexTokens": 330,
       "card": "cards/pack-android-swiftui-react-native-app-building.md"
     },
     {
@@ -1042,7 +1042,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 53,
-      "indexTokens": 1200,
+      "indexTokens": 1171,
       "card": "cards/pack-app-legal-privacy-terms-store-review.md"
     },
     {
@@ -1069,7 +1069,7 @@
         "media-critic"
       ],
       "alwaysOnTokens": 69,
-      "indexTokens": 1112,
+      "indexTokens": 1119,
       "card": "cards/pack-audio-video-media.md"
     },
     {
@@ -1082,7 +1082,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 43,
-      "indexTokens": 176,
+      "indexTokens": 170,
       "card": "cards/pack-dependency-supply-chain-risk-checks.md"
     },
     {
@@ -1114,7 +1114,7 @@
         "design-critic"
       ],
       "alwaysOnTokens": 74,
-      "indexTokens": 1343,
+      "indexTokens": 1344,
       "card": "cards/pack-design-ui-logos-slides-posters.md"
     },
     {
@@ -1129,7 +1129,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 45,
-      "indexTokens": 273,
+      "indexTokens": 274,
       "card": "cards/pack-django-flask-laravel-shops-and-chat.md"
     },
     {
@@ -1144,7 +1144,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 34,
-      "indexTokens": 319,
+      "indexTokens": 305,
       "card": "cards/pack-engineering-testing-performance-code-design.md"
     },
     {
@@ -1164,7 +1164,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 56,
-      "indexTokens": 657,
+      "indexTokens": 658,
       "card": "cards/pack-games-design-prototype-playtest-assets.md"
     },
     {
@@ -1186,20 +1186,20 @@
       ],
       "agents": [],
       "alwaysOnTokens": 58,
-      "indexTokens": 865,
+      "indexTokens": 854,
       "card": "cards/pack-godot-camera-shaders-particles-export.md"
     },
     {
       "id": "learning-lessons-explanations-practice",
       "title": "Learning: lessons and explanations from zero",
-      "description": "Use when the user wants to learn something from zero: lesson by lesson teaching, patterns, spaced rechecks and practice, before any test or mock.",
+      "description": "Use when the user wants to learn something from zero: lesson by lesson teaching, patterns and practice, before any test.",
       "why": "Learn something from zero: lesson by lesson, with spaced rechecks and practice before any test.",
       "skills": [
         "teach"
       ],
       "agents": [],
-      "alwaysOnTokens": 37,
-      "indexTokens": 131,
+      "alwaysOnTokens": 30,
+      "indexTokens": 132,
       "card": "cards/pack-learning-lessons-explanations-practice.md"
     },
     {
@@ -1227,7 +1227,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 57,
-      "indexTokens": 1073,
+      "indexTokens": 1074,
       "card": "cards/pack-marketing-copy-emails-seo-signups.md"
     },
     {
@@ -1255,7 +1255,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 50,
-      "indexTokens": 1010,
+      "indexTokens": 1011,
       "card": "cards/pack-marketing-plans-offers-pricing-launches.md"
     },
     {
@@ -1285,7 +1285,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 49,
-      "indexTokens": 1252,
+      "indexTokens": 1253,
       "card": "cards/pack-mobile-apps-flutter-firebase.md"
     },
     {
@@ -1305,7 +1305,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 57,
-      "indexTokens": 649,
+      "indexTokens": 650,
       "card": "cards/pack-phone-app-testing-release-and-agents.md"
     },
     {
@@ -1321,7 +1321,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 36,
-      "indexTokens": 435,
+      "indexTokens": 398,
       "card": "cards/pack-python-backend-fastapi-docker-agents.md"
     },
     {
@@ -1343,7 +1343,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 58,
-      "indexTokens": 779,
+      "indexTokens": 780,
       "card": "cards/pack-stock-research-backtests-trading-safety.md"
     },
     {
@@ -1361,7 +1361,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 48,
-      "indexTokens": 466,
+      "indexTokens": 497,
       "card": "cards/pack-unity-editor-scripts-prefabs-builds.md"
     },
     {
@@ -1377,7 +1377,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 45,
-      "indexTokens": 309,
+      "indexTokens": 310,
       "card": "cards/pack-web-api-security-login-and-graphql.md"
     },
     {
@@ -1399,7 +1399,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 59,
-      "indexTokens": 739,
+      "indexTokens": 735,
       "card": "cards/pack-web-astro-cloudflare-gsap-performance.md"
     },
     {
@@ -1412,7 +1412,7 @@
       ],
       "agents": [],
       "alwaysOnTokens": 52,
-      "indexTokens": 165,
+      "indexTokens": 196,
       "card": "cards/pack-web-search-and-scraping-into-files.md"
     }
   ],

@@ -34,16 +34,16 @@ Open `docs/brand-guidelines.md` and change, in order:
 ### 3. Sync the tokens
 
 ```bash
-node brand/scripts/sync-brand-to-tokens.cjs
+node skills/brand/scripts/sync-brand-to-tokens.cjs
 ```
 
-The script rewrites the colours in `assets/design-tokens.json` and regenerates `assets/design-tokens.css`.
+The script rewrites the colours in `assets/design-tokens.json`, then regenerates `assets/design-tokens.css` with the token generator at `.claude/skills/design-system/scripts/generate-tokens.cjs`. This domain does not ship that generator: without it the script stops with exit 1 and "CSS not regenerated" after updating the JSON, and the CSS still holds the old colours. Put a generator there and re-run, or copy the new values into `design-tokens.css` by hand (`brand.md`, Sync workflow).
 
 ### 4. Check it took
 
 ```bash
 # the guidelines still parse
-node brand/scripts/inject-brand-context.cjs --json | head -30
+node skills/brand/scripts/inject-brand-context.cjs --json | head -30
 
 # the CSS carries the new values
 grep "primary" assets/design-tokens.css | head -5
@@ -51,12 +51,12 @@ grep "primary" assets/design-tokens.css | head -5
 
 ### 5. Report back
 
-Tell the user the theme, the three colours with their hex codes, and that the guidelines, the JSON tokens and the CSS tokens were all updated.
+Tell the user the theme, the three colours with their hex codes, and that the guidelines and the JSON tokens were updated. Say the CSS tokens were updated only if the sync regenerated them or you copied the values in by hand; otherwise say that `assets/design-tokens.css` still holds the old colours.
 
 ## Related skills
 
 - `brand` reads the guidelines and runs the sync.
-- `design-system` generates the tokens.
+- The token generator at `.claude/skills/design-system/scripts/generate-tokens.cjs` in the project, when there is one, generates the CSS tokens. This domain does not ship that generator.
 
 ## Invocations
 

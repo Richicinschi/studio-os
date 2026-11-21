@@ -1,6 +1,6 @@
 ---
 name: production-fastapi
-description: "Production FastAPI: structured logging, health checks, graceful shutdown, middleware, Pydantic models (v2), async, error handling, security, Uvicorn/Gunicorn setup, best practices. Use for fastapi/starlette/pydantic/uvicorn code or /production fastapi. Not Django or Flask unless asked."
+description: "Production FastAPI: structured logging, health checks, graceful shutdown, middleware, Pydantic v2 models, async, error handling, security, Uvicorn/Gunicorn. Use for fastapi/starlette/pydantic/uvicorn code or /production fastapi. Not Django or Flask unless asked."
 metadata:
   category: backend
   author: Richicinschi

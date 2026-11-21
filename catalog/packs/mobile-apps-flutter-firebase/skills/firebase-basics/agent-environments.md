@@ -1,8 +1,9 @@
 # Getting the Firebase skills and MCP server into your agent
 
-Install and refresh recipes per agent. Two cross-cutting rules:
+Install and refresh recipes per agent. The cross-cutting rules:
 
-- Every skill, plugin, extension or MCP server here comes from outside. Scan and vet it first (`vet-and-adopt`), name what it will install, and get a yes before running the install. All of it is recommended, not required: if the person declines, carry on with the CLI and tell them which later steps need it (listed in the gate of [machine-prereqs.md](machine-prereqs.md)).
+- Every skill, plugin, extension or MCP server here comes from outside. Vet it before installing (the kit's `vet-and-adopt`, run from the kit folder), name what it will install, and get a yes before running the install.
+- All of it is recommended, not required: if the person declines, carry on with the CLI and tell them which later steps need it (listed in the gate of [machine-prereqs.md](machine-prereqs.md)).
 - After any change, ask the user to restart the app, then stop and wait for their reply before you check that the connection shows up.
 
 ## The skills CLI pattern (Cursor, Copilot, Antigravity, others)

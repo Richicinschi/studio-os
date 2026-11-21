@@ -26,8 +26,9 @@ Read-only. Presence, settings, names and versions; no network.
 - The scripts: `.claude/hooks/git-guardrails/block-dangerous-git.mjs` or `~/.claude/hooks/git-guardrails/block-dangerous-git.mjs`, present or not, with `guard.mjs`, `rules.mjs` and `lib/` beside it; and version 1.4.0's bash script, `.claude/hooks/block-dangerous-git.sh` or `~/.claude/hooks/block-dangerous-git.sh`.
 - The skill: a skill named `git-guardrails`, or another doing the same job, at project or user level. Names and descriptions only.
 - Whether your instruction files put pushing on your ask-first list (for question 2).
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/git-guardrails/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a git guard runs for every shell tool Claude has, **partly** when a guard is set but one shell tool is not matched, or its entry names a script that is missing, and **not yet** otherwise.
+The menu marks the item **have** when a git guard runs for every shell tool Claude has, **partly** when a guard is set but one shell tool is not matched, or its entry names a script that is missing, and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -78,7 +79,7 @@ The menu marks the item **have** when a git guard runs for every shell tool Clau
    Copy-Item -Recurse -Force <this-skill>/scripts/* .claude/hooks/git-guardrails/
    ```
 
-   The entry script needs `guard.mjs`, `rules.mjs` and `lib/` beside it; copied alone, it refuses every command that names git. When plain pushes are refused (question 2), Claude adds that rule to `rules.mjs` and shows you the change before saving it. If you install the skill too, Claude rewrites in your words its note on G6, the studio's own guard, which your setup does not have. When Detect found version 1.4.0's bash script, Claude removes it and its settings entry in the same change, so one guard runs.
+   The entry script needs `guard.mjs`, `rules.mjs` and `lib/` beside it; copied alone, it refuses every command that names git. When plain pushes are refused (question 2), Claude adds that rule to `rules.mjs` and shows you the change before saving it. When Detect found version 1.4.0's bash script, Claude removes it and its settings entry in the same change, so one guard runs.
 3. **Claude:** merges one entry into `hooks.PreToolUse` of the settings file for that place, keeping every other setting, and shows you the change before saving it. For this project:
 
    ```json

@@ -52,4 +52,4 @@ This skill drafts only. It never sends, schedules or uploads anything to a mail 
 - Subject lines sit near 40-60 characters and previews do not repeat them.
 - Nothing was sent, scheduled or imported, and the user was told so.
 - Recipients opted in to this mail, and every email carries a working way to unsubscribe.
-- Output is English only, with no em or en dashes.
+- Output is in the languages the project supports, with no em or en dashes.

@@ -56,8 +56,7 @@ when, after its magic, `./` and `//` collapse and `..` takes off the segment bef
 left (`.`, `./`, `src/..`, an empty `:/`), or what is left is wildcards alone with a `*` in them
 (`*`, `**`, `./**`, `**/*`, `:(glob)*`). `src/*.js`, `*.js`, `src/**`, `:(top)src/a.js` and
 `:(literal)*` do not. A list made only of exclusions (`:!x`, `:^x`, `:(exclude)x`) means
-everything but those, so it names the whole tree too. G6 in the studio hub reads pathspecs with
-the same rule (`lib/git.mjs`).
+everything but those, so it names the whole tree too. The rule lives in `lib/git.mjs`.
 
 git reads a config key in any case, so the `core.hooksPath` rules match `core.hookspath`,
 `CORE.HOOKSPATH` and every other mix. Turning hooks on with `git config core.hooksPath <folder>`

@@ -45,7 +45,10 @@ fi
 printf 'Found %s test files\n\n' "$total"
 
 n=0
-for file in $files; do
+# One path per line, read whole, so a folder name with a space stays one path.
+# The list comes in on fd 3: a test that reads stdin cannot swallow the rest of it.
+while IFS= read -r file <&3; do
+  [ -n "$file" ] || continue
   n=$((n + 1))
 
   # If the path is already there, no later test can be blamed for creating it.
@@ -66,11 +69,11 @@ for file in $files; do
     printf 'Pollution details:\n'
     ls -la "$watched"
     printf '\nTo investigate:\n'
-    printf '  npm test %s    # Run just this test\n' "$file"
-    printf '  cat %s         # Review test code\n' "$file"
+    printf '  npm test "%s"    # Run just this test\n' "$file"
+    printf '  cat "%s"         # Review test code\n' "$file"
     exit 1
   fi
-done
+done 3<<< "$files"
 
 printf '\n✅ No polluter found - all tests clean!\n'
 exit 0

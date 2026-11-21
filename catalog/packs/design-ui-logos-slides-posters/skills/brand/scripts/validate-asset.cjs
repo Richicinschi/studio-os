@@ -127,11 +127,13 @@ function checkManifest(file) {
   try {
     const raw = fs.readFileSync(manifestFile, 'utf-8');
     const list = JSON.parse(raw).assets;
-    const rel = path.relative(process.cwd(), file);
+    // Both sides use forward slashes, so a backslash path (Windows) matches the entry and vice versa.
+    const slashes = (p) => p.split('\\').join('/');
+    const wanted = [path.relative(process.cwd(), file), file].map(slashes);
     let entry;
     if (list !== undefined && list !== null) {
       if (!Array.isArray(list)) throw new TypeError('assets must be a list');
-      entry = list.find((item) => [rel, file].includes(item.path));
+      entry = list.find((item) => typeof item.path === 'string' && wanted.includes(slashes(item.path)));
     }
     const message = entry ? 'Asset registered in manifest' : 'Asset not in manifest';
     return { registered: Boolean(entry), message, asset: entry };

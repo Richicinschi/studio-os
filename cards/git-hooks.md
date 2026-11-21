@@ -28,7 +28,6 @@ Read-only. Settings as set or not set, presence, counts and versions; no network
   - `git -C "<repo>" config --get core.hooksPath >/dev/null && echo set || echo "not set"`.
 - Your user setting, which applies to every repository: `git config --global --get core.hooksPath >/dev/null && echo set || echo "not set"`.
 - Whether the template is already in your setup: `<your setup>/git-hooks/check-staged.mjs`, present or not.
-- Whether git knows who you are, which the canary needs: `git config --global --get user.email >/dev/null && echo set || echo "not set"`.
 - Versions: `git --version`, `node --version` (the hooks need Node), and `gitleaks version` (optional; it may not be installed).
 
 The menu marks the item **have** when the repositories you chose run the template's checks, through `core.hooksPath` or a call from their own hook, **partly** when the template is in your setup but on in none or only some of them, and **not yet** otherwise.
@@ -58,7 +57,7 @@ The menu marks the item **have** when the repositories you chose run the templat
 
 ## Needs
 
-- Git, with your name and email set; the canary stops without them.
+- Git. The canary needs no name or address of yours: it sets its own in its throwaway repository.
 - Node.js on the PATH: the hooks are sh scripts that call `node`. [Tools some items need](../docs/install-reference.md#tools-some-items-need) installs Node.js 22:
   - Windows: `! winget install --id OpenJS.NodeJS.22 -e`;
   - macOS and Linux: through nvm, the three lines in [docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux";
@@ -106,9 +105,9 @@ Which steps each size takes: **light** and **standard** every step but 3 and 4, 
    Without gitleaks, the last line reads `SKIP  the secret scan (gitleaks is not installed)`; at light, the trailer line is not there.
 2. **Claude:** for each repository turned on through the setting, `git -C "<repo>" config --get core.hooksPath` prints the folder from step 7.
 3. **Claude:** on every route, in each repository from step 7, with nothing else staged: stages a new file holding one conflict-marker line (`<<<<<<< check`) and tries `git commit -m "hooks check"`. Expected: `pre-commit refused this commit:` and a line naming the conflict marker. Then it unstages and deletes the file. At standard and full, it then tries `git commit --allow-empty -m x -m "Co-authored-by: Check <check@example.invalid>"`. Expected: `commit-msg refused`. The canary proves the scripts work; this proves the real repository runs them.
-4. At full, for the never-share list: Claude makes a throwaway repository in a temporary folder and gives you the line that points its `core.hooksPath` at your folder, which you run as in step 7. Claude then stages a file holding one term from your list and tries `git commit -m "list check"`. Expected: `pre-commit refused this commit:` and a line ending `a term from your never-share list (line <n> of the list)`, which names the line of the list, never the term. Then it deletes the folder.
+4. At full, for the never-share list: Claude makes a throwaway repository in a temporary folder with `git init`, then `git config user.name throwaway`, `git config user.email canary@example.invalid` and `git config commit.gpgsign false` inside it, so your own name, address and signing take no part. It gives you the line that points its `core.hooksPath` at your folder, which you run as in step 7. Claude then stages a file holding one term from your list and tries `git commit -m "list check"`. Expected: `pre-commit refused this commit:` and a line ending `a term from your never-share list (line <n> of the list)`, which names the line of the list, never the term. Then it deletes the folder.
 
-A `FAIL` line, or a commit that goes through in step 3 or 4, means the item is not done: the plan row stays unticked, and the failing line's message is the next thing to look at. A commit that went through in step 3 is removed only on your yes. If the canary stops with "a plain commit fails here", git cannot commit even in a throwaway repository, often because signing cannot ask for its passphrase; fix that first.
+A `FAIL` line, or a commit that goes through in step 3 or 4, means the item is not done: the plan row stays unticked, and the failing line's message is the next thing to look at. A commit that went through in step 3 is removed only on your yes. If the canary stops with "a plain commit fails here", git cannot commit even in a throwaway repository; the lines git printed below it say why, and that is the first thing to fix.
 
 ## Undo
 
@@ -124,7 +123,7 @@ A `FAIL` line, or a commit that goes through in step 3 or 4, means the item is n
 - **A public address passes.** The address check knows the private ranges only. Before the first push of any repository, search its whole history for addresses and secrets ([a real address in history](../examples/real-address-in-history.md)).
 - **Shared hook files.** A `.husky/` file or a `.pre-commit-config.yaml` is usually committed for the whole team; a line there that calls a file in your own setup fails on everyone else's machine and puts your path into the repository. Agree such a change with the team, or keep the call in an unshared hook.
 - **A Claude that adds trailers.** If your Claude ends its commit messages with an attribution trailer, a kept `commit-msg` refuses every one of its commits; change one or the other.
-- **Signed commits and the canary.** When your commits are signed with a passphrase nobody can type at that moment, the canary's plain commit fails, and it stops and says so ([signed commits](signed-commits.md)).
+- **Signed commits and the canary.** The canary commits unsigned, under its own name and address (`commit.gpgsign false`, `canary@example.invalid`), set in its throwaway repository only: it tests the hooks, not signing, so a passphrase nobody can type at that moment does not stop it. Whether your own commits are signed is checked by [signed commits](signed-commits.md).
 - **Roll out on a canary first.** A mistake in a shared hook reaches every repository at once; the order in step 8 keeps it to one.
 - **gitleaks** v8.30.1 is the current release, and its author has announced security fixes only from here on ([docs/facts.md](../docs/facts.md)).
 - **Windows:** write the `core.hooksPath` folder with forward slashes, as the canary does; a canary that reads PASS on your machine shows git found the scripts there.

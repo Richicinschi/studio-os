@@ -9,8 +9,8 @@ Use this when the person wants to settle how a page, app, brand, deck or product
 
 Neighbouring skills, and where each takes over:
 
-- Building UI code with a distinctive look is the job of the hub skill `frontend-design`. Hand it the finished direction from this skill and let it build from there.
-- Looking up palettes, font pairings, product-type styles and UX guidelines from data is the job of the hub skill `ui-styles-palettes-fonts`. Use it as a source of candidates while writing the options, or once a direction is chosen to fill in details.
+- Building UI code with a distinctive look is the job of `frontend-design` in this domain. Hand it the finished direction from this skill and let it build from there.
+- Looking up palettes, font pairings, product-type styles and UX guidelines from data is the job of `ui-styles-palettes-fonts` in this domain. Use it as a source of candidates while writing the options, or once a direction is chosen to fill in details.
 - Fixing a screen that already exists and looks generic is `fix-ai-looking-ui` (same pack). This skill is for the stage before building.
 
 This skill ends with a written direction. The person, or one of the skills above, builds from it.

@@ -15,7 +15,7 @@ checked: 2026-11-02
 
 ## Detect
 
-Read-only. These commands print settings as set or not set, versions and counts. They never print a key ID, a fingerprint or a file name, and they use no network.
+Read-only. These commands print settings as set or not set, versions and counts. They never print a key ID, a fingerprint or a file name, they use no network, and they leave no file behind: `gpg` makes its keyring folder and files the first time it lists keys, so it runs only where a keyring already exists. Where one does, listing the keys starts `gpg-agent`, which keeps its socket files in that folder while it runs; once the agent stops, nothing is left.
 
 - Signing settings, for your user and for each repository in `adoption/inventory.md`:
   - `git config --global --get commit.gpgsign` and `git config --global --get gpg.format`;
@@ -24,7 +24,11 @@ Read-only. These commands print settings as set or not set, versions and counts.
 - Whether a company repository overrides any of them locally: `git -C <repo> config --local --name-only --get-regexp '^(commit\.gpgsign|gpg\.format|user\.signingkey)$'`. `--name-only` is not in docs/facts.md as of 2026-11-02, so Claude first checks in `git help config` that it prints names without values.
 - Versions: `git --version`, `ssh -V`, and `gpg --version | head -1` (it may not be installed).
 - How many keys exist, counts only:
-  - GPG secret keys: `gpg --list-secret-keys --with-colons 2>/dev/null | grep -c '^sec'`;
+  - GPG secret keys, counted only when the folder that holds them exists (`gpgconf` names the keyring folder the `gpg` you run uses, without creating it), otherwise `no keyring`:
+    ```bash
+    if d=$(gpgconf --list-dirs homedir 2>/dev/null) && [ -d "$d/private-keys-v1.d" ]
+    then gpg --no-auto-check-trustdb --list-secret-keys --with-colons 2>/dev/null | grep -c '^sec'; else echo "no keyring"; fi
+    ```
   - SSH public keys: `ls "$HOME"/.ssh/*.pub 2>/dev/null | wc -l`.
 
 The menu marks the item **have** when `commit.gpgsign` is `true` and a signing key is set, **partly** when a key exists but signing is off, and **not yet** otherwise.
@@ -62,7 +66,12 @@ The menu marks the item **have** when `commit.gpgsign` is `true` and a signing k
    - SSH: `ssh-keygen -t ed25519 -C "<your email>"`;
    - GPG: `gpg --full-generate-key` (GnuPG 2.1.17 or later).
 2. **you:** tell Claude which key to use. For SSH, type the path of the public key file (the one ending in `.pub`); for GPG, the key ID. Claude never lists your key folders to find it.
-3. **Claude:** on your yes, sets three values in the scope you chose (`git config --global ...` for every repository, `git -C <repo> config ...` for one):
+3. **Claude:** first writes down, in `adoption/decisions.md`, what the values this card sets were before it, in the scope you chose, so Undo can put them back; `not set` for each one that was not:
+   ```bash
+   for k in user.signingkey commit.gpgsign gpg.format gpg.ssh.allowedSignersFile; do
+     echo "$k: $(git config --global --get "$k" || echo 'not set')"; done
+   ```
+   (for one repository, `git -C <repo> config --local --get` instead). Then, on your yes, it sets three values in that scope (`git config --global ...` for every repository, `git -C <repo> config ...` for one):
    - SSH: `gpg.format ssh`, `user.signingkey <path to the .pub file>`, `commit.gpgsign true`;
    - GPG: `user.signingkey <key ID>`, `commit.gpgsign true`.
    Claude shows the commands before it runs them. They are the ones GitHub and git's own reference give ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder").
@@ -71,7 +80,7 @@ The menu marks the item **have** when `commit.gpgsign` is `true` and a signing k
    - GPG on GitHub: Settings, then "SSH and GPG keys", "New GPG key", pasting the output of `gpg --armor --export <key ID>`;
    - a company server: its own settings page; ask your administrator if you cannot find it.
 5. **Claude:** for SSH, writes one line to an allowed-signers file so your own machine can check signatures: your email, `namespaces="git"`, then the public key, so the key is accepted for git signatures only ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder"). The file can live outside any repository: in your setup folder, or in a file of your choice for every repository, such as `~/.config/git/allowed_signers`. `gpg.ssh.allowedSignersFile` points at it, in the same scope as step 3.
-6. **Claude:** records the scope, the key type and the undo in `adoption/decisions.md`. It never records the key ID or the key itself.
+6. **Claude:** records the scope, the key type and the undo in `adoption/decisions.md`, next to the earlier values from step 3, and for SSH the two paths it set, the `.pub` file and the allowed-signers file, as `git config --get` prints them back after step 5 (Git Bash can rewrite a path on its way to git), so Undo can tell whether they changed later. It never records the new key's ID or the key itself; an earlier `user.signingkey`, a key ID or a path, is written down only because Undo needs it back.
 
 ## Check
 
@@ -85,7 +94,8 @@ If step 1 prints `No signature` or an error, the item is not done: the plan row 
 
 ## Undo
 
-- **Claude:** removes the values in the same scope: `git config [--global] --unset commit.gpgsign`, then the same for `gpg.format`, `user.signingkey` and `gpg.ssh.allowedSignersFile`. (Newer git also accepts `git config unset <key>`.)
+- **Claude:** first reads each value as it is now, with the loop from step 3, and compares it with what the card left: `commit.gpgsign` `true`; for SSH, `gpg.format` `ssh` and the two paths recorded in step 6; for GPG, `user.signingkey` the key you named in step 2, which the card does not record, so Claude asks you whether it is still that key; and for a key the card did not set, the value step 3 wrote down. A value that differs was changed after the card, by you or by another tool: Claude names it and asks you before it puts the earlier value back over it, and on your no leaves it as it is.
+- **Claude:** then puts back the values written down in step 3, in the same scope, except any you chose to keep: each one recorded as `not set` is removed (`git config [--global] --unset <key>`; newer git also accepts `git config unset <key>`), and each other one is set again to its recorded value (`git config [--global] <key> <recorded value>`). A signing key or a `commit.gpgsign` you had before the card is then as it was.
 - **Claude:** deletes the line it added to the allowed-signers file.
 - **you:** remove the key from your server: `! gh ssh-key delete <id>` (or `gh gpg-key delete`), or the "SSH and GPG keys" settings page.
 - Your key itself stays on your machine; deleting it is your own decision.

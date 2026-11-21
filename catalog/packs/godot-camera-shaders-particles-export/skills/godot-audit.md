@@ -3,8 +3,8 @@ name: godot-audit
 description: >-
   Audit a Godot 4.x / GDScript project for code quality, project-structure, performance,
   and — uniquely — progression and currency ECONOMY health. Use when reviewing a Godot game's code
-  before merge, when a game's progression "feels off" (maxes too fast, currency snowballs,
-  grind dead-zones), or when asked to "audit / review the Godot project", "check the
+  before merge, or when its progression "feels off" (maxes too fast, currency snowballs,
+  grind dead-zones). Also when asked to "audit / review the Godot project", "check the
   GDScript", "review the skill tree / economy balance". Produces a structured findings
   report (Critical / Improvements / Positive) with file:line locations and suggested fixes.
   Checks code against Godot's official GDScript style guide and the economy against

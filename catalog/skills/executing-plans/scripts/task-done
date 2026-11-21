@@ -29,7 +29,9 @@ if ! git rev-parse --verify --quiet "$base_ref" > /dev/null; then
   exit 2
 fi
 
-workspace=$("$sdd_scripts/sdd-workspace" "$plan_file")
+# Run the sibling through bash: unpacking a package with some tools drops the
+# executable bit.
+workspace=$("${BASH:-bash}" "$sdd_scripts/sdd-workspace" "$plan_file")
 test_log="$workspace/task-${task_no}-tests.log"
 ledger_file="$workspace/progress.md"
 

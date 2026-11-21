@@ -107,7 +107,7 @@ Do not trust keyword matching alone for branches whose remote is gone. For each 
 3. For a group, list the recent PR merges and see which one carried which work.
 4. Confirm that the specific commits were absorbed. A similarly named pull request that merged is not enough.
 
-If the user asks whether a branch is safe because its work was checked, the check is a local verification run. The studio retired hosted CI. Never say that CI is green.
+If the user asks whether a branch is safe because its work was checked, name the check you actually saw: a local verification run, or the hosted CI result for that commit. Never say that CI is green unless you read that result.
 
 ## Step 4. Sort the rest
 
@@ -137,7 +137,7 @@ Git cannot see that a squash merge took in a branch. So `git branch -d` always r
 
 When a branch is squash-merged, plan `-D` from the start. Never try `-d` first and then come back with a second question. That burns one of the user's two confirmations for nothing.
 
-Note: studio repositories merge pull requests with merge commits only (hard rule 13). Squash-merged branches are rare here. Still check for them. Outside repositories and old history contain squash merges.
+Note: where pull requests merge with merge commits only, squash-merged branches are rare. Still check for them. Outside repositories and old history contain squash merges.
 
 ## Step 5. Worktrees and live sessions
 

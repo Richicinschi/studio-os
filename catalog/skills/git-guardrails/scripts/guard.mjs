@@ -28,13 +28,14 @@ export const message = (command, reason) => `BLOCKED: '${command}' ${reason}. Yo
  * { code, stderr } for the hook's raw stdin: 2 refuses the command, 0 lets it run. A hook that
  * fails lets the command run, so this one fails closed: when it cannot read the payload or the
  * command, it refuses if the text names git (the command's text, or all of stdin when that is not
- * JSON) and allows otherwise. Empty stdin holds no command.
+ * JSON) and allows otherwise. Empty stdin holds no command. One leading byte-order mark (U+FEFF,
+ * which PowerShell writes before what it pipes) is dropped before the JSON is read.
  */
 export function run(raw, deps) {
   if (!raw.trim()) return { code: 0, stderr: '' };
   let text = raw;
   try {
-    const payload = JSON.parse(raw);
+    const payload = JSON.parse(raw.startsWith('\uFEFF') ? raw.slice(1) : raw);
     const command = payload?.tool_input?.command;
     text = typeof command === 'string' ? command : '';
     const { block, reason } = decide(payload, deps);

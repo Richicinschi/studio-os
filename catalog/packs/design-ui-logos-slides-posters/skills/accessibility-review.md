@@ -11,7 +11,7 @@ Typical words: "is this accessible", "can colour-blind people read it", "does it
 
 Neighbours:
 - Choosing or designing the colours, type and layout in the first place: the visual design skills of this pack take over. Come back here to check the result.
-- Page speed, SEO and general quality audits: the hub skills for performance and SEO cover those.
+- Page speed, SEO and general quality audits: the performance and SEO skills of other domains cover those.
 - Legal advice on accessibility duties: out of scope. Report measured results and say a jurist decides what is required.
 
 The basis is the public WCAG 2.2 success criteria. Level AA is the default target. Report AAA only when asked.

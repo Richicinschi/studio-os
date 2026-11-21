@@ -1,6 +1,6 @@
 ---
 name: council
-description: Convene the Studio Council — a panel of the studio's persona-agents — to critique a decision, plan, or question from multiple viewpoints and return one synthesized brief. Use when facing a real fork ("should we build X", "is this plan sound", "ship the paywall now?") and you want diverse, conflicting perspectives before deciding. Trigger on "/council", "convene the council", "what does the board think", "get the council's take". For a multi-round deliberation where the seats actually rebut and respond to each other, trigger "debate", "deliberate", "/council --debate", "argue it out", "full deliberation".
+description: Convene the Studio Council (the studio's persona-agents) to critique a decision, plan or question from several viewpoints and return one synthesized brief. Use when facing a real fork ("should we build X", "is this plan sound", "ship the paywall now?") and you want diverse, conflicting perspectives before deciding. Trigger on "/council", "convene the council", "what does the board think", "get the council's take". For a multi-round deliberation where the seats actually rebut and respond to each other, trigger "debate", "deliberate", "/council --debate", "argue it out", "full deliberation".
 metadata:
   category: studio
   author: Richicinschi

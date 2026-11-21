@@ -85,4 +85,4 @@ This skill decides what to make, how to gate it, and how to get it seen. Neighbo
 - A consent statement, privacy link and unsubscribe are planned, and the legal skills were pointed to.
 - Any paid promotion names a budget and was approved by the owner.
 - Targets come from the owner's own baseline, not from outside averages.
-- Text is English, with no em or en dashes.
+- Text is in the languages the project supports, with no em or en dashes.

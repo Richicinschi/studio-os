@@ -2,7 +2,6 @@
 name: building-pydantic-ai-agents
 description: Use when the user mentions Pydantic AI or asks to test agent behavior, get structured output, design multi-agent patterns, define agents from YAML, then stream output, or build an AI agent. Also when code imports pydantic_ai, to add tools or capabilities, or defer capability loading.
 metadata:
-  scan: SkillSpector, no findings
   category: backend
   author: Richicinschi
   version: "1.1.0"

@@ -1,5 +1,5 @@
 /**
- * git's option reader, shared by G6 (grant-required.mjs) and the shipped git-guardrails guard:
+ * git's option reader, shared by the grant guard (grant-required.mjs) and the shipped git-guardrails guard:
  * git's global options and subcommand, then a subcommand's options and positionals, and which
  * pathspecs name the whole tree. Self-contained (no imports), so it can be copied byte for byte.
  */

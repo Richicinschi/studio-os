@@ -33,9 +33,9 @@ The menu marks the item **have** when all three answers are yes; **partly** when
 ## Ask
 
 1. **"Size?"** Each estimate is the instruction block before you fill it, bytes divided by 4; it grows with your lists. How claude.ai brings a Project's instructions and knowledge into each chat is not documented in docs/facts.md as of 2026-11-02, so the knowledge files are not counted.
-   - Light: the block as the template has it (the work, two lines on who you are, the "ask me first" and "never" lists, the line to read the newest handoff note first, and the handoff shape), with only the handoff notes in the knowledge. About 116 tokens (estimate). Recommended for a first adoption, and when your data rules keep everything else out of claude.ai.
-   - Standard: light, plus the two or three `STYLE.md` lines you would miss most in the block, and the reference documents this stream needs in the knowledge. About 130 tokens (estimate). Recommended when a new chat in this stream keeps asking for the same documents.
-   - Full: standard, plus the full `USER.md` and `RELATIONSHIP.md` ([identity files](identity-user.md)) in the knowledge, and one line in the block that points to them. About 151 tokens (estimate). Recommended when you wrote them at the standard or full level.
+   - Light: the block as the template has it (the work, two lines on who you are, the "ask me first" and "never" lists, the line to read the newest handoff note first, and the handoff shape), with only the handoff notes in the knowledge. Light costs about 116 tokens (estimate). Recommended for a first adoption, and when your data rules keep everything else out of claude.ai.
+   - Standard: light, plus the two or three `STYLE.md` lines you would miss most in the block, and the reference documents this stream needs in the knowledge. Standard costs about 130 tokens (estimate). Recommended when a new chat in this stream keeps asking for the same documents.
+   - Full: standard, plus the full `USER.md` and `RELATIONSHIP.md` ([identity files](identity-user.md)) in the knowledge, and one line in the block that points to them. Full costs about 151 tokens (estimate). Recommended when you wrote them at the standard or full level.
    - Not sure: light, the size recommended above for a first adoption and the narrowest choice; update mode offers a larger size.
    - Default when skipped: light.
 2. **"A claude.ai Project for this stream of work?"** A stream is a product, a client or a recurring report, not a single question.
@@ -87,7 +87,7 @@ If it asks you, answers in general terms, or uses an older note, the item is not
 
 ## Watch out
 
-- **What it costs per chat.** The template's block, before you fill it, is 462 bytes, about 116 tokens (estimate, bytes divided by 4); the standard size's `STYLE.md` line adds 58 bytes, and the full size's pointer line 82 more, for about 130 and 151 tokens (estimates). It grows with your lists. How claude.ai brings a Project's instructions and knowledge into each chat, and how it caches chats, is not documented in docs/facts.md as of 2026-11-02.
+- **What it costs per chat.** The template's block, the light size before you fill it, is about 116 tokens (estimate, bytes divided by 4); the standard size's `STYLE.md` line and the full size's pointer line bring it to about 130 and 151 tokens (estimates). It grows with your lists. How claude.ai brings a Project's instructions and knowledge into each chat, and how it caches chats, is not documented in docs/facts.md as of 2026-11-02.
 - **Memory differs by plan.** It is on by default on Free, Pro, Max and Ultra. On Team and Enterprise it is off for each member until they turn it on, and owners cannot turn it on for them. It builds itself from your chats, so keep your contract in the instructions, which you wrote and review.
 - **Past chats.** On Pro, Max, Ultra, Team and Enterprise, claude.ai can search and reference your past chats, on by default (Settings > Your Claude > "Search and reference chats"). The note is still the record you control.
 - **Company data.** A personal account holding company material can break your company's rules. Put into a Project only what your data rules allow, and nothing that crosses between streams of work.

@@ -33,7 +33,7 @@ One rule governs every command: write the CLI as `npx firebase-tools@15.36.0 <co
 6. **Initialize services.** Look for `firebase.json` first; if it exists, the folder is already set up. Otherwise, from the codebase root, run `npx firebase-tools@15.36.0 init` and answer its prompts (features, project, config files). Details in [cli-tour.md](firebase-basics/cli-tour.md).
 7. **Discover commands from the tool itself.** `--help` for the full list, `<command> --help` for one command. See [cli-tour.md](firebase-basics/cli-tour.md).
 8. **Add the SDK.** Use [flutterfire-walkthrough.md](firebase-basics/flutterfire-walkthrough.md) for Flutter, and [native-and-web-setup.md](firebase-basics/native-and-web-setup.md) for Android, iOS and web.
-9. **Genkit.** If the project uses Genkit, its skills install with `npx skills add genkit-ai/skills`. That is an outside install: scan and vet it first (`vet-and-adopt`) and ask before running it.
+9. **Genkit.** If the project uses Genkit, its skills install with `npx skills add genkit-ai/skills`. That is an outside install: vet it before installing (the kit's `vet-and-adopt`, run from the kit folder) and ask before running it.
 
 ## Without local tools
 
@@ -47,4 +47,4 @@ Node and npx are required for every command here. If they are missing, do not im
 - Config files came from `apps:sdkconfig`, are in the right place, and iOS output has no CLI header text.
 - Android: `projects:list` and `apps:list --project <PROJECT_ID>` show the new project and app.
 - Anything installed from outside (skills, plugins, MCP servers) was vetted first and you named its effect before running it.
-- Any app strings set up along the way are English only.
+- Any app strings set up along the way are in the languages the project supports.

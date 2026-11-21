@@ -64,6 +64,7 @@ The menu marks the item **have** when an instruction file carries the rule and D
      docker run -d --name <job-name> --memory <limit> --cpus <count> \
        -v "<data folder>:/data" -v "<secrets folder>:/secrets:ro" <image> <command>
      ```
+     In Git Bash on Windows, the shell Claude Code uses there, the line starts with `MSYS_NO_PATHCONV=1 docker run ...`: without it, Git Bash rewrites `/data` and every other argument that starts with `/` into a Windows path before Docker sees it, so nothing is mounted and the job's output stays inside the container. PowerShell, macOS and Linux need no prefix.
    - then how to follow it, `docker logs -f <job-name>`, and how to stop it, `docker stop <job-name>`.
 
    `-d` runs it in the background, `--name` names it, `--memory` and `--cpus` set its ceiling, and `:ro` mounts a folder read-only ([docs/facts.md](../docs/facts.md), "Docker: a long job in a named container"). A mounted folder (`-v`) is a folder on your disk that the container sees as one of its own, so what the job writes there stays on your disk. The job prints one progress line every so many units (how many done, of how many, the time left), never a bar that redraws itself, and its output is not buffered, so each line reaches the log when it happens. A restart policy (a setting that starts a container again after it stops) is for a service that must keep running; a one-off job gets none, and Docker's default is `no`, so it is not started again once it ends ([docs/facts.md](../docs/facts.md)).
@@ -73,10 +74,10 @@ The menu marks the item **have** when an instruction file carries the rule and D
 ## Check
 
 1. **Claude:** `grep -ci container <your front door>`. Expected: `1` or more.
-2. **you:** in a new session, ask for a job you expect to run longer than your threshold, such as your full test suite or a large data pull. Expected: before it starts, Claude names the container, the command to follow its log and the command to stop it, and waits for your yes; it starts no background shell.
-3. **you:** close that session. In a terminal, `docker ps -a --filter name=<job-name>` lists the container, and `docker logs <job-name>` prints its lines. Once it has finished, `docker inspect --format '{{.State.ExitCode}}' <job-name>` prints `0`, once Claude has found that field name in the full `docker inspect <job-name>` output, as in Detect.
+2. **you:** in a new session, ask for a job you expect to run longer than your threshold and that writes its result to the data folder, such as a large data pull, or your full test suite with its report saved there. Expected: before it starts, Claude names the container, the command to follow its log and the command to stop it, and waits for your yes; it starts no background shell.
+3. **you:** close that session. In a terminal, `docker ps -a --filter name=<job-name>` lists the container, and `docker logs <job-name>` prints its lines. Once it has finished, `docker inspect --format '{{.State.ExitCode}}' <job-name>` prints `0`, once Claude has found that field name in the full `docker inspect <job-name>` output, as in Detect. Then remove the container, `docker rm <job-name>`, and list the data folder on your disk, `ls "<data folder>"` (the same in PowerShell). Expected: the file the job wrote is there. Only what is on your disk outlives the container; a job whose mount failed still ends with `0`.
 
-If Claude starts a background shell in step 2, or in step 3 the container is missing or its log is empty, the item is not done: the plan row stays unticked, and the wording of the rule, or the job's output buffering, is the next thing to look at.
+If Claude starts a background shell in step 2, or in step 3 the container is missing, its log is empty or the job's file is not in the data folder, the item is not done: the plan row stays unticked, and the wording of the rule, the job's output buffering, or the `-v` mount (in Git Bash, the `MSYS_NO_PATHCONV=1` prefix) is the next thing to look at.
 
 ## Undo
 

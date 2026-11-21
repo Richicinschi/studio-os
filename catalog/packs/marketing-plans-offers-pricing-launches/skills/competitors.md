@@ -44,4 +44,4 @@ Neighbours and where each takes over:
 - The summary, who-it-suits and migration sections exist on every page.
 - The plural format lists 4 to 7 genuine options.
 - Pages read from the records, and the page set plan is ordered.
-- English only, no em or en dashes.
+- Written in the language the user works in, no em or en dashes.

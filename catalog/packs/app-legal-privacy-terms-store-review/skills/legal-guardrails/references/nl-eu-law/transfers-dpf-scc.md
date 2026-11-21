@@ -3,7 +3,7 @@
 Reference for adjudicating the **international-transfer** clauses of a Privacy Policy / Terms of Service.
 Scope: GDPR/AVG Chapter V (Arts 44–50), the EU-US Data Privacy Framework adequacy decision (Implementing Decision (EU) 2023/1795), the 2021 Standard Contractual Clauses, and the Transfer Impact Assessment (TIA) obligation.
 
-Worked examples use the **example app** (`legal-guardrails.md` §8: Flutter breathing/mindfulness app; Dutch *eenmanszaak*; the owner is the sole controller; no DPO; EU/NL-first; primary storage in Firebase **europe-west**; auto-renewing subscriptions sold *through* Apple/Google as merchants of record + RevenueCat middleware). The rules apply to any EU/NL consumer app: build the register in §6 from the app's own recipients (fact sheet + data-surface scan).
+Worked examples use one app, the **worked example** (profile: `worked-example.md` §1). The rules apply to any EU/NL consumer app: build the register in §6 from the app's own recipients (fact sheet + data-surface scan).
 
 **Re-checked 2026-11-18:** the adequacy decision text on EUR-Lex (still in force; the General Court confirmed it in T-553/23); GDPR Chapter V, the 2021 SCC decision and the Schrems II judgment on EUR-Lex; EDPB Guidelines 2/2018 and Recommendations 01/2020; the European Commission EU-US transfers page; the RevenueCat DPA (version effective August 2026). The DPF website (`dataprivacyframework.gov`) loads its text by script and could not be read by fetch; it was read in a browser on 2026-11-19 (Program Overview, the DPF List, the verification article), and its lines below are dated that day.
 
@@ -30,7 +30,7 @@ The privacy notice **must name the mechanism per recipient** (Art 13(1)(f)). A P
 | **Art 45** | *Adequacy decision*: transfer needs no further authorisation if the Commission has decided the third country (or a territory/sector/entity within it) ensures an **adequate** level of protection. Art 45(3) is the legal base for the DPF decision. | [settled — GDPR Art 45(1), (3); Impl. Dec. 2023/1795 recital 2 cites Art 45(3), verified 2026-11-18] |
 | **Art 45(3)–(5)** | Commission **monitors** developments (45(4)) and **periodically reviews** adequacy decisions (45(3): the decision must provide for a review at least every four years); can repeal/amend/suspend (45(5)). | [settled — GDPR Art 45(3)–(5) (EUR-Lex), verified 2026-11-18] |
 | **Art 46** | *Appropriate safeguards* where there is no adequacy: among them **Standard Contractual Clauses** (Art 46(2)(c)), **Binding Corporate Rules** (Art 46(2)(b), Art 47), approved codes of conduct (46(2)(e)), certification (46(2)(f)). Requires **enforceable rights + effective remedies** for data subjects (46(1)). | [settled — GDPR Art 46(1)–(2) (EUR-Lex), verified 2026-11-18] |
-| **Art 47** | BCRs — intra-group transfers; not relevant to a publisher with no corporate group (e.g. a sole trader, as in the example app). | [verify] |
+| **Art 47** | BCRs — intra-group transfers; not relevant to a publisher with no corporate group (e.g. a sole trader). | [verify] |
 | **Art 49** | *Derogations* for specific situations (explicit consent, contract necessity, etc.) — **exceptions, not a routine basis**; EDPB reads them narrowly, for occasional/non-repetitive transfers. Do **not** rely on Art 49 consent as the standing basis for an ongoing sub-processor flow. | [settled — GDPR Art 49(1); EDPB Guidelines 2/2018 §1 "General" (derogations read restrictively; even those not limited to "occasional" transfers must stay exceptions), verified 2026-11-18] |
 | **Art 13(1)(f)** | The privacy notice **must state**: the fact of the transfer, the existence/absence of an adequacy decision, **and** (for Art 46/47) reference to the appropriate safeguards **and the means to obtain a copy** of them or where they are available. | [settled — GDPR Art 13(1)(f) (EUR-Lex), verified 2026-11-18] |
 
@@ -78,10 +78,10 @@ The privacy notice **must name the mechanism per recipient** (Art 13(1)(f)). A P
 
 For any non-adequate / non-DPF importer, the standing Art 46 safeguard is the **2021 SCCs**.
 
-| Module | Relationship | Relevance to an app publisher (worked: example app) |
+| Module | Relationship | Relevance to an app publisher (worked example) |
 |---|---|---|
 | **Module 1** | Controller → Controller | Where a US recipient is an independent controller of the data. |
-| **Module 2** | Controller → Processor | **Most common for an app publisher**: the publisher (controller) → US **processor** (e.g. RevenueCat, Firebase services on US infra, in the example app). |
+| **Module 2** | Controller → Processor | **Most common for an app publisher**: the publisher (controller) → US **processor** (e.g. RevenueCat, Firebase services on US infra, in the worked example). |
 | **Module 3** | Processor → Sub-processor | Only if the publisher were a processor (an app publisher acting for itself is not — it is the controller). |
 | **Module 4** | Processor → Controller | Importer is a controller receiving from an EU processor. Niche. |
 
@@ -100,15 +100,15 @@ A TIA is the documented **case-by-case assessment** (per Schrems II + EDPB **Rec
 
 Six-step EDPB method (compressed): (1) **map** the transfers; (2) identify the **transfer tool** (DPF / SCC / etc.); (3) assess whether the third-country **law/practice** undermines that tool (esp. government access — FISA 702, EO 12333 for the US); (4) adopt **supplementary measures**; (5) take **procedural steps** to put them in place; (6) **re-evaluate** periodically. [settled — EDPB Recommendations 01/2020 v2.0, steps 1–6, verified 2026-11-18]
 
-**Best-practice rule (applies to any app with US recipients, including the example app):** run/record a **TIA even under the DPF**, because (a) the DPF can be invalidated on short notice (Schrems history) and (b) it documents the controller's accountability (Art 5(2)). The TIA + SCCs become the immediate fallback if the DPF falls. [house practice, not a legal duty: EDPB Recommendations 01/2020 v2.0 para 19 says transfers under an adequacy decision need no further steps beyond monitoring whether the decision is revoked or invalidated, verified 2026-11-18]
+**Best-practice rule (applies to any app with US recipients):** run/record a **TIA even under the DPF**, because (a) the DPF can be invalidated on short notice (Schrems history) and (b) it documents the controller's accountability (Art 5(2)). The TIA + SCCs become the immediate fallback if the DPF falls. [house practice, not a legal duty: EDPB Recommendations 01/2020 v2.0 para 19 says transfers under an adequacy decision need no further steps beyond monitoring whether the decision is revoked or invalidated, verified 2026-11-18]
 
 For an *eenmanszaak* with no DPO, the TIA can be **lightweight but written**: one short record per US recipient (data categories, mechanism, residency, encryption, government-access exposure, conclusion). The repo already carries a **TIA file** and a **DPF-log** — the reviewer's job is to confirm each US recipient appears there.
 
 ---
 
-## 6. Per-recipient transfer register (the operative checklist; worked for the example app — build one row per recipient of the app under review)
+## 6. Per-recipient transfer register (the operative checklist; worked for the worked example — build one row per recipient of the app under review)
 
-The example app keeps **primary storage in Firebase europe-west** (EU region), which **minimises** but does not eliminate transfer exposure — some sub-processors and platform flows still touch US entities. For each recipient the PP/record must name the mechanism:
+The worked example keeps **primary storage in Firebase europe-west** (EU region), which **minimises** but does not eliminate transfer exposure — some sub-processors and platform flows still touch US entities. For each recipient the PP/record must name the mechanism:
 
 | Recipient | Role | US transfer? | Mechanism to record | Tier |
 |---|---|---|---|---|

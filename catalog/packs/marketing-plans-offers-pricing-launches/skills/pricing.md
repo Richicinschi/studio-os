@@ -21,7 +21,7 @@ Neighbouring skills take over here:
 - Testing a price change: ab-testing.
 - Deal desk, proposals and sales decks: revops and sales-enablement.
 
-Studio rule: the studio's own prices are the owner's decision. Work out options and reasoning, but never fix a real price for a studio product without asking the owner. Every price in this skill and its files is an invented example and is labelled as one.
+Rule: real prices are the owner's decision. Work out options and reasoning, but never fix a real price for the owner's product without asking them. Every price in this skill and its files is an invented example and is labelled as one.
 
 ## How it works
 

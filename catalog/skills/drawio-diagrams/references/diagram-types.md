@@ -49,7 +49,7 @@ below, and `html=1;` to every edge style. They are left out of the rows to keep 
 | Tier | `swimlane;startSize=30;` | One container per layer, such as Client, API, Service and Data. |
 | Service | `rounded=1;` plus the tier colour | Colour by tier. |
 | Database | `shape=cylinder3;` | Green. |
-| Queue or bus | `rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;` | Yellow; place it centrally as the hub. |
+| Queue or bus | `rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;` | Yellow; place it in the centre, as a hub. |
 | Gateway or balancer | `rounded=1;` in orange, or an `mxgraph.aws4` icon | Orange. |
 | External system | `rounded=1;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;` | Dashed outline. |
 | Layout | Top to bottom or left to right, by tier count; four or more tiers go top to bottom | Hubs in the middle. |

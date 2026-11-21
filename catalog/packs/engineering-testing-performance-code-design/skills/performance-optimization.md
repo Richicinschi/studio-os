@@ -1,7 +1,7 @@
 ---
 name: performance-optimization
 description: >-
-  Use when performance requirements exist, regression is suspected, or profiling reveals bottleneck in Core Web Vitals, load times. Studio: richicinschi-website/scripts/perf-trace.mjs runs 4x-CPU-throttle; Lighthouse via chrome-devtools MCP if installed. See web-perf-lessons memory: measured gotchas.
+  Use when performance requirements exist, a regression is suspected, Core Web Vitals or load times need work, or profiling shows a bottleneck. Measure first, change one thing, measure again.
 metadata:
   category: engineering
   author: Richicinschi
@@ -25,11 +25,12 @@ A guess about speed is usually wrong, and a wrong guess leaves behind complexity
 
 There is no sign of a problem yet. Speculative tuning adds code that costs more to maintain than it ever saves.
 
-## Studio tools
 
-- Web pages: `richicinschi-website/scripts/perf-trace.mjs` compares two builds under a 4x CPU throttle (A/B runs).
-- The chrome-devtools MCP, when installed, gives a Lighthouse audit and a Core Web Vitals trace.
-- The web-perf-lessons memory lists traps already hit while measuring. Read it before trusting a number.
+## Measuring tools
+
+- Web pages: compare two builds under the same CPU throttle, several runs each, with the browser's performance panel or the project's own trace script if it has one.
+- A Chrome DevTools MCP server, when installed, gives a Lighthouse audit and a Core Web Vitals trace (`browser-testing-with-devtools` in this domain).
+- If the project keeps notes on traps already hit while measuring, read them before trusting a number.
 
 ## Web Vitals thresholds
 

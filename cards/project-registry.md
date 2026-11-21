@@ -4,6 +4,7 @@ module: 11-workspace-layout
 checked: 2026-11-02
 other_figures:
   - 57
+  - 1500
 ---
 
 # A project registry
@@ -24,10 +25,12 @@ Read-only. Presence and counts; no network.
   grep -E '^\|' "<your setup>/registry/PROJECTS.md" | sed '1,2d' | wc -l
   ```
 - How many repositories you have: the rows of `adoption/inventory.md`, and those inside your setup folder, the setup itself included when it is one: `find "<your setup>" -maxdepth 3 -name .git | wc -l`.
-- Rows whose path is not a repository, counted (`0` is right):
+- Rows whose path is not the top folder of a repository, counted (`0` is right). As in Check step 1, git's `--show-toplevel` must be the path itself, so a plain folder inside a repository counts here, and so does an empty Path cell:
   ```bash
   cd "<your setup>" && grep -E '^\|' registry/PROJECTS.md | sed '1,2d' | cut -d'|' -f3 | tr -d ' `' |
-    while read -r p; do git -C "$p" rev-parse --git-dir >/dev/null 2>&1 || echo x; done | wc -l
+    while read -r p; do
+      [ -n "$p" ] && top=$(git -C "$p" rev-parse --show-toplevel 2>/dev/null) && [ "$top" -ef "$p" ] || echo x
+    done | wc -l
   ```
 - Whether your front door points at it: `grep -c PROJECTS.md CLAUDE.md AGENTS.md 2>/dev/null`.
 - Another list doing the same job: a table of repositories in your front door or a README, noted by its heading only.
@@ -74,12 +77,15 @@ The menu marks the item **have** when the registry has a row for every repositor
 
 ## Check
 
-1. **Claude:** every path in the table is a repository:
+1. **Claude:** every path in the table is the top folder of a repository, which git names with `git rev-parse --show-toplevel`:
    ```bash
    cd "<your setup>" && grep -E '^\|' registry/PROJECTS.md | sed '1,2d' | cut -d'|' -f3 | tr -d ' `' |
-     while read -r p; do git -C "$p" rev-parse --git-dir >/dev/null 2>&1 && echo "ok $p" || echo "MISSING $p"; done
+     while read -r p; do
+       if [ -n "$p" ] && top=$(git -C "$p" rev-parse --show-toplevel 2>/dev/null) && [ "$top" -ef "$p" ]
+       then echo "ok $p"; else echo "MISSING ${p:-(empty Path cell)}"; fi
+     done
    ```
-   Expected: one `ok` line per row, and no `MISSING`.
+   Expected: one `ok` line per row, and no `MISSING`. A plain folder inside a repository is `MISSING`, because git answers there for the repository around it; so is an empty Path cell, which git would otherwise read as the folder the command runs in.
 2. **Claude:** `grep -c PROJECTS.md <your front door>`. Expected: `1` or more.
 3. **Claude:** when the session hooks are installed, it creates an empty file `registry-check.txt` in one listed repository, runs the start hook by hand, `node "<your setup>/hooks/session-start-status.mjs" "<your setup>"`, and expects, among its lines, `<that repository's folder name>: uncommitted changes`. Then it deletes the file.
 4. **you:** in a new session started in your setup folder, ask "Where does <a project in the table> start?" Expected: Claude reads the registry and names that row's Read first file.
@@ -96,9 +102,9 @@ A `MISSING` line, a missing pointer, or a hook run that does not name the reposi
 
 - **A path with a space is skipped.** The hooks take a table cell as a path only when it has no spaces, so a folder named `client work` is never checked; and a path that starts with `~` is not expanded, so it is never found either. Write paths relative to the setup folder. Rename a folder with a space with care (a move can break six things, [module 11](../modules/11-workspace-layout/README.md#the-mechanism)), or accept that the hooks skip it.
 - **Every table in the file is read.** The hooks read each cell of each table in the registry as a possible path, so a second table that names a repository's folder puts it under the checks. Keep the left-out list, and anything else, as prose.
-- **An index, not a log.** Dated entries and project news belong in each project's own front door. The studio keeps its own registry under about 6,000 bytes and moves anything else out ([module 11](../modules/11-workspace-layout/README.md#the-mechanism) lists that note as a source).
+- **An index, not a log.** Dated entries and project news belong in each project's own front door. The studio keeps its own registry under about 1,500 tokens and moves anything else out ([module 11](../modules/11-workspace-layout/README.md#the-mechanism) lists that note as a source).
 - **A move leaves a stale row.** Moving a repository breaks its path here as well as in configs, scripts and links; Check step 1 finds it.
 - **Absence on purpose.** Name the repositories that have no front door, and the folders that are deliberately not projects, so a session reads the absence as a known fact, not a fault to fix.
 - **Paths are relative to the setup folder,** not to `registry/`: the hooks resolve them from the folder they run for. A session started inside a project folder finds no registry there, and its hooks check that repository only.
 - **Where the setup folder goes.** If your setup folder is pushed to a remote, the registry goes with it, with every project name in it; name company and client projects only as your data rules allow.
-- **Token cost:** the pointer line costs about 57 tokens in every session, an estimate (bytes divided by 4). The registry loads only when Claude reads it: about 110 tokens for the template's header and comment, and about 18 per row, also estimates.
+- **Token cost:** the pointer line costs about 57 tokens in every session, an estimate (bytes divided by 4). The registry, `PROJECTS.md`, loads only when Claude reads it: about 110 tokens for the template's header and comment, and about 18 per row, also estimates.

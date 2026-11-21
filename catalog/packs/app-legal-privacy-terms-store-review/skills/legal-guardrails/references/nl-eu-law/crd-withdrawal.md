@@ -2,9 +2,8 @@
 
 **Scope of this file.** The EU Consumer Rights Directive (CRD) 14-day withdrawal right, the 12-month
 extension, and the conditions for validly waiving the right when an app unlocks paid digital
-content/services immediately. Worked examples use the **example app** (`legal-guardrails.md` §8:
-Dutch *eenmanszaak*; auto-renewing subscriptions sold THROUGH Apple/Google as merchants of record,
-RevenueCat middleware, Firebase EU backend; general wellness, no medical claims). The rules apply to
+content/services immediately. Worked examples use one app, the worked example (`worked-example.md`
+§1 has its profile, §5 its mechanism). The rules apply to
 any EU/NL distance-sold app subscription: apply them to the app under review from its fact sheet.
 
 **Primary source (first fetched 2026-06-06 as the 2022-05-28 consolidation; re-verified 2026-11-18):**
@@ -34,7 +33,7 @@ novel / contested / fact-specific jurist call.
 | R4 | The right can be **lost** for digital content not on a tangible medium **only if THREE cumulative conditions** are met: (i) prior express consent, (ii) acknowledgement of loss, (iii) durable-medium confirmation. | [settled — Art 16(m), verified 2026-11-18] |
 | R5 | If any of the three fails, the consumer can still withdraw AND **owes nothing** for content already supplied (Art 14(4)(b)). The trader eats the cost. | [settled — Art 14(4)(b), verified 2026-11-18] |
 | R6 | The trader must publish the **model withdrawal form** (Annex I(B)) and inform of the right and, where applicable, of the existence and placement of the **Art 11a withdrawal function** (from 19 June 2026); otherwise R3 applies. | [settled — Annex I(B) + Art 6(1)(h), verified 2026-11-18] |
-| R7 | **Common gap to verify (the example app's):** an unticked paywall checkbox satisfies (i)+(ii); whether the Apple/Google receipt or a publisher-sent email satisfies (iii) durable-medium confirmation is the **open item**. | [low-confidence] |
+| R7 | **Common gap to verify:** an unticked paywall checkbox satisfies (i)+(ii); whether the Apple/Google receipt or a publisher-sent email satisfies (iii) durable-medium confirmation is the **open item**. | [low-confidence] |
 | R8 | **Withdrawal function (Art 11a; NL BW 6:230oa).** For a distance contract concluded through an online interface where a withdrawal right exists, the trader provides a "withdraw from contract here" function (or equivalent wording), available throughout the withdrawal period, with a "confirm withdrawal" step and an acknowledgement on a durable medium. Directive applies from 19 June 2026; BW 6:230oa in force 25 June 2026. **Store-billed sales:** Apple Distribution International sells as the developer's commissionaire in its own name, is merchant of record, and takes withdrawals via Apple Account › Purchase History › "Withdraw Transaction"; Google Commerce Limited is the seller on Google Play and takes withdrawal notices and its model form. For these sales the function is the store's; the Terms must say where it is (Art 6(1)(h); BW 6:230m(1)(h)). **Own checkout (web, EU alternative payment, link-out):** the publisher is the trader and must build the function itself. | [settled — Dir. (EU) 2023/2673 Arts 1–2; CRD Arts 6(1)(h), 11a; BW 6:230oa, 6:230m(1)(h) (Stb. 2026, 153); ADPLA Sch. 2 §1.1 + Exhibit A §2; Apple Media Services Terms (14 Sep 2026); Google Play Terms of Service, verified 2026-11-19] Whether the publisher is also a "trader" for store-billed contracts (Art 2(2), "on his behalf") and answers if a store's function falls short: [low-confidence — LEGAL REVIEW REQUIRED]. Whether Apple's and Google's routes meet Art 11a(2)–(4): [verify — not tested 2026-11-19] |
 
 ---
@@ -47,7 +46,7 @@ novel / contested / fact-specific jurist call.
 - **A subscription is a contract under the CRD even if "paid" only with personal data**, except where
   the data is processed solely to perform the contract or meet a legal duty. Art 3(1a) (added by
   2019/2161) extends the CRD to digital content/services supplied against personal data.
-  [settled — Art 3(1a), verified 2026-11-18] — *for a paid subscription (as in the example app) this is moot
+  [settled — Art 3(1a), verified 2026-11-18] — *for a paid subscription this is moot
   for the paid tier; relevant only if a "free for data" tier is offered.*
 - **Definitions (Art 2, as amended by 2019/2161):**
   - **'service contract'** = any contract other than a sales contract under which the trader supplies a
@@ -75,7 +74,7 @@ to withdraw from a distance or off-premises contract, **without giving any reaso
 | **Digital content NOT on a tangible medium** | the **day of conclusion of the contract** | [settled — Art 9(2)(c), verified 2026-11-18] |
 | Sales contract (goods) | the day the consumer acquires physical possession | [settled — Art 9(2)(b), verified 2026-11-18] |
 
-> **App subscriptions (the example app's case):** whether a paid-tier unlock is "digital service" or "digital content," **the clock starts at
+> **App subscriptions:** whether a paid-tier unlock is "digital service" or "digital content," **the clock starts at
 > purchase** — there is no delivery event. So absent a valid waiver, a subscriber could withdraw within
 > 14 days of buying and demand a refund.
 
@@ -95,7 +94,7 @@ organised excursions only. Not relevant to in-app purchases. [settled, verified 
 
 > **Adjudication hook:** if the Terms/paywall do not clearly state the withdrawal right (and the model
 > form), the practical refund-exposure window balloons to ~12 months. This is a strong reason to keep
-> the Terms' withdrawal-section disclosure explicit (§6 in the example app) even though the waiver is intended to extinguish the right.
+> the Terms' withdrawal-section disclosure explicit even though the waiver is intended to extinguish the right.
 
 ---
 
@@ -208,19 +207,19 @@ rule + Art 6(1)(h) consequence chain]
 
 ---
 
-## 8. Worked application (the example app; re-run it on the app under review)
+## 8. Worked application (a paywall waiver checkbox; re-run it on the app under review)
 
-### 8.1 The mechanism (as the example app implements it)
+### 8.1 The mechanism (one app's implementation: `worked-example.md` §5)
 - **Paywall checkbox, UNTICKED by default**, that the user must affirmatively tick to subscribe; the
   copy captures (i) **prior express consent** to begin immediate performance during the 14-day window
   **and** (ii) **acknowledgement** that doing so **forfeits the 14-day withdrawal right**.
-- The app records the timestamp **`withdrawalConsentAt`** (Firestore) as evidence of (i)+(ii).
+- The app records a consent timestamp (e.g. in its database) as evidence of (i)+(ii).
 
 **Assessment:**
 - Unticked-by-default + affirmative tick = a proper **active opt-in** (no pre-ticked box) → satisfies
   the *form* of (i) and (ii) under Art 16(m). [verify — conditions (i)/(ii) are about substance of the
   wording; confirm the checkbox copy actually states BOTH consent-to-begin AND loss-of-right, not just one]
-- `withdrawalConsentAt` is good **internal evidence** but is **not itself** the durable-medium
+- The consent timestamp is good **internal evidence** but is **not itself** the durable-medium
   confirmation owed **to the consumer** under Art 8(7)/16(m)(iii). [settled — 8(7) is a trader→consumer
   artefact, verified 2026-11-18]
 
@@ -250,7 +249,7 @@ For store-billed sales the store contracts in its own name: Apple Distribution I
 Even when relying on the 16(m) waiver, **still disclose** the existence of the 14-day right, the
 conditions under which it is lost, **make the Annex I(B) model form available**, and, where applicable,
 say that the **Art 11a withdrawal function** exists and where it is (Art 6(1)(h)).
-Omission re-opens the Art 10 12-month window. Keep this in the Terms' withdrawal section (**§6** in the example app). [settled — Art 6(1)(h)
+Omission re-opens the Art 10 12-month window. Keep this in the Terms' withdrawal section. [settled — Art 6(1)(h)
 + Art 10 chain, verified 2026-11-18]
 
 ---
@@ -270,7 +269,7 @@ Omission re-opens the Art 10 12-month window. Keep this in the Terms' withdrawal
 5. [ ] Terms draft acknowledgement wording to satisfy **both Art 16(m)** (digital content) **and
    Art 16(a)** (digital service, "fully performed") given the classification ambiguity. [low-confidence]
 6. [ ] For store-billed sales, the Terms name the store's withdrawal route (Apple: Purchase History › Withdraw Transaction; Google: notice or form to Google Commerce Limited) and say where the Art 11a function is; for own-checkout sales, the publisher's own function exists. [settled — CRD Art 6(1)(h), 11a; BW 6:230m(1)(h), 6:230oa, verified 2026-11-19]
-7. [ ] Internal evidence (`withdrawalConsentAt`) is logged — note it is evidence, **not** the consumer's
+7. [ ] Internal evidence (the consent timestamp) is logged — note it is evidence, **not** the consumer's
    Art 8(7) confirmation. [settled, verified 2026-11-18]
 
 ---
@@ -281,8 +280,8 @@ Omission re-opens the Art 10 12-month window. Keep this in the Terms' withdrawal
   service" (Art 16(a)) — and does that change the validity/extent of the waiver and any pro-rata refund?
 - **[low-confidence] Condition (iii) durable medium:** does the Apple/Google receipt satisfy Art 8(7),
   or must the publisher send its own durable-medium confirmation reproducing the consent + acknowledgement
-  before unlock? (An implementation that only logs a consent timestamp such as `withdrawalConsentAt`, as
-  the example app does, may not deliver a consumer-facing durable artefact.)
+  before unlock? (An implementation that only logs a consent timestamp may not deliver a
+  consumer-facing durable artefact.)
 - **[verify] Checkbox copy substance:** confirm the live paywall wording captures **both** consent-to-begin
   and loss-of-right (Art 16(m)(i) AND (ii)), not just one.
 - **[low-confidence — LEGAL REVIEW REQUIRED] Publisher as co-trader:** for store-billed sales the store

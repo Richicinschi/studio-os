@@ -3,8 +3,8 @@ id: sherlock-researcher
 module: 08-agents-and-council
 checked: 2026-11-02
 tokens:
-  description: 57
-  body: 356
+  description: 45
+  body: 320
 other_figures:
   - 230000
 ---
@@ -26,8 +26,9 @@ Read-only: names, descriptions and counts, never an agent's or a skill's instruc
 - Another agent or skill doing the same job: a researcher, a "deep research" or fact-checking skill. This reader prints each file's `name` and `description` lines and nothing below them:
   `awk 'FNR==1{n=0} /^---[[:space:]]*$/{n++; next} n==1 && /^(name|description):/{p=1; print FILENAME": "$0; next} n==1 && p && /^[[:space:]]/{print FILENAME": "$0; next} {p=0}' .claude/agents/*.md .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/agents/*.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md 2>/dev/null`
 - Whether you hit usage limits: your answer in `adoption/spec.md`.
+- An agent of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' agents/sherlock-researcher.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when an agent file named `sherlock-researcher`, or the name recorded for it, exists at either level; **partly** when another agent or skill does the same job; and **not yet** otherwise.
+The menu marks the item **have** when an agent file named `sherlock-researcher`, or the name recorded for it, exists at either level; **partly** when another agent or skill does the same job; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -61,9 +62,9 @@ The menu marks the item **have** when an agent file named `sherlock-researcher`,
 1. **Claude:** runs `vet-and-adopt` on `catalog/agents/sherlock-researcher.md`: scans it with SkillSpector (`skillspector scan catalog/agents/sherlock-researcher.md --no-llm`), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit's maintainers scanned its skills, not its agents, so yours is the first scan of this file. Expect ADAPT: the file carries the studio's naming and its own research jobs.
 2. **Claude:** writes the agent in your words, and shows it to you before saving:
    - **the name:** a plain role name such as `researcher`, or the kit's `sherlock-researcher`; the file name and the `name:` line match;
-   - **the description:** the kinds of research you do, in place of the studio's crew name and the studio's own example job;
+   - **the description:** the kinds of research you do, in place of the studio's crew name; the kit's copy says it searches one thread at a time, as its steps do. A copy taken from an earlier kit says "Fans out searches" there instead: that phrase goes, unless you chose several searches at once;
    - **how it searches:** your answer to question 2. The kit's copy already says one at a time in step 2 of "how you work", with a pointer to one of the studio's memory notes as its reason; the pointer goes, and the reason stays in your words. For several at once, step 2 names your cap instead;
-   - **the skills it reaches for:** the kit's copy names `deep-research`, which is not in the kit, and `competitor-profiling`, which the kit lists without shipping it. They become your own research skills, or the lines are cut. `dispatching-parallel-agents`, which the kit's copy keeps for independent work other than searching, stays if you take it, and covers searches too only when you chose several at once;
+   - **the skills it reaches for:** the kit's copy names `competitor-profiling`, which ships in the kit's marketing-plans-offers-pricing-launches domain. It stays if you take that domain; otherwise it becomes your own research skill, or the line is cut. `dispatching-parallel-agents`, which the kit's copy keeps for independent work other than searching, stays if you take it, and covers searches too only when you chose several at once;
    - **keep:** the lens (separate fact from assertion; state confidence; name what is unknown), the step that checks key claims against each other, and the report format. Keep "write it to a file only if asked";
    - **the tools:** read, search, shell, web, Skill and Write; the `tools:` line is an allowlist. The kit's copy also lists `Task`, its way to start helpers of its own. A subagent can start subagents of its own, up to three layers below the main conversation; with one search at a time it does not need to, and `Task` is dropped. No model line, so it runs on your session's model unless Claude names a model for that call or `CLAUDE_CODE_SUBAGENT_MODEL` is set ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from").
 3. **Claude:** saves it as `~/.claude/agents/<name>.md` or `.claude/agents/<name>.md`, as you chose.
@@ -85,9 +86,10 @@ If the report has findings without sources, or a cited page does not say what th
 
 ## Watch out
 
-- **Its description loads every session:** about 57 tokens (its 228 bytes divided by 4, an estimate). Its instructions, about 344 tokens (estimate), load only when it runs. When subagent descriptions load is not documented ([docs/facts.md](../docs/facts.md)); the kit counts them as every session.
+- **Its description loads every session:** about 45 tokens (an estimate, bytes divided by 4). Its body (its instructions), about 320 tokens (estimate), loads only when it runs. When subagent descriptions load is not documented ([docs/facts.md](../docs/facts.md)); the kit counts them as every session.
 - **Parallel research has a rate cost.** The studio once sent nine research agents out at once. Together they used about 1.1 million subagent tokens and hit the session limit, and the last two died mid-run and had to be run again. Run one at a time, each agent still used about 190,000 to 230,000 tokens. These figures are the studio's own record of those runs, not re-measured for the kit ([module 02, Evidence](../modules/02-context-and-models/README.md#evidence)).
 - **The model.** The studio's agents run on the session's model, with one exception: wide web research runs on the smaller `sonnet` model, one agent at a time, because it is search-and-cite work ([module 02](../modules/02-context-and-models/README.md)). Choose the model for the session before you start a big research run.
 - **What it searches for leaves your machine.** The question and every search the agent writes are session content, which Claude Code sends over the network ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"); where WebSearch and WebFetch send their requests beyond that is not in docs/facts.md as of 2026-11-02. If your company's data rules keep a topic or a name inside, leave it out of the question, or take WebSearch and WebFetch out of the `tools:` line, an allowlist ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), and point it at internal sources.
 - **A citation is a claim too.** Open one or two cited pages before you act on the report.
 - **The council lists it but calls it on no panel.** The kit's council names the researcher in its crew, and no row of its panel table convenes it; you call it by name.
+- **A plugin's copy has another name.** Claude Code names a plugin's agent after its plugin, `<plugin>:sherlock-researcher` ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills"), so if you use a plugin's copy instead of the kit's, anything of yours that starts the researcher by its bare name needs that name.

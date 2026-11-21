@@ -2,12 +2,9 @@
 
 > **Scope:** The Dutch supervisory authority for data protection and its concrete, app-specific
 > expectations. Use this to adjudicate a Privacy Policy / Terms of Service against the Dutch
-> (AVG/UAVG) layer that sits on top of the GDPR. Worked examples use the **example app**
-> (`legal-guardrails.md` §8: Flutter breathing/mindfulness app; publisher = NL eenmanszaak / sole
-> proprietorship; owner is the sole data controller; no employees; no DPO; EU/NL-first;
-> auto-renewing subscriptions sold through Apple/Google as merchants of record; RevenueCat +
-> Firebase EU-region `europe-west`; general wellness, no medical claims; free tier = on-device
-> only, paid tier = Firestore sync). Apply each rule to the app under review from its fact sheet.
+> (AVG/UAVG) layer that sits on top of the GDPR. Worked examples use one app, the
+> **worked example** (profile: `worked-example.md` §1). Apply each rule to the app under review
+> from its fact sheet.
 
 **Reference date:** 2026-06-06 · **Primary authority:** Autoriteit Persoonsgegevens (AP),
 the Dutch *toezichthouder* for the AVG (the Dutch GDPR) and the UAVG (Uitvoeringswet AVG).
@@ -49,21 +46,21 @@ the Dutch *toezichthouder* for the AVG (the Dutch GDPR) and the UAVG (Uitvoering
 These are AP's published expectations on its "Privacy and apps" page. They are written as
 user-facing rights but each maps to a **developer obligation** for the review.
 
-| # | AP rule (developer obligation) | Verbatim / paraphrase from AP | Application (worked: example app) | Tier |
+| # | AP rule (developer obligation) | Verbatim / paraphrase from AP | Application (worked example) | Tier |
 |---|---|---|---|---|
 | G1 | **Consent before reading from / placing data on the device** | An app "asks you for consent to use your personal data **before it retrieves data from or places data on your device**" (AP "Privacy and apps", EN). | The very act of writing to SharedPreferences / reading device identifiers / initialising an SDK that stores on-device triggers this. Strictly-necessary storage (for the service the user explicitly requested) is exempt; **non-essential telemetry is not** (see §3). | [settled — AP "Privacy and apps", verified 2026-11-19] |
 | G2 | **Separate consent per data type (unbundling)** | "Apps have to ask you for consent **for each type** of your data that they want to use" / "**separately ask for consent** for different types of personal data." | **Do not bundle** the age attestation, the analytics/crash-telemetry opt-in, and the withdrawal/immediate-delivery acknowledgement into one tick. Health-adjacent data, analytics, and account data each need their own basis/consent surface. | [settled — AP "Privacy and apps", verified 2026-11-19] |
 | G3 | **Clear, fixed purposes** | "Apps should indicate **clear and understandable purposes** for which the app uses your data and **should not change these purposes without your consent**." | The PP must state purposes per data category; a later purpose change (e.g. new analytics use) needs fresh consent, not a silent PP edit. | [settled — AP "Privacy and apps", verified 2026-11-19] |
 | G4 | **Withdrawal of consent must be possible and as easy as giving it** | AP: an app "gives you the option to withdraw your consent, to de-install the app, and to remove the personal data collected" (Privacy and apps); withdrawal "must be as easy as giving consent" (Legal basis of consent). | The app must provide an in-app **opt-out** that flips telemetry off (for Firebase: `setAnalyticsCollectionEnabled(false)` / `setCrashlyticsCollectionEnabled(false)`) and stops future processing. Maps to **GDPR Art. 7(3)**. | [settled — AP "Privacy and apps" + AP "Legal basis of consent" + GDPR Art. 7(3), verified 2026-11-19] |
-| G5 | **Data minimisation — only what the app needs to function** | AP guidance: collect only data **necessary for the app to function**; users can restrict per-app access (location, contacts, etc.). | Keep each tier's data where its feature needs it: in the example app the free tier stays **on-device only** and Firestore sync (paid tier) is justified by the user-requested sync feature. Don't request permissions the app's core feature doesn't need. Maps to **GDPR Art. 5(1)(c)**. | [settled — AP "Privacy and apps" + GDPR Art. 5(1)(c), verified 2026-11-19] |
-| G6 | **Readable / accessible privacy statement** | AP expects a **privacy statement (privacyverklaring)** that is readable, understandable and accessible ("Privacy bij apps"). On functional cookies, the AP's Cookies page adds: "You can find this information, for example, in the privacy statement of the website or app." | The app's PP must be reachable **in-app and pre-install** (store listing), plain-language, and list every data category + SDK (for the example app: Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions, RevenueCat). Maps to **GDPR Arts. 12–14**. | [settled — AP "Privacy and apps" + AP "Cookies" + GDPR Arts. 12–14, verified 2026-11-19] |
+| G5 | **Data minimisation — only what the app needs to function** | AP guidance: collect only data **necessary for the app to function**; users can restrict per-app access (location, contacts, etc.). | Keep each tier's data where its feature needs it: in the worked example the free tier stays **on-device only** and Firestore sync (paid tier) is justified by the user-requested sync feature. Don't request permissions the app's core feature doesn't need. Maps to **GDPR Art. 5(1)(c)**. | [settled — AP "Privacy and apps" + GDPR Art. 5(1)(c), verified 2026-11-19] |
+| G6 | **Readable / accessible privacy statement** | AP expects a **privacy statement (privacyverklaring)** that is readable, understandable and accessible ("Privacy bij apps"). On functional cookies, the AP's Cookies page adds: "You can find this information, for example, in the privacy statement of the website or app." | The app's PP must be reachable **in-app and pre-install** (store listing), plain-language, and list every data category + SDK (for the worked example: Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions, RevenueCat). Maps to **GDPR Arts. 12–14**. | [settled — AP "Privacy and apps" + AP "Cookies" + GDPR Arts. 12–14, verified 2026-11-19] |
 | G7 | **Don't change purposes / scope-creep** | (See G3.) The AP page supports the purpose-change rule only; treating undisclosed expansion as a breach of the transparency + consent rules is this suite's reading. | Version the PP; trigger re-consent on material change (e.g. by bumping a terms-version constant such as `kTermsVersion`). | [settled — AP "Privacy and apps", verified 2026-11-19] |
 
 ---
 
 ## 3. Analytics & device telemetry — AP's opt-IN position (the load-bearing NL rule)
 
-For an app that ships third-party analytics or crash SDKs (the example app ships Firebase Analytics + Crashlytics), this is the single highest-impact NL-specific finding.
+For an app that ships third-party analytics or crash SDKs, this is the single highest-impact NL-specific finding.
 
 | Item | Rule | Tier |
 |---|---|---|
@@ -71,7 +68,7 @@ For an app that ships third-party analytics or crash SDKs (the example app ships
 | NL analytics exemption (narrow) | Tw 11.7a lid 3(b) has a narrow **analytics exemption** (no prior consent) for collecting information on the quality or effectiveness of the service with no or minor privacy consequences (see `eprivacy-cookiewet.md` §3). Secondary sources read it as met **only if ALL** of: (1) first-party only; (2) IP anonymised/masked; (3) **no** cross-site/cross-app tracking; (4) **no** data shared with third parties for their own purposes; (5) minimal privacy impact (solely measuring quality/performance). These five conditions are not on the AP's pages (checked 2026-11-19), nor in the statute. The AP's own published test: limited analytics cookies with "geen of geringe gevolgen" for privacy need no consent (Cookies page, 16 Oct 2026); on its cookie-banner page (9 Nov 2026), functional and/or limited analytics cookies need no consent and rest on legitimate interest ("gerechtvaardigd belang"), while analytics cookies "met meer dan een geringe impact op de privacy" require consent. | [settled — AP "Cookies" (16 Oct 2026) + AP "Vuistregels heldere cookiebanners" (9 Nov 2026), verified 2026-11-19] [verify — five conditions per secondary sources; not on the AP's pages, checked 2026-11-19] |
 | **AP's GA4 / "cookie letter" position** | Secondary sources (turing.law) report that the AP took the position (in a **"cookie letter"** on Google Analytics 4; no AP page by that name was found on 2026-11-19) that **standard GA4 — and by extension Firebase Analytics in default config — does NOT qualify** for the exemption, because data is shared with Google for Google's own purposes, **failing condition (4)**. Therefore such telemetry needs **prior opt-IN consent** in NL. | [verify — secondary source (turing.law), 2026-06-06] [verify — source blocked 2026-11-19: the AP's Google Analytics documents (ambtsbericht of 11 Dec 2025 and two Woo decisions) sat behind a CAPTCHA; no readable AP page names GA4 and AP search finds no "cookie letter"; the AP's general test (vuistregels, 9 Nov 2026) is "more than minor privacy impact → consent"; GA4 specifics rest on turing.law only] |
 | Legitimate interest does NOT cure it | A **GDPR Art. 6(1)(f) legitimate-interest** basis for analytics does **not** override the **Art. 5(3) / Tw 11.7a device-access consent** requirement. The consent gate is a separate, prior obstacle. | [settled — ePrivacy 5(3) is lex specialis to GDPR Art. 6, EDPB Opinion 5/2019, verified 2026-11-18] |
-| **Verdict for a Firebase app (the example app)** | Default Firebase Analytics needs prior opt-in in NL: it stores and reads an app-instance identifier (and on iOS the IDFV) on the device, which needs consent under Tw 11.7a(1) and ePrivacy Art 5(3); the analytics exemption of Tw 11.7a(3)(b) requires "geen of geringe gevolgen" for privacy, which an identifier linked to a user ID and sent to Google does not safely meet. The conclusion rests on the statute; the AP's GA4 position supports it but could not be read. | [settled — Tw 11.7a(1), (3)(b), wetten-overheid.nl mirror, verified 2026-11-19; ePrivacy Art 5(3) + EDPB Guidelines 2/2023, verified 2026-11-18] [verify — source blocked 2026-11-19: AP GA4 position; the AP's Google Analytics documents sat behind a CAPTCHA] |
+| **Verdict for a Firebase app** | Default Firebase Analytics needs prior opt-in in NL: it stores and reads an app-instance identifier (and on iOS the IDFV) on the device, which needs consent under Tw 11.7a(1) and ePrivacy Art 5(3); the analytics exemption of Tw 11.7a(3)(b) requires "geen of geringe gevolgen" for privacy, which an identifier linked to a user ID and sent to Google does not safely meet. The conclusion rests on the statute; the AP's GA4 position supports it but could not be read. | [settled — Tw 11.7a(1), (3)(b), wetten-overheid.nl mirror, verified 2026-11-19; ePrivacy Art 5(3) + EDPB Guidelines 2/2023, verified 2026-11-18] [verify — source blocked 2026-11-19: AP GA4 position; the AP's Google Analytics documents sat behind a CAPTCHA] |
 
 > **Review rule:** If the app initialises Firebase Analytics/Crashlytics (or any non-essential telemetry SDK) before an affirmative
 > consent gate, that is a **finding**. Acceptable remediation: gate telemetry behind a
@@ -97,11 +94,11 @@ For an app that ships third-party analytics or crash SDKs (the example app ships
 NL sets the **digital-consent age at 16** (the maximum the GDPR Art. 8(1) allows). The UAVG
 fixes 16; below 16 the **holder of parental responsibility must consent**.
 
-| # | AP / NL rule | Application (worked: example app) | Tier |
+| # | AP / NL rule | Application (worked example) | Tier |
 |---|---|---|---|
-| C1 | **Age of valid consent = 16.** Children under 16 **cannot** give valid consent; a parent/guardian must consent for processing their data. **Since 1 Sep 2026** (Verzamelwet gegevensbescherming) a child aged **12 or older may withdraw** that consent themselves: "Kinderen van 12 jaar of ouder mogen zelf de toestemming intrekken." | A 16+ self-attestation checkbox (recording e.g. `ageConfirmedAt`) is the right pattern for an app that is **not** targeting under-16s and obtains an age statement (as the example app does). An app that does serve under-16s must let a child of 12+ withdraw consent without the parent. | [settled — GDPR Art. 8(1) + UAVG (NL = 16) + AP "Grondslag toestemming" (updated 17 Sep 2026), verified 2026-11-19] |
+| C1 | **Age of valid consent = 16.** Children under 16 **cannot** give valid consent; a parent/guardian must consent for processing their data. **Since 1 Sep 2026** (Verzamelwet gegevensbescherming) a child aged **12 or older may withdraw** that consent themselves: "Kinderen van 12 jaar of ouder mogen zelf de toestemming intrekken." | A 16+ self-attestation checkbox (recording a confirmation timestamp) is the right pattern for an app that is **not** targeting under-16s and obtains an age statement. An app that does serve under-16s must let a child of 12+ withdraw consent without the parent. | [settled — GDPR Art. 8(1) + UAVG (NL = 16) + AP "Grondslag toestemming" (updated 17 Sep 2026), verified 2026-11-19] |
 | C2 | **No email (or any data) from an under-16 without parental consent.** AP: "An app is **not allowed**, for example, **to ask for an email address without having obtained consent from the parents**." | Because sign-up (email/Google) collects email, an app that **knowingly** serves under-16s would need verifiable parental consent. The mitigation for an adult-facing app = the 16+ gate; it must not market to children. | [settled — AP "Privacy and apps", verified 2026-11-19] |
-| C3 | **No child-targeted advertising using children's data.** AP: "Apps mogen geen gegevens van kinderen gebruiken voor specifieke op een kind gerichte advertenties." (NL page, 19 May 2026; the older EN page says "children under the age of 16"). | An app that shows no ads and collects no advertising ID (`AD_ID` stripped, as in the example app) is compliant by design; an app with ads must keep children's data out of child-targeted advertising. | [settled — AP "Privacy bij apps", verified 2026-11-19] |
+| C3 | **No child-targeted advertising using children's data.** AP: "Apps mogen geen gegevens van kinderen gebruiken voor specifieke op een kind gerichte advertenties." (NL page, 19 May 2026; the older EN page says "children under the age of 16"). | An app that shows no ads and collects no advertising ID (`AD_ID` stripped) is compliant by design; an app with ads must keep children's data out of child-targeted advertising. | [settled — AP "Privacy bij apps", verified 2026-11-19] |
 | C4 | **Child-appropriate language.** Where an app targets children, "information about the app must be offered in a simple manner, with use of language that is in line with the age of the children." | Not directly triggered (16+ gate), but the readability standard (G6) still applies generally. | [settled — AP "Privacy and apps", verified 2026-11-19] |
 
 > **Review rule:** If the app's store listing, age rating, or copy could be read as
@@ -124,13 +121,13 @@ fixes 16; below 16 the **holder of parental responsibility must consent**.
 | **Notifying data subjects (Art. 34)** | If the breach is likely to result in a **high risk** to individuals, the controller must also inform the **affected individuals without undue delay**, in plain language. | [settled — GDPR Art. 34(1)–(2), verified 2026-11-18] |
 | Records of all breaches (Art. 33(5)) | The controller must **document all breaches** (facts, effects, remedial action), reportable or not, so the AP can verify compliance. Keep an internal breach register. | [settled — GDPR Art. 33(5), verified 2026-11-18] |
 
-> **Eenmanszaak note:** a sole-trader publisher like the example app's has **no DPO** (not required — no large-scale or
+> **Eenmanszaak note:** a sole-trader publisher (as in the worked example) has **no DPO** (not required — no large-scale or
 > special-category core processing under Art. 37). In the Art. 33(3) notification, give the
 > **owner/controller's contact** as the contact point, not a DPO.
 
 ---
 
-## 6. How this maps onto an app's actual stack (worked: the example app; build the same table for the app under review)
+## 6. How this maps onto an app's actual stack (the worked example's stack; build the same table for the app under review)
 
 | Stack element | AP/NL position | Required state for SHIP |
 |---|---|---|
@@ -138,8 +135,8 @@ fixes 16; below 16 the **holder of parental responsibility must consent**.
 | Firebase **Crashlytics** | Same as Analytics → **opt-in** | Same gate; do not init pre-consent |
 | Firebase **Auth / Firestore (paid-tier sync)** | Arguably strictly-necessary for the user-requested sync/account service | Basis = **contract (Art. 6(1)(b))**; document necessity |
 | **RevenueCat + store billing** | Necessary to provide the purchased subscription | Basis = **contract (Art. 6(1)(b))**; name RevenueCat + Apple/Google as recipients/processors |
-| **Age attestation (16+)** | C1/C2 satisfied by the gate; **separate** consent (G2) | Own checkbox; records `ageConfirmedAt`; not bundled |
-| **Withdrawal/immediate-delivery ack** | Distinct consumer/consent surface (G2) | Own unticked checkbox; records `withdrawalConsentAt` |
+| **Age attestation (16+)** | C1/C2 satisfied by the gate; **separate** consent (G2) | Own checkbox; records a timestamp; not bundled |
+| **Withdrawal/immediate-delivery ack** | Distinct consumer/consent surface (G2) | Own unticked checkbox; records a timestamp |
 | **Device region** | EU `europe-west` keeps processing in-EU (helps Chapter V) | State EU hosting in PP; flag any non-EU sub-processor (Crashlytics/RevenueCat US legs) for transfer-mechanism review |
 | **PP accessibility (G6)** | In-app + store listing, plain language | Confirm both surfaces serve the current version |
 | **Supervisory authority named** | AP (§5) | PP §complaint-rights names + links the AP |
@@ -152,7 +149,7 @@ fixes 16; below 16 the **holder of parental responsibility must consent**.
 - [ ] **Telemetry is opt-IN**, gated before Firebase Analytics/Crashlytics init (not opt-out, not legitimate-interest). [§3]
 - [ ] **Consents are unbundled** — age, telemetry, withdrawal-ack each separate. [G2]
 - [ ] **Withdrawal** of consent is available in-app and stops future processing. [G4 / Art. 7(3)]
-- [ ] **Data minimisation** — no permissions/data beyond what breathing + sync need; free tier on-device. [G5]
+- [ ] **Data minimisation** — no permissions/data beyond what the app's core feature + sync need; free tier on-device. [G5]
 - [ ] **PP is readable + accessible** in-app and on the store listing; lists every SDK/recipient. [G6]
 - [ ] **Purposes are fixed + versioned**; material change triggers re-consent. [G3/G7]
 - [ ] **16+ gate** present; no data requested from under-16s; not marketed to children. [§4]

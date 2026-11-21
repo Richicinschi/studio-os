@@ -9,7 +9,7 @@ strip**, never as donor text.
 
 **How to use.** When the ToS-scan emits a 🔴/🟠 on a clause, paste the matching replacement below
 into the Redline, entity-named and tailored to the app's facts (the fact sheet). The wording below
-is written for the example app in `legal-guardrails.md` §8 — Apple/Google as merchants of record,
+is written for the worked example (`legal-guardrails/references/worked-example.md`) — Apple/Google as merchants of record,
 RevenueCat middleware, Firebase EU backend — so swap in the app's own sellers and processors, and
 `<app name>` / `<publisher>` for the names. Each replacement carries its basis + tier. The
 **liability-cap reasonableness is `[low-confidence]`** — propose it, but reserve the final
@@ -112,7 +112,7 @@ Three hits this cures: a foreign/seat forum without the one-month court choice (
 advice that ousts the court (6:236(n), void), and any link to the **dead EU ODR platform**
 (`ec.europa.eu/consumers/odr` — shut down 19/20 Jul 2025, must be removed). Do **not** name
 De Geschillencommissie as the route unless the publisher has actually affiliated (ask; an
-unaffiliated sole trader, like the example app's publisher, has not). Describe
+unaffiliated sole trader has not). Describe
 ConsuWijzer as guidance, never as a body that decides disputes.
 
 > **Complaints and disputes.** If you have a complaint, contact us first at `[support email]`; we

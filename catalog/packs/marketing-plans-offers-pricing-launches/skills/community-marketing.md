@@ -14,7 +14,7 @@ Neighbours, and where each takes over:
 - Posts and content for social channels: the social skill in this pack.
 - Interviews, surveys and member language research: the customer research skill in this pack.
 
-Studio rules for everything here: English only, no em or en dashes. Never suggest fake accounts, sock puppets or staged "organic" praise. Follow each platform's own rules on promotion and self-posting. Nothing is posted, DMed or announced publicly until the owner has said so; draft it and stop.
+Rules for everything here: write in the languages the project supports, no em or en dashes. Never suggest fake accounts, sock puppets or staged "organic" praise. Follow each platform's own rules on promotion and self-posting. Nothing is posted, DMed or announced publicly until the owner has said so; draft it and stop.
 
 ## How it works
 

@@ -50,9 +50,9 @@ Boundaries:
    `ffmpeg -i clip.mp4 -vf "fps=12,scale=256:-1:flags=neighbor" frames/f_%03d.png`
    Choose the frame rate from the manifest, not from the clip. Pick the loop start and end by viewing the numbered frames, then delete the rest.
 
-8. **Run the check script on every batch.** The file `game-art-pipeline/check_art.py` (stdlib plus Pillow, reads only) reports missing alpha, an opaque border, leftover key colour, semi-transparent halos, and sizes off the ladder:
-   `python game-art-pipeline/check_art.py art/out --ladder 32,64 --cell 64` (adjust the path to where the script was saved)
-   Use `py -3` on Windows if `python` is not found, and `python3` on macOS or Linux. Exit code 1 means a warning: read it, fix the image, run again. Exit code 2 means bad input or a PNG that is corrupt or truncated: re-export that file. A 16-bit greyscale PNG is reported as "no alpha". `python check_art.py --self-test` checks the script on small test images. A warning on a deliberate soft effect (glow, smoke) is fine; note why in `art/brief.md`.
+8. **Run the check script on every batch.** The file `skills/game-art-pipeline/check_art.py` (stdlib plus Pillow, reads only) reports missing alpha, an opaque border, leftover key colour, semi-transparent halos, and sizes off the ladder:
+   `python skills/game-art-pipeline/check_art.py art/out --ladder 32,64 --cell 64`
+   Use `py -3` on Windows if `python` is not found, and `python3` on macOS or Linux. Exit code 1 means a warning: read it, fix the image, run again. Exit code 2 means bad input or a PNG that is corrupt or truncated: re-export that file. A 16-bit greyscale PNG is reported as "no alpha". `python skills/game-art-pipeline/check_art.py --self-test` checks the script on small test images. A warning on a deliberate soft effect (glow, smoke) is fine; note why in `art/brief.md`.
 
 9. **Hand off to the engine.** Import one asset first and view it at real screen size: edges, scale, filtering (pixel art needs none) and sheet slicing. Then import the rest. Keep originals in `art/source/`, never overwritten.
 

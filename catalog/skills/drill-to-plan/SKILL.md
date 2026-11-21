@@ -34,10 +34,10 @@ mechanical operations. For lightweight product-intent exploration, prefer
 drilling past the first reasonable design until every branch is resolved. Its output (an
 **approved spec**) is the input to `writing-plans`.
 
-**Honour the studio rules:** producing a spec is fine; do NOT start implementing until the
-user approves the spec (same gate as brainstorming). Follow the hard rules in
-your rules file + the Karpathy guidelines in your coding guidelines —
-the spec is "huge" because of genuine coverage, never filler.
+**Honour the project's rules:** producing a spec is fine; do NOT start implementing until the
+user approves the spec (same gate as brainstorming). Follow the rules and coding guidelines the
+project's `AGENTS.md` or `CLAUDE.md` loads — the spec is "huge" because of genuine coverage,
+never filler.
 
 ## Procedure
 

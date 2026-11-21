@@ -3,7 +3,7 @@ id: git-cleanup
 module: 06-git-and-guardrails
 checked: 2026-11-02
 tokens:
-  description: 46
+  description: 0
   body: 2575
 ---
 
@@ -26,8 +26,9 @@ Read-only. Names of skills, counts of branches, never branch names; nothing is f
   - branches already merged into the default branch: `git -C <repo> branch --merged <default branch> | wc -l` (the default branch itself counts as one);
   - worktrees: `git -C <repo> worktree list | wc -l` (the main checkout counts as one).
 - Whether Claude has a Bash tool, since the skill's commands are bash, and whether a git guard blocks `git branch -D` ([git-guardrails](git-guardrails.md), Detect).
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/git-cleanup/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when `git-cleanup`, or a skill doing the same job that asks before each deletion, exists, **partly** when a cleanup skill or routine exists that deletes without asking first, and **not yet** otherwise.
+The menu marks the item **have** when `git-cleanup`, or a skill doing the same job that asks before each deletion, exists, **partly** when a cleanup skill or routine exists that deletes without asking first, and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 

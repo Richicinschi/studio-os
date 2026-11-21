@@ -2,7 +2,7 @@
 
 **Scope:** Adjudicating the "dispute resolution / out-of-court complaints" clause of a consumer Terms of Service for a Dutch publisher (eenmanszaak / sole proprietorship), EU/NL-first, after the EU ODR platform shutdown.
 
-**Worked example:** the applications below use the example app (`legal-guardrails.md` §8) — a Flutter breathing/mindfulness app; publisher is a Dutch sole proprietor (sole data controller, no DPO); subscriptions sold *through* Apple/Google as merchants of record (RevenueCat + Firebase backend, EU `europe-west`); general-wellness, no medical claims. Apply the rules to the app under review from its fact sheet (`legal-signoff-orchestrator.md` Step 0).
+**Worked example:** the applications below use one app, the worked example (profile: `worked-example.md` §1). Apply the rules to the app under review from its fact sheet (`legal-signoff-orchestrator.md` Step 0).
 
 **Citation tiers used below:**
 - `[settled — <source>, verified 2026-11-18]` confirmed against a primary source fetched on that date
@@ -102,7 +102,7 @@ Do **not** write "submit your dispute to ConsuWijzer" or imply it issues decisio
 
 ---
 
-## 5. Model dispute-resolution clause for an UNAFFILIATED eenmanszaak (the example app's case)
+## 5. Model dispute-resolution clause for an UNAFFILIATED eenmanszaak (the worked example's case)
 
 Use this when the publisher has not joined any geschillencommissie (the expected default). EN + NL outline:
 
@@ -124,7 +124,7 @@ Use this when the publisher has not joined any geschillencommissie (the expected
 
 ## 6. Interaction with the Apple/Google merchant-of-record reality
 
-When an app's subscriptions are sold through Apple/Google as merchants of record (as in the example app, with RevenueCat as middleware), the *payment* contract for the subscription is with the store. Implications for the dispute clause:
+When an app's subscriptions are sold through Apple/Google as merchants of record (as in the worked example, with RevenueCat as middleware), the *payment* contract for the subscription is with the store. Implications for the dispute clause:
 
 | Point | Guidance | Tier |
 |---|---|---|

@@ -4,8 +4,9 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { makeFixtureHub, FIXTURE_OWNER as owner } from './fixture-hub.mjs';
+import { makeFixtureHub, makePackHub, FIXTURE_OWNER as owner } from './fixture-hub.mjs';
 import { buildKit } from '../build.mjs';
+import { STUDIO_REWRITES } from '../rules.mjs';
 
 const flags = (importance = 'recommended') => ({ importance, why: `Why ${importance}.` });
 const manifest = { kit: 'studio-os', version: '2.0.0', items: [
@@ -219,6 +220,126 @@ test('the studio rewrite list replaces studio pointers in shipped markdown, by e
   } finally { done(); }
 });
 
+test('a studio rewrite matches in any case; a match that starts with a capital gets a capital, mid-sentence stays lower case', () => {
+  const { hub, out, done } = setup();
+  try {
+    const file = path.join(hub, '.claude/skills/alpha/SKILL.md');
+    const rule11 = STUDIO_REWRITES.find((r) => r.file === '*' && r.phrase === 'hard rule 11');
+    assert.ok(rule11, 'the hard rule 11 entry is in STUDIO_REWRITES');
+    const rewrites = [
+      rule11,
+      { file: 'catalog/skills/alpha/SKILL.md', pattern: 'run scripts/gone\\.py', replacement: 'skip the importer', why: 'test' },
+      { file: 'catalog/skills/alpha/SKILL.md', phrase: 'the zorblat', replacement: 'The README', why: 'test' },
+    ];
+    writeFileSync(file, '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nHard rule 11 lets you act. Before that, see hard rule 11.\n\nRun scripts/gone.py first; then run scripts/gone.py again.\n\nOpen the zorblat.\n');
+    buildKit({ hub, out, manifest, owner, rewrites });
+    assert.equal(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
+      '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nThe rule that each risky act needs a recorded yes lets you act. Before that, see the rule that each risky act needs a recorded yes.\n\nSkip the importer first; then skip the importer again.\n\nOpen The README.\n');
+    // An entry whose phrase is in the file only in another case still matches, so it is not stale.
+    writeFileSync(file, '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nHARD RULE 11 applies.\n');
+    buildKit({ hub, out, manifest, owner, rewrites: [rule11] });
+    assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'), /\nThe rule that each risky act needs a recorded yes applies\.\n/);
+  } finally { done(); }
+});
+
+test('a rewrite whose phrase starts with a proper noun keeps its replacement as written where the text matches it exactly', () => {
+  const { hub, out, done } = setup();
+  try {
+    const file = path.join(hub, '.claude/skills/alpha/SKILL.md');
+    const rewrites = [
+      { file: 'catalog/skills/alpha/SKILL.md', phrase: 'Zorvex app', replacement: 'this app', why: 'test' },
+      { file: 'catalog/skills/alpha/SKILL.md', pattern: 'Brindle (?:site|page)', replacement: 'the site', why: 'test' },
+    ];
+    writeFileSync(file, '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nWe ship Zorvex app and Brindle site.\n\nThen `Zorvex app` again, on Brindle page.\n');
+    buildKit({ hub, out, manifest, owner, rewrites });
+    assert.equal(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
+      '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nWe ship this app and the site.\n\nThen this app again, on the site.\n');
+  } finally { done(); }
+});
+
+test('an exact match of a capitalised entry at the start of a sentence keeps the capital; mid-sentence it stays as written', () => {
+  const { hub, out, done } = setup();
+  try {
+    const file = path.join(hub, '.claude/skills/alpha/SKILL.md');
+    const rewrites = [{ file: 'catalog/skills/alpha/SKILL.md', phrase: 'Zorvex app', replacement: 'this app', why: 'test' }];
+    writeFileSync(file, '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nZorvex app ships today. We test Zorvex app daily. Done. Zorvex app again.\n\n- Zorvex app, in a list.\n');
+    buildKit({ hub, out, manifest, owner, rewrites });
+    assert.equal(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
+      '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nThis app ships today. We test this app daily. Done. This app again.\n\n- This app, in a list.\n');
+  } finally { done(); }
+});
+
+test('a phrase in backticks at the start of a sentence gets a capital too; mid-sentence it stays as written', () => {
+  const { hub, out, done } = setup();
+  try {
+    const file = path.join(hub, '.claude/skills/alpha/SKILL.md');
+    const rewrites = [
+      { file: 'catalog/skills/alpha/SKILL.md', phrase: 'Zorvex app', replacement: 'this app', why: 'test' },
+      { file: 'catalog/skills/alpha/SKILL.md', phrase: 'hard rule 11', replacement: 'the rule that each risky act needs a recorded yes', why: 'test' },
+    ];
+    writeFileSync(file, '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\n`Zorvex app` ships today. We test `Zorvex app` daily.\n\n`HARD RULE 11` applies. See `hard rule 11` too.\n');
+    buildKit({ hub, out, manifest, owner, rewrites });
+    assert.equal(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
+      '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nThis app ships today. We test this app daily.\n\nThe rule that each risky act needs a recorded yes applies. See the rule that each risky act needs a recorded yes too.\n');
+  } finally { done(); }
+});
+
+test('the outside-skill pointer names vet-and-adopt as the kit\'s, run from the kit folder', () => {
+  const { hub, out, done } = setup();
+  try {
+    const entry = STUDIO_REWRITES.find((r) => r.phrase && r.phrase.startsWith('For an outside skill'));
+    assert.ok(entry, 'the outside-skill entry is in STUDIO_REWRITES');
+    writeFileSync(path.join(hub, '.claude/skills/alpha/SKILL.md'), '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nFor an outside skill: `vet-external-skill`, then `writing-great-skills` to adapt it.\n');
+    buildKit({ hub, out, manifest, owner, rewrites: [{ ...entry, file: 'catalog/skills/alpha/SKILL.md' }] });
+    assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
+      /\nFor an outside skill: vet it with the kit's `vet-and-adopt` \(run from the kit folder\), then `writing-great-skills` to adapt it\.\n/);
+  } finally { done(); }
+});
+
+// The block markers are assembled at runtime, so no kit file but rules.mjs carries them for the gate to find.
+const ONLY = ['studio', 'only'].join('-');
+
+test(`a hub skill's ${ONLY} block is cut from the shipped copy, before the rewrites; one left open stops the build`, () => {
+  const { hub, out, done } = setup();
+  try {
+    const file = path.join(hub, '.claude/skills/alpha/SKILL.md');
+    writeFileSync(file, `---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\n<!-- ${ONLY} -->\nRun the studio's own save step, then tell ${owner}.\n<!-- /${ONLY} -->\nSave the session your own way, then tell ${owner}.\n`);
+    buildKit({ hub, out, manifest, owner, rewrites: [{ file: '*', phrase: 'your own way', replacement: 'as you usually do', why: 'test' }] });
+    assert.equal(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
+      '---\nname: alpha\ndescription: Use when alpha.\n---\n# alpha\n\nSave the session as you usually do, then tell the owner.\n');
+    writeFileSync(file, `---\nname: alpha\n---\n<!-- ${ONLY} -->\nstudio text\n`);
+    assert.throws(() => buildKit({ hub, out, manifest, owner }), (e) => e.message.includes(`SKILL.md:4 ${ONLY} block`));
+  } finally { done(); }
+});
+
+test(`a hub agent's ${ONLY} block is cut from the shipped copy; a marker sharing its line stops the build`, () => {
+  const { hub, out, done } = setup();
+  try {
+    const file = path.join(hub, '.claude/agents/gamma.md');
+    writeFileSync(file, `---\nname: gamma\n---\nA seat.\n<!-- ${ONLY} -->\nRead the studio's agent index.\n<!-- /${ONLY} -->\nAsk ${owner}.\n`);
+    buildKit({ hub, out, manifest, owner });
+    assert.equal(readFileSync(path.join(out, 'catalog/agents/gamma.md'), 'utf8'), '---\nname: gamma\n---\nA seat.\nAsk the owner.\n');
+    writeFileSync(file, `---\nname: gamma\n---\nA seat. <!-- ${ONLY} -->\n`);
+    assert.throws(() => buildKit({ hub, out, manifest, owner }), (e) => e.message.includes(`gamma.md:4 ${ONLY} block`));
+  } finally { done(); }
+});
+
+test(`a domain stub's ${ONLY} block is cut from the stub it ships as`, () => {
+  const hub = makePackHub();
+  const out = mkdtempSync(path.join(os.tmpdir(), 'kit-out-'));
+  try {
+    writeFileSync(path.join(hub, '.claude/skills/stubby/SKILL.md'), `---\nname: stubby\ndescription: x\n---\n<!-- ${ONLY} -->\nStudio step.\n<!-- /${ONLY} -->\nRead \`pack-one-two-three/skills/stubby.md\` and follow it.\n`);
+    const items = [
+      { id: 'alpha', kind: 'skill', status: 'catalog-only', pack: 'catalog' }, { id: 'beta', kind: 'skill', status: 'catalog-only', pack: 'catalog' },
+      { id: 'gamma', kind: 'agent', status: 'catalog-only', pack: 'catalog' }, { id: 'private-pack-for-me', kind: 'pack', status: 'private' },
+      { id: 'pack-one-two-three', kind: 'pack', status: 'shipped', why: 'A domain.' }, { id: 'pack-with-licence-inside', kind: 'pack', status: 'withheld' },
+    ];
+    buildKit({ hub, out, manifest: { items }, owner });
+    assert.equal(readFileSync(path.join(out, 'catalog/packs/pack-one-two-three/stubs/stubby/SKILL.md'), 'utf8'),
+      '---\nname: stubby\ndescription: x\n---\nRead `pack-one-two-three/skills/stubby.md` and follow it.\n');
+  } finally { rmSync(hub, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
+});
+
 test('a studio rewrite entry that no longer matches stops the build, so the list stays true', () => {
   const { hub, out, done } = setup();
   try {
@@ -284,5 +405,91 @@ test('outside data named in a NOTICE file inside a skill is listed in the third-
     const e = r.notices.find((n) => n.id === 'alpha');
     assert.deepEqual(e, { id: 'alpha', upstream: 'https://example.invalid/data-project', licenceFile: 'data/INDEX-NOTICE.md', licenceLine: 'Apache License 2.0 (data; see the notice file)' });
     assert.match(readFileSync(path.join(out, 'docs/THIRD_PARTY_NOTICES.md'), 'utf8'), /\| alpha \| https:\/\/example\.invalid\/data-project \| Apache License 2\.0 \(data/);
+  } finally { done(); }
+});
+
+test('buildKit returns the studio names, the names the kit ships (its own skills and stubs included) and the private names apart', () => {
+  const hub = makePackHub();
+  const out = mkdtempSync(path.join(os.tmpdir(), 'kit-out-'));
+  const w = (rel, text) => { mkdirSync(path.dirname(path.join(hub, rel)), { recursive: true }); writeFileSync(path.join(hub, rel), text); };
+  try {
+    // A hidden (public: false) pack with a skill, an agent and a stub; a shipped pack's stub that its skills do not list.
+    w('library/hidden-pack/pack.json', JSON.stringify({ id: 'hidden-pack', public: false, title: 'x', description: 'x',
+      skills: [{ id: 'hidden-job' }], agents: [{ id: 'hidden-seat' }], standalone: [{ id: 'hidden-stub' }] }));
+    const packJson = path.join(hub, 'library/pack-one-two-three/pack.json');
+    const pack = JSON.parse(readFileSync(packJson, 'utf8'));
+    writeFileSync(packJson, JSON.stringify({ ...pack, standalone: [...pack.standalone, { id: 'lone-stub', userOnly: true }] }));
+    w('.claude/skills/lone-stub/SKILL.md', '---\nname: lone-stub\ndescription: x\n---\nRead the pack.\n');
+    for (const id of ['vet-and-adopt', 'drill-to-adopt']) {
+      mkdirSync(path.join(out, '.claude/skills', id), { recursive: true });
+      writeFileSync(path.join(out, '.claude/skills', id, 'SKILL.md'), `---\nname: ${id}\ndescription: x\n---\n`);
+    }
+    mkdirSync(path.join(out, '.claude/skills/no-skill-file'), { recursive: true });
+    const items = [
+      manifest.items[0], { id: 'beta', kind: 'skill', status: 'catalog-only', pack: 'catalog' }, manifest.items[2],
+      { id: 'private-pack-for-me', kind: 'pack', status: 'private' },
+      { id: 'pack-one-two-three', kind: 'pack', status: 'shipped', why: 'A domain.' }, { id: 'pack-with-licence-inside', kind: 'pack', status: 'withheld' },
+    ];
+    const r = buildKit({ hub, out, manifest: { ...manifest, items }, owner });
+    assert.deepEqual(r.names, {
+      studio: ['alpha', 'beta', 'gamma', 'lic-job', 'one-job', 'pack-one-two-three', 'pack-with-licence-inside', 'seat-one', 'stubby'],
+      shipped: ['alpha', 'drill-to-adopt', 'gamma', 'lone-stub', 'one-job', 'pack-one-two-three', 'seat-one', 'stubby', 'vet-and-adopt'],
+      private: ['hidden-job', 'hidden-pack', 'hidden-seat', 'hidden-stub', 'private-pack-for-me', 'secret-job'],
+    });
+  } finally { rmSync(hub, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
+});
+
+const tokensOfText = (s) => Math.ceil(Buffer.byteLength(s, 'utf8') / 4);
+const bodyOf = (text) => text.replace(/^---\n[\s\S]*?\n---\n/, '');
+const descriptionOf = (text) => text.match(/^description: (.*)$/m)[1];
+
+test('a skill and an agent are measured on the shipped, rewritten copy, not on the hub\'s', () => {
+  const { hub, out, done } = setup();
+  try {
+    const long = 'the studio ledger at zorblat/ledgers/long/path/to/the/yes-file.md';
+    writeFileSync(path.join(hub, '.claude/skills/alpha/SKILL.md'),
+      `---\nname: alpha\ndescription: Use when alpha, see ${long}.\n---\n# alpha\n\n${`Record it in ${long} first.\n`.repeat(20)}`);
+    writeFileSync(path.join(hub, '.claude/agents/gamma.md'), `---\nname: gamma\ndescription: A seat.\n---\n${`Read ${long}.\n`.repeat(20)}`);
+    const rewrites = [{ file: '*', phrase: long, replacement: 'your ledger', why: 'a studio path' }];
+    buildKit({ hub, out, manifest, owner, rewrites });
+    const f = JSON.parse(readFileSync(path.join(out, 'catalog/features.json'), 'utf8'));
+    const item = (id) => f.modules.flatMap((x) => x.items).find((x) => x.id === id);
+    for (const [id, rel, hubRel] of [['alpha', 'catalog/skills/alpha/SKILL.md', '.claude/skills/alpha/SKILL.md'], ['gamma', 'catalog/agents/gamma.md', '.claude/agents/gamma.md']]) {
+      const shipped = readFileSync(path.join(out, rel), 'utf8');
+      const fromHub = readFileSync(path.join(hub, hubRel), 'utf8');
+      assert.equal(item(id).onDemandTokens, tokensOfText(bodyOf(shipped)), id);
+      assert.equal(item(id).everySessionTokens, tokensOfText(descriptionOf(shipped)), id);
+      assert.ok(item(id).onDemandTokens < tokensOfText(bodyOf(fromHub)), `${id}: the shipped body is the shorter one`);
+    }
+  } finally { done(); }
+});
+
+test('a skill Claude cannot start costs 0 every session, keeps its body figure, and is shown as "you start it by name"', () => {
+  const { hub, out, done } = setup();
+  try {
+    const skill = (id, flag) => {
+      mkdirSync(path.join(hub, '.claude/skills', id), { recursive: true });
+      writeFileSync(path.join(hub, '.claude/skills', id, 'SKILL.md'), `---\nname: ${id}\ndescription: ${'d'.repeat(400)}\ndisable-model-invocation: ${flag}\n---\n${'b'.repeat(800)}`);
+    };
+    skill('by-hand', 'true');
+    skill('not-flagged', 'false');
+    const m = { ...manifest, items: [...manifest.items,
+      { id: 'by-hand', kind: 'skill', status: 'shipped', pack: 'way-of-working', module: '01-continuity', ...flags('optional') },
+      { id: 'not-flagged', kind: 'skill', status: 'shipped', pack: 'way-of-working', module: '01-continuity', ...flags('optional') },
+    ] };
+    buildKit({ hub, out, manifest: m, owner });
+    const f = JSON.parse(readFileSync(path.join(out, 'catalog/features.json'), 'utf8'));
+    const mod = f.modules.find((x) => x.id === '01-continuity');
+    const item = (id) => mod.items.find((x) => x.id === id);
+    assert.deepEqual({ loads: item('by-hand').loads, everySessionTokens: item('by-hand').everySessionTokens, onDemandTokens: item('by-hand').onDemandTokens, heavy: item('by-hand').heavy },
+      { loads: 'by-name', everySessionTokens: 0, onDemandTokens: 200, heavy: false });
+    assert.deepEqual({ loads: item('not-flagged').loads, everySessionTokens: item('not-flagged').everySessionTokens }, { loads: 'every-session', everySessionTokens: 100 });
+    const md = readFileSync(path.join(out, 'catalog/FEATURES.md'), 'utf8');
+    assert.match(md, /\| by-hand \| skill \| optional \| Why optional\. \| you start it by name[^|]*\| 0 \|/);
+    assert.match(md, /\| not-flagged \| skill \| optional \| Why optional\. \| description every session, body on demand \(about 200\) \| 100 \|/);
+    const total = mod.items.reduce((s, it) => s + it.everySessionTokens, 0);
+    assert.equal(total, item('alpha').everySessionTokens + 100);
+    const section = md.slice(md.indexOf('## `01-continuity`'), md.indexOf('## `05-skills`'));
+    assert.match(section, new RegExp(`Every session for this module: about ${total} tokens`));
   } finally { done(); }
 });

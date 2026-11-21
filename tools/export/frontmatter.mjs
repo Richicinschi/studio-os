@@ -93,6 +93,10 @@ export function parseFrontmatter(text) {
   return { data: parseBlock(raw.split('\n'), 0, 0)[0], body };
 }
 
+// A skill whose front matter sets `disable-model-invocation: true` is one Claude cannot start: its
+// description stays out of context and the user starts it by name. `data` is parseFrontmatter(text).data.
+export const startedByName = (data) => Boolean(data) && data['disable-model-invocation'] === 'true';
+
 // A quoted scalar that closes on its own line: "..." (with \ escapes) or '...' (with '' escapes).
 const closedQuote = (s) => (s[0] === '"' ? /^"(?:[^"\\]|\\.)*"/ : /^'(?:[^']|'')*'/).test(s);
 

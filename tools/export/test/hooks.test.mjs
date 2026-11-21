@@ -186,6 +186,28 @@ test('session-start-status: nothing printed when all is clean; idle branches fol
   } finally { s.done(); }
 });
 
+test('session-start-status: a date counts only inside the current state section, up to the next heading of the same or higher level', () => {
+  const s = sandbox();
+  try {
+    const setup = s.withRemote(s.repo('setup'));
+    const frontDoor = (text) => {
+      writeFileSync(path.join(setup, 'AGENTS.md'), text);
+      s.git(setup, ['add', 'AGENTS.md']);
+      s.git(setup, ['commit', '-q', '-m', 'front door']);
+      s.git(setup, ['push', '-q', 'origin', 'main']);
+      return s.run(START, setup);
+    };
+    // The state has no date; the history's date is not the state's: no date, so no line.
+    let r = frontDoor('# Front door\n\n## Current state\n\nWorking on the export.\n\n## History\n\n**2025-01-01**: started.\n');
+    assert.equal(r.status, 0, r.err);
+    assert.equal(r.out, '');
+    // A lower heading, and a heading-like line in a fenced block, stay inside the section.
+    r = frontDoor('# Front door\n\n## Current state\n\n```\n# not a heading\n```\n\n### Next\n\n**2020-01-01**: started.\n\n## History\n\n**2025-01-01**: older notes.\n');
+    assert.equal(r.status, 0, r.err);
+    assert.match(r.out.trim(), /^setup: the front door's current state \(2020-01-01\) is \d+ days older than the last commit$/);
+  } finally { s.done(); }
+});
+
 test('session-start-status: a repository with no commits yet is skipped, and the checked-out branch is never called idle', () => {
   const s = sandbox();
   try {

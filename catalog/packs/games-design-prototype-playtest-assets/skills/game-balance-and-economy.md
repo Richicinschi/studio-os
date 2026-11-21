@@ -30,12 +30,12 @@ You change nothing in the game yourself until the person approves the proposed n
 
 4. **Check the progression curve.** Costs per level usually grow by a ratio. Compute, for each level, the cost, the running total, and the minutes needed at the player's income, then the ratio of each level's time to the one before. Rules of thumb, not laws: a ratio from about 1.05 to 1.3 feels like steady climbing (the script prints the same guideline); a sudden jump far above the trend is a wall; a ratio below 1 means a level that goes faster than the last, which feels like a gift or a bug. Also check that income grows alongside cost. If cost grows exponentially and income grows linearly, time per level explodes, and that is the usual cause of "grindy after level N".
 
-   This skill ships a small script. Given Python 3 (any recent version, standard library only), run from the skill folder:
-   `python balance_sim.py curve --base 100 --growth 1.15 --levels 30 --income 60`
-   On Windows the launcher may be `py -3` instead of `python`. `--kind power` switches to a polynomial curve. Read its last column first. Without `--income` the minutes column shows n/a; the script exits with a one-line message, not a traceback, on a bad number, an empty or duplicated drop table, or a zero count of trials, so read that message and fix the input. A `--base` that is not finite or makes the curve overflow stops with exit code 2 and a message. `python balance_sim.py --self-test` runs the script's own checks.
+   This skill ships a small script. Given Python 3 (any recent version, standard library only), run:
+   `python skills/game-balance-and-economy/balance_sim.py curve --base 100 --growth 1.15 --levels 30 --income 60`
+   On Windows the launcher may be `py -3` instead of `python`. `--kind power` switches to a polynomial curve. Read its last column first. Without `--income` the minutes column shows n/a; the script exits with a one-line message, not a traceback, on a bad number, an empty or duplicated drop table, or a zero count of trials, so read that message and fix the input. A `--base` that is not finite or makes the curve overflow stops with exit code 2 and a message. `python skills/game-balance-and-economy/balance_sim.py --self-test` runs the script's own checks.
 
 5. **Check drop rates by sampling, not by feel.** Put the drop table as `name:weight` pairs and sample it:
-   `python balance_sim.py drops --table "common:80,rare:19,epic:1" --trials 20000 --seed 7`
+   `python skills/game-balance-and-economy/balance_sim.py drops --table "common:80,rare:19,epic:1" --trials 20000 --seed 7`
    Read the 90th percentile, not only the mean. A 1 percent item has a mean of about 100 tries, but one player in ten needs well over double that. If that unlucky tenth would quit, the table needs a mercy rule (a guarantee after N misses, or a rising chance). The seed makes the run repeatable, so run it again after any change and compare like with like. Keep the seed in your notes. Draws that hit `--cap` are counted in the `capped` and `capped_share` columns and left out of mean, median, p90 and worst, so those cover finished draws only and read low when `capped` is above zero; raise `--cap` until the share is zero, or report the share next to the numbers.
 
 6. **Check the other levers with plain arithmetic.** Show the working, one line each:

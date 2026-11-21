@@ -4,7 +4,7 @@ module: 01-continuity
 checked: 2026-11-02
 tokens:
   description: 73
-  body: 1816
+  body: 1595
   light: 68
   standard: 197
   full: 197
@@ -34,8 +34,9 @@ Read-only, at the root of your setup folder. Presence, counts and dates; no note
 - A check that runs when a session stops (a `Stop` hook) already in place: `grep -c '"Stop"' .claude/settings.json .claude/settings.local.json "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json" 2>/dev/null`.
 - Work left behind today, as counts, in each repository listed in `adoption/inventory.md`: `git -C <repo> status --porcelain | wc -l` (uncommitted changes) and `git -C <repo> rev-list --count HEAD --not --remotes` (commits on no remote).
 - claude.ai: Claude Code cannot see your account, so Claude asks one yes or no question: "Does a claude.ai Project's knowledge hold files named `handoff-YYYY-MM-DD.md`?"
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/handoff/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when notes are in use (the template, at least one dated note, and a front door that names `handoffs/`; or, on claude.ai only, a note in a Project's knowledge) and, in Claude Code, a skill named `handoff` or another whose description covers ending a session exists; **partly** when only some of that is true, such as notes without a skill, or a skill without notes; and **not yet** when there is no note anywhere and no skill doing this job.
+The menu marks the item **have** when notes are in use (the template, at least one dated note, and a front door that names `handoffs/`; or, on claude.ai only, a note in a Project's knowledge) and, in Claude Code, a skill named `handoff` or another whose description covers ending a session exists; **partly** when only some of that is true, such as notes without a skill, or a skill without notes; and **not yet** when there is no note anywhere and no skill doing this job. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -81,13 +82,12 @@ Light takes steps 1 to 3 and 8 to 10; on claude.ai, step 7 takes the place of st
    - the trigger phrases and "the owner" → the phrases you actually say at the end of a session;
    - the studio's health check before closing (its first step) → `git status --short`, and the kit copy's count of commits that exist only on this disk, on any branch or worktree, in each repository the session touched: `git -C <repo> rev-list --count --ignore-missing --branches $(git -C <repo> worktree list --porcelain | sed -n 's/^HEAD //p') --not --remotes` (the copy's own reason: `HEAD` alone misses side branches and worktrees);
    - the studio's end-of-session gate (its description and last step) → dropped; the last step runs the same two git commands again and expects empty output, and `0` where it may push;
-   - the studio's wiki log → your handoff note;
-   - the call to the studio's transcript archiver, and its reference to that archiver's sweep step → dropped; the sweep stays, written out in the skill itself and pointing at your `memory/README.md`;
-   - the studio's memory provenance fields and its memory lint → the format in your `memory/README.md`;
-   - the studio's rule that memory is written in its root folder and committed from a separate worktree branch → dropped; memory is committed where your memory folder lives;
-   - the studio's commit rules (signed, no trailers, a hook that refuses them) and its list of repositories that take changes only through a PR → your own: signing only if you took [signed commits](signed-commits.md), and your own list of protected branches, or none;
-   - the branch clean-up, which in the kit copy lists every merged branch and finished worktree and deletes only what the studio says yes to, with pointers to a studio memory note, its record of approvals and its rule numbers → the same list-ask-delete, on your yes to the exact list, with those pointers dropped; or dropped;
-   - the links to the studio's vault rule and to its curator → your `memory/vault/MEMORY-VAULT.md`.
+   - the session log of the floor's first trace, which the kit copy appends to only where a project keeps one → your handoff note;
+   - step 3, which saves the session's record where a project keeps session records → your handoff note, or dropped; the sweep in step 2 stays, written out in the skill itself and pointing at your `memory/README.md`;
+   - the record in each memory file of which runtime and session wrote it, and when → the format in your `memory/README.md`;
+   - the commit rules (a plain `git commit`, no trailers, a commit-msg hook that refuses them) and the rule that a repository whose `main` is guarded gets a branch and a PR → your own: signed if you took [signed commits](signed-commits.md), the hook only if you took its standard or full size on the [git hooks](git-hooks.md) card, and your own list of protected branches, or none;
+   - the branch clean-up, which in the kit copy lists every merged branch and finished worktree and deletes only what the owner says yes to → the same list-ask-delete, on your yes to the exact list; or dropped;
+   - the rule that a corrected memory's old text is kept "somewhere it can be found again", and that an `AGENTS.md` past its size moves older detail into a file it links to → your `memory/vault/MEMORY-VAULT.md` where you took the [vault](vault.md), and your own archive file.
    It shows the whole file before saving.
 5. **Claude:** for FOLD, adds the sweep, the note and the last-message rule to your existing skill, with the diff shown.
 6. **Claude:** for full, follows the [session-end check](session-end-check.md) card's steps, which add the check as a `Stop` hook in your settings; that card has its own check and undo.
@@ -116,12 +116,12 @@ If Claude guesses, asks you, or reads an older note; or if the skill does not st
 
 ## Watch out
 
-- **Cost.** The two front-door lines are 272 bytes, about 68 tokens every session; the front door card leaves them out until you take this item. The kit copy's description is about 73 tokens every session, and its body, about 1,816 tokens, loads only when it runs. A note loads only when a task continues earlier work: a filled one written for this card was 1,039 bytes, about 260 tokens. All estimates, bytes divided by 4; your adapted copy differs, so measure its description with `wc -c`.
+- **Cost.** The two front-door lines are about 68 tokens every session; the front door card leaves them out until you take this item. The kit copy's description is about 73 tokens every session, and its body, about 1,595 tokens, loads only when it runs. A note loads only when a task continues earlier work: a filled one written for this card was about 260 tokens. All estimates, bytes divided by 4; your adapted copy differs, so measure its description with `wc -c`.
 - **Facts, not intentions.** "Done" lists what was checked and how. A note that records what was attempted as if it worked sends the next session off on a false start.
 - **Pausing is not ending.** The skill fires on phrases like "end of day". When you are only pausing, Claude says so and skips it: a close-out on a session that is about to continue is wasted.
 - **Never as part of a handoff:** merging a PR, force-pushing, rewriting history or tagging. Keep these lines from the kit copy; each is a separate act that waits for your own yes.
 - **A push leaves your machine,** and a note quotes queries, results and decisions. Your data rules decide whether Claude may push at all, and whether a note may go into a claude.ai Project; keep customer data out of the notes.
 - **Writing nothing is a valid sweep.** The skill must never invent a memory to look productive, and must never call a repository clean without having checked it.
-- **The studio's own failure.** Before the skill, one clean-up pass had to retire about 130 stale branches, 13 forgotten worktrees and 6 working copies with uncommitted changes, piled up over 64 sessions. Each was cheap to fix in the session that made it. The kit copy of the skill records this at its top.
+- **The studio's own failure.** Before the skill, one clean-up pass had to retire about 130 stale branches, 13 forgotten worktrees and 6 working copies with uncommitted changes, piled up over 64 sessions. Each was cheap to fix in the session that made it. The kit copy of the skill keeps the lesson at its top, without these figures.
 - **Two naming schemes.** `YYYY-MM-DD-<topic>.md` in `handoffs/`, and `handoff-YYYY-MM-DD.md` on claude.ai and in `adoption/`. Both sort by date, which is what "newest" relies on; two notes on one day under the second scheme share a name, so add a letter to the second. The claude.ai shape has four fields: the Project's instructions already tell a new chat to read the newest note, so it leaves out the resume prompt.
 - **Never replace an old note with a shorter summary.** The old notes are your record; on claude.ai they are your vault.

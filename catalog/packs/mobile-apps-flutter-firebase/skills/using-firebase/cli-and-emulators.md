@@ -15,7 +15,7 @@ Every command here runs as `npx firebase-tools@15.36.0 <command>`, never the bar
 
 `npx firebase-tools@15.36.0 deploy` sends everything configured. Narrow it with `--only` or `--except`:
 `hosting`, `functions`, `functions:name`, `functions:a,b`, `firestore`, `firestore:rules`, `firestore:indexes`, `storage`.
-Extra flags: `--dry-run`, `--message "text"`, and `--force` (bypasses the prompts and also deletes deployed functions that are missing from the local code; only when the owner says so).
+Extra flags: `--dry-run`, `--message "text"`, and `--force` (bypasses the prompts and also deletes deployed functions that are missing from the local code; only when the owner says so). `fbtool.sh deploy --force` is not this flag: it skips fbtool's own question and is never passed to the Firebase CLI.
 
 ## Emulators
 

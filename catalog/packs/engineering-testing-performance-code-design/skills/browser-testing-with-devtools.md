@@ -1,7 +1,7 @@
 ---
 name: browser-testing-with-devtools
 description: >-
-  Real browser, Chrome DevTools MCP: building, debugging what runs (richicinschi-website, OOP platform). Inspect DOM, capture console errors, analyze network, Lighthouse audit, profile Core Web Vitals, verify visual output. Measurement instrument, performance-optimization; pairs our web-perf-lessons.
+  Tests a page in a real browser through the Chrome DevTools MCP. Use when building or debugging a page in a browser: inspect the DOM, read console errors, check network calls, run Lighthouse, profile Core Web Vitals or check what the page shows. It is the measuring tool for performance-optimization.
 metadata:
   category: engineering
   author: Richicinschi
@@ -9,12 +9,10 @@ metadata:
   domain: testing and profiling a running page with Chrome DevTools
 ---
 
-> **Studio note:** the `chrome-devtools` MCP is already set up here, at user scope with a
-> throwaway (`--isolated`) profile, since 2026-06-23. Its tools are named
-> `mcp__chrome-devtools__*` and include `lighthouse_audit` and the `performance_*` trace and
-> Core Web Vitals tools. The setup section below matters only when you provision another
-> machine (the Mac, say). System Chrome lives at
-> `C:/Program Files/Google/Chrome/Application/chrome.exe`.
+
+> **Before setup:** if a Chrome DevTools MCP server is already connected (its tools include
+> `lighthouse_audit` and the `performance_*` trace and Core Web Vitals tools), skip the setup
+> section below; it matters only on a machine that does not have the server yet.
 
 # Looking at the running page
 

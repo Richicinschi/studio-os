@@ -39,7 +39,7 @@ In Kotlin the alias call is `.alias(...)` where the web SDK says `.as(...)`, bec
 
 ## iOS (Swift)
 
-Two hard rules:
+Two rules without exceptions:
 
 1. Never import or link `FirebaseFirestoreSwift`, the old Swift-extension Firestore module. Since SDK 11 its features (`@DocumentID`, `@ServerTimestamp`, Codable support) live in the main module. Only `import FirebaseFirestore`, and do not add the `FirebaseFirestoreSwift` product to Swift Package Manager or Xcode.
 2. Never create the Firestore instance as an inline property of an object that might be built before `FirebaseApp.configure()` runs. A `let db = Firestore.firestore()` in an observable class created as state in the app root crashes at launch. Use `lazy var db`, or create the manager after configuration.

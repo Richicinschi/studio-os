@@ -2,7 +2,7 @@
 name: supply-chain-risk-auditor
 description: >-
   Use to audit a project's dependencies for heightened risk of exploitation or takeover, or to vet a
-  new package before adding it: past CVEs, no security contact, low popularity, lone maintainers.
+  new package before adding it. It checks past CVEs, no security contact, low popularity, lone maintainers.
   npm, pub, pip across our apps and Python tools; needs gh CLI. Dependency risk before a security
   audit.
 metadata:

@@ -1,10 +1,10 @@
 """A complete production-shaped FastAPI app in one file.
 
-How to use it: copy to your project as main.py and edit. It combines every pattern from
-the production-fastapi skill: settings that fail fast, structured logging, pure ASGI
-middleware, problem-details errors, health probes, lifespan-managed resources, CORS and
-docs switched off in production. When the file grows, split each section into the module
-of the same name under templates/.
+How to use it: copy to your project as app/main.py and edit; `python -m app.main` starts
+it. It combines every pattern from the production-fastapi skill: settings that fail fast,
+structured logging, pure ASGI middleware, problem-details errors, health probes,
+lifespan-managed resources, CORS and docs switched off in production. When the file grows,
+split each section into the module of the same name under templates/.
 """
 
 import asyncio
@@ -291,3 +291,13 @@ app.include_router(health_router)
 @app.get("/")
 async def root() -> dict:
     return {"service": settings.app_name, "version": settings.app_version}
+
+
+# --- Start ------------------------------------------------------------------------------
+# `python -m app.main` (the production-docker Dockerfile's ENTRYPOINT) starts the server here.
+# Port 8000 is the one that Dockerfile exposes and health-checks at /health/live.
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

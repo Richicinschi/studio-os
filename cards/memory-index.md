@@ -22,23 +22,30 @@ other_figures:
 
 ## Detect
 
-Read-only, at the root of your setup folder. Counts and sizes only: the memory files themselves are not opened.
+Read-only, at the root of your setup folder. File names, counts and sizes only: the memory files themselves are not opened, and the vault, where there is one, is only searched for a file's name, with nothing from it printed.
 
 - Whether the index and its format note exist: `ls memory/MEMORY.md memory/README.md 2>/dev/null`.
-- How many memory files, and how many index lines (leaving out the template's own example line, `- [Title](file.md)`, which sits in its comment): `ls memory/*.md 2>/dev/null | grep -vcE '/(MEMORY|README)\.md$'` and `grep -E '^- \[' memory/MEMORY.md | grep -vc '^- \[Title\](file\.md)'`. Two different numbers mean a file without a line, or a line without a file.
+- Whether each index line links a file that exists, and each memory file has a line, both ways (the template's own example line, which links `file.md` in its comment, is left out):
+  ```bash
+  links=$(grep -E '^- \[' memory/MEMORY.md | sed -nE 's/^- \[[^]]*\]\(([^)]*)\).*/\1/p' | grep -vx 'file\.md' | sort -u)
+  printf '%s\n' "$links" | while read -r l; do [ -z "$l" ] || { [ -f "memory/${l%%#*}" ] && echo "ok $l" || echo "no file for line: $l"; }; done
+  ls memory | grep -E '\.md$' | grep -vxE 'MEMORY\.md|README\.md' | sort | while read -r f; do
+    printf '%s\n' "$links" | sed 's/#.*//' | grep -qxF "$f" || { grep -qF "($f)" memory/vault/MEMORY-VAULT.md 2>/dev/null && echo "in the vault: $f"; } || echo "no line for file: $f"; done
+  ```
+  A `no file` line is a line without a file; a `no line` line is a file without a line. A line counts when the file it links exists, so a pointer into the vault (`vault/MEMORY-VAULT.md`, with or without a `#section`, which the test drops) is `ok`; a file whose line the [vault](vault.md) card moved, word for word, into `memory/vault/MEMORY-VAULT.md` prints `in the vault`, not `no line`. Two equal counts are not enough: a line that links `staging-vpn.md` and a file named `staging-needs-vpn.md` count 1 and 1.
 - The index's size: `echo "about $(( ($(wc -c < memory/MEMORY.md) + 3) / 4 )) tokens (estimate)"`.
 - Whether the front door loads it: `grep -c 'memory/MEMORY.md' AGENTS.md CLAUDE.md 2>/dev/null`.
 - Whether the light size is in place: `ls NOTES.md 2>/dev/null` and `grep -c 'NOTES.md' AGENTS.md CLAUDE.md 2>/dev/null`.
 - Whether another memory store is in use: a notes or memory file the front door names (Claude reads the front door, which discovery may do), and Claude Code's own auto memory. Where auto memory keeps its folder is not documented in docs/facts.md as of 2026-11-02; `/context`, which you type, shows which auto memory files loaded.
 
-The menu marks the item **have** when `memory/MEMORY.md` exists, the front door names it, and the two counts match, or, at the light size, when `NOTES.md` exists and the front door names it; **partly** when the folder or the index exists but the front door does not load it, or the counts differ; and **not yet** when there is no memory folder.
+The menu marks the item **have** when `memory/MEMORY.md` exists, the front door names it, and the comparison prints no `no file` or `no line` line, or, at the light size, when `NOTES.md` exists and the front door names it; **partly** when the folder or the index exists but the front door does not load it, or the comparison prints a `no file` or `no line` line; and **not yet** when there is no memory folder.
 
 ## Ask
 
 1. **"Size?"** Each estimate is what the size loads every session at the start, bytes divided by 4.
-   - Light: one notes file, `NOTES.md`, a line per fact with its reason and date, loaded from the front door; plus [handoff notes](handoff.md), which a session reads only when it continues earlier work. About 51 tokens (estimate, from a sample `NOTES.md` of 203 bytes written as step 2 describes), and every fact you add loads in full. Recommended for a first adoption: it is the smallest that stops you repeating facts.
-   - Standard: the index, `memory/MEMORY.md`, with one file per fact, and `memory/README.md` with the format and the four tests. About 55 tokens (estimate, the 218 bytes of the empty index template); each fact adds one index line, about 33 tokens (estimate), and its file opens only when the line matches the task. Recommended when your facts no longer fit one short file, or Detect finds a notes file that has grown long.
-   - Full: the index with the [vault](vault.md), `memory/vault/MEMORY-VAULT.md`, where a line goes word for word before it is shortened or leaves the index. About 55 tokens (estimate), the same as standard: the vault loads only when a session opens it. Recommended when Detect finds an index already in use, whose lines will need somewhere to go.
+   - Light: one notes file, `NOTES.md`, a line per fact with its reason and date, loaded from the front door; plus [handoff notes](handoff.md), which a session reads only when it continues earlier work. Light costs about 51 tokens (estimate, from a sample `NOTES.md` written as step 2 describes), and every fact you add loads in full. Recommended for a first adoption: it is the smallest that stops you repeating facts.
+   - Standard: the index, `memory/MEMORY.md`, with one file per fact, and `memory/README.md` with the format and the four tests. Standard costs about 55 tokens (estimate, the empty index template); each fact adds one index line, about 33 tokens (estimate), and its file opens only when the line matches the task. Recommended when your facts no longer fit one short file, or Detect finds a notes file that has grown long.
+   - Full: the index with the [vault](vault.md), `memory/vault/MEMORY-VAULT.md`, where a line goes word for word before it is shortened or leaves the index. Full costs about 55 tokens (estimate), the same as standard: the vault loads only when a session opens it. Recommended when Detect finds an index already in use, whose lines will need somewhere to go.
    - Not sure: the size recommended above for what Detect found: full when it finds an index already in use; standard when it finds a notes file that has grown long; light otherwise. Grow it in update mode when the notes file gets long.
    - Default when skipped: light.
 2. **"Keep a memory store?"**
@@ -78,10 +85,19 @@ Which steps each size takes: **light** 1, 2, 5 to 7 and 10; **standard** 1, 3 to
 
 ## Check
 
-1. **Claude:** `grep -E '^- \[' memory/MEMORY.md | grep -vc '^- \[Title\](file\.md)'` and `ls memory/*.md | grep -vcE '/(MEMORY|README)\.md$'` print the same number, `1` after step 7. At light, instead: `grep -c 'NOTES.md' AGENTS.md` prints `1` or more.
+1. **Claude:** compares the files the index links with the files in `memory/`, both ways, and names each one that has no partner (the template's example line, which links `file.md`, is left out):
+
+   ```bash
+   links=$(grep -E '^- \[' memory/MEMORY.md | sed -nE 's/^- \[[^]]*\]\(([^)]*)\).*/\1/p' | grep -vx 'file\.md' | sort -u)
+   printf '%s\n' "$links" | while read -r l; do [ -z "$l" ] || { [ -f "memory/${l%%#*}" ] && echo "ok $l" || echo "no file for line: $l"; }; done
+   ls memory | grep -E '\.md$' | grep -vxE 'MEMORY\.md|README\.md' | sort | while read -r f; do
+     printf '%s\n' "$links" | sed 's/#.*//' | grep -qxF "$f" || { grep -qF "($f)" memory/vault/MEMORY-VAULT.md 2>/dev/null && echo "in the vault: $f"; } || echo "no line for file: $f"; done
+   ```
+
+   Expected after step 7: an `ok` line naming the first memory's file, and no `no file` or `no line` line. With the vault, a line that points into it prints `ok vault/MEMORY-VAULT.md`, with its `#section` if it names one, and a file whose line moved there prints `in the vault`. Equal counts are not enough: an index line that links `staging-vpn.md` and a file named `staging-needs-vpn.md` count 1 and 1, and this prints both as missing. At light, instead: `grep -c 'NOTES.md' AGENTS.md` prints `1` or more.
 2. **you:** in a new session in your setup folder, ask a question that only the first memory answers. Expected: Claude opens that memory file (you see it read `memory/<file>.md`) and answers from it. At light, Claude answers from `NOTES.md`, which it read at the start, without opening any other file.
 
-If the counts differ, or Claude answers without opening the file, or opens every memory file to find it, the item is not done: the plan row stays unticked. The usual causes are a front door that does not load the index, or a hook that does not say when to open the file.
+If step 1 prints a `no file` or `no line` line, or Claude answers without opening the file, or opens every memory file to find it, the item is not done: the plan row stays unticked. The usual causes are a front door that does not load the index, or a hook that does not say when to open the file.
 
 ## Undo
 
@@ -90,7 +106,7 @@ If the counts differ, or Claude answers without opening the file, or opens every
 
 ## Watch out
 
-- **The index grows with every line, and loads every session.** The empty index is 218 bytes, about 55 tokens. A realistic line, `- [Staging needs the VPN](staging-needs-vpn.md) — open before any deploy or staging query: staging answers only on the company VPN`, is 133 bytes with its line break (the long dash alone takes 3): about 33 tokens per line, an estimate (bytes divided by 4). So 50 lines add about 1,650 tokens to every session, and 100 lines about 3,300. The memory files cost nothing until a session opens one.
+- **The index grows with every line, and loads every session.** The empty index, `MEMORY.md`, is about 55 tokens. A realistic line, `- [Staging needs the VPN](staging-needs-vpn.md) — open before any deploy or staging query: staging answers only on the company VPN`, with its line break: about 33 tokens per line, an estimate (bytes divided by 4). So 50 lines add about 1,650 tokens to every session, and 100 lines about 3,300. The memory files cost nothing until a session opens one.
 - **Never shorten a line to make room.** A line cut to a slogan still loads, so nothing looks wrong; the detail is missing when it matters. Move it word for word to the vault and leave a pointer ([vault before you shorten](../examples/vault-before-shortening.md)).
 - **Two memories can disagree.** Claude Code has its own auto memory, which loads the first 200 lines or 25 KB of its own `MEMORY.md` each session ([docs/facts.md](../docs/facts.md)). If you keep both, decide which one is the record, and keep a fact in one place only.
 - **Nothing secret in memory.** The index loads into every session and the folder usually lives in git: no keys, passwords, customer data or real network addresses, and nothing your company's data rules keep off your machine.

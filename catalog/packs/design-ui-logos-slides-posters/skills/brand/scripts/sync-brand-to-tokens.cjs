@@ -102,7 +102,6 @@ function applyColors(tokens, colors) {
 
   tokens.primitive = tokens.primitive || {};
   const palette = tokens.primitive.color || {};
-  for (const stale of ["coral", "purple", "mint"]) delete palette[stale];
   for (const c of [P, S, A]) palette[c.name] = buildScale(c.base, c.dark, c.light);
   tokens.primitive.color = palette;
 
@@ -178,15 +177,20 @@ function runSync(cliArgs) {
   fs.writeFileSync(tokensPath, serialized);
   console.log("✅ Updated: " + FILES.tokensJson);
 
+  // The JSON is written; the sync is complete only once the CSS is regenerated from it too.
   const generator = path.join(process.cwd(), FILES.generator);
-  if (fs.existsSync(generator)) {
-    try {
-      const options = { stdio: "inherit", cwd: process.cwd() };
-      cp.execFileSync("node", [generator, "--config", FILES.tokensJson, "-o", FILES.tokensCss], options);
-      console.log("✅ Regenerated: " + FILES.tokensCss);
-    } catch (err) {
-      console.error("⚠️  Failed to regenerate CSS:", err.message);
-    }
+  if (!fs.existsSync(generator)) {
+    console.error("❌ CSS not regenerated: generator not found");
+    console.error("   Looked for " + FILES.generator + "; " + FILES.tokensCss + " still holds the old colours.");
+    process.exit(1);
+  }
+  try {
+    const options = { stdio: "inherit", cwd: process.cwd() };
+    cp.execFileSync("node", [generator, "--config", FILES.tokensJson, "-o", FILES.tokensCss], options);
+    console.log("✅ Regenerated: " + FILES.tokensCss);
+  } catch (err) {
+    console.error("❌ CSS not regenerated: the generator failed: " + err.message);
+    process.exit(1);
   }
 
   console.log("\n✨ Brand sync complete!");

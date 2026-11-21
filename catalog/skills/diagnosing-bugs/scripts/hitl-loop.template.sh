@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Template for a reproduction loop that needs a person.
-# Copy it, replace the prompts in the marked block, then run it
+# Copy it, replace the prompts in the marked block, then have it run
 # with: bash hitl-loop.template.sh
-# You (the agent) launch it; the user answers in their own shell.
+# The prompts wait for answers typed at a terminal, so the user runs it in
+# their own shell. Started without a terminal (by the agent, or with input
+# from a pipe) it stops at once with exit code 2 and prints the command.
 #
 # Helpers available inside the block:
 #   step "<instruction>"        print an instruction and wait for Enter
@@ -14,6 +16,14 @@
 set -u
 set -o pipefail
 set -e
+
+# Check before the first prompt: without a terminal, read gets no answer
+# and set -e would end the script with no word of why.
+if [ ! -t 0 ]; then
+  echo "This loop needs the user at a terminal: its prompts wait for typed answers." >&2
+  echo "Ask the user to run it in their own terminal: bash \"$0\"" >&2
+  exit 2
+fi
 
 show() {
   echo

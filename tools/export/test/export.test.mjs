@@ -1,6 +1,7 @@
 // tools/export/test/export.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,10 +18,12 @@ const manifest = { kit: 'studio-os', version: '2.0.0', items: [
 ] };
 
 // A fresh kit as a maintainer has it before the first release: entry files, the changelog header, and
-// the two local files (deny list position 2 is an invented private term).
-function setup() {
+// the two local files (deny list position 2 is an invented private term). The kit is a git work tree, as
+// a maintainer's checkout is, unless git is false.
+function setup({ git = true } = {}) {
   const hub = makeFixtureHub();
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-root-'));
+  if (git) execFileSync('git', ['-C', root, 'init', '-q'], { stdio: 'ignore' });
   const w = (rel, t) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), t); };
   w('export.manifest.json', JSON.stringify(manifest));
   w('README.md', '# Kit\n');
@@ -100,6 +103,127 @@ test('a shipped skill with a risky pattern fails the export at the risky gate', 
     assert.match(out, /risky: FAIL \(1\)/);
     assert.match(out, /catalog\/skills\/beta\/SKILL\.md:\d+ bare Bash in allowed-tools/);
     assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
+test('a block marker the build does not cut fails the export at the studioBlocks gate', () => {
+  const s = setup();
+  try {
+    const only = ['studio', 'only'].join('-');
+    mkdirSync(path.join(s.hub, '.claude/skills/beta/scripts'), { recursive: true });
+    writeFileSync(path.join(s.hub, '.claude/skills/beta/scripts/run.sh'), `#!/bin/sh\n# <!-- ${only} -->\necho hi\n`);
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /studioBlocks: FAIL \(1\)/);
+    assert.ok(out.includes(`catalog/skills/beta/scripts/run.sh:2 ${only} marker left in shipped text`), out);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
+test('a studio marker in shipped catalog text fails the export at the markers gate', () => {
+  const s = setup();
+  try {
+    writeFileSync(path.join(s.hub, '.claude/skills/beta/SKILL.md'), '---\nname: beta\ndescription: Use when beta.\n---\n# beta\nAsk the hub first.\n');
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /markers: FAIL \(1\)/);
+    assert.match(out, /catalog\/skills\/beta\/SKILL\.md:\d+ studio marker "the hub"/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
+test('a shipped JSON file that does not parse fails the export at the json gate', () => {
+  const s = setup();
+  try {
+    writeFileSync(path.join(s.hub, '.claude/skills/beta/config.json'), '{"say": "hi "there""}\n');
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /json: FAIL \(1\)/);
+    assert.match(out, /catalog\/skills\/beta\/config\.json: not valid JSON \(.+\)/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
+const addScript = (s) => {
+  mkdirSync(path.join(s.hub, '.claude/skills/beta/scripts'), { recursive: true });
+  writeFileSync(path.join(s.hub, '.claude/skills/beta/scripts/run.sh'), '#!/bin/sh\necho hi\n');
+};
+const gitIn = (dir, args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+
+test('in a kit that is not a git work tree, the export says the scripts were not marked executable and exits non-zero', () => {
+  const s = setup({ git: false });
+  try {
+    addScript(s);
+    assert.equal(s.run(), 1, s.lines.join('\n'));
+    assert.ok(existsSync(path.join(s.root, 'catalog/skills/beta/scripts/run.sh')));
+    assert.match(s.lines.join('\n'), /export: the catalog was copied, but .* is not a git work tree: 1 script\(s\) were not marked executable/);
+    assert.doesNotMatch(s.lines.join('\n'), /modes: .* marked executable in the git index/);
+  } finally { s.done(); }
+});
+
+test('in a kit that is not a git work tree, a release says so, exits non-zero and writes no release files', () => {
+  const s = setup({ git: false });
+  try {
+    const before = readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8');
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1, s.lines.join('\n'));
+    assert.match(s.lines.join('\n'), /is not a git work tree: 0 script\(s\) were not marked executable, and the release files were not written/);
+    assert.equal(readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8'), before);
+    assert.equal(existsSync(path.join(s.root, 'tools/export/state.json')), false);
+  } finally { s.done(); }
+});
+
+test('in a git work tree, the export records every shipped script as 100755 in the index', () => {
+  const s = setup();
+  try {
+    addScript(s);
+    gitIn(s.root, ['init', '-q']);
+    assert.equal(s.run(), 0, s.lines.join('\n'));
+    assert.match(gitIn(s.root, ['ls-files', '-s', '--', 'catalog/skills/beta/scripts/run.sh']), /^100755 /);
+    assert.match(s.lines.join('\n'), /modes: 1 script\(s\) marked executable in the git index/);
+  } finally { s.done(); }
+});
+
+test('when git cannot mark the scripts executable, the export says so and exits non-zero', () => {
+  const s = setup();
+  try {
+    addScript(s);
+    const calls = [];
+    const kitGit = (dir, args) => {
+      calls.push(args);
+      if (args[0] === 'rev-parse') return 'true';
+      throw new Error('index.lock exists');
+    };
+    assert.equal(s.run({ kitGit }), 1);
+    assert.match(s.lines.join('\n'), /export: the catalog was copied, but git could not mark 1 script\(s\) executable: index\.lock exists/);
+    assert.deepEqual(calls[1], ['add', '--chmod=+x', '--', 'catalog/skills/beta/scripts/run.sh']);
+  } finally { s.done(); }
+});
+
+test('a name the kit does not ship fails the export at the names gate; shipped names and the kit\'s own skills pass', () => {
+  const s = setup();
+  try {
+    s.w('.claude/skills/vet-and-adopt/SKILL.md', '---\nname: vet-and-adopt\ndescription: x\n---\n');
+    writeFileSync(path.join(s.hub, '.claude/skills/beta/SKILL.md'), '---\nname: beta\ndescription: Use when beta.\n---\n# beta\nRun `gamma`, then [[vet-and-adopt]].\nSee [[no-such-skill]].\n');
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /names: FAIL \(1\)/);
+    assert.match(out, /catalog\/skills\/beta\/SKILL\.md:\d+ names no-such-skill, which the kit does not ship/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
+test('a hidden pack\'s skill named in shipped text fails the names gate, and the log never prints it', () => {
+  const s = setup();
+  try {
+    const hidden = path.join(s.hub, 'library/hush-pack');
+    mkdirSync(hidden, { recursive: true });
+    writeFileSync(path.join(hidden, 'pack.json'), JSON.stringify({ id: 'hush-pack', public: false, title: 'x', description: 'x', skills: [{ id: 'hush-job' }] }));
+    writeFileSync(path.join(s.hub, '.claude/skills/beta/SKILL.md'), '---\nname: beta\ndescription: Use when beta.\n---\n# beta\nRun `hush-job` first.\n');
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /names: FAIL \(1\)/);
+    assert.match(out, /catalog\/skills\/beta\/SKILL\.md:\d+ names a private studio item \(on the private list, private\.local\.txt, or in a hub pack whose pack\.json says public: false\)/);
+    assert.ok(!out.includes('hush-job'), out);
   } finally { s.done(); }
 });
 

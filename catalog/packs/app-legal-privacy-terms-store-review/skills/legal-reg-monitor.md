@@ -2,7 +2,7 @@
 name: legal-reg-monitor
 description: >-
   Use when a legal/regulatory or platform-policy change might affect already-shipped legal
-  docs — the law moved AFTER review and you need the delta, not a full re-review. Extracts
+  docs: the law moved AFTER review and you need only the delta. Extracts
   the concrete NEW requirement from a specific change (an EU/NL ruling, an AP/EDPB guidance
   update, an Apple Review Guidelines or Google Play policy revision, an ePrivacy/cookiewet or
   DPF development), diffs each against the shipped Privacy Policy + Terms + compliance pack,
@@ -38,7 +38,7 @@ Adapts: claude-for-legal **reg-gap-analysis** (requirement-extraction table + pe
 
 ## Inputs
 - **The change** — one of: (a) a specific delta the user names (a ruling, guidance note, ASRG/Play-policy revision, a date), or (b) **no change named** → run **freshness mode**: re-validate every `[settled — … verified <date>]` anchor in the loaded references against its verified-date and flag stale ones (verified more than 90 days before the run, `legal-guardrails.md` §1).
-- **App fact sheet** (the orchestrator's Step 0 sheet; run alone, read the project first and ask only for the rest): publisher (legal form, controller, DPO or none); processors, each named, with hosting region; who sells (stores as merchants of record or the publisher); health claims; what each tier stores where. Worked case: the example app in `legal-guardrails.md` §8 (NL eenmanszaak, sole controller, no DPO; Apple, Google Firebase in EU `europe-west`, RevenueCat, Cloudflare for DNS/email routing; stores as merchants of record; no medical claims; free tier on-device, paid tier Firestore sync).
+- **App fact sheet** (the orchestrator's Step 0 sheet; run alone, read the project first and ask only for the rest): publisher (legal form, controller, DPO or none); processors, each named, with hosting region; who sells (stores as merchants of record or the publisher); health claims; what each tier stores where. Worked case: the worked example in `legal-guardrails/references/worked-example.md` (NL eenmanszaak, sole controller, no DPO; Apple, Google Firebase in EU `europe-west`, RevenueCat, Cloudflare for DNS/email routing; stores as merchants of record; no medical claims; free tier on-device, paid tier Firestore sync).
 - **Current state to diff against**: the shipped Privacy Policy + Terms (paths, languages, version from the fact sheet); the project's compliance pack, if it keeps one (RoPA, LIA, TIA, DPA register, DPF log, retention schedule, SDK inventory, breach runbook); and any store-declaration notes it keeps. Grep these; never assume — quote what they actually say.
 
 ## Workflow
@@ -74,7 +74,7 @@ Categories: **Notice** (Arts 12–14) · **Rights** (Arts 15–22) · **Lawful-b
 ```
 
 ## Remediation effort taxonomy (Step 4)
-| Class | Means | Typical owner | Example (example app, `legal-guardrails.md` §8) |
+| Class | Means | Typical owner | Example (the worked example) |
 |---|---|---|---|
 | **POLICY-ONLY** | edit the PP/ToS/pack wording; bump the terms-version constant (e.g. `kTermsVersion`) if it triggers re-consent | owner (Claude drafts) | rename a supervisory authority, add an Art. 13 disclosure, drop a dead URL |
 | **PRODUCT-CHANGE** | code/UX change in the app or its backend config (e.g. a Flutter app's Firebase config); the doc edit alone would be a false statement | code | the **analytics opt-IN gate** (don't init Firebase Analytics/Crashlytics pre-consent); a new consent surface; a retention/cron change |

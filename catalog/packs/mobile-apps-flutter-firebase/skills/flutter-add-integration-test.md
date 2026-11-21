@@ -50,4 +50,4 @@ No Flutter SDK or device available: do steps 1 to 4 as files only, say plainly t
 - Every widget the test touches has a key, and the test finds by key.
 - `ensureInitialized()` is called, and `test_driver/integration_test.dart` exists.
 - The test passed in a real `flutter drive` run, and you can quote the result.
-- Test and key names are English, as everywhere in the studio.
+- Test and key names are in the language the project's code uses.

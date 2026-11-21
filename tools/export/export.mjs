@@ -5,7 +5,10 @@
 //   node tools/export/export.mjs --hub <path to the studio hub>
 //   node tools/export/export.mjs --hub <hub> --release 2.0.0 --note "What this release is about."
 //   --no-gitleaks only for a dry run on a machine without gitleaks; never for a release.
-// Exit codes: 0 done, 1 a gate failed (the kit is unchanged), 2 refused before building.
+// After the copy, every shipped file that starts with #! is marked executable in the kit's git index.
+// Exit codes: 0 done; 1 the build stopped or a gate failed (the kit is unchanged), or the kit is not a git
+// work tree or git could not mark the scripts executable (the catalog was copied; the release files were
+// not written); 2 refused before building.
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
@@ -15,7 +18,7 @@ import { loadManifest, hubInventory } from './manifest.mjs';
 import { loadDenyList, loadOwnerName, loadLocalRewrites, STUDIO_REWRITES } from './rules.mjs';
 import { buildKit } from './build.mjs';
 import { resolvePacks } from './packs.mjs';
-import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateRisky, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, isLocalOnly } from './gates.mjs';
+import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateRisky, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, gateStudioBlocks, gateMarkers, gateNames, gateJson, shebangFiles, isLocalOnly } from './gates.mjs';
 import { parseTriage } from './scan.mjs';
 import { itemHashes, diffItems, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
 import { lintKit } from './lint-content.mjs';
@@ -23,10 +26,10 @@ import { lintKit } from './lint-content.mjs';
 // What the build produces; only these move from the staging copy into the kit.
 const GENERATED = ['catalog', 'docs/THIRD_PARTY_NOTICES.md'];
 
-const defaultHubGit = (hub, args) => execFileSync('git', ['-C', hub, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+const defaultGit = (dir, args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
 export function runExport({ root, hub, release, notes = [], noGitleaks = false, today = new Date().toISOString().slice(0, 10),
-  gitleaks = gateGitleaks, hubGit = defaultHubGit, log = console.log, rewrites = STUDIO_REWRITES }) {
+  gitleaks = gateGitleaks, hubGit = defaultGit, kitGit = defaultGit, log = console.log, rewrites = STUDIO_REWRITES }) {
   if (release && noGitleaks) { log('export: a release always runs gitleaks'); return 2; }
   const local = (f) => path.join(root, 'tools/export', f);
   let manifest; let deny; let owner; let localRewrites;
@@ -97,6 +100,10 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       privacy: gatePrivacy(stage, deny),
       paths: gatePaths(stage),
       risky: gateRisky(stage),
+      studioBlocks: gateStudioBlocks(stage),
+      markers: gateMarkers(stage),
+      names: gateNames(stage, built.names),
+      json: gateJson(stage),
       accounting: [...gateAccounting(stage, { written: built.written, notices: built.notices, manifest }), ...gateDiagramUrls(stage)],
       links: gateLinks(stage),
       cards: gateCards(stage, manifest),
@@ -121,6 +128,23 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       rmSync(path.join(root, g), { recursive: true, force: true });
       cpSync(path.join(stage, g), path.join(root, g), { recursive: true });
     }
+    // The kit's checkout has core.fileMode=false, so a script is executable only by its mode in the index.
+    const scripts = shebangFiles(root, GENERATED);
+    let workTree = false;
+    try { workTree = kitGit(root, ['rev-parse', '--is-inside-work-tree']) === 'true'; } catch { /* not a repository */ }
+    // Without a work tree the modes cannot be recorded, so the export stops short of success, scripts or not.
+    if (!workTree) {
+      log(`export: the catalog was copied, but ${root} is not a git work tree: ${scripts.length} script(s) were not marked executable${release ? ', and the release files were not written' : ''}; run the export in the kit's git checkout`);
+      return 1;
+    }
+    try {
+      // Batched, so a long list never runs past the command-line limit.
+      for (let i = 0; i < scripts.length; i += 100) kitGit(root, ['add', '--chmod=+x', '--', ...scripts.slice(i, i + 100)]);
+    } catch (e) {
+      log(`export: the catalog was copied, but git could not mark ${scripts.length} script(s) executable: ${String(e.stderr || e.message).trim()}`);
+      return 1;
+    }
+    log(`modes: ${scripts.length} script(s) marked executable in the git index`);
     if (release) {
       // The committed file, not the in-memory manifest: that one also holds the private items from the local list.
       const committed = loadManifest(path.join(root, 'export.manifest.json'));

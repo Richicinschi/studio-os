@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 // ---- Bundled EXAMPLE answers (pass --answers with the app's own file) ----
-// The example app of legal-guardrails.md section 8: a Firebase + RevenueCat
+// The worked example in legal-guardrails/references/worked-example.md: a Firebase + RevenueCat
 // wellness app with no health data. Derived from the Data Safety taxonomy
 // (14 categories / 7 purposes / 2 security declarations) and that app's data
 // surface. "Health & fitness" left unmarked, to be confirmed [verify] (see
@@ -40,8 +40,8 @@ const EXAMPLE_ANSWERS = {
     { category: 'App info and performance', type: 'Diagnostics', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['App functionality'], recipient: 'Google (Crashlytics, processor)' },
     { category: 'Device or other IDs', type: 'Device or other IDs', collected: true, shared: false, ephemeral: false, optional: true, purposes: ['Analytics', 'Fraud prevention, security, and compliance'], recipient: 'Google (Firebase installation/app-instance IDs, processor)' },
   ],
-  // Categories the example app answers NOT collected, for the cross-check.
-  // 'Health & fitness' is the example's answer, to be confirmed against the
+  // Categories the worked example answers NOT collected, for the cross-check.
+  // 'Health & fitness' is the worked example's answer, to be confirmed against the
   // app's own data, not asserted [verify]: Google's Health info and Fitness info
   // turn on the data, not on Health Connect (play-data-safety.md section 5).
   notCollected: ['Location', 'Health & fitness', 'Messages', 'Photos & videos', 'Audio', 'Files & docs', 'Calendar', 'Contacts', 'Web browsing history', 'Advertising ID'],
@@ -66,11 +66,11 @@ function readableCsv(a) {
   for (const d of a.data) {
     rows.push([d.category, d.type, d.collected ? 'Yes' : 'No', d.shared ? 'Yes' : 'No', d.ephemeral ? 'Yes' : 'No', d.optional ? 'Optional' : 'Required', (d.purposes || []).join('; '), d.recipient || '']);
   }
-  rows.push([]);
   rows.push(['Security: encrypted in transit', a.security.encryptedInTransit ? 'Yes' : 'No']);
   rows.push(['Security: users can request deletion', a.security.userCanRequestDeletion ? 'Yes' : 'No']);
   rows.push(['Not collected', (a.notCollected || []).join('; ')]);
-  return rows.map((r) => r.map(csvEscape).join(',')).join('\n');
+  const width = rows[0].length; // a short row gets empty cells up to the header's width
+  return rows.map((r) => [...r, ...Array(width - r.length).fill('')].map(csvEscape).join(',')).join('\n');
 }
 
 // Importable form: fill a Play Console export template's "Response value" column
@@ -85,7 +85,7 @@ function importableCsv(a, templateText) {
   const sharedLabels = new Set(a.data.filter((d) => d.shared).map((d) => d.type.toLowerCase()));
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
-    if (!line.trim()) { out.push(line); continue; }
+    if (!line.trim()) continue; // a blank line is not a row
     const cols = line.split(',');
     const label = (cols[cols.length - 1] || '').toLowerCase();
     // Heuristic fill: set TRUE where a label references a collected/shared type.
@@ -96,16 +96,20 @@ function importableCsv(a, templateText) {
     if (val && cols.length >= 3) cols[2] = val; // Response value is column 3
     out.push(cols.join(','));
   }
-  return out.join('\n') + '\n\n# NOTE: heuristic fill by label match — REVIEW every row before importing. Purposes/shared per-type still need manual confirmation against the template structure.';
+  return out.join('\n');
 }
 
+// Notes go to stderr, so the CSV (stdout or --out) holds only rows.
 let output;
+const notes = [];
 if (templatePath && existsSync(resolve(templatePath))) {
   output = importableCsv(answers, readFileSync(resolve(templatePath), 'utf8'));
+  notes.push('NOTE: heuristic fill by label match — REVIEW every row before importing. Purposes/shared per-type still need manual confirmation against the template structure.');
 } else {
   output = readableCsv(answers);
-  if (templatePath) output += '\n\n# (template not found — emitted readable CSV. Export a template via Play Console > Data safety > Export to CSV.)';
+  if (templatePath) notes.push('Template not found — emitted the readable CSV. Export a template via Play Console > Data safety > Export to CSV.');
 }
 
 if (outPath) { writeFileSync(resolve(outPath), output); console.log(`Wrote ${outPath}`); }
 else console.log(output);
+for (const note of notes) console.error(note);

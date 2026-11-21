@@ -58,7 +58,7 @@ Inputs to classify alongside it (proceed with whatever is present, note what is 
 - Store listing copy (Play description, App Store metadata)
 - The app code (for the data-surface scan) + any compliance pack the project keeps (RoPA, LIA, TIA, DPA register)
 
-Confirm the document versions and whether a DRAFT banner is present. The references under `legal-guardrails/references/` carry worked examples written for an **example app** (`legal-guardrails.md` §8); they are patterns. Apply the rules to the fact sheet, never the example's facts.
+Confirm the document versions and whether a DRAFT banner is present. The references under `legal-guardrails/references/` carry worked examples written for one app (`legal-guardrails/references/worked-example.md`); they are patterns. Apply the rules to the fact sheet, never the example's facts.
 
 ## Workflow
 

@@ -28,7 +28,7 @@ One model gives one view, shaped by how you framed the question. Asking the same
   - the reviewer ([`linus-reviewer`](../../catalog/agents/linus-reviewer.md)) asks whether the diff is right, with findings by file and line and a verdict;
   - the researcher ([`sherlock-researcher`](../../catalog/agents/sherlock-researcher.md)) asks what the sources say, and returns a cited report.
 
-  The studio has eleven seats: a board that advises and a crew that does the work.
+  The studio has eleven seats: a board of eight that advises, shipped in the council domain ([its card](../../cards/pack-advisor-council-for-big-decisions.md)), and a crew of three that does the work, in `catalog/agents/`.
 - **Tools follow the role.** A subagent's `tools:` line is an allowlist ([docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). The seven advisors get no Write, Edit or Bash, so "read-only" is enforced by what they lack, not by a promise. Two seats are exceptions: the operator ([`atlas-operator`](../../cards/pack-advisor-council-for-big-decisions.md)) advises but also writes plans, so it carries Write, Edit and Bash; the reviewer keeps Bash for git and tests, and Bash can change files, so its read-only is a rule it follows, not a limit. The crew gets the writes its work needs. No seat sets a model, so each runs on the session's, unless `CLAUDE_CODE_SUBAGENT_MODEL` is set.
 - **Solo for one view.** "Have the reviewer look at this branch."
 - **`/council` for a real fork.** The `council` skill:
@@ -49,12 +49,12 @@ By design, the convener does not vote and does not average. It surfaces the conf
 
 ## Apply it in Claude Code
 
-1. **Pick two or three seats** you would use this month. The skeptic and the architect suit most decisions; the reviewer suits anyone who merges code. All eleven are in `catalog/agents/` ([the index](../../catalog/INDEX.md) lists them).
+1. **Pick two or three seats** you would use this month. The skeptic and the architect suit most decisions; the reviewer suits anyone who merges code. Three are in `catalog/agents/`: the reviewer, the researcher and the builder ([the index](../../catalog/INDEX.md) lists them). The eight board seats are in the council domain, `catalog/packs/advisor-council-for-big-decisions/agents/` ([its card](../../cards/pack-advisor-council-for-big-decisions.md)).
 2. **Take each through `vet-and-adopt`** (ADAPT). The seats carry the studio's framing: its portfolio of projects, its context files and registry, its design system, and skills you may not have. Replace those with your projects, files and skills, or cut the lines. Keep the lens, the output format and the tool list.
 3. **Save them** in `.claude/agents/` for one project or `~/.claude/agents/` for all of them.
 4. **Keep advisors read-only:** no Write, Edit or Bash in their `tools:` line, since Bash can change files too. Leave `model:` out so each seat uses the session's model (module 02; [docs/facts.md](../../docs/facts.md) gives the order Claude Code follows).
 5. **Try one seat solo:** "Have `karen-skeptic` refute this plan."
-6. **Adopt `council`** once you have three seats (ADAPT: its seat list and panel table name the studio's eleven, so rewrite them to yours).
+6. **Adopt `council`** once you have three seats (ADAPT: its seat list and panel table name the studio's eleven, the eight in its domain and the three in `catalog/agents/`, so rewrite them to yours).
 7. **Use `/council`** for real forks, and `--debate` only when one round leaves the seats split.
 
 (studio-specific: `council` points to a roster file, a long-running agent service and a studio note on how many agents run at once, none of which the kit ships, and the studio checks its seats' front matter with a small script. Drop the pointers; set a cap on parallel seats that suits your plan.)

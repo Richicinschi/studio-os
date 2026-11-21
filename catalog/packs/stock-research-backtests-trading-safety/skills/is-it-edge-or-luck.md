@@ -25,7 +25,7 @@ This is a statistics aid, not investment advice. A good result here is never a p
 
 4. **Run the chance test.** Save the per-trade results as a text file, one number per line (fractions or money, same unit throughout). The helper script in `skills/is-it-edge-or-luck/bootstrap_check.py` uses only the Python standard library:
 
-   `python bootstrap_check.py results.txt --cost 0.001 --tries 20`
+   `python skills/is-it-edge-or-luck/bootstrap_check.py results.txt --cost 0.001 --tries 20`
 
    On Windows use `py` or `python`, on macOS and Linux use `python3`. The flags: `--cost` is the cost per trade in the same unit as the results, `--tries` is the number of strategies or settings tried, `--column` picks a CSV column (counting from 0), `--reps` and `--seed` set resampling count and repeatability. It also accepts decimal commas (`0,0159`): `--decimal auto` is the default and says what it detected, `--decimal ","` or `--decimal "."` forces one reading, and a line that does not fit is skipped, counted and listed, never read as 0. `--self-test` runs the built-in checks. It prints the trade count, the average after costs, two chance tests (a sign-flip permutation test and a centered bootstrap, both asking "how often would a strategy with no edge do at least this well"), a 95 percent interval for the average, the worst drop of the running total, a many-tries adjustment, and a one-line verdict. Read the numbers yourself too; do not just repeat the verdict. If it prints a note about skipped lines, check the file: a header line is normal, anything else means rows were dropped. It exits with a plain message, not a crash, on a missing, empty or non-numeric file. Both tests treat the trades as independent draws, and the sign-flip test also assumes that with no edge the results are symmetric around zero. Overlapping trades, one big trend carrying many trades, or strongly skewed results make the p-values look better than they should, so say so when it applies and lean toward the weaker verdict.
 
@@ -49,7 +49,7 @@ This is a statistics aid, not investment advice. A good result here is never a p
 On claude.ai without a shell or Python, work from pasted text and do the arithmetic by hand where small:
 1. Ask the person to paste the per-trade results as a list, plus the number of tries, the costs and any untouched period.
 2. Count trades, subtract costs, compute the average and the worst drop by hand, and show the working. A hand calculation cannot do the resampling test; say plainly that the chance test was not run and that the verdict is weaker.
-3. If they can run Python themselves, give them the exact steps: install Python from the official site if missing, save the script text as `bootstrap_check.py` (paste it in full from the skill folder), save their results as `results.txt`, open a terminal in that folder, run the command from step 4, and paste the printed lines back.
+3. If they can run Python themselves, give them the exact steps: install Python from the official site if missing, save the script text as `bootstrap_check.py` (paste it in full from the skill folder), save their results as `results.txt`, open a terminal in that folder, run `python bootstrap_check.py results.txt --cost 0.001 --tries 20`, and paste the printed lines back.
 4. Rough spreadsheet check: average divided by (standard deviation over the square root of the trade count); a small value is weak (a starting point: below about 2).
 
 ## Checks before done

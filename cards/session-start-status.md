@@ -2,6 +2,8 @@
 id: session-start-status
 module: 01-continuity
 checked: 2026-11-18
+other_figures:
+  - 200
 ---
 
 # A status line at the start of a session
@@ -79,7 +81,7 @@ The menu marks the item **have** when a SessionStart entry runs `session-start-s
 
 ## Check
 
-1. **Claude:** makes a throwaway repository in a temporary folder (`git init`) with one empty commit (`git commit --allow-empty -m check`; if your commits are signed, type your passphrase when asked) and one new file, uncommitted. Then it runs `node "<your setup>/hooks/session-start-status.mjs" "<temp folder>"; echo "exit $?"`. Expected:
+1. **Claude:** makes a throwaway repository in a temporary folder (`git init`, then `git config user.name throwaway`, `git config user.email canary@example.invalid` and `git config commit.gpgsign false` inside it, so your own name, address and signing take no part) with one empty commit (`git commit --allow-empty -m check`) and one new file, uncommitted. Then it runs `node "<your setup>/hooks/session-start-status.mjs" "<temp folder>"; echo "exit $?"`. Expected:
 
    ```text
    <folder name>: uncommitted changes
@@ -99,11 +101,11 @@ If step 1 prints only `exit 0`, the hook cannot see the repository: the folder a
 
 ## Watch out
 
-- **It speaks into every session that has something to report.** At most ten lines; a longer list ends with "... and N more". Ten lines of about 80 bytes come to about 200 tokens; a git guard line, with its full path, is about 170 bytes, so ten such lines come to about 425. A clean day costs 0 (estimates, bytes divided by 4).
+- **It speaks into every session that has something to report.** At most ten lines; a longer list ends with "... and N more". Ten ordinary lines come to about 200 tokens; a git guard line, with its full path, is about twice as long, so ten such lines come to about 425. A clean day costs 0 (estimates, bytes divided by 4).
 - **Silence has two meanings.** It prints nothing when all is in order, and also when it can see nothing: a registry path with a space in it, or a wrong folder argument. A cell in a column headed `Path` or `Folder` that looks like a path (starting with `/`, `~`, `./`, `../` or a drive letter) and does not exist prints `<cell>: not found`; the hook does not expand `~`, so such a cell is named that way too. Cells in other columns, such as "Read first", are never named. A repository git cannot read prints `<name>: could not be checked`, and so does every repository when git is missing from the PATH. So treat a start-of-session hook that should speak and prints nothing as a failure. The Check shows it can speak; [setup-check](setup-check.md) shows it again later.
 - **A git guard is tested, not only found.** For each `block-dangerous-git.mjs` a PreToolUse entry names, it sends the guard a test force-push, as a Bash call, and prints `git guard <path> did not refuse a test force-push` when the guard does not exit 2: a guard whose rules changed, a mistyped or missing path, a path that is a folder (never run), or one that has not answered in the 3 seconds each run gets. A guard that refuses the force-push is also sent a plain `git status`, a second run, and `git guard <path> refused a plain git status` is printed when that does not exit 0, as with a guard copied without `guard.mjs` beside it. All runs together get 6 seconds: a run is not started with less than 1 second of them left, and a run cut short by what was left is not counted as a failure; such guards are counted in one line, `<n> git guard(s) not tested`. These lines come first, so the ten-line limit never hides them. `${CLAUDE_PROJECT_DIR}` is read as your setup folder. An entry in exec form (`command` plus `args`) runs no shell, so any other path in it is taken as written; in a shell-form command, `$CLAUDE_PROJECT_DIR`, and `~` or `$HOME` at the start, are read as the shell reads them. Guards under other file names, such as version 1.4.0's `block-dangerous-git.sh`, are not seen.
 - **A repository with no commits yet** is skipped until its first commit, so a new repository stays silent at first. A checked-out branch with no commit yet, as after `git checkout --orphan`, still has its other branches counted: their commits on no remote are printed.
-- **The front-door line needs a dated "current state" heading.** It looks for a heading containing "current state" in `AGENTS.md` or `CLAUDE.md` and takes the first date written as YYYY-MM-DD after it. The kit's front-door template has no such heading, so that line stays silent unless your front door keeps one.
+- **The front-door line needs a dated "current state" heading.** It looks for a heading containing "current state" in `AGENTS.md` or `CLAUDE.md` and takes the first date written as YYYY-MM-DD in that section only: from the heading to the next heading of the same or higher level (a `#` line inside a fenced code block is not a heading). A date further down, under `## History` say, never counts, so a section with no date of its own prints no line. The kit's front-door template has no such heading, so that line stays silent unless your front door keeps one.
 - **It compares with what your machine last heard.** It never contacts the server, so "not on any remote" means not on any remote your machine has fetched. It makes no network call, so the only wait it adds to the start of a session is the guard test, a moment per guard and 6 seconds at most; fetch first when you need the server's view.
 - **It reports; it does not fix.** Claude reads the lines as context and may raise them; acting on them waits for your word.
 - **Windows:** hooks run through Git Bash, or through PowerShell when Git Bash is not installed. A registry path written the way Git Bash prints it, `/c/work/x`, is read as `C:/work/x`. How a path inside `node "<path>"` is treated on Windows is not documented in docs/facts.md as of 2026-11-02; an entry in exec form (`"command": "node", "args": ["<path>"]`) passes the path to `node` as one argument with no shell ([docs/facts.md](../docs/facts.md), "Claude Code: hooks"). Step 3 of the Check runs the command the way Claude Code does.

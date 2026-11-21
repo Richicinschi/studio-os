@@ -24,8 +24,9 @@ Read-only. Names, descriptions and counts.
 - Another skill doing the same job: one whose description is about writing, reviewing or improving skills. Names and descriptions only, never a skill's body.
 - How many skills you have at each level, counted by folder.
 - Whether your front door already holds a checklist for writing skills.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/writing-great-skills/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when `writing-great-skills` or another skill for writing skills exists, **partly** when only a checklist in your front door or notes does that job, and **not yet** otherwise.
+The menu marks the item **have** when `writing-great-skills` or another skill for writing skills exists, **partly** when only a checklist in your front door or notes does that job, and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -79,7 +80,7 @@ If Claude answers without using the skill, the description's triggers do not mat
 
 ## Watch out
 
-- **Token cost:** its description, about 74 tokens (estimate), loads every session. The body, about 2,160 tokens (estimate), loads only when it is used, and `GLOSSARY.md`, about 3,760 tokens (estimate), only when Claude follows the pointer to it; so do the two references, about 2,470 and 640 tokens (estimates).
+- **Token cost:** its description, about 74 tokens (estimate), loads every session. The body, about 2,160 tokens (estimate), loads only when it is used, and `GLOSSARY.md`, about 3,760 tokens (estimate), only when Claude follows the pointer to it; so do the two references, `testing-skills-with-subagents.md`, about 2,470 tokens, and `bulletproofing.md`, about 640 tokens (estimates).
 - **The description budget is shared.** All skill descriptions together get 1% of the context window (8,000 characters when that cannot be worked out); past it, the descriptions of the skills you use least are dropped first, and one description is capped at 1,536 characters ([docs/facts.md](../docs/facts.md)). Short descriptions that hold only triggers keep yours in view.
 - **One copy of each skill.** A user-level skill wins over a project skill of the same name ([docs/facts.md](../docs/facts.md)); the studio's own audit found stale personal copies hiding the project's newer ones ([the rules audit](../examples/rules-audit.md)).
 - **In claude.ai,** a custom skill is uploaded as a zip and needs code execution turned on; on Team and Enterprise an owner can turn skill creation off ([docs/facts.md](../docs/facts.md), "claude.ai: custom skills and the built-in document skills").

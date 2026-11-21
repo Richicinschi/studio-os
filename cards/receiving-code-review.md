@@ -24,8 +24,9 @@ Read-only: names, descriptions, versions and counts, never a skill's instruction
 - Another skill that handles review feedback. This reader prints each file's `name` and `description` lines and nothing below them:
   `awk 'FNR==1{n=0} /^---[[:space:]]*$/{n++; next} n==1 && /^(name|description):/{p=1; print FILENAME": "$0; next} n==1 && p && /^[[:space:]]/{print FILENAME": "$0; next} {p=0}' .claude/skills/*/SKILL.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/*/SKILL.md 2>/dev/null`
 - A rule in your instruction files about review feedback or agreeing too readily: `grep -n -i -E 'review|feedback|absolutely right' CLAUDE.md AGENTS.md .claude/CLAUDE.md 2>/dev/null`.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/receiving-code-review/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a skill of this name exists at either level; **partly** when another skill or an instruction-file rule covers how to take review feedback; and **not yet** otherwise.
+The menu marks the item **have** when a skill of this name exists at either level; **partly** when another skill or an instruction-file rule covers how to take review feedback; and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -78,7 +79,7 @@ If Claude agrees and starts changing code before checking, or removes the functi
 
 ## Watch out
 
-- **Its description loads every session:** about 59 tokens (its 234 bytes divided by 4, an estimate). Its instructions, about 1,480 tokens (estimate), load only when it is used.
+- **Its description loads every session:** about 59 tokens (an estimate, bytes divided by 4). Its body (its instructions), about 1,480 tokens (estimate), loads only when it is used.
 - **Two copies answer the same feedback.** If you also have another skill that does the same job, both descriptions load. Keep one.
 - **It forbids thanks.** Its replies to review state the fix and leave out gratitude. In a team that reads those replies, some people find that curt; it is the kit's choice, and yours to keep or soften in your copy.
 - **It weighs sources differently.** It trusts feedback from you after it understands it, checks an outside reviewer's suggestion against the codebase first, and stops to ask you when outside feedback conflicts with a decision you made earlier.

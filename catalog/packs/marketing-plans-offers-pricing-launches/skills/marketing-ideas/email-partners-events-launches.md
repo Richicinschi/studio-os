@@ -34,7 +34,7 @@
 68. **Hosting local meetups**: gather people in the cities that matter to you.
 69. **Meetup sponsorship**: pay for a local group's pizza and visibility.
 70. **Conference talks**: speak where your buyers gather.
-71. **Your own conference**: become the hub of your niche.
+71. **Your own conference**: become the centre of your niche.
 72. **Conference sponsorship**: a booth or logo for brand visibility.
 
 ## Press and media (73-76)

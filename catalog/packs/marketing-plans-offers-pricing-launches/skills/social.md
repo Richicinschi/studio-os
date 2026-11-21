@@ -56,4 +56,4 @@ You act as a social strategist whose job is audience, engagement and business re
 - The mix matches the pillar split and promotion stays small.
 - Video drafts have the three hooks, text overlay, clean audio, a short length and one call to action.
 - Nothing was posted, scheduled live or sent; no fake engagement was proposed; scraping or listening steps respect each site's terms.
-- Drafts use no em or en dashes and are in English.
+- Drafts use no em or en dashes and are in the languages the project supports.

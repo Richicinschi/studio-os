@@ -197,7 +197,11 @@ Then these passes, under the same rules:
   and agent at both levels, divided by 4. Tell them `/context` shows the live breakdown; a total they
   read you is recorded as measured. Never open a data or secret file for this.
 - **Run the Detect part of every card** in `cards/`, so each menu item can be marked **have**,
-  **partly** or **not yet**. Detect commands print settings as set or not set, versions and counts;
+  **partly** or **not yet**. Where a plugin enabled in their project brings a skill or agent of the
+  same name, the mark is **a plugin provides one** in place of **not yet**, or
+  **partly (a plugin provides one)** in place of **partly**, so what is missing stays in view; either
+  way the kit's copy is not offered as a second. Where the card's plugin check could not run, say so
+  and give no plugin mark. Detect commands print settings as set or not set, versions and counts;
   never print a key, a credential or a file's contents.
 
 Write `adoption/inventory.md` in their setup from `templates/adoption/inventory.md`, every section
@@ -266,7 +270,7 @@ From `catalog/features.json`, show the menu in two levels. Never list every item
    "Not sure: as proposed".
 3. **An opened module** shows its items, one numbered line each: what it does for them in plain words
    (from its why), its importance, its context cost in words (none, on demand, every session), have /
-   partly / not yet, and whether it is proposed. Never a bare id, never two items on one line: each
+   partly / partly (a plugin provides one) / not yet / a plugin provides one, and whether it is proposed. Never a bare id, never two items on one line: each
    council seat is an item of its own. Their
    answer (numbers to add or drop, or "keep") closes that module; then the menu comes back once, with
    the change shown.

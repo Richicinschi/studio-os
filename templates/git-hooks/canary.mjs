@@ -7,10 +7,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const hooks = path.dirname(fileURLToPath(import.meta.url)).split(path.sep).join('/');
-if (!spawnSync('git', ['config', 'user.email'], { encoding: 'utf8' }).stdout.trim()) {
-  console.error('canary: set your git identity first: git config --global user.name "<you>" and git config --global user.email "<your email>"');
-  process.exit(2);
-}
 const repo = mkdtempSync(path.join(os.tmpdir(), 'hooks-canary-'));
 const git = (...args) => spawnSync('git', ['-C', repo, ...args], { encoding: 'utf8' });
 const results = [];
@@ -33,6 +29,10 @@ function tryCommit(file, text, wantOk, name) {
 let blocked = '';
 try {
   git('init', '-q');
+  // Its own name and address, unsigned: it tests the hooks, not your identity or your signing.
+  git('config', 'user.name', 'Studio OS canary');
+  git('config', 'user.email', 'canary@example.invalid');
+  git('config', 'commit.gpgsign', 'false');
   git('config', 'core.hooksPath', hooks);
   const plain = git('commit', '-q', '--allow-empty', '-m', 'canary: plain');
   if (plain.status !== 0) {
@@ -52,7 +52,7 @@ try {
   rmSync(repo, { recursive: true, force: true });
 }
 if (blocked) {
-  console.error(`canary: a plain commit fails here, so the hooks cannot be tested. Git said:\n  ${blocked}\nA common cause is commit signing that cannot ask for its passphrase, for example over SSH. Fix that, then run the canary again.`);
+  console.error(`canary: a plain commit fails here, so the hooks cannot be tested. Git said:\n  ${blocked}\nFix what git names, then run the canary again.`);
   process.exit(2);
 }
 console.log(results.join('\n'));

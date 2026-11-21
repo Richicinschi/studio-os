@@ -106,7 +106,7 @@ graph TD
     style HUB fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
-Reading it: a solid line joins the hub to a spoke; a dashed line joins two spokes.
+Reading it: a solid line joins a hub to a spoke; a dashed line joins two spokes.
 
 ---
 

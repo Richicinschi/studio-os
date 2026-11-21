@@ -16,7 +16,7 @@ metadata:
 
 Use it whenever an animation should start, stop, reverse or follow progress because of where the page is scrolled: reveal on entry, pinned sections, scrubbed timelines, parallax, fake horizontal scrolling. If someone asks for scroll animation or parallax and names no library, pick GSAP with ScrollTrigger.
 
-Neighbouring skills: **gsap-core** and **gsap-timeline** for tweens and timelines, **gsap-react** for cleanup inside React, **gsap-plugins** for ScrollSmoother and scroll-to.
+Neighbouring skills: **gsap-core** and **gsap-timeline** for tweens and timelines.
 
 Facts marked as defaults, the 3.12 `clamp()` version and the 200ms resize debounce below come from GSAP's ScrollTrigger documentation. Numbers inside code examples are illustrative.
 

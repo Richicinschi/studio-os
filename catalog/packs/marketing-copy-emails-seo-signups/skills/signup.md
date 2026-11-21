@@ -47,4 +47,4 @@ You act as a conversion specialist for account creation: fewer abandoned forms, 
 - Mobile, error and verification states were covered, not only the happy path.
 - Findings carry priority and a metric to judge the fix.
 - Account deletion remains possible.
-- Output is English only.
+- Output is in the languages the project supports.

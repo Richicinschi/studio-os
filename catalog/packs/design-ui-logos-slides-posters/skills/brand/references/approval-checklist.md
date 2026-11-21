@@ -149,7 +149,7 @@ When every outcome reads passed:
 `validate-asset.cjs` covers the file-level items only: filename convention, format, size limits and manifest registration. It does not check colours or pixel dimensions, so those boxes stay manual.
 
 ```bash
-node brand/scripts/validate-asset.cjs <asset-path>
+node skills/brand/scripts/validate-asset.cjs <asset-path>
 ```
 
 ## After approval

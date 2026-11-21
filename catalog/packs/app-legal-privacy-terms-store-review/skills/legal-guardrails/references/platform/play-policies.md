@@ -1,8 +1,8 @@
 # Google Play Developer Policies — PP/ToS + Store-Config Gates
 
-**Scope:** Google Play Developer Program Policy modules that gate the Privacy Policy, Terms of Service, and Play Console store configuration of a mobile app. Worked verdicts use the **example app** (`legal-guardrails.md` §8: Flutter breathing/mindfulness app; Dutch eenmanszaak sole-controller publisher; EU/NL-first; auto-renew subscriptions sold through Google Play as merchant of record via RevenueCat + Firebase backend in `europe-west`; general-wellness, no medical claims; free tier = on-device data only, paid tier = Firestore sync).
+**Scope:** Google Play Developer Program Policy modules that gate the Privacy Policy, Terms of Service, and Play Console store configuration of a mobile app. Worked applications use one app, the **worked example** (profile: `worked-example.md` §1).
 
-**How to use:** Each section is a discrete PASS/FAIL module. Adjudicate a clause/config against the rule rows, then record the verdict for the app under review (from its fact sheet and build; the worked column shows the example app's). Citation tiers:
+**How to use:** Each section is a discrete PASS/FAIL module. Adjudicate a clause/config against the rule rows, then record the verdict for the app under review (from its fact sheet and build). Each table's Check column holds the checks; the worked example's verdicts are in `worked-example.md` §8. Citation tiers:
 - `[settled — <src>, verified <date>]` = confirmed against the primary Play Help page fetched on that date. A bare `[settled, verified <date>]` rests on the module's source line. Play Help pages show no last-updated date.
 - `[verify]` / `[verify-pinpoint]` / `[low-confidence]` = see flags at the end.
 
@@ -16,14 +16,14 @@ Source: Google, Play Console Help **10144311** (User Data), https://support.goog
 
 ### 1A. Privacy-policy posting & URL hygiene
 
-| # | Rule | Tier | Application (worked: example app) |
+| # | Rule | Tier | Check (one app's verdicts: `worked-example.md` §8) |
 |---|------|------|---------------------|
-| 1 | A privacy policy link MUST be in **the Play Console's privacy policy field** AND **inside the app** (a link or the policy text). | settled | Console field + in-app `/legal/privacy` route both required. App has both (in-app `MarkdownDocScreen`). PASS. |
-| 2 | URL must be **active, publicly accessible, and non-geofenced** — **no PDFs**. | settled | The privacy URL (e.g. `https://<your-domain>/<app>/privacy`) must be HTML (the example app's is on Firebase Hosting), reachable globally. Verify it is NOT served only to NL IPs. |
-| 3 | URL must be **non-editable** (not a doc/wiki that anyone can change). | settled | Static Hosting page — non-editable. PASS. |
+| 1 | A privacy policy link MUST be in **the Play Console's privacy policy field** AND **inside the app** (a link or the policy text). | settled | Console field + an in-app link (or the policy text) both required. |
+| 2 | URL must be **active, publicly accessible, and non-geofenced** — **no PDFs**. | settled | The privacy URL (e.g. `https://<your-domain>/<app>/privacy`) must be HTML (the worked example's is on Firebase Hosting), reachable globally. Verify it is NOT served only to NL IPs. |
+| 3 | URL must be **non-editable** (not a doc/wiki that anyone can change). | settled | Confirm the URL is a static page the publisher controls, not a doc or wiki others can edit. |
 | 4 | Must be **clearly labelled** as a privacy policy (e.g. "privacy policy" in the title). | settled | Page `<title>` / heading must read "Privacy Policy". Confirm the rendered HTML title, not just the in-app screen. |
 | 5 | The **entity named in the Play store listing** (developer/company) must appear in the privacy policy, **or** the app must be named in the policy. | settled | Listing publisher = `<publisher>` (for a Dutch publisher, the KvK trade name). Policy "Who we are" block must name **`<publisher>`** (and ideally `<app name>`). Cross-check against any still-pending `[KVK]`/`[REGISTERED ADDRESS]` fills. |
-| 6 | Must be served over **HTTPS** (secure transmission of user data is mandated). | verify-pinpoint | Hosting is HTTPS-only. PASS in practice. The page (2026-11-18) requires personal and sensitive user data to be transmitted "using modern cryptography (for example, over HTTPS)"; it sets no HTTPS rule for the policy URL itself. |
+| 6 | Must be served over **HTTPS** (secure transmission of user data is mandated). | verify-pinpoint | Confirm the policy page is served over HTTPS. The page (2026-11-18) requires personal and sensitive user data to be transmitted "using modern cryptography (for example, over HTTPS)"; it sets no HTTPS rule for the policy URL itself. |
 
 ### 1B. Comprehensive disclosure (policy content)
 
@@ -33,7 +33,7 @@ The privacy policy MUST comprehensively cover `[settled, verified 2026-11-18]`:
 3. **Secure data handling** procedures.
 4. **Data retention and deletion** policies.
 
-Recipients to enumerate: every recipient of the app's data (the example app's: Google (Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions/Hosting), **RevenueCat** (subscription middleware), Apple/Google (billing)). The policy's §3/§4 + recipient list must match the SDK inventory and the Data safety form.
+Recipients to enumerate: every recipient of the app's data (the worked example's: Google (Firebase Auth/Firestore/Analytics/Crashlytics/Cloud Functions/Hosting), **RevenueCat** (subscription middleware), Apple/Google (billing)). The policy's §3/§4 + recipient list must match the SDK inventory and the Data safety form.
 
 ### 1C. Prominent disclosure + affirmative consent (BEFORE sensitive-data collection)
 
@@ -51,14 +51,14 @@ Where the app's access, collection, use or sharing of **personal and sensitive u
 
 **Defined term — "personal and sensitive user data":** includes, but is not limited to, PII, financial and payment info, authentication info, phonebook, contacts, device location, SMS and call-related data, **health data**, Health Connect data, inventory of other apps on the device, microphone, camera, and other sensitive device or usage data. `[settled, verified 2026-11-18]`
 
-**Application (worked: example app):** the example app collects email + auth (Firebase Auth) and analytics/crash diagnostics. The sign-up flow already carries an explicit consent checkbox + privacy/terms acceptance (affirmative tick). Analytics/Crashlytics have an in-app opt-out. Free-tier breathing data is on-device only (not "collected" = not leaving device). PASS, provided the consent tick precedes any account-creation network write. **Do not over-classify breathing sessions as health data**: the suite's answer is App activity, not Health & fitness, but Google's Health and Fitness types turn on the data, not on Health Connect access, so confirm it `[verify]`.
+**Application (worked example):** the worked example collects email + auth (Firebase Auth) and analytics/crash diagnostics. The sign-up flow already carries an explicit consent checkbox + privacy/terms acceptance (affirmative tick). Analytics/Crashlytics have an in-app opt-out. Free-tier session data is on-device only (not "collected" = not leaving device). Check that the consent tick precedes any account-creation network write (one app's verdict: `worked-example.md` §8). **Do not over-classify session logs that reveal nothing about health or exercise as health data**: the suite's answer is App activity, not Health & fitness, but Google's Health and Fitness types turn on the data, not on Health Connect access, so confirm it `[verify]`.
 
 ### 1D. Data minimization, no-sale, Data-safety consistency
 
-| # | Rule | Tier | Worked (example app) |
+| # | Rule | Tier | Check (one app's verdicts: `worked-example.md` §8) |
 |---|------|------|---------|
-| 1 | **Data minimization** — collect/use only what's needed for current features. | settled | Only auth + diagnostics. PASS. |
-| 2 | **No sale** of personal/sensitive user data ("sale" = exchange/transfer to a third party for monetary consideration). | settled | No data sale; ads disabled; AD_ID stripped. PASS. |
+| 1 | **Data minimization** — collect/use only what's needed for current features. | settled | Compare what the app collects with what its current features need. |
+| 2 | **No sale** of personal/sensitive user data ("sale" = exchange/transfer to a third party for monetary consideration). | settled | Confirm the app sells no personal or sensitive user data. |
 | 3 | The **Data safety section** must be completed clearly and accurately for every app, and **where relevant must be consistent with the privacy policy disclosures**. | settled | Data safety form answers (categories, encrypted-in-transit = yes, deletion = yes) must mirror Privacy §3/§4. Reconcile both before submit. |
 
 **FAIL triggers:** PDF policy URL · geofenced/editable URL · policy entity ≠ listing entity · missing recipient list · no in-app prominent disclosure before sensitive collection · Data safety form contradicts the policy · any data-sale.
@@ -74,13 +74,13 @@ Source: Google, Play Console Help **13327111** (Account deletion requirements), 
 Applies whenever the app **lets users create an account from within the app** — **including apps that direct users to account-creation flows outside the app**, and even if some features work without an account. `[settled, verified 2026-11-18]`
 **Exemptions:** permanently private apps and enterprise device-management apps; accounts created and operated offline are not app accounts. `[settled — .../answer/13327111 FAQ, verified 2026-11-18]`
 
-Any app that creates accounts is **in scope** (the example app creates Firebase Auth accounts).
+Any app that creates accounts is **in scope** (the worked example creates Firebase Auth accounts).
 
 ### 2B. Dual-path requirement (BOTH mandatory)
 
-| Path | Rule (summary) | Worked (example app) |
+| Path | Rule (summary) | Check (one app's verdict: `worked-example.md` §8) |
 |------|-----------------|---------|
-| In-app | A path inside the app to delete the account and its data. | Settings → Account → type-`DELETE` soft-delete flow. PASS (discoverable in account settings). |
+| In-app | A path inside the app to delete the account and its data. | Find the in-app path (e.g. in account settings) and confirm it deletes the account and its data. |
 | Web | A web page where users can ask for the account and its data to be deleted (it serves users who have uninstalled the app). | The app's public deletion URL (e.g. `https://<your-domain>/<app>/delete-account`). Verify it loads + describes the request path. |
 
 ### 2C. Web-resource standards
@@ -95,7 +95,7 @@ Any app that creates accounts is **in scope** (the example app creates Firebase 
 - Deleting an account means deleting **the user data tied to that account** — including personal data, financial info, authentication details, location, health data, and other sensitive usage data **listed in your Data safety section**. `[settled, verified 2026-11-18]`
 - Data may be kept only where **a legitimate reason** requires it (security, preventing fraud, complying with regulation), and the developer **must tell users clearly what it keeps**, for example in the privacy policy. `[settled, verified 2026-11-18]`
 
-**Mapping (worked: example app):** 30-day soft-delete grace → a scheduled purge job hard-purges Firestore + Auth + RevenueCat. The Privacy retention clause must describe the app's grace period + the security/legal retention basis so the policy language matches the actual purge. PASS if the Privacy retention wording matches the purge job.
+**Mapping (worked example):** 30-day soft-delete grace → a scheduled purge job hard-purges Firestore + Auth + RevenueCat. The Privacy retention clause must describe the app's grace period + the security/legal retention basis so the policy language matches the actual purge. PASS if the Privacy retention wording matches the purge job.
 
 ### 2E. Data-safety form connection
 
@@ -112,13 +112,13 @@ Source: Google, Play Console Help **16679511** (Health content and services), ht
 ### 3A. Scope (a wellness app is in scope by framing)
 
 Covers any app with **health-related features or information**, or that uses health data for non-health features — **even when health is a side feature**, not the app's main purpose. `[settled, verified 2026-11-18]`
-→ A mindfulness/breathing app falls in scope **by framing alone** even without Health Connect access.
+→ An app with mindfulness or wellness framing (the app category the person gives) falls in scope **by framing alone** even without Health Connect access.
 
 ### 3B. Health apps declaration form — DECISION (do not silently skip)
 
 **"All developers must complete the Health apps declaration form"** (Google, Play Console Help 16679511, https://support.google.com/googleplay/android-developer/answer/16679511), on the App content page in Play Console. `[settled, verified 2026-11-18]`
 
-**Adjudication (worked: example app):** the wording is written broadly ("all developers"); an app with mindfulness/relaxation framing, like the example app, falls within the health-related scope of 3A. **Decision: complete the Health apps declaration form** (do not assume exemption). Document the reasoning in the review rather than skipping. `[verify]` — whether a purely on-device, no-health-data wellness app is strictly *required* to file vs. *eligible* to attest is a judgment; the conservative, defensible call is to file. Flag for the reviewer.
+**Adjudication (worked example):** the wording is written broadly ("all developers"); an app with mindfulness/relaxation framing falls within the health-related scope of 3A. **Decision: complete the Health apps declaration form** (do not assume exemption). Document the reasoning in the review rather than skipping. `[verify]` — whether a purely on-device, no-health-data wellness app is strictly *required* to file vs. *eligible* to attest is a judgment; the conservative, defensible call is to file. Flag for the reviewer.
 
 ### 3C. Prohibited claims (cross-check store listing + ToS + PP + About + in-app copy)
 
@@ -134,14 +134,14 @@ Prohibited `[settled, verified 2026-11-18]`:
 
 Health and medical apps that are not regulated medical devices must state in the app description that the app is **"not a medical device and does not diagnose, treat, cure, or prevent any medical condition"** (Google, Play Console Help 16679511, https://support.google.com/googleplay/android-developer/answer/16679511), and apps must also remind users to consult a healthcare professional for medical advice, diagnosis or treatment (the page does not say where). `[settled, verified 2026-11-18]`
 
-**Application:** the disclaimer must appear in the **Play store listing description itself** (not only the in-app About). Confirm both placements. If the app already has a long in-app health disclaimer (the example app does), add/confirm the condensed version in the Play description.
+**Application:** the disclaimer must appear in the **Play store listing description itself** (not only the in-app About). Confirm both placements. If the app already has a long in-app health disclaimer, add/confirm the condensed version in the Play description.
 
 ### 3E. Health-data disclosure, permissions, minimization
 
 - Privacy policy: a link in the Play Console field, and a link or the text inside the app (mirrors Module 1). `[settled, verified 2026-11-18]`
 - **Minimization:** request no permission the app's core health function does not need, and remove unused ones. `[settled, verified 2026-11-18]`
 
-**Worked (example app):** requests no health permissions, no Health Connect, no precise location. Verify the merged manifest holds no leftover sensitive permissions (ties to Module 6).
+**Worked example:** requests no health permissions, no Health Connect, no precise location. Verify the merged manifest holds no leftover sensitive permissions (ties to Module 6).
 
 **FAIL triggers:** any diagnose/treat/cure/prevent verb · missing "not a medical device / consult a professional" disclaimer in the **store description** · Health apps declaration form not filed without documented reasoning · unused sensitive permission present.
 
@@ -155,7 +155,7 @@ Source: Google, Play Console Help **9893335** (Families / Designed for Families)
 
 Every app must declare its **target audience prior to publishing**, selecting from the provided age groups. `[settled, verified 2026-11-18]`
 
-**Decision for an adult-facing app (the example app): declare NOT primarily child-directed (adult/16+),** consistent with the in-app **16+ self-attestation age gate** (GDPR Art. 8 alignment) and the IARC age rating. Document the reconciliation.
+**Decision for an adult-facing app: declare NOT primarily child-directed (adult/16+),** consistent with the in-app **16+ self-attestation age gate** (GDPR Art. 8 alignment) and the IARC age rating. Document the reconciliation.
 
 ### 4B. Obligations that attach ONLY if child-directed (an adult-facing app avoids them by declaring 16+)
 
@@ -167,7 +167,7 @@ If targeted to children `[settled, verified 2026-11-18]`:
 - Must not contain APIs/SDKs not approved for child-directed services.
 - **Mixed-audience** apps must implement a **neutral age screen** to gate child protections.
 
-**Application (worked: example app):** by declaring not-primarily-child-directed, these heavy obligations do not attach — but the declaration MUST stay consistent with: (a) the 16+ in-app gate, (b) the Privacy Policy's 16+ statement, (c) the IARC rating (Module 7). A contradiction (e.g. declaring child-directed while the policy says 16+) is a FAIL. Note: the example app strips AD_ID anyway (Module 6), so it would not transmit the advertising ID regardless.
+**Application (worked example):** by declaring not-primarily-child-directed, these heavy obligations do not attach — but the declaration MUST stay consistent with: (a) the 16+ in-app gate, (b) the Privacy Policy's 16+ statement, (c) the IARC rating (Module 7). A contradiction (e.g. declaring child-directed while the policy says 16+) is a FAIL. Note: the worked example strips AD_ID anyway (Module 6), so it would not transmit the advertising ID regardless.
 
 **FAIL triggers:** target-audience section incomplete · declaration inconsistent with the 16+ gate / Privacy 16+ clause / IARC rating.
 
@@ -193,11 +193,11 @@ Developers must clearly disclose `[settled, verified 2026-11-18]`:
 - Developers may offer a **more flexible refund policy** directly, but must notify users of changes. `[settled, verified 2026-11-18]`
 - **Charge timing — up to 24h before period start:** `[verify]` (standard Play billing rule; not surfaced verbatim on this page this run — confirm against Play Billing docs).
 
-### 5C. ToS module (worked: example app)
+### 5C. ToS module (worked example)
 
 The subscription clause must state: price + cycle + **auto-renew** + **trial-end charge** + **cancel via Google Play (Subscription Center)**, and route **refunds/cancellation to Google Play** as merchant of record (Apple parallel = App Store / Apple EULA). RevenueCat is internal middleware — **not** named as the merchant of record to users.
 
-**Cross-regime check:** reconcile Play's "no current-period refund" with the **EU 14-day right of withdrawal** the app implements (in the example app: an unticked paywall checkbox + `withdrawalConsentAt` capturing the immediate-performance waiver). The two regimes coexist: EU withdrawal/waiver governs the consumer-law statutory right; Google's refund mechanics govern the store transaction. The ToS must not state the Play refund rule in a way that **denies** the EU statutory withdrawal right.
+**Cross-regime check:** reconcile Play's "no current-period refund" with the **EU 14-day right of withdrawal** the app implements (in the worked example: an unticked paywall checkbox + a consent timestamp capturing the immediate-performance waiver). The two regimes coexist: EU withdrawal/waiver governs the consumer-law statutory right; Google's refund mechanics govern the store transaction. The ToS must not state the Play refund rule in a way that **denies** the EU statutory withdrawal right.
 
 **FAIL triggers:** paywall omits auto-renew / trial-end charge / cancel path · ToS names RevenueCat (not Google) as merchant of record · refund clause contradicts EU withdrawal rights.
 
@@ -207,14 +207,14 @@ The subscription clause must state: price + cycle + **auto-renew** + **trial-end
 
 Source: Google, Play Console Help **6048248** (Advertising ID), https://support.google.com/googleplay/android-developer/answer/6048248 `[settled (core)/verify (notes-only) — .../answer/6048248, verified 2026-11-18]`
 
-| # | Rule | Tier | Worked (example app) |
+| # | Rule | Tier | Check (one app's verdicts: `worked-example.md` §8) |
 |---|------|------|---------|
-| 1 | Apps **targeting Android 13+ (API 33+)** that use the advertising ID MUST declare `<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>`. | settled | The example app targets API 35; it does **not** use the GAID. |
-| 2 | If a user deletes their advertising ID, the app gets **a string of zeros** instead of the identifier. Enforcement reached all Play devices **April 1, 2022**. | settled | N/A for an app that collects no GAID (the example app). |
-| 3 | **Auto-merge trap:** some SDKs declare AD_ID in their library manifest, and it **merges into the app's main manifest by default** (e.g. Google Mobile Ads SDK; in practice `firebase_analytics` also merges it.) | settled (general) / verify (firebase_analytics specific) | In the example app, `firebase_analytics` merged AD_ID → stripped. |
-| 4 | **Use both controls** so the GAID is not collected: strip the permission via `tools:node="remove"` on the `<uses-permission>` in `AndroidManifest.xml` (for an app targeting Android 13+ the ID "is automatically removed and replaced with a string of zeroes"), **and** set Firebase's `<meta-data android:name="google_analytics_adid_collection_enabled" android:value="false"/>`. | settled — Android 13 behaviour changes; Firebase Analytics config (Android); Play Help 6048248, verified 2026-11-19 | The example app applies `tools:node="remove"` to AD_ID + AdServices and **must also set the flag**; its "no advertising ID" stays `[verify]` until the **MERGED manifest** (not source) shows the permission absent and the flag present. Below Android 13 the strip alone is `[verify — not stated by Android]`. |
-| 5 | Declared **permissions/SDKs must match the Data safety section** ("no advertising ID" answer must be honest). | verify | Data safety must answer "no advertising ID"; reconcile against merged manifest. |
-| 6 | **targetSdk must meet the current Play minimum (API 34+)**. | verify-pinpoint | Read the app's targetSdk from the scan (the example app targets API 35 → satisfies). (Exact current minimum not re-confirmed this run.) |
+| 1 | Apps **targeting Android 13+ (API 33+)** that use the advertising ID MUST declare `<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>`. | settled | Read the app's targetSdk and whether it uses the GAID. |
+| 2 | If a user deletes their advertising ID, the app gets **a string of zeros** instead of the identifier. Enforcement reached all Play devices **April 1, 2022**. | settled | N/A for an app that collects no GAID. |
+| 3 | **Auto-merge trap:** some SDKs declare AD_ID in their library manifest, and it **merges into the app's main manifest by default** (e.g. Google Mobile Ads SDK; in practice `firebase_analytics` also merges it.) | settled (general) / verify (firebase_analytics specific) | Check the merged manifest for an AD_ID permission an SDK merged in. |
+| 4 | **Use both controls** so the GAID is not collected: strip the permission via `tools:node="remove"` on the `<uses-permission>` in `AndroidManifest.xml` (for an app targeting Android 13+ the ID "is automatically removed and replaced with a string of zeroes"), **and** set Firebase's `<meta-data android:name="google_analytics_adid_collection_enabled" android:value="false"/>`. | settled — Android 13 behaviour changes; Firebase Analytics config (Android); Play Help 6048248, verified 2026-11-19 | An app that does not use the GAID applies both controls; its "no advertising ID" stays `[verify]` until the **MERGED manifest** (not source) shows the permission absent and the flag present. Below Android 13 the strip alone is `[verify — not stated by Android]`. |
+| 5 | Declared **permissions/SDKs must match the Data safety section** ("no advertising ID" answer must be honest). | verify | If the app collects no GAID, Data safety answers "no advertising ID"; reconcile against merged manifest. |
+| 6 | **targetSdk must meet the current Play minimum (API 34+)**. | verify-pinpoint | Read the app's targetSdk from the scan. (Exact current minimum not re-confirmed this run.) |
 | 7 | **`QUERY_ALL_PACKAGES`** requires policy justification. | verify | An app without a policy-approved need should not declare it; grep merged manifest to confirm absence. |
 
 **Adjudication step (scanner):** grep the **MERGED** manifest (`app/build/outputs/.../AndroidManifest.xml`) for `AD_ID`, `AdServices`, the `google_analytics_adid_collection_enabled` meta-data, `QUERY_ALL_PACKAGES`, location/camera/mic perms → reconcile each against Data safety + Privacy §4. Source-manifest absence is insufficient; SDK merge is the trap.
@@ -235,7 +235,7 @@ Source: Google, Play Console Help **9859655** (Content ratings / IARC), https://
 | 4 | **Re-complete** the questionnaire after any change to content or features that would change the answers. | settled |
 | 5 | Misrepresenting the app's content can get the app removed or suspended. | settled |
 
-**Application (worked: example app):** declare **in-app purchases = yes** (subscriptions), **unrestricted internet = yes** (Firebase), **user interaction = no** (no UGC/social), **shares location = no**, no objectionable content → expect lowest age bands (PEGI 3 / ESRB Everyone / IARC 3+). The resulting age rating MUST be consistent with: the **target-audience declaration** (Module 4, not-primarily-child-directed/16+) and the **Apple age rating**. A low PEGI rating does not contradict the 16+ self-attestation (the 16+ gate is a GDPR data-consent age, not a content-maturity rating) — note this so the two are not mistaken for a conflict.
+**Application (worked example):** declare **in-app purchases = yes** (subscriptions), **unrestricted internet = yes** (Firebase), **user interaction = no** (no UGC/social), **shares location = no**, no objectionable content → expect lowest age bands (PEGI 3 / ESRB Everyone / IARC 3+). The resulting age rating MUST be consistent with: the **target-audience declaration** (Module 4, not-primarily-child-directed/16+) and the **Apple age rating**. A low PEGI rating does not contradict the 16+ self-attestation (the 16+ gate is a GDPR data-consent age, not a content-maturity rating) — note this so the two are not mistaken for a conflict.
 
 **FAIL triggers:** unrated app · IARC answers omit IAP · answers contradict actual features · rating not re-taken after a material content/feature change.
 
@@ -252,7 +252,7 @@ These five facts must agree across the policy, the app, and every Console form:
 | No advertising ID | Privacy §4 "no ad ID" | (none collected) | "no advertising ID" (Device or other IDs still = Yes for the app-instance ID) | merged manifest: AD_ID stripped **and** `google_analytics_adid_collection_enabled=false` |
 | Health framing/disclaimer | health disclaimer §; "supports/may help relax" | About disclaimer | Health & fitness answer confirmed against the data, not asserted `[verify]` (worked example: not collected) | **Health apps declaration form**; "not a medical device" in store description |
 | Age / audience | 16+ statement | 16+ sign-up attestation | (n/a) | Target-audience = not-child-directed; IARC age rating |
-| Subscription terms | auto-renew/trial/cancel-via-Google | paywall copy + `withdrawalConsentAt` | (n/a) | Play subscription product config |
+| Subscription terms | auto-renew/trial/cancel-via-Google | paywall copy + the waiver consent timestamp | (n/a) | Play subscription product config |
 
 **Adjacent gate (admin, flag don't adjudicate):** **DSA trader status** (DSA Arts. 30/31) — the eenmanszaak must register & display name/address/phone/email in Play Console; non-registration → EU discoverability loss. Must match the KvK + Privacy/Terms contact block. `[verify-pinpoint]` (Article numbers from harvested notes, not re-fetched this run.)
 

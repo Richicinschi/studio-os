@@ -1,5 +1,6 @@
 // Prints the ordered list of GIF size-reduction steps, with estimated settings, as JSON.
-import { pathToFileURL } from 'node:url';
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const LOSSY_LEVELS = [80, 120, 180];
 const COLOUR_COUNTS = [192, 128, 64];
@@ -71,4 +72,6 @@ function runCli(argv) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) runCli(process.argv.slice(2));
+// Node loads a linked script from its real path, so both sides are compared as real paths.
+const realPath = (p) => { try { return realpathSync(p); } catch { return null; } };
+if (process.argv[1] && realPath(process.argv[1]) === realPath(fileURLToPath(import.meta.url))) runCli(process.argv.slice(2));

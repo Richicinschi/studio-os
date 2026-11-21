@@ -15,25 +15,36 @@ The product of this skill is a pair of files: a `.drawio` document you write as 
 beside it that opens locally. A linter sits between writing and handing over. The scripts in this
 folder assist you; the diagram itself is XML that you author directly.
 
-Never return just a hosted link (diagrams.net or its viewer). The owner does not open those
-(`.studio/identity/STYLE.md` section 3; it went wrong on 2026-07-28). A link is an optional
-extra.
+Never return just a hosted link (diagrams.net or its viewer): the user may not open one, and a
+local file works offline. A link is an optional extra.
 
 This copy of the skill makes no network calls. It leaves out the brand-icon fetcher and the
 scripts that read code structure. It reads and writes files, and may run Graphviz or the
 draw.io CLI when they are present.
 
-## Tooling on this machine
+## Check which tools exist
 
-There is no draw.io CLI here, and no `dot`, Inkscape or rsvg either. So the usual route is:
+Before you pick a route, check what is installed. Each command prints a version when its tool
+is there (the draw.io binary's name differs per platform; see `references/troubleshooting.md`):
+
+```bash
+drawio --version        # the draw.io CLI: PNG, PDF and SVG export
+dot -V                  # Graphviz: autolayout.py needs it
+inkscape --version
+rsvg-convert --version
+python3 --version       # runs the scripts in this folder
+```
+
+The commands in this skill run Python as `python3`. Windows often has no `python3`; there, use
+`py -3` in its place.
+
+Without the draw.io CLI, take this route:
 
 1. Write a small generator that reads one list of nodes and edges and writes both the
-   `.drawio` and a hand-made `.svg`. Because both come from one list, they cannot disagree. Copy
-   the house style of `docs/specs/2026-09-14-analytics-stack-lab-phases.drawio` and
-   the `.svg` next to it. Run the generator with `py -3.13` on Windows or `uv run python` on
-   the Mac.
+   `.drawio` and a hand-made `.svg`. Because both come from one list, they cannot disagree. Run
+   the generator with `python3`.
 2. Lint the document:
-   `py -3.13 <skill-dir>/scripts/validate.py <name>.drawio` (Mac: `uv run python` in its place).
+   `python3 <skill-dir>/scripts/validate.py <name>.drawio`.
 3. Check the picture with a headless browser. Chrome, for example:
    `chrome.exe --headless=new --window-size=W,H --user-data-dir=<scratch dir> --screenshot=<png> file:///<abs path>.svg`
    (Edge takes the same flags as `msedge.exe`). Open the PNG, then fix any overlap or clipped text.
@@ -42,8 +53,8 @@ There is no draw.io CLI here, and no `dot`, Inkscape or rsvg either. So the usua
 If the user asks for a browser link, and only as a bonus to the SVG, run the encoder:
 
 ```bash
-py -3.13 <skill-dir>/scripts/encode_drawio_url.py --edit <name>.drawio   # editor link
-py -3.13 <skill-dir>/scripts/encode_drawio_url.py <name>.drawio          # viewer link
+python3 <skill-dir>/scripts/encode_drawio_url.py --edit <name>.drawio   # editor link
+python3 <skill-dir>/scripts/encode_drawio_url.py <name>.drawio          # viewer link
 ```
 
 The XML sits after the `#` in the link, so the file never leaves the machine.
@@ -57,7 +68,7 @@ and the hand-made SVG.
 | Open | When |
 |---|---|
 | `references/diagram-types.md` | The request names a kind: ERD, UML class, sequence, architecture, ML model, flowchart. It gives shapes, edges and layout for each. |
-| `references/shapes.md` with `scripts/shapesearch.py` | You need a vendor shape (AWS, Azure, GCP, Cisco, Kubernetes, UML, ER). `py -3.13 scripts/shapesearch.py "<keywords>"` prints the official `style=` string. A made-up `shape=mxgraph.*` name draws an empty box if it is wrong. |
+| `references/shapes.md` with `scripts/shapesearch.py` | You need a vendor shape (AWS, Azure, GCP, Cisco, Kubernetes, UML, ER). `python3 scripts/shapesearch.py "<keywords>"` prints the official `style=` string. A made-up `shape=mxgraph.*` name draws an empty box if it is wrong. |
 | `references/autolayout.md` with `scripts/autolayout.py` | More than about 15 nodes. Describe the graph as JSON and let Graphviz place nodes and bends. It needs `dot`; if that is missing, place by hand. |
 | `references/style-presets.md` with `references/style-extraction.md` | The user wants a reusable style learned, saved, listed or made the default. |
 | `references/troubleshooting.md` | A render looks wrong or an export fails; it also covers WSL2 and Linux notes. |
@@ -181,7 +192,7 @@ For ERD, UML class, sequence, architecture, ML model and flowchart, open
 # Preview PNG: no -e (embedded XML breaks image APIs); width kept under the 2576 px limit
 drawio -x -f png --width 2000 -o preview.png model.drawio
 # Final editable PNG: keep -e, then complete the IEND chunk
-drawio -x -f png -e -s 2 -o final.drawio.png model.drawio && uv run python scripts/repair_png.py final.drawio.png
+drawio -x -f png -e -s 2 -o final.drawio.png model.drawio && python3 scripts/repair_png.py final.drawio.png
 # SVG and PDF are text formats, -e is safe
 drawio -x -f svg -e -o final.svg model.drawio
 ```

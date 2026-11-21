@@ -26,22 +26,23 @@ Read-only: names, descriptions, versions and counts. No skill body is opened, an
 - A decision log it can read, names only: `ls -d docs/adr docs/adrs docs/decisions 2>/dev/null`.
 - A rule about the model subagents use, in your instruction files: `grep -n -i 'model' CLAUDE.md AGENTS.md 2>/dev/null`.
 - `gh --version`, only if you want its `--issues` option.
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/improve/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when an `improve` skill exists at either level, **partly** when another audit skill covers the job, and **not yet** otherwise.
+The menu marks the item **have** when an `improve` skill exists at either level, **partly** when another audit skill covers the job, and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
 1. **"Take improve?"**
    - Keep what you have. Recommended when Detect says **have**.
    - ADAPT the kit's copy: your decision log in place of the studio's, and your author line. Recommended when Detect says **not yet**.
-   - FOLD its plan template, "write each plan for the weakest plausible executor", into the audit skill you have. Recommended when Detect says **partly**.
+   - FOLD its plan template, "Write each plan for the weakest executor you can imagine", into the audit skill you have. Recommended when Detect says **partly**.
    - SKIP: you do not audit codebases or hand work to other sessions.
    - Not sure: the recommended option above for what Detect found.
    - Skip for now: leave it open; nothing is set, and it comes back in a later wave.
    - Default when skipped: no change.
 2. **"Which model carries out a plan under `execute`?"**
    - The kit copy's default: the session's own model, unless you name one for a run (`execute 003 haiku`). Recommended when Detect finds no rule about subagent models, or a rule that subagents keep the session's model.
-   - A cheaper model by default, such as the `sonnet` alias, which fits the skill's own economics (an expensive model plans, a cheaper one carries out). Recommended when you run many plans and want each run to cost less.
+   - A cheaper model by default, such as the `sonnet` alias, which fits the skill's own split (the planner spends its effort on judgement, the executor on typing). Recommended when you run many plans and want each run to cost less.
    - Never use `execute`: you open a new session for each plan and hand it the file.
    - Not sure: the recommended option above for what Detect found and how many plans you run; the kit copy's default when Claude cannot tell. You can still name a model for each run.
    - Default when skipped: the kit copy's default.
@@ -86,9 +87,9 @@ If Claude edits a source file, or writes plans before you pick findings, the ite
 
 - **Read-only by its own rule.** It never edits source, installs, builds into your tree or commits; it writes only under `plans/`. Ask it to fix something and it declines, and offers `execute` or a better plan instead.
 - **`--issues` publishes.** With that flag only, it turns each plan into a GitHub issue through `gh`. On a public repository it warns you and asks before publishing any plan that describes a vulnerability or where a credential lives. For a company repository, ask your company first.
-- **A cheaper executor is a choice.** The skill's text still rests on a cheaper model carrying out the plans, but the kit's copy names no model, so the executor runs on the session's model unless a run names one or `CLAUDE_CODE_SUBAGENT_MODEL` is set ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), by the studio's rule that the agent writing the code is not downgraded to save tokens. Name a cheaper model for a run (`execute 003 haiku`) when you want that saving ([module 02](../modules/02-context-and-models/README.md), [module 04](../modules/04-delegation/README.md)).
+- **A cheaper executor is a choice.** The kit's copy names no model (only its plan template still says the reader may be a small, cheap model), so the executor runs on the session's model unless a run names one or `CLAUDE_CODE_SUBAGENT_MODEL` is set ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), by the studio's rule that the agent writing the code is not downgraded to save tokens. Name a cheaper model for a run (`execute 003 haiku`) when you want that saving ([module 02](../modules/02-context-and-models/README.md), [module 04](../modules/04-delegation/README.md)).
 - **Fan-out costs.** A `deep` audit runs up to eight read-only subagents at once, and parallel agents have a rate cost of their own ([module 02, Evidence](../modules/02-context-and-models/README.md#evidence)). `quick` keeps it to one or none.
 - **Secrets stay out.** A finding names the file, the line and the kind of credential, never its value.
 - **A fresh worktree is bare.** It shares the history but not installed dependencies or build output, so the executor installs them first; that is expected.
 - **Not writing-plans.** improve turns an audit into plans; [writing-plans](writing-plans.md) turns a spec you approved into a plan. The studio keeps both.
-- **Cost:** its name and description load into every session, about 74 tokens (an estimate, bytes divided by 4); the full skill, about 3,184 tokens (estimate), loads only when it is used, with its references as it reads them.
+- **Cost:** its name and description load into every session, about 74 tokens (an estimate, bytes divided by 4); the body, about 3,184 tokens (estimate), loads only when it is used, with its references as it reads them.

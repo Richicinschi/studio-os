@@ -32,7 +32,7 @@ Operates under `legal-guardrails` — load its constitution + the references lis
 
 This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a), which is logically **prior to** the GDPR lawful-basis question. Clearing the Art. 6 basis does NOT clear Art. 5(3): consent is the only lawful basis for the device read/write where the exemption fails. (`eprivacy-cookiewet.md` §1.)
 
-**App inputs (from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest):** the SDK list (read it from the lockfile / `build.gradle`; e.g. Firebase Analytics, Crashlytics, Remote Config), default telemetry state at boot (on/off — read the init code), the consent UI (none / opt-out toggle / first-run opt-in gate), the PP wording for the analytics basis, and the store-declaration answers (Apple App Privacy / Play Data Safety). The references above work these through for the example app (`legal-guardrails.md` §8), a Firebase app that ships analytics opt-out.
+**App inputs (from the orchestrator's Step 0 fact sheet; run alone, read the project first and ask only for the rest):** the SDK list (read it from the lockfile / `build.gradle`; e.g. Firebase Analytics, Crashlytics, Remote Config), default telemetry state at boot (on/off — read the init code), the consent UI (none / opt-out toggle / first-run opt-in gate), the PP wording for the analytics basis, and the store-declaration answers (Apple App Privacy / Play Data Safety). The references above work these through for the worked example (`legal-guardrails/references/worked-example.md`), a Firebase app that ships analytics opt-out.
 
 ---
 
@@ -51,9 +51,9 @@ This skill governs **Gate 1 — device access** (ePrivacy Art. 5(3) → Tw 11.7a
 
 5. **Check the implementation (often the headline finding).** Determine which of these the app ships:
    - ❌ **Telemetry initialises before any consent** (`setAnalyticsCollectionEnabled(true)` / Crashlytics handlers active at boot, or default-ON when the toggle is unset) → 🔴 **BLOCKER** (prior-consent violation, Art. 5(3)).
-   - ❌ **Opt-OUT only** (collection on by default; Settings toggle to disable) → 🟠 **MATERIAL** → must become opt-in. *The most common pattern in indie apps, and the example app's.*
+   - ❌ **Opt-OUT only** (collection on by default; Settings toggle to disable) → 🟠 **MATERIAL** → must become opt-in. *The most common pattern in indie apps.*
    - ❌ **"Legitimate interest" claimed** in PP for analytics → 🟠/🔴 (false/over-claimed basis).
-   - ✅ **First-run opt-in gate** (boot OFF; affirmative, granular, no cookie wall; records `analyticsConsentAt`; easy withdrawal) → 🟢 OK.
+   - ✅ **First-run opt-in gate** (boot OFF; affirmative, granular, no cookie wall; records the consent with a timestamp; easy withdrawal) → 🟢 OK.
    - **iOS kill-switch key.** The iOS Info.plist must use the documented key `FIREBASE_ANALYTICS_COLLECTION_ENABLED` (or `FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED`). Any other spelling (e.g. `FirebaseAnalyticsCollectionEnabled`) may not be recognised, so native Analytics could log `first_open` before Dart applies the kill switch → a hard condition: confirm on a device that nothing is logged before consent; if something is, it is telemetry before consent (🔴 above) `[verify — on a device]`. `[settled — Firebase Analytics config (Apple platforms), verified 2026-11-19]`
 
 6. **Validate the consent mechanics** (if a gate exists) against `eprivacy-cookiewet.md` §4 / `gdpr-articles.md` Art. 7: **prior** (no telemetry before the click), **affirmative** (no pre-ticked box, no "by continuing"), **freely given** (no cookie wall — declining must not block the app), **granular / unbundled** (separate from the 16+ age checkbox and the paywall withdrawal-waiver checkbox — AP G2 separate-consent-per-data-type), **reject as easy as accept** (no asymmetric buttons), **withdrawable** as easily as granted (Art. 7(3); Settings → Data & privacy), **informed** (names Google/Firebase, the events/identifiers, the purpose), and **recorded** (timestamp + wording version, Art. 7(1)).
@@ -95,7 +95,7 @@ await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(consented);
 // Separate surface from the 16+ age checkbox and the paywall withdrawal-waiver checkbox.
 Future<void> grantTelemetryConsent() async {
   await prefs.setBool('analyticsConsent', true);
-  await prefs.setString('analyticsConsentAt', DateTime.now().toIso8601String()); // Art. 7(1) record
+  await prefs.setString('analyticsConsentTime', DateTime.now().toIso8601String()); // Art. 7(1) record
   await prefs.setString('analyticsConsentVersion', kTelemetryConsentVersion);    // wording shown
   await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
@@ -109,7 +109,7 @@ Future<void> withdrawTelemetryConsent() async {
 }
 ```
 
-If the app already applies a persisted toggle at boot before the Crashlytics handlers (as the example app does), the fix is to make the **default-when-unset OFF** and add the **first-run gate**, not merely an opt-out toggle.
+If the app already applies a persisted toggle at boot before the Crashlytics handlers, the fix is to make the **default-when-unset OFF** and add the **first-run gate**, not merely an opt-out toggle.
 
 ---
 
@@ -143,4 +143,4 @@ End with the `legal-guardrails` §5 review footer. **Give a firm ruling**, each 
 
 **Jurisdiction (`legal-guardrails.md` §9):** outside the Netherlands and the EU this ruling is not given. In EU states other than the Netherlands it rests on ePrivacy Art. 5(3) and GDPR Arts. 6–7; the Tw 11.7a and AP-guidance points are 🟡 notes only.
 
-**Typical headline for an app that ships Firebase telemetry opt-out (the example app's case):** `[COOK-1] 🟠 Firebase Analytics/Crashlytics ship opt-OUT (default-ON, legitimate-interest framing) — NL requires prior opt-in` → **FIX FIRST**.
+**Typical headline for an app that ships Firebase telemetry opt-out:** `[COOK-1] 🟠 Firebase Analytics/Crashlytics ship opt-OUT (default-ON, legitimate-interest framing) — NL requires prior opt-in` → **FIX FIRST**.

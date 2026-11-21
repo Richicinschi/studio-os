@@ -1,13 +1,13 @@
 # Remote Config on iOS
 
-Read the iOS part of `firebase-basics` and the `xcode-project-setup` skill first.
+Read the iOS part of `firebase-basics` first. Every Xcode step below is done by hand in Xcode.
 
 ## Project and app
 
 1. Read the bundle ID from `PRODUCT_BUNDLE_IDENTIFIER` in the `.pbxproj` file, or from `Info.plist`.
 2. No Firebase project yet? Make one with the CLI subcommand `projects:create`, passing a new project ID and a `--display-name`.
 3. Register the iOS app with the subcommand `apps:create`, giving platform `IOS` and the bundle ID from step 1.
-4. Fetch `GoogleService-Info.plist` and link it into the Xcode target with the script from `xcode-project-setup`.
+4. Fetch the config with `npx firebase-tools@15.36.0 apps:sdkconfig IOS <app-id>` and save it as `GoogleService-Info.plist` in the Xcode project folder, without any non-XML lines the CLI printed above the plist. In Xcode, drag the file into the project navigator with the main app target ticked: a file that only sits in the folder is not linked.
 
 ## Packages
 

@@ -14,7 +14,7 @@ Typical wordings: "set up translations", "add l10n to this app", "make the strin
 - Plurals, placeholders and gendered text: see [formatting patterns](flutter-setup-localization/formatting.md).
 - Layout that breaks with longer translated text: that is layout work, use the responsive layout or layout-fix skills of this pack.
 
-Studio rule: the studio ships English only. Adding a second language is a deliberate milestone, and it needs professionally reviewed text. Do not add machine-translated locales on your own. A project can still be set up for localization with English as the only locale.
+Ship the languages the project supports: one ARB file and one `Locale` per language. Add a language when the user asks for one.
 
 ## How it works
 
@@ -53,7 +53,7 @@ Track these four tasks as you go: dependencies, generate flag, config file, app 
      home: const HomeScreen(),
    )
    ```
-   The same two lists go into `CupertinoApp`. Add one `Locale` per ARB file you ship. Per the studio rule above, a new locale entry is a milestone, not a default.
+   The same two lists go into `CupertinoApp`. Add one `Locale` per ARB file you ship.
 
 5. **Write the strings.** Create `lib/l10n/app_en.arb` (the template). Every new key gets a description so a translator knows the context:
    ```json
@@ -88,4 +88,4 @@ If the `flutter` command is not available, make the edits by hand: add the three
 - Each key exists in every ARB file, and every placeholder name matches across files.
 - The app widget lists all four delegates and a `supportedLocales` entry for each shipped ARB file.
 - No hardcoded user-facing string was left in the widgets you touched.
-- If a new language was added: the user asked for it and the text was reviewed by a professional, per the studio rule.
+- If a new language was added: the user asked for it.

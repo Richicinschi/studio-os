@@ -98,13 +98,13 @@ Build every link with the helpers in `src/lib/urls.ts`: `serviceUrl`, `areaUrl`,
 
 ## 6. On-page SEO
 
-Titles: at most 60 characters with the brand included (a studio rule):
+Titles: at most 60 characters with the brand included (this guide's rule):
 - combo page: `<Service> in <Area>, <State> | <Brand>`
 - service page: `<Service> Services | <Brand>`
 - area page: `<Trade> in <Area>, <State> | <Brand>`
 - home: `<Brand> | <City> <State> <Trade>`
 
-Meta descriptions: 140 to 155 characters (a studio rule). Each must contain the phone number as the call to action, and must name the area and the service where the page has them. A pattern that works: "Need X in Y? Brand offers Z. Call 555-0100."
+Meta descriptions: 140 to 155 characters (this guide's rule). Each must contain the phone number as the call to action, and must name the area and the service where the page has them. A pattern that works: "Need X in Y? Brand offers Z. Call 555-0100."
 
 Every page needs: exactly one H1, a title, a description, an absolute canonical URL, Open Graph tags, a Twitter card, JSON-LD, and alt text on every image. `templates/src/components/SEO.astro` produces all the head tags; it appends the brand to a title that lacks it, builds the canonical from the request path when none is passed, and supports `noindex`. Change its `SITE_NAME` constant.
 
@@ -280,15 +280,7 @@ FAQ rules: exactly five questions per block; each question includes the area and
 
 All images are WebP. Hero images load `eager`, everything else `lazy`. Always give `width` and `height` so the layout does not jump. Alt text describes the picture and, where it fits, names the service and the area.
 
-Optional: with a Gemini key and the `nano-banana-pro` skill installed, a service picture can be generated:
-
-```bash
-python3 ~/.claude/skills/nano-banana-pro/scripts/generate_image.py \
-  --prompt "Tradesperson doing [service] in a [area] home, realistic photo, bright light" \
-  --output public/images/[service-slug].webp
-```
-
-Without it, drop in placeholder images and leave a comment saying they need replacing.
+Until the person supplies the pictures, drop in placeholder images and leave a comment saying they need replacing.
 
 ## 15. Deploy
 

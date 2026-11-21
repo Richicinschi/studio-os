@@ -25,8 +25,9 @@ Read-only: names, descriptions, settings as set or not set, and counts. No skill
 - Where plans live today, counts only: `ls docs/plans/*.md plans/*.md 2>/dev/null | wc -l`, and any plan-folder rule in `CLAUDE.md` or `AGENTS.md`.
 - The agents its execution menu names: `ls .claude/agents/ "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents/" 2>/dev/null`, file names only, looking for `bob-builder.md`, `linus-reviewer.md`, or your own builder and reviewer.
 - Whether you sign commits: `git config --get commit.gpgsign` in each repository (`true`, or nothing).
+- A skill of the same name from a plugin enabled here: run from the project folder, `claude plugin list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let l;try{l=JSON.parse(s)}catch{}if(!Array.isArray(l))return console.log("plugin check could not run");for(const p of l){const r=p.readFromFolder||p.installPath,f=r&&require("path").join(r,process.argv[1]);if(p.enabled&&f&&require("fs").existsSync(f))console.log(p.id,f)}})' skills/writing-plans/SKILL.md` prints the plugin's id and the path of each copy, and nothing else. `claude plugin list` reports which plugins are enabled for the current folder and the folder each one loads from, so a disabled plugin, a plugin installed for another repository and an old version left after an update do not count. When it prints `plugin check could not run` or an error such as `claude: command not found`, Detect says the plugin check could not run, and the item gets no plugin mark ([docs/facts.md](../docs/facts.md), "Claude Code: installed plugins and their skills").
 
-The menu marks the item **have** when a `writing-plans` skill exists at either level, **partly** when another planning skill or an instruction-file rule covers the job, and **not yet** otherwise.
+The menu marks the item **have** when a `writing-plans` skill exists at either level, **partly** when another planning skill or an instruction-file rule covers the job, and **not yet** otherwise. When nothing marks it **have** and that plugin line prints a copy, the menu says **a plugin provides one** instead of **not yet**, or **partly (a plugin provides one)** instead of **partly**, so what is missing stays in view, and it does not offer the kit's copy as a second.
 
 ## Ask
 
@@ -57,7 +58,7 @@ The menu marks the item **have** when a `writing-plans` skill exists at either l
    - the author line in the front matter, which names the studio, to yours;
    - "Save plans to": the copy uses `docs/plans/YYYY-MM-DD-<feature-name>.md`; Claude puts your folder there, or keeps that one;
    - the execution menu at the end, which names the kit's `bob-builder` (a builder subagent per task) and `linus-reviewer` (one reviewer at the end): your own agents' names, or the two roles described without names. If you take neither executor skill, the menu and the plan header's "REQUIRED SUB-SKILL" line say instead that the plan is handed back to you;
-   - the commit step, `git commit -S -m ...`, which signs: Claude keeps `-S` when you sign ([signed commits](signed-commits.md)) and drops it when you do not, because a signing commit fails without a key;
+   - the commit step, a plain `git commit -m ...`: kept as it is; it signs when you took [signed commits](signed-commits.md), which signs every commit;
    - the line that sends worktree setup to `using-git-worktrees`: kept if you take [using-git-worktrees](using-git-worktrees.md), dropped otherwise.
 
    Claude shows the result before it saves it.
@@ -84,5 +85,5 @@ If either check fails, the item is not done: the plan row stays unticked. A skil
 - **Signing:** with `-S` left in and no signing key, every commit step fails. Decide in step 2.
 - **Models:** the kit's copy leaves the model to the session, following the studio's rule that subagents keep the session's model ([module 02](../modules/02-context-and-models/README.md)). Choose your own rule.
 - **Company repositories:** a plan committed to `docs/` stays in the repository's history. Ask whether your company wants plans there before the first commit.
-- **Cost:** its description loads into every session, about 49 tokens (an estimate, bytes divided by 4, description only, as on the other cards); the full skill, about 2,600 tokens (estimate), loads only when it is used.
+- **Cost:** its description loads into every session, about 49 tokens (an estimate, bytes divided by 4, description only, as on the other cards); the body, about 2,540 tokens (estimate), loads only when it is used.
 - **Where specs come from:** [brainstorming](brainstorming.md) (the lighter design conversation) and [drill-to-plan](drill-to-plan.md) (the heavier interview) both end in an approved spec for this skill.

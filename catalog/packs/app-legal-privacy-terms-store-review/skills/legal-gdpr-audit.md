@@ -5,7 +5,7 @@ description: >-
   not the prose) for an EU/NL mobile app. Runs six determinations: (1) the lawful-basis selector —
   one Art. 6 basis per purpose (core delivery = 6(1)(b); Firebase Analytics + Crashlytics = CONSENT
   6(1)(a) NOT legitimate interest, ePrivacy/cookiewet bites first; fiscal = 6(1)(c)); (2) the Art. 9
-  special-category (health) determination on breathing/mood/stress data; (3) the Art. 35 DPIA
+  special-category (health) determination on session/mood/stress data; (3) the Art. 35 DPIA
   threshold screen; (4) the Art. 30(5) RoPA-mandatory assertion; (5) the Art. 28 DPA-coverage check
   per processor (Google/Firebase, RevenueCat, Apple, Cloudflare); (6) the Chapter V transfer check
   (DPF cert vs SCC + TIA per US sub-processor). Reconciles against the in-repo compliance pack
@@ -37,7 +37,7 @@ on the UAVG or AP guidance are 🟡 notes.
 
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails.md` — the constitution (tiers, severity, staleness, finding/verdict format, review footer).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/method/*` — attribution-tiering, finding-format, verdict-model, disclosure-grading.
-- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md` — **the backbone**: Art. 6/7/8/9/28/30/35 tables + the worked lawful-basis map (example app) + the adjudication cheat-sheet.
+- `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md` — **the backbone**: Art. 6/7/8/9/28/30/35 tables + the worked lawful-basis map (worked example) + the adjudication cheat-sheet.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/transfers-dpf-scc.md` — Chapter V, DPF adequacy, 2021 SCCs, TIA, per-recipient register.
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/nl-eu-law/ap-guidance.md` — Autoriteit Persoonsgegevens positions (incl. the GA4 opt-in line, the AP DPIA blacklist).
 - `app-legal-privacy-terms-store-review/skills/legal-guardrails/references/taxonomy/sdk-data-map.md` — which SDK egresses which data category (feeds the Art. 9 scan + the per-processor transfer check).
@@ -53,11 +53,8 @@ verification log, LIA, retention schedule, SDK privacy inventory, DPO-not-requir
 check below names one of these files (e.g. `ropa.md`), read the project's own equivalent; a
 missing record is itself a finding.
 
-The determinations below show the **example app** (`legal-guardrails.md` §8) as the worked case:
-Dutch eenmanszaak (sole controller, no employees, no DPO); Firebase (Auth, Firestore, Analytics,
-Crashlytics, Cloud Functions, Hosting; `europe-west`) + RevenueCat + Apple/Google as merchants of
-record; no medical claims; free tier on-device only, paid tier Firestore sync. Re-run each one on
-the person's facts.
+The determinations below show the worked example (`legal-guardrails/references/worked-example.md`
+§1) as the worked case. Re-run each one on the person's facts.
 
 `skill-id` for findings = **`GDPR`** (per `method/finding-format.md`).
 
@@ -69,7 +66,7 @@ the person's facts.
 
 Build the purpose→basis table from the actual data model + the Privacy Policy's data section, then
 check it against the **worked lawful-basis map** in `gdpr-articles.md` (Art. 6 section). The model
-answer for the example app (add a row for every purpose the person's app has that it lacks):
+answer for the worked example (add a row for every purpose the person's app has that it lacks):
 
 | Purpose | Correct basis |
 |---|---|
@@ -121,7 +118,7 @@ Per `gdpr-articles.md` §Art. 9 + the **Privado adversarial test** (re-authored,
 
 Walk **Art. 35(3)(a)/(b)/(c)** (the DPIA-Sentinel routing, re-authored — see Sources):
 - (a) systematic + extensive **automated evaluation/profiling** with legal-or-similar effect →
-  an app that makes **no** such decisions (Art. 22 N/A, as for the example app) → **fails (a)**.
+  an app that makes **no** such decisions (Art. 22 N/A) → **fails (a)**.
 - (b) **large-scale Art. 9** processing → only if Step 2 found inference; with the no-inference
   posture → **fails (b)**.
 - (c) **systematic monitoring of a publicly accessible area** → N/A → **fails (c)**.

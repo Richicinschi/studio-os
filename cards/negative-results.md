@@ -91,5 +91,5 @@ If Claude plans the retry without naming the entry, the item is not done: the pl
 - **Never soften a no.** If the honest answer is "nothing survived", that is the answer. A finding softened to look better cannot be checked.
 - **Keep a superseded claim word for word.** Rewriting it loses what was believed and why; the studio keeps the old entry, marked, beside the new one ([nothing freed by loss](../PRINCIPLES.md#nothing-freed-by-loss)).
 - **Tuning a failed run until it passes,** and reporting only the pass, turns the criteria into decoration. A new attempt gets its own criteria, written first.
-- **Token cost:** the rule loads every session. The starting-point line was 344 bytes, about 86 tokens (estimate, bytes divided by 4). The list loads only when Claude opens it, which the rule asks for before each new experiment.
+- **Token cost:** the rule loads every session. The starting-point line was about 86 tokens every session (estimate, bytes divided by 4). The list loads only when Claude opens it, which the rule asks for before each new experiment.
 - **claude.ai:** keep `ruled-out.md` in the Project's knowledge, and start each new experiment chat by asking Claude to read it and name the entries that touch the idea.

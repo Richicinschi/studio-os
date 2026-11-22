@@ -4,7 +4,7 @@ description: "Use when writing or hardening a Dockerfile, docker-compose file or
 metadata:
   category: backend
   author: Richicinschi
-  domain: container images and compose files for production, kept ready for the SaaS ventures
+  domain: container images and compose files for production
 ---
 
 # Production Docker

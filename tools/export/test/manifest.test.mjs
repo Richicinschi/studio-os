@@ -115,3 +115,24 @@ test('the licence line takes copyright notices only, never legal text that menti
     assert.equal(readSkillMeta(path.join(hub, '.claude', 'skills', 'beta')).licenceLine, 'Copyright 2025 Someone; © 2024 Other');
   } finally { rmSync(hub, { recursive: true, force: true }); }
 });
+
+// ---- the kit's version: package.json carries the version the export writes into export.manifest.json
+import { mkdtempSync } from 'node:fs';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+import { versionMismatch } from '../manifest.mjs';
+
+test('a package.json version other than the manifest version is reported, naming both', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'kit-version-'));
+  try {
+    writeFileSync(path.join(root, 'export.manifest.json'), JSON.stringify({ version: '3.4.0' }));
+    writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'x', version: '3.1.1' }));
+    assert.equal(versionMismatch(root), 'package.json says 3.1.1 and export.manifest.json says 3.4.0: set package.json\'s version to the release');
+    writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'x', version: '3.4.0' }));
+    assert.equal(versionMismatch(root), null);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the kit\'s package.json carries the version of its export.manifest.json', () => {
+  assert.equal(versionMismatch(fileURLToPath(new URL('../../../', import.meta.url))), null);
+});

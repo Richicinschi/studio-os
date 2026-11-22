@@ -19,7 +19,7 @@ tokens:
 
 ## Detect
 
-Read-only, for each repository in `adoption/inventory.md`. Manifests and CI workflow files may be read; nothing else is opened, and no test is run.
+Read-only, for each repository in `adoption/inventory.md`. Manifests and CI workflow files may be read; nothing else is opened, and no test is run. In the adoption's audit (phase 1), they stay closed: what they name comes from the audit script's output.
 
 - A verify script already: `ls <repo>/verify.sh <repo>/tools/verify.sh <repo>/scripts/verify.sh 2>/dev/null`.
 - The test and lint commands the repository already names, names only:

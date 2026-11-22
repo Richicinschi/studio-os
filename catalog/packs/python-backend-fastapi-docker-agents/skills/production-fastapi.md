@@ -4,7 +4,7 @@ description: "Production FastAPI: structured logging, health checks, graceful sh
 metadata:
   category: backend
   author: Richicinschi
-  domain: backend / production FastAPI patterns (logging, health, shutdown, Pydantic v2, security), kept ready for the SaaS ventures
+  domain: backend / production FastAPI patterns (logging, health, shutdown, Pydantic v2, security)
 ---
 
 # Production FastAPI

@@ -124,3 +124,25 @@ test('lintKit lints every card', () => {
     assert.deepEqual(lintKit(root), ['cards/handoff.md: missing heading "## Steps"']);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('lintKit fails on a literal byte-order mark (EF BB BF) under tools/, templates/ or .claude/; catalog/ and local files are not read', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'kit-lint-'));
+  const w = (rel, t) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), t); };
+  const BOM = '\uFEFF';
+  try {
+    w('START-HERE.md', '# Start here\n\n### Windows\nx\n\n### macOS\nx\n\n### Linux\nx\n'); w('ADOPT.md', 'x'); w('CHANGELOG.md', 'x'); w('export.manifest.json', '{}');
+    w('tools/export/x.mjs', `// one\nconst re = /^${BOM}?---/;\n`);
+    w('tools/export/escaped.mjs', 'const re = /^\\uFEFF?---/;\n');
+    w('templates/rules/a.md', `${BOM}# A rule\n`);
+    w('.claude/hooks/h.mjs', `a\nb\n'${BOM}' + '${BOM}'\n`);
+    w('catalog/packs/p/skills/robots_check.py', `# ${BOM}\n`);
+    w('tools/export/privacy.local.txt', `${BOM}term\n`);
+    w('templates/git-hooks/never-share.local.txt', `${BOM}term\n`);
+    w('docs/notes.md', `${BOM}# Notes\n`);
+    assert.deepEqual(lintKit(root), [
+      '.claude/hooks/h.mjs:3 a literal byte-order mark (bytes EF BB BF); remove it, or in code write the escape \\uFEFF',
+      'templates/rules/a.md:1 a literal byte-order mark (bytes EF BB BF); remove it, or in code write the escape \\uFEFF',
+      'tools/export/x.mjs:2 a literal byte-order mark (bytes EF BB BF); remove it, or in code write the escape \\uFEFF',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

@@ -728,7 +728,7 @@ test('session-start-status: guards are found in settings.local.json in shell for
     // Saved with a byte-order mark, as Windows PowerShell 5.1 writes UTF-8.
     const user = writeScript(path.join(s.dir, 'user-hooks/block-dangerous-git.mjs'), ALLOWS);
     mkdirSync(s.config);
-    writeFileSync(path.join(s.config, 'settings.json'), `﻿${JSON.stringify(preToolUse(execHook(posix(user))))}`);
+    writeFileSync(path.join(s.config, 'settings.json'), `\uFEFF${JSON.stringify(preToolUse(execHook(posix(user))))}`);
     const home = writeScript(path.join(s.home, '.claude/hooks/git-guardrails/block-dangerous-git.mjs'), ALLOWS);
     writeJson(path.join(s.home, '.claude/settings.json'), preToolUse(shellHook('node ~/.claude/hooks/git-guardrails/block-dangerous-git.mjs')));
     const run = (extra = {}) => s.run(START, setup, '', { CLAUDE_PROJECT_DIR: setup, ...extra });

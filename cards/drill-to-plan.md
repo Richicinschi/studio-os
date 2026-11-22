@@ -52,7 +52,7 @@ The menu marks the item **have** when a `drill-to-plan` skill exists at either l
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/drill-to-plan/`: scans it with SkillSpector (`skillspector scan catalog/skills/drill-to-plan --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is prose, a spec template and a question bank, with no scripts; the kit's own scan of 2026-11-02 rated it `SAFE`, and your scan of your copy is still the gate. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
+1. **Claude:** runs `vet-and-adopt` on the kit's copy, `catalog/skills/drill-to-plan/`: scans it with SkillSpector (`skillspector scan catalog/skills/drill-to-plan --no-llm`; on Windows, `PYTHONUTF8=1` first, as docs/facts.md shows) and triages each finding with you. It is prose, a spec template and a question bank, with no scripts; the kit's own scan with SkillSpector v2.13.6, on 2026-11-21, rated it `SAFE` at 0/100 with no findings, and your scan of your copy is still the gate. Then it recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found.
 2. **Claude:** on your yes, writes the copy into the scope you chose and replaces the studio-specific parts (module 03 marks them):
    - the project folders it explores first, which name the studio's own projects and its project registry: "the repository you are in", or your projects;
    - where it saves specs, which are the studio's project folders and a dated file in `docs/specs/`: your folder;

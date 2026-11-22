@@ -5,12 +5,16 @@ on:
     branches: [main, 'release/**']
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'
 
 permissions:
   contents: read
 
 jobs:
+  # The weekly schedule is for the scan job alone; the tests run on pushes, pull requests and manual runs.
   test:
+    if: github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
@@ -23,3 +27,28 @@ jobs:
           node-version: 22
       - run: npm test
       - run: npm run lint
+
+  # Rescans every gated item with the pinned SkillSpector and compares the findings with tools/export/scans.json.
+  # Not on pull requests or pushes to main: only release branches, a manual run and the weekly schedule.
+  # A red weekly run means re-triage (a new CVE or rule hit), not flaky CI; see docs/MAINTAINING.md.
+  scan:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # No token left in the checkout: this job installs and runs third-party Python.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      # SkillSpector v2.13.6, pinned by commit as in tools/export/scanner.json.
+      - run: pip install "skillspector @ git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da"
+      - run: pip freeze
+      - run: node tools/export/scan.mjs --check
+        env:
+          PYTHONUTF8: '1'

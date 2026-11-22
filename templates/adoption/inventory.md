@@ -1,6 +1,8 @@
 # Inventory
 
-Written by `drill-to-adopt`'s discovery, read-only, on <YYYY-MM-DD>. Only manifests and instruction files were read; secrets and data files are counted, never opened.
+Written by `drill-to-adopt`'s discovery, read-only, on <YYYY-MM-DD>. Secrets and data files are listed by name and counted, never opened.
+
+The script `node tools/audit.mjs`, run from the kit, fills Stack, File types (top 15), Repositories, Existing Claude setup, Hooks and Present but not opened, and the Kind, Name, Scope and What it does columns of Already installed, for the setup folder: names only, never values. Claude fills the rest (profiles, the user-level rows and plugins, the last three columns of Already installed, and the sections from What loads into every session today on) without opening the files the script reads.
 
 **Setup folder:** <path> · **Looked at:** <the whole folder / one subfolder> · **Starting point:** <empty / existing work / existing Claude setup>
 
@@ -38,7 +40,7 @@ profiles: <data / ml / software / general, inferred from manifests and file type
 |---|---|
 
 ## Present but not opened
-<Secret-looking files and data files: their kind and how many, nothing else.>
+<Secret-looking files and data files: their kind, how many, and up to 10 of their paths, as the script prints them; never their contents. An inventory from before the script has the kind and how many only.>
 
 ## What loads into every session today
 | What | Size | Tokens (estimate) |
@@ -48,7 +50,7 @@ profiles: <data / ml / software / general, inferred from manifests and file type
 | Agent descriptions (<N> agents) | | |
 | **Total** | | |
 
-<An estimate: file sizes divided by 4. Type `/context` in Claude Code to see the live breakdown.>
+<An estimate: file sizes divided by 4. Type `/context` in Claude Code to see the live breakdown. When the audit script ran, files imported with `@` are not counted in the first row, since finding them means opening the instruction files; an inventory from before the script counted them.>
 
 ## What the kit covers
 | Your work or tool | Covered / partly / not covered | Kit module or item |

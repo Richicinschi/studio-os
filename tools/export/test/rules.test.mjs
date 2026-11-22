@@ -90,9 +90,9 @@ test('the deny list is required, must not be empty, and must be UTF-8', () => {
     assert.throws(() => loadDenyList(path.join(dir, 'missing.txt')), /deny list missing/);
     writeFileSync(path.join(dir, 'empty.txt'), '# only a comment\n\n');
     assert.throws(() => loadDenyList(path.join(dir, 'empty.txt')), /deny list is empty/);
-    writeFileSync(path.join(dir, 'list.txt'), '﻿# people\nZorblat Quenlin\n\nacme-corp\n');
+    writeFileSync(path.join(dir, 'list.txt'), '\uFEFF# people\nZorblat Quenlin\n\nacme-corp\n');
     assert.deepEqual(loadDenyList(path.join(dir, 'list.txt')), ['Zorblat Quenlin', 'acme-corp']);
-    writeFileSync(path.join(dir, 'wide.txt'), Buffer.from('﻿Zorblat\n', 'utf16le'));
+    writeFileSync(path.join(dir, 'wide.txt'), Buffer.from('\uFEFFZorblat\n', 'utf16le'));
     assert.throws(() => loadDenyList(path.join(dir, 'wide.txt')), /must be UTF-8/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -114,7 +114,7 @@ test('local rewrites are required; each entry needs file, phrase or pattern, rep
     const { gone, ...noGone } = entry;
     writeFileSync(f, JSON.stringify([entry, noGone, { ...entry, pattern: 'Zorblat' }]));
     assert.throws(() => loadLocalRewrites(f), (e) => /entry 2, 3 in/.test(e.message) && !/Zorblat/.test(e.message));
-    writeFileSync(f, `﻿${JSON.stringify([entry])}`);
+    writeFileSync(f, `\uFEFF${JSON.stringify([entry])}`);
     assert.deepEqual(loadLocalRewrites(f), [{ ...entry, localIndex: 1 }]);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -194,7 +194,7 @@ test('text is decided by content: UTF-8 without NUL bytes; known binary types pa
   assert.equal(fileKind('a/main.py.template', Buffer.from('x = 1\n')), 'text');
   assert.equal(fileKind('a/LICENSE', Buffer.from('MIT\n')), 'text');
   assert.equal(fileKind('a/logo.png', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0xff])), 'binary');
-  assert.equal(fileKind('a/notes.md', Buffer.from('﻿hi', 'utf16le')), 'unknown');
+  assert.equal(fileKind('a/notes.md', Buffer.from('\uFEFFhi', 'utf16le')), 'unknown');
   assert.equal(fileKind('a/blob.dat', Buffer.from([0xff, 0xfe, 0x00])), 'unknown');
 });
 
@@ -280,7 +280,7 @@ test(`${ONLY} markers left over: a misspelt marker in its comment form is found 
   assert.deepEqual(findStudioMarkers('studio only, not in this kit\n<!-- studio notes -->\n'), []);
 });
 
-const MARKERS = ['the hub', 'hard rule', 'studio rule', 'this machine', 'his yes', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8'];
+const MARKERS = ['the hub', 'hard rule', 'studio rule', 'studio hub', 'this machine', 'his yes', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8'];
 const marker = (m, line) => ({ line, reason: `studio marker "${m}"` });
 const CARD = 'catalog/skills/x/SKILL.md';
 
@@ -299,6 +299,23 @@ test('studio markers: G6 is found, g6, G60, PG6, G6a, G0 and G9 are not; nor is 
   assert.deepEqual(findMarkers('see G6.\n(g6)\n(G6)\n', CARD), [marker('G6', 1), marker('G6', 3)]);
   assert.deepEqual(findMarkers('G60 PG6 G6a G0 G9 G6_x\n', CARD), []);
   assert.deepEqual(findMarkers('bathe hub, the hubris, othis machine, this machinery, his yesterday, hard ruler\n', CARD), []);
+});
+
+// Task 6 review, M2: "the studio hub's shared root checkout" shipped past the list, which knew only "the hub".
+test('studio markers: "studio hub" and the possessive forms are found, with a straight or a curly apostrophe', () => {
+  const text = [
+    'Never clean in the studio hub\'s shared root checkout.',
+    'The studio hub keeps it.',
+    'studio hubs differ',
+    'the hub\'s root',
+    'the hub’s root',
+    'the studio hub’s root',
+    'a studio hubcap, the hubris',
+  ].join('\n');
+  assert.deepEqual(findMarkers(text, CARD), [
+    marker('studio hub', 1), marker('studio hub', 2), marker('studio hub', 3),
+    marker('the hub', 4), marker('the hub', 5), marker('studio hub', 6),
+  ]);
 });
 
 test('studio markers: a "Hard rules" heading is found (a false hit goes on the allow-list, not out of the rule)', () => {

@@ -1,27 +1,18 @@
 // tools/export/changelog.mjs
 // What changed between exports (per catalog item), the changelog section, and the staleness report
 // for hand-written pages (hub sources changed since the last export; facts older than 90 days).
-import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseFrontmatter } from './frontmatter.mjs';
 import { walkFiles } from './gates.mjs';
+import { hashItem } from './item-hash.mjs';
 
 // A SOURCE.md names the scanner version and date of its last scan; a re-scan with the same verdict is not
-// a change to the item, so only the verdict enters the hash.
-const hashable = (f, buf) => (f.endsWith('/SOURCE.md')
-  ? Buffer.from(buf.toString('utf8').replace(/^(- \*\*Last scan:\*\* \S+ \(risk [^)]*\)).*$/m, '$1'))
-  : buf);
-
-export function itemHashes(root, itemFiles) {
-  const out = {};
-  for (const [key, files] of Object.entries(itemFiles)) {
-    const h = createHash('sha256');
-    for (const f of [...files].sort()) h.update(f).update('\0').update(hashable(f, readFileSync(path.join(root, f)))).update('\0');
-    out[key] = h.digest('hex').slice(0, 16);
-  }
-  return out;
+// a change to the item, so only the verdict (and, with `findings`, the number of findings) enters the hash
+// (item-hash.mjs).
+export function itemHashes(root, itemFiles, { findings = false } = {}) {
+  return Object.fromEntries(Object.entries(itemFiles).map(([key, files]) => [key, hashItem(root, files, { findings })]));
 }
 
 export function diffItems(prev = {}, next = {}) {
@@ -30,6 +21,17 @@ export function diffItems(prev = {}, next = {}) {
     removed: Object.keys(prev).filter((k) => !(k in next)).sort(),
     changed: Object.keys(next).filter((k) => k in prev && prev[k] !== next[k]).sort(),
   };
+}
+
+// What a release lists against the previous state, and the items of the state it writes. The state says
+// how its hashes were made (`hashes`). One written before finding counts were hashed (v3.3.0 and earlier,
+// with no `hashes`) is compared in its own form: compared in the new one, every item with a finding would
+// look changed. The new state is always written in the new form, so the next release sees counts.
+export const HASHES = 'verdict+findings';
+export function releaseDiff(root, itemFiles, prev) {
+  const items = itemHashes(root, itemFiles, { findings: true });
+  const compare = prev?.hashes === HASHES ? items : itemHashes(root, itemFiles);
+  return { diff: diffItems(prev?.items, compare), state: { hashes: HASHES, items } };
 }
 
 // Removals recorded in the manifest (`removed`: kind, id, was, in, and a `replacedBy` domain or a `note`)

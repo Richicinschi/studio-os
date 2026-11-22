@@ -94,6 +94,8 @@ references:
   - https://code.claude.com/docs/en/plugins/loading
   - https://code.claude.com/docs/en/plugins-reference
   - https://code.claude.com/docs/en/plugins/cli-reference
+  - https://docs.github.com/en/rest/repos/rules
+  - https://docs.github.com/en/rest/actions/permissions
 ---
 
 # Facts the kit depends on
@@ -270,6 +272,38 @@ Checked on 2026-11-09. The kit does not set the sandbox up; these facts say what
 - A rebase merge on GitHub "Always updates the committer information and creates new commit SHAs", and with **Rebase and merge** "the commits in the head branch are added to the base branch without commit signature verification": GitHub creates a modified commit and "can't sign the commit on the user's behalf". The documented workaround is to rebase and merge locally, then push. ([source](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github), [source](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification))
 - `gh` "is supported for users on GitHub.com, GitHub Enterprise Cloud, and supported GitHub Enterprise Server versions"; its README names no other host. GitLab's own command line is `glab`, "an open source GitLab CLI tool". ([source](https://github.com/cli/cli), [source](https://docs.gitlab.com/cli/))
 
+## GitHub rulesets and Actions settings, tried 2026-11-21
+
+Tried on 2026-11-21 on a throwaway repository, `Richicinschi/wave3-ruleset-trial` (deleted after the trial, so the addresses in the output below no longer open), with git 2.54.0 and gh 2.92.0, before the same rules go on `studio-os`. Its workflow, `tests`, had two jobs whose checks were `test (ubuntu-latest)` (a one-entry `os` matrix, as in the kit) and `scan`, both `echo ok`. Commits were GPG-signed by config; the unsigned ones were made with `git -c commit.gpgsign=false commit`.
+
+- Rulesets on a private repository were refused on this account: `gh api -X POST repos/<owner>/<repo>/rulesets` returned HTTP 403, "Upgrade to GitHub Pro or make this repository public to enable this feature." The API page says nothing about plans. The trial went on with the repository public. ([source](https://docs.github.com/en/rest/repos/rules))
+- The branch ruleset: target `branch`, include `~DEFAULT_BRANCH`, enforcement `active`, no bypass actors, and the rules `deletion`, `non_fast_forward`, `required_status_checks` (both checks, `strict_required_status_checks_policy: false`) and `required_signatures`. Read back, it showed `current_user_can_bypass: never`. The first commit of `main` was pushed before the ruleset was made.
+- A signed commit pushed to `release/x`, its run green on both checks, then `git push origin HEAD:main`: accepted (`ecbf0d7..6aa2fa5  HEAD -> main`). Checks belong to the commit, so a run from a `release/**` push counts for `main`.
+- A new signed commit pushed straight to `main`, with no run: refused.
+
+  ```
+  remote: error: GH013: Repository rule violations found for refs/heads/main.
+  remote: Review all repository rules at https://github.com/Richicinschi/wave3-ruleset-trial/rules?ref=refs%2Fheads%2Fmain
+  remote:
+  remote: - 2 of 2 required status checks are expected.
+  remote:
+  To https://github.com/Richicinschi/wave3-ruleset-trial.git
+   ! [remote rejected] HEAD -> main (push declined due to repository rule violations)
+  error: failed to push some refs to 'https://github.com/Richicinschi/wave3-ruleset-trial.git'
+  ```
+
+- An unsigned commit whose run on `release/y` was green on both checks: refused, the rule line being `- Commits must have verified signatures.`, then `Found 1 violation:` and the commit's full id. The same commit pushed before any run got both rule lines, the checks first.
+- A signed commit whose `scan` failed on `release/z`: refused, with `- Required status check "scan" is failing.`
+- A tag ruleset (target `tag`, include `~ALL`, no bypass actors) accepted `required_signatures` next to `update`, `deletion` and `non_fast_forward`. The API page describes the rule as "Commits pushed to matching refs must have verified signatures", and that is what it checked, not the tag ([source](https://docs.github.com/en/rest/repos/rules)):
+  - on commits already on GitHub, a lightweight tag, an unsigned annotated tag and a signed annotated tag were all accepted, on a signed commit and on an unsigned one alike;
+  - a lightweight tag, an unsigned annotated tag and a signed annotated tag that each brought a new unsigned commit were refused with `- Commits must have verified signatures.`; a lightweight tag that brought a new signed commit was accepted.
+  - So a release tag, which points at the commit already on `main`, passes the rule whether the tag is signed or not; only `git verify-tag` checks the tag.
+- The first push of the signed annotated tag on a new unsigned commit was refused with a different message, `remote: error: GH006: Protected tag update failed for refs/tags/<tag>.` and `! [remote rejected] <tag> -> <tag> (protected tag hook declined)`; the same push again gave the GH013 refusal. Why: not documented as of 2026-11-21.
+- Deleting a tag under that ruleset was refused with `- Cannot delete this tag`, then `! [remote rejected] <tag> (push declined due to repository rule violations)`.
+- From a detached HEAD, git itself refuses `git push origin HEAD:release/x` when that branch is not on the remote yet ("The destination you provided is not a full refname"); `HEAD:refs/heads/release/x` works. `HEAD:main` works from a detached HEAD, because `main` is on the remote.
+- Actions settings: `gh api -X PUT repos/<owner>/<repo>/actions/permissions -F enabled=true -f allowed_actions=selected -F sha_pinning_required=true`, and `PUT repos/<owner>/<repo>/actions/permissions/selected-actions` with `{"github_owned_allowed":true,"verified_allowed":false,"patterns_allowed":[]}` sent through `--input`, each returned `204 No Content`. Read back with `GET` on the same paths: `{"enabled":true,"allowed_actions":"selected","selected_actions_url":"...","sha_pinning_required":true}` and `{"github_owned_allowed":true,"patterns_allowed":[],"verified_allowed":false}`; before, `allowed_actions` was `all` and `sha_pinning_required` was `false`. ([source](https://docs.github.com/en/rest/actions/permissions))
+- With those settings the workflow with `actions/checkout` pinned by full commit id ran green. The same workflow with `actions/checkout@v4` ended as `startup_failure`: no job ran and the commit got no checks, so `main` would refuse it as missing checks. The run page said "The action actions/checkout@v4 is not allowed in Richicinschi/wave3-ruleset-trial because all actions must be from a repository owned by Richicinschi or created by GitHub. All actions must also be pinned to a full-length commit SHA." `gh run view` said only "This run likely failed because of a workflow file issue." The message states the whole policy: `actions/checkout` is GitHub's own, so the tag is what failed it, and actions from the owner's own repositories are allowed too.
+
 ## Git: signed commits and identity per folder
 
 Checked on 2026-11-02, and run once on Windows with git 2.54.0 in a throwaway folder (a temporary key and `GIT_CONFIG_GLOBAL` pointing at a temporary file).
@@ -322,8 +356,8 @@ claude --version
 # Node.js 22
 winget install --id OpenJS.NodeJS.22 -e
 node --version
-# uv
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+# uv (without winget: the fallbacks below the blocks)
+winget install --id=astral-sh.uv -e
 uv --version
 # gitleaks
 winget install --id Gitleaks.Gitleaks -e
@@ -345,8 +379,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 \. "$HOME/.nvm/nvm.sh"
 nvm install 22
 node --version
-# uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# uv (needs Homebrew, https://brew.sh; without it: the fallbacks below the blocks)
+brew install uv
 uv --version
 # gitleaks (needs Homebrew, https://brew.sh)
 brew install gitleaks
@@ -368,8 +402,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 \. "$HOME/.nvm/nvm.sh"
 nvm install 22
 node --version
-# uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# uv (needs pipx; without it: the fallback below the blocks)
+pipx install uv
 uv --version
 # gitleaks: the release binary into ~/.local/bin (linux_arm64 on ARM machines)
 mkdir -p ~/.local/bin
@@ -384,17 +418,17 @@ gitleaks version
 - Node.js documents nvm for macOS and Linux and fnm or Chocolatey for Windows; the winget package `OpenJS.NodeJS.22` installs the current 22.x release (22.23.4 on 2026-11-02). ([source](https://nodejs.org/en/download), [source](https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/OpenJS/NodeJS/22))
 - Homebrew's `node@22` formula is keg-only (not put on the PATH), which is why macOS uses nvm here. ([source](https://github.com/Homebrew/homebrew-core/blob/main/Formula/n/node@22.rb))
 - Node.js 22 is in maintenance long-term support until 2027-04-30. ([source](https://github.com/nodejs/Release))
-- uv's installers are `curl -LsSf https://astral.sh/uv/install.sh | sh` on macOS and Linux and `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"` on Windows; `brew install uv` and `winget install --id=astral-sh.uv -e` also work. ([source](https://docs.astral.sh/uv/getting-started/installation/))
+- uv installs through a package manager: `winget install --id=astral-sh.uv -e` on Windows, `brew install uv` on macOS, or `pipx install uv` on any system with pipx. Without one, uv's own piped scripts are the fallback: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"` on Windows, `curl -LsSf https://astral.sh/uv/install.sh | sh` on macOS and Linux. This runs a script from the network before you have read it; uv's page shows how to read it first. ([source](https://docs.astral.sh/uv/getting-started/installation/))
 - gitleaks names Homebrew, Docker, Go and the release binaries; Windows gets it from the winget package `Gitleaks.Gitleaks`. The current release is v8.30.1, and its author has announced security fixes only from here on. ([source](https://github.com/gitleaks/gitleaks), [source](https://github.com/gitleaks/gitleaks/releases), [source](https://github.com/microsoft/winget-pkgs/tree/master/manifests/g/Gitleaks/Gitleaks))
 - The command that scans staged changes, as gitleaks' own pre-commit hook runs it: `gitleaks git --pre-commit --redact --staged --verbose`. ([source](https://github.com/gitleaks/gitleaks/blob/master/.pre-commit-hooks.yaml))
 - Two more of its flags: `--no-banner` ("suppress banner") and `--exit-code` ("exit code when leaks have been encountered (default 1)"). Its exit codes: 0, no leaks present; 1, leaks or error encountered; 126, unknown flag. ([source](https://github.com/gitleaks/gitleaks))
 
 ## Installing SkillSpector
 
-The same command on Windows, macOS and Linux, once uv is installed:
+The same command on Windows, macOS and Linux, once uv is installed. It installs SkillSpector v2.13.6, pinned by the full commit of its tag (`tools/export/scanner.json` holds the line the kit uses):
 
 ```text
-uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git
+uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da
 skillspector --version
 ```
 
@@ -412,11 +446,17 @@ PYTHONUTF8=1 skillspector scan <path or git URL> --no-llm
 ```
 
 - The README's install is `uv tool install git+https://github.com/NVIDIA/skillspector.git`; the package needs Python `>=3.12,<3.16`, which `--python 3.13` satisfies. ([source](https://github.com/NVIDIA/SkillSpector), [source](https://github.com/NVIDIA/SkillSpector/blob/main/pyproject.toml))
+- Release v2.13.6 was published on 2026-11-16; its tag is a lightweight tag, pointing straight at commit `e2674da339b0bddc6e565d059c0577c6d9cd25da`, "Release v2.13.6 (#1138)" (checked 2026-11-21). ([source](https://github.com/NVIDIA/SkillSpector/releases/tag/v2.13.6))
 - `PYTHONUTF8=1` turns on Python's UTF-8 mode. ([source](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONUTF8))
-- `--no-llm` runs the static scan only, with no API key and no cost; `--format json --output report.json` or `--format markdown` write a report. Scores run from 0 to 100, each with a recommendation. ([source](https://github.com/NVIDIA/SkillSpector))
-- In the JSON report the verdict is `risk_assessment.score`, `risk_assessment.severity` and `risk_assessment.recommendation` (`SAFE` when clean), as written on 2026-11-02 by the build that reports 2.2.3. ([source](https://github.com/NVIDIA/SkillSpector))
-- The newest release is v2.13.3 (2026-11-02). ([source](https://github.com/NVIDIA/SkillSpector), [source](https://github.com/NVIDIA/SkillSpector/tags))
-- Which version the kit's scans used: a build of the repository's main branch, installed with the line above before July 2026, whose `skillspector --version` reports 2.2.3. No 2.2.3 release exists: the oldest tag is v2.5.0 (2026-07-27), main's `pyproject.toml` says 2.12.0, and the newest tag is v2.13.3. The install line takes main as it is on the day, so a fresh install reports a newer version, and its scores and finding counts may differ from the numbers the kit quotes. ([source](https://github.com/NVIDIA/SkillSpector/tags), [source](https://github.com/NVIDIA/SkillSpector/blob/main/pyproject.toml))
+- `--no-llm` runs the static scan only, with no API key and no cost; `--format json` or `--format markdown` chooses the report, which the scanner prints on stdout. Scores run from 0 to 100, each with a recommendation. ([source](https://github.com/NVIDIA/SkillSpector))
+- On Windows, v2.13.6 refuses `--output`: it exits 2 with "Error: Safe file output is unsupported on this platform", and asks for stdout to be redirected to a new file outside the scanned folder instead (seen on Windows 10, 2026-11-21). So the kit reads the report from stdout on every system: `tools/export/scan.mjs` captures it, and `vet-and-adopt` pipes it straight into the kit's comparer, with no file in between: `skillspector scan <path> --no-llm --format json | node tools/scan-compare.mjs <item-key> - --root <path>`.
+- The JSON report is plain ASCII: any other character is written as a `\u` escape (seen with v2.13.6 on 2026-11-21, on a test skill whose folder name and text held accented letters and dashes). So the report passes through a pipe unchanged, including Windows PowerShell 5.1's, which hands text from one program to the next in `$OutputEncoding`, `us-ascii` there by default. A file made with `>` in Windows PowerShell 5.1 is UTF-16, which is one more reason to pipe. ([source](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_character_encoding))
+- In the JSON report written by v2.13.6 (2026-11-21): the verdict is `risk_assessment.score`, `risk_assessment.severity` and `risk_assessment.recommendation` (`SAFE` when clean); each finding is one entry of `issues`, with its rule in `id`, its place in `location.file` (relative to the scanned folder) and `location.start_line`, and its `severity`; the folder it scanned is `skill.source`, and its version `metadata.skillspector_version`, without the leading v. A single file, such as an agent, is scanned from a copy in a temporary folder, which `skill.source` names. The scanner exits 1 when the recommendation is `DO_NOT_INSTALL`, and 0 for `SAFE`. ([source](https://github.com/NVIDIA/SkillSpector))
+- Two scans of the same folder with v2.13.6 give the same report except `skill.scanned_at`, the time of the scan, and, for a single file such as an agent, `skill.source`, a temporary folder with a random name (`skillspector_` and eight characters). Seen on 2026-11-21: the kit's 48 items scanned three times in a row on Windows 10, every verdict, score and finding (rule, file, line, severity) the same each time. `tools/export/scan.mjs` records neither field. A finding of the SC4 rule can still change between two scans, because that rule asks OSV.dev for known vulnerabilities at scan time, but only in two ways: a pinned version newly matched by an advisory, or a package's first advisory. For a dependency given as a range (`"astro": "^7.4.7"`), v2.13.6 asks OSV by package name only and reports one LOW finding, "Unverifiable Dependency", at the same file and line whenever the package has any advisory in its history; a new advisory for a release inside the range leaves that finding as it was (read in the pinned release's `nodes/analyzers/static_patterns_supply_chain.py`, 2026-11-21). For those, `npm audit` on an install is the check.
+- The v2.13.6 report also says how much of each file it read (`analysis_completeness`: each file read only in part, with a reason such as `static_parse_limit`, `obfuscated_instruction_text` or `archive_member_size_limit`). A file read only in part that another file of the item links to is reported as an AE1 finding at the linking line, and an item with no finding where one of its own files was read only in part is rated `CAUTION` at 0/100 (seen 2026-11-21 on two of the kit's skills). ([source](https://github.com/NVIDIA/SkillSpector))
+- `uv tool install` with another version of a tool uv already installed replaces it, with no extra flag: uv 0.11.7 swapped one version of a small package for another this way (seen on Windows 10, 2026-11-21, in a throwaway tool folder). So the pinned line also replaces a copy of SkillSpector that uv installed at another version; a copy installed some other way stays a separate program on the `PATH`.
+- The kit pinned v2.13.6 on 2026-11-21, when it was the newest release. ([source](https://github.com/NVIDIA/SkillSpector/releases))
+- Before the pin, the install line named no version, so it took the repository's main branch as it was on the day. The scans recorded by kit releases up to v3.3.0 came from a build of main installed before July 2026, whose `skillspector --version` reports 2.2.3, a number no release carries: the oldest tag is v2.5.0 (2026-07-27). From v3.4.0, every recorded scan is made with the pinned v2.13.6, so an adopter who installs the pinned line runs the same scanner as the kit's records. The pin fixes the scanner's own code only: its Python dependencies are not pinned and are resolved on the day of the install, which is why the kit's CI `scan` job prints `pip freeze`. ([source](https://github.com/NVIDIA/SkillSpector/tags))
 
 ## Docker: a long job in a named container
 

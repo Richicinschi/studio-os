@@ -38,14 +38,14 @@ The menu marks the item **have** when a plan with ticked rows exists and your ki
 
 ## Needs
 
-- Claude Code, and the kit folder at a version whose `drill-to-adopt` has setup-check mode. An older copy is updated with `git pull` in the kit's folder.
+- Claude Code, and the kit folder at a version whose `drill-to-adopt` has setup-check mode. An older copy is updated with `git pull` in the kit's folder, then checked with `git verify-commit HEAD` there ([START-HERE](../START-HERE.md#your-first-session), "Your first session", step 1, says what a pass shows).
 - `adoption/plan.md` with ticked rows.
 - What each row's check needs: the tools in that item's Needs part, such as Node.js, git or SkillSpector. A tool missing today is itself a finding.
 
 ## Steps
 
 1. **Claude:** runs `vet-and-adopt` for this item. Nothing ships but this card: the mode is part of `drill-to-adopt`, which you already use, so there is nothing to scan. Claude compares the card with what Detect found.
-2. **you:** when Detect says your kit copy is older than the mode, update it: `! git -C <kit> pull`.
+2. **you:** when Detect says your kit copy is older than the mode, update it: `! git -C <kit> pull`, then `! git -C <kit> verify-commit HEAD`.
 3. **you:** in a terminal, start Claude Code in the kit folder with your setup added, the way you started the adoption (START-HERE, "Your first session"): `claude --add-dir "<your setup>"`. This starts Claude Code itself, so it goes in a terminal, not after `!` inside a session.
 4. **you:** say "check my setup".
 5. **Claude:** reads `adoption/plan.md`. For each ticked row it opens that item's card in the kit and runs its Check part, then reports one line per item: **pass**, **fail**, or **needs you** for a check only you can do (the first answer in a new session, a push to your server), each with the line that showed it. Whatever the plan holds, it also sends one fake force-push to each git guard (`block-dangerous-git.mjs`) that a PreToolUse entry in your settings names, as in Check step 3, and reports pass for `exit 2`, fail otherwise; it runs no other hook. It changes nothing in your setup. For a failure it says what to look at next and offers a new plan row to fix it, on your yes.

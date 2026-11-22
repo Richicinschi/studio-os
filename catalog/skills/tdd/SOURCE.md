@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone writing code that must keep working.
 - **Pack / module:** data-work / 09-data-work
-- **Last scan:** CAUTION (risk 25/100), SkillSpector v2.2.3 with --no-llm, 2026-11-19; 1 finding, read: 1 false positive ([triage](../../../tools/export/scan-triage.md#tdd-caution-25100-1-finding))
+- **Last scan:** CAUTION (risk 37/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 2 findings, all read: 2 false positives ([triage](../../../tools/export/scan-triage.md#tdd-caution-37100-2-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

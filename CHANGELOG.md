@@ -2,6 +2,19 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.4.0 (2026-11-22)
+
+- The kit now pins its scanner, SkillSpector v2.13.6, by its exact commit, and every scan it records is bound to the exact content the scan read, so a changed item shows as needing a new scan (#53).
+- Every item was scanned again with SkillSpector v2.13.6, so most items listed as changed below changed only their recorded verdict and score (each SOURCE.md links its triage); pack:design-ui-logos-slides-posters (6 findings, now 9) and pack:marketing-copy-emails-seo-signups (6, now 8) keep their verdict but have new findings, so read those if you took either. If you installed SkillSpector before this release, replace it with the pinned install line in cards/skillspector.md.
+- vet-and-adopt now scans the copy you installed, not only the kit's copy, and tools/compare-install.mjs shows how your installed copy differs from the kit's (#54).
+- The audit in drill-to-adopt now runs as a script, tools/audit.mjs, that prints names only and never opens files that hold tokens; Node.js 22 is recommended (#55).
+- SECURITY.md and START-HERE show how to check that your clone is the signed release (#56).
+- GitHub's settings on the public repository enforce the release rules: a release reaches main only when its tests have passed on Linux, Windows and macOS, its scan has passed and its commit has a verified signature, and a pushed release tag cannot be moved or deleted (#57).
+- Export and catalog leftovers are fixed: the shipped text no longer names things only the studio has, the wrangler init command is pinned to a version, and the writing-great-skills description now points to vet-and-adopt (#67).
+- Maintainers: a CI scan job runs the pinned scanner on release branches, by hand and weekly on the public repository; the release's triage gate fails every item changed since its scan; the publish steps check that the rulesets are active, push the release branch only after the count, tree, release-key and history checks, make a signed tag and check the release key before main and the tag move; dev pull requests merge on a local npm test run; the scanner gate holds every install line to the pinned commit, the names gate reads descriptions, the lint refuses literal byte-order marks, a SOURCE.md with no findings says so, and from the next release the changelog also lists an item whose finding count changed.
+
+**Changed:** `pack:android-swiftui-react-native-app-building`, `pack:app-legal-privacy-terms-store-review`, `pack:audio-video-media`, `pack:engineering-testing-performance-code-design`, `pack:games-design-prototype-playtest-assets`, `pack:godot-camera-shaders-particles-export`, `pack:marketing-plans-offers-pricing-launches`, `pack:mobile-apps-flutter-firebase`, `pack:phone-app-testing-release-and-agents`, `pack:python-backend-fastapi-docker-agents`, `pack:stock-research-backtests-trading-safety`, `pack:unity-editor-scripts-prefabs-builds`, `pack:web-api-security-login-and-graphql`, `pack:web-astro-cloudflare-gsap-performance`, `pack:web-search-and-scraping-into-files`, `skill:brainstorming`, `skill:claim-auditor`, `skill:diagnosing-bugs`, `skill:drawio-diagrams`, `skill:executing-plans`, `skill:finishing-a-development-branch`, `skill:git-cleanup`, `skill:git-guardrails`, `skill:improve`, `skill:subagent-driven-development`, `skill:tdd`, `skill:using-agent-skills`, `skill:using-git-worktrees`, `skill:writing-great-skills`
+
 ## v3.3.0 (2026-11-21)
 
 - What ships works: the fixes for public issues #45, #47, #48, #49, #51 and #52, found by running what the kit ships.

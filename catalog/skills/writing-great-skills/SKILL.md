@@ -1,7 +1,7 @@
 ---
 name: writing-great-skills
 description: >-
-  Use when authoring or editing, adapting or reviewing a Claude Code skill (SKILL.md), by principles that make it predictable. Triggers: "why isn't my skill firing", "improve this skill", "write a skill"; questions on descriptions, granularity, progressive disclosure. Pairs with vet-external-skill
+  Use when authoring or editing, adapting or reviewing a Claude Code skill (SKILL.md), by principles that make it predictable. Triggers: "why isn't my skill firing", "improve this skill", "write a skill"; questions on descriptions, granularity, progressive disclosure. Pairs with vet-and-adopt
 metadata:
   category: studio
   author: Richicinschi

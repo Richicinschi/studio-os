@@ -40,7 +40,7 @@ Start only when the user explicitly asks for it. Never start it on your own. The
 3. Never touch `main`, `master`, `develop` or anything under `release`. Filter them out by pattern in code. Do not analyze them. Do not delete them.
 4. Pick the delete flag by category (see "Which delete flag").
 5. Refuse to remove a worktree with uncommitted changes unless the user says, in so many words, that they accept losing those changes.
-6. Never switch branches, stash or clean in the studio hub's shared root checkout. Other live sessions may be using it.
+6. Never switch branches, stash or clean in a checkout that other live sessions may be using.
 
 ## Step 1. Collect
 

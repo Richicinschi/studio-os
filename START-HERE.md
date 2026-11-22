@@ -58,6 +58,10 @@ You need two things before your first session:
 - **A plan that includes Claude Code.** Claude Code runs on the Pro, Max, Ultra, Team and Enterprise plans and on the API; the free claude.ai plan does not include it ([docs/facts.md](docs/facts.md), "Models: which for what", "Installing the tools on Windows, macOS and Linux" and "Claude Code: plans, account, attribution and where session content goes"). Pro is a plan for individuals; for company work, ask your admin which plan you are on and whether Claude Code is turned on for you.
 - **Claude Code and Git on your computer:** the block for your operating system below.
 
+Recommended, a third:
+
+- **Node.js 22 or later**, needed for the audit: the drill's first phase runs a kit script with it, which reads your setup and prints names only. Without it, the drill lists file and folder names only, opens no file, and marks what it could not check, so the menu shows fewer have and partly marks. The install lines are in [Tools some items need](docs/install-reference.md#tools-some-items-need); check with `node --version`, which prints a version that starts with `v22` or higher.
+
 Run the block one line at a time, in a terminal (PowerShell on Windows). After each install, its check prints a version. If a check says the command is not found, open a new terminal and run the check again. Sources and alternatives are in `docs/facts.md`, under "Installing the tools on Windows, macOS and Linux".
 
 **On a company laptop**, an install may need admin rights, `winget` may be missing, or scripts piped from the internet (the `irm ... | iex` and `curl ... | bash` lines) may be blocked. Do not work around a block: ask your IT team to install Claude Code and Git for you, or for the company's approved way. The other installers the vendors document (a winget package on Windows, Homebrew on macOS) are in the same section of `docs/facts.md`.
@@ -95,7 +99,7 @@ claude --version
 
 On Fedora, the first line is `sudo dnf install git curl`. The later lines need `curl`, which a minimal system may not have, so the first line installs it with Git.
 
-Then get the kit and start, as "Your first session" describes. The scanner and the tools some items need come later, at their rows of your plan ([Install steps that come later](#install-steps-that-come-later)).
+Then get the kit and start, as "Your first session" describes. The scanner and the tools some items need come later, at their rows of your plan, except Node.js, which the audit needs and you may install now ([Install steps that come later](#install-steps-that-come-later)).
 
 ## Your first session
 
@@ -109,6 +113,32 @@ Plan about an hour for deciding, and more time for installing the first wave (es
    ```
 
    Expected: a new folder, `studio-os`, inside the folder you were in. The kit is public, so you need no GitHub account for this.
+
+   **Optional: check that your copy is the signed release.** The kit runs in your Claude Code session before anything in it is scanned, so it is worth knowing that what you cloned is what was published. Import the release key, then check the newest commit in the kit folder. In Git Bash, macOS and Linux (macOS and Linux need `gpg`; where it comes from: [docs/facts.md](docs/facts.md), "Git: signed commits and identity per folder"):
+
+   ```bash
+   cd "$HOME/studio-os"
+   curl -fsSL https://github.com/Richicinschi.gpg | gpg --import
+   git verify-commit HEAD
+   ```
+
+   In Windows PowerShell, with the `gpg` that comes with Git for Windows, found from `git` wherever Git is installed:
+
+   ```powershell
+   cd "$HOME/studio-os"
+   $gpg = Join-Path (Split-Path (Split-Path (Split-Path (git --exec-path)))) 'usr\bin\gpg.exe'
+   Invoke-RestMethod https://github.com/Richicinschi.gpg | & $gpg --import
+   git verify-commit HEAD
+   ```
+
+   Expected: the import prints `Total number processed: 3`, and the check prints, among its lines:
+
+   ```text
+   gpg: Good signature from "<uid>" [unknown]
+   Primary key fingerprint: 991E 1809 86B7 7CE9 9299  3AEB 2E92 6BA8 8C6D 6423
+   ```
+
+   `<uid>` stands for the key's name and email. The fingerprint must match [SECURITY.md](SECURITY.md#checking-that-your-copy-is-the-release), "Checking that your copy is the release", character for character: that address holds three keys of the same account, and only this one signs the kit. The warning that the key "is not certified with a trusted signature" is expected; it says you have not vouched for the key in gpg yourself, and the fingerprint check stands in for that. If you have marked the key as trusted, gpg leaves out the "Primary key fingerprint" line, and its "using RSA key" line shows the same fingerprint without spaces. `Can't check signature: No public key` means the key is not imported; no output at all means the commit is not signed. Another fingerprint, or no signature, means your copy is not the release: clone it again with the command above before going on. The check counts only in a clone you made yourself with that command: a copy you received any other way (a zip, a folder someone shared) is cloned again, not checked, because its `.git` folder chooses the program that checks it. A clone of a release tag is checked as SECURITY.md says, and so are `[expired]` after 2027-05-20, `BAD signature` and a revoked key. These forms assume git uses its own `gpg`. If `git config --get gpg.program` prints a program in your own clone, that setting comes from your own git configuration (a fresh clone brings none), so import the key with that program instead.
 2. **Choose where your setup lives.** Your setup holds your Claude files: the front door (the one instruction file every session reads first), memory, handoff notes and your `adoption/` record. Where it lives decides where you start Claude Code for daily work:
    - **in your work repository:** you start Claude Code in that repository, and it reads your setup there. Your company may not allow these files in a shared repository; [module 11](modules/11-workspace-layout/README.md) has a way to keep them local.
    - **in a folder of its own,** such as `~/claude-setup` (`~` is your home folder): nothing goes into your work repository. For daily work you start Claude Code in this folder and add the folder you work in with `--add-dir`. That order matters: Claude Code reads instruction files from the folder it starts in and the folders above it, and from a folder added with `--add-dir` only when a setting is on ([docs/facts.md](docs/facts.md), "Claude Code: where skills, agents and instruction files load from" and "Claude Code: context commands, subagents, extra folders").
@@ -124,7 +154,7 @@ Plan about an hour for deciding, and more time for installing the first wave (es
 
    **The first start.** Claude Code may ask you to sign in, and whether you trust the files in this folder. Sign in with the account your plan is on; on a company plan, the one your admin set up. The kit folder holds text files and the kit's three skills, and trusting it is what lets the adoption run. Then Claude Code waits for your first message. These first screens are not described in `docs/facts.md`; if you see something else, read it before you answer.
 4. **Say "Start the adoption."** Expected: Claude loads `drill-to-adopt`, and its first reply is one question: may it look around your setup folder, read-only, with the choices yes, no, or only one subfolder you name. That question tells you the drill is running. If Claude replies with anything else, say "Use the drill-to-adopt skill."
-5. **Before you answer the audit question.** The drill reads only manifests (files such as `package.json`, `pyproject.toml` or `requirements.txt` that list what a project uses), your existing Claude files and hooks, and git's state. It never opens secrets (`.env` files, keys, anything named credential or secret) or data files (`.csv`, `.parquet`, `.xlsx`, `.db`, `.sqlite`, data folders), and never reads a notebook's contents, because output cells can hold data. Everything else, SQL files and notebooks included, it only counts by type. That is a rule Claude follows, not a lock: Claude Code can read and edit every file in a folder you add ([docs/facts.md](docs/facts.md), "Claude Code: context commands, subagents, extra folders"). If a folder holds anything you must not expose, answer with one subfolder that holds none of it, or answer no; no is fine.
+5. **Before you answer the audit question.** The drill runs a script from the kit, `tools/audit.mjs`, that reads only manifests (files such as `package.json`, `pyproject.toml` or `requirements.txt` that list what a project uses), your existing Claude files and hooks, and git's state, and prints names only, never values. It never opens secrets (`.env` files, keys, anything named credential or secret) or data files (`.csv`, `.parquet`, `.xlsx`, `.db`, `.sqlite`, data folders), and never reads a notebook's contents, because output cells can hold data. Everything else, SQL files and notebooks included, it only counts by type. The script keeps those rules, and a test checks it ([SECURITY.md](SECURITY.md#enforced-by-code)). Claude itself still reads your user-level Claude folder, and later steps may read your instruction files; that, and that Claude opens none of the files the script reads, is a rule Claude follows, not a lock: Claude Code can read and edit every file in a folder you add ([docs/facts.md](docs/facts.md), "Claude Code: context commands, subagents, extra folders"). If a folder holds anything you must not expose, answer with one subfolder that holds none of it, or answer no; no is fine.
 6. **Answer one question at a time.** Besides the choices, you can type `skip` (move on and leave this one open), `why` (Claude explains the question), `coverage` (a checklist of what is covered so far), `draft` (Claude writes the spec now from what you have) or `stop`. The feature menu comes as one question: you pick from lists of choices, or, when Claude Code does not offer its multiple-choice tool, you answer a numbered checklist with the numbers you want ([docs/facts.md](docs/facts.md), "Claude Code: measuring context and asking multiple choice").
 7. **Approve the spec, then the plan.** Both land in your setup's `adoption/` folder; nothing is installed before your explicit yes. If you need to stop today, this is the place.
 8. **Install the first wave, row by row.** Row 1 is the scanner. If your setup folder is empty or new, row 2 is `setup-workspace`, which builds it from the kit's templates; if you asked for existing work to be reorganized, a later row is `setup-workspace` in its restructure mode. Each item goes through `vet-and-adopt`, the kit's skill that takes one item at a time: scan, decide, apply, check, record.
@@ -155,7 +185,7 @@ The kit folder is only for the adoption, its updates, and taking one more item l
 
 ## Install steps that come later
 
-Your plan hands you each of these at its row, on your yes, so you do not need them to start. They are on their own page, [docs/install-reference.md](docs/install-reference.md), so you can read them first or run them by hand: [Install task 1: the scanner](docs/install-reference.md#install-task-1-the-scanner), [Tools some items need](docs/install-reference.md#tools-some-items-need) (Node.js and gitleaks).
+Your plan hands you each of these at its row, on your yes, so you do not need them to start; Node.js is the exception, recommended for the audit ([Prepare](#prepare)). They are on their own page, [docs/install-reference.md](docs/install-reference.md), so you can read them first or run them by hand: [Install task 1: the scanner](docs/install-reference.md#install-task-1-the-scanner), [Tools some items need](docs/install-reference.md#tools-some-items-need) (Node.js and gitleaks).
 
 ## If you only use claude.ai
 
@@ -177,7 +207,7 @@ A skill that needs a program on your computer (`ffmpeg` for video, for example) 
 
 ## When the kit changes
 
-Pull the kit (`git pull` in its folder), read the top of `CHANGELOG.md`, open Claude Code in it as in step 3, and say "Update my adoption." The drill reads your `adoption/` folder and asks only about what is new or changed.
+Pull the kit (`git pull` in its folder), check it with `git verify-commit HEAD` in the same folder (the key stays imported; step 1 says what a pass shows), read the top of `CHANGELOG.md`, open Claude Code in it as in step 3, and say "Update my adoption." The drill reads your `adoption/` folder and asks only about what is new or changed.
 
 ## What is in this repo
 

@@ -71,10 +71,30 @@ test('the drill and the features template know the plugin marks, and keep partly
   for (const l of lines) assert.match(l, /<have \/ partly \/ partly \(a plugin provides one\) \/ not yet \/ a plugin provides one>/, l);
 });
 
+test('the plugin command test runs under bash, and on Windows only under Git Bash, MSYS or Cygwin, never WSL', () => {
+  assert.equal(bashSkip('win32', 'ok\nLinux\n'), 'no Git Bash', 'WSL bash answers too, as Linux');
+  assert.equal(bashSkip('win32', 'ok\nMINGW64_NT-10.0-19045\n'), false);
+  assert.equal(bashSkip('win32', 'ok\r\nMSYS_NT-10.0-19045\r\n'), false);
+  assert.equal(bashSkip('win32', 'ok\nCYGWIN_NT-10.0\n'), false);
+  assert.equal(bashSkip('win32', 'ok\n'), 'no Git Bash', 'no uname printed');
+  assert.equal(bashSkip('linux', 'ok\nLinux\n'), false);
+  assert.equal(bashSkip('darwin', 'ok\nDarwin\n'), false);
+  assert.equal(bashSkip('linux', ''), 'no bash');
+  assert.equal(bashSkip('win32', undefined), 'no bash');
+});
+
 // The command itself, run by bash with a stand-in `claude` that prints a made-up `plugin list --json`
-// over a made-up plugins tree. Skipped where no bash is found.
-const bash = spawnSync('bash', ['-c', 'echo ok'], { encoding: 'utf8' });
-test('the plugin command prints only copies from enabled plugins, where each one loads from', { skip: bash.stdout?.trim() !== 'ok' && 'no bash' }, () => {
+// over a made-up plugins tree. Skipped where no bash is found. On Windows it runs only under Git Bash
+// (or MSYS, Cygwin): WSL's bash.exe also answers `echo ok`, but WSL then holds the temporary folder, so
+// its removal throws EBUSY and hides the assertions' result.
+export function bashSkip(platform, stdout) {
+  const [ok = '', uname = ''] = String(stdout ?? '').split(/\r?\n/).map((l) => l.trim());
+  if (ok !== 'ok') return 'no bash';
+  if (platform === 'win32' && !/^(?:MINGW|MSYS|CYGWIN)/i.test(uname)) return 'no Git Bash';
+  return false;
+}
+const bash = spawnSync('bash', ['-c', 'echo ok; uname -s'], { encoding: 'utf8' });
+test('the plugin command prints only copies from enabled plugins, where each one loads from', { skip: bashSkip(process.platform, bash.stdout) }, () => {
   const home = mkdtempSync(path.join(os.tmpdir(), 'kit-plugins-'));
   const fwd = (p) => p.replace(/\\/g, '/');
   const at = (r) => path.join(home, r);

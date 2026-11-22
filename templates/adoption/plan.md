@@ -10,7 +10,7 @@ Row 1 is always the scanner, so it arrives right before the first thing it check
 
 | # | Item | Module | Route (adopt, adapt, fold, write, run) | Steps only you can do | How you will see it works | Done |
 |---|---|---|---|---|---|---|
-| 1 | skillspector: SkillSpector and the scan-first rule | 05-skills | adopt | Install uv, then SkillSpector: the `!` lines for your system in the kit's `cards/skillspector.md` | `skillspector --version` prints a version, and a scan of one kit skill prints a verdict | [ ] |
+| 1 | skillspector: SkillSpector and the scan-first rule | 05-skills | adopt | Install uv (the `!` line for your system), then SkillSpector v2.13.6 (one pinned line, the same on every system): both in the kit's `cards/skillspector.md` | `skillspector --version` prints a version, and a scan of one kit skill, handed to the kit's comparer, prints `known: N, moved: 0, reworded: 0, new: 0` and a `report:` line | [ ] |
 | 2 | setup-workspace, create mode (only in an empty folder) | 11-workspace-layout | run | none; `git init` comes as its own question afterwards | every file of the tree exists, copied from the kit's templates | [ ] |
 | 3 | scan what you already have (only when something installed was never scanned) | 05-skills | read-only | none | each installed item scanned, its result in `adoption/decisions.md`, nothing changed | [ ] |
 | 4 | handoff (<size>) | 01-continuity | adapt | <the card's you: steps> | a fresh session asked "where did we stop?" answers from your note | [ ] |

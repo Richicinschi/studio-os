@@ -12,12 +12,12 @@ const FILE = { fill: '#d5e8d4', stroke: '#82b366' };
 
 const phases = [
   { title: 'BEFORE · PREPARE', who: 'you · about 10 minutes (estimate)', c: YOU, out: 'nothing written yet', lines: [
-    '• Install Claude Code and Git', '• Clone the kit and open', '  its folder in Claude Code,', '  your setup folder added', '• Say "start the adoption"', '',
+    '• Install Claude Code, Git', '  and Node.js 22 (audit)', '• Clone the kit and open', '  its folder in Claude Code,', '  your setup folder added', '• Say "start the adoption"', '',
     'Nothing in your own setup', 'is read or touched yet.', '',
     'claude.ai only: paste the', 'kit\'s Project instructions', 'instead, and follow the', 'same phases by hand.'] },
   { title: '1 · AUDIT', who: 'Claude · read-only · about 5 min', c: CLAUDE, out: 'adoption/inventory.md', lines: [
-    '• Asks first: may I look?', '• Reads your setup the way', '  /init reads a project:', '  stack, instruction files,', '  skills, hooks, MCP servers,',
-    '  git remotes', '• Never opens secrets or', '  data files', '• Estimates what loads into', '  every session today (tokens)',
+    '• Asks first: may I look?', '• A kit script lists your', '  setup, names only: stack,', '  instruction files, skills,', '  hooks, MCP servers, git',
+    '  remote hosts', '• Never opens secrets or', '  data files', '• Estimates what loads into', '  every session today (tokens)',
     '• Lists what the kit covers,', '  partly covers, or misses'] },
   { title: '2 · DECIDE', who: 'you answer · one question at a time', c: YOU, out: 'adoption/features.md', lines: [
     '• Confirm your profile and', '  your data rules, before', '  anything that stores', '• The feature menu: tick', '  modules, then the items',

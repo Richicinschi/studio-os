@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-app-legal-privacy-terms-store-review.md](../../../cards/pack-app-legal-privacy-terms-store-review.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.2.3 with --no-llm, 2026-11-19; 27 findings, all read: 26 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#packapp-legal-privacy-terms-store-review-do_not_install-100100-27-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 83/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 38 findings, all read: 37 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#packapp-legal-privacy-terms-store-review-do_not_install-83100-38-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

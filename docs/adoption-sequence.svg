@@ -7,17 +7,18 @@
 <path d="M48,110 H252 Q260,110 260,118 V164 H40 V118 Q40,110 48,110 Z" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
 <text x="150" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">BEFORE · PREPARE</text>
 <text x="150" y="152" font-size="11" text-anchor="middle" fill="#333333">you · about 10 minutes (estimate)</text>
-<text x="52" y="190" font-size="12" fill="#222222" xml:space="preserve">• Install Claude Code and Git</text>
-<text x="52" y="207" font-size="12" fill="#222222" xml:space="preserve">• Clone the kit and open</text>
-<text x="52" y="224" font-size="12" fill="#222222" xml:space="preserve">  its folder in Claude Code,</text>
-<text x="52" y="241" font-size="12" fill="#222222" xml:space="preserve">  your setup folder added</text>
-<text x="52" y="258" font-size="12" fill="#222222" xml:space="preserve">• Say &quot;start the adoption&quot;</text>
-<text x="52" y="292" font-size="12" fill="#222222" xml:space="preserve">Nothing in your own setup</text>
-<text x="52" y="309" font-size="12" fill="#222222" xml:space="preserve">is read or touched yet.</text>
-<text x="52" y="343" font-size="12" fill="#222222" xml:space="preserve">claude.ai only: paste the</text>
-<text x="52" y="360" font-size="12" fill="#222222" xml:space="preserve">kit's Project instructions</text>
-<text x="52" y="377" font-size="12" fill="#222222" xml:space="preserve">instead, and follow the</text>
-<text x="52" y="394" font-size="12" fill="#222222" xml:space="preserve">same phases by hand.</text>
+<text x="52" y="190" font-size="12" fill="#222222" xml:space="preserve">• Install Claude Code, Git</text>
+<text x="52" y="207" font-size="12" fill="#222222" xml:space="preserve">  and Node.js 22 (audit)</text>
+<text x="52" y="224" font-size="12" fill="#222222" xml:space="preserve">• Clone the kit and open</text>
+<text x="52" y="241" font-size="12" fill="#222222" xml:space="preserve">  its folder in Claude Code,</text>
+<text x="52" y="258" font-size="12" fill="#222222" xml:space="preserve">  your setup folder added</text>
+<text x="52" y="275" font-size="12" fill="#222222" xml:space="preserve">• Say &quot;start the adoption&quot;</text>
+<text x="52" y="309" font-size="12" fill="#222222" xml:space="preserve">Nothing in your own setup</text>
+<text x="52" y="326" font-size="12" fill="#222222" xml:space="preserve">is read or touched yet.</text>
+<text x="52" y="360" font-size="12" fill="#222222" xml:space="preserve">claude.ai only: paste the</text>
+<text x="52" y="377" font-size="12" fill="#222222" xml:space="preserve">kit's Project instructions</text>
+<text x="52" y="394" font-size="12" fill="#222222" xml:space="preserve">instead, and follow the</text>
+<text x="52" y="411" font-size="12" fill="#222222" xml:space="preserve">same phases by hand.</text>
 <path d="M54,480 H234 L246,492 V526 H54 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
 <text x="150" y="507" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1a1a">nothing written yet</text>
 <line x1="260" y1="139" x2="298" y2="139" stroke="#444444" stroke-width="2" marker-end="url(#arr)"/>
@@ -26,11 +27,11 @@
 <text x="410" y="133" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">1 · AUDIT</text>
 <text x="410" y="152" font-size="11" text-anchor="middle" fill="#333333">Claude · read-only · about 5 min</text>
 <text x="312" y="190" font-size="12" fill="#222222" xml:space="preserve">• Asks first: may I look?</text>
-<text x="312" y="207" font-size="12" fill="#222222" xml:space="preserve">• Reads your setup the way</text>
-<text x="312" y="224" font-size="12" fill="#222222" xml:space="preserve">  /init reads a project:</text>
-<text x="312" y="241" font-size="12" fill="#222222" xml:space="preserve">  stack, instruction files,</text>
-<text x="312" y="258" font-size="12" fill="#222222" xml:space="preserve">  skills, hooks, MCP servers,</text>
-<text x="312" y="275" font-size="12" fill="#222222" xml:space="preserve">  git remotes</text>
+<text x="312" y="207" font-size="12" fill="#222222" xml:space="preserve">• A kit script lists your</text>
+<text x="312" y="224" font-size="12" fill="#222222" xml:space="preserve">  setup, names only: stack,</text>
+<text x="312" y="241" font-size="12" fill="#222222" xml:space="preserve">  instruction files, skills,</text>
+<text x="312" y="258" font-size="12" fill="#222222" xml:space="preserve">  hooks, MCP servers, git</text>
+<text x="312" y="275" font-size="12" fill="#222222" xml:space="preserve">  remote hosts</text>
 <text x="312" y="292" font-size="12" fill="#222222" xml:space="preserve">• Never opens secrets or</text>
 <text x="312" y="309" font-size="12" fill="#222222" xml:space="preserve">  data files</text>
 <text x="312" y="326" font-size="12" fill="#222222" xml:space="preserve">• Estimates what loads into</text>

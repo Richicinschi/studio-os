@@ -65,10 +65,10 @@ Every session for this module: about 268 tokens (estimate).
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
 | skillspector | outside tool: SkillSpector with the scan-first rule | core | A copied skill can carry a prompt injection or send data out; every later item is scanned with it before it is installed. | none | 0 |
-| writing-great-skills | skill | recommended | Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable. | description every session, body on demand (about 2,045) | 74 |
+| writing-great-skills | skill | recommended | Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable. | description every session, body on demand (about 2,045) | 73 |
 | using-agent-skills | skill | optional | Once you lose track of your skills: one router that names each skill and when to reach for it. | description every session, body on demand (about 994) | 56 |
 
-Every session for this module: about 130 tokens (estimate).
+Every session for this module: about 129 tokens (estimate).
 
 ## Git and guardrails (`06-git-and-guardrails`)
 
@@ -79,14 +79,14 @@ Every session for this module: about 130 tokens (estimate).
 | sensitive-file-deny-rules | practice: Deny rules for secret files | recommended | A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files. | none | 0 |
 | commit-and-pr-writing | practice: Commit messages and PR bodies that say why | optional; recommended for software, ml, data | A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does. | every session | 69 |
 | finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 2,230) | 33 |
-| git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | you start it by name, body on demand (about 2,581) | 0 |
+| git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | you start it by name, body on demand (about 2,575) | 0 |
 | git-identity-per-folder | practice: One git identity per folder | optional; recommended for software, ml, data | Company work committed under a personal address, or the reverse, is hard to undo; each folder picks its own address. | none | 0 |
 | grant-ledger | practice: The grant ledger for risky acts | optional; recommended for software, ml, data | One recorded yes per force-push, merge, tag or hook skip, so a vague "clean up" never covers an act you did not name. | every session | 101 |
 | merge-commit-only | practice: Merge commits only | optional; recommended for software, ml, data | A squash folds a branch into one commit and a rebase rewrites every one; a merge commit keeps the full history. | every session | 78 |
 | never-share-list | practice: A never-share list | optional; recommended for software, ml, data | Client names and internal terms leak through commits and posts; a private list the pre-commit checks refuses them first. | every session | 61 |
 | rules-audit | practice: The periodic rules audit | optional; recommended for software, ml, data | Rules drift from what enforces them; a read-only session every few months finds contradictions and gaps. | on demand | 0 |
 | signed-commits | practice: Signed commits | optional; recommended for software, ml, data | A signature proves a commit came from you; some companies require it, and a server shows signed commits as verified. | none | 0 |
-| using-git-worktrees | skill | optional; recommended for software, ml, data | Sets up a separate worktree for a branch, so parallel work never switches branches under another session. | description every session, body on demand (about 1,674) | 57 |
+| using-git-worktrees | skill | optional; recommended for software, ml, data | Sets up a separate worktree for a branch, so parallel work never switches branches under another session. | description every session, body on demand (about 1,670) | 57 |
 | worktrees | practice: One worktree per parallel session | optional; recommended for software, ml, data | Two sessions in one checkout switch branches under each other; a worktree each keeps their work apart. | none | 0 |
 
 Every session for this module: about 463 tokens (estimate).

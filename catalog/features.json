@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -346,7 +346,7 @@
           "importance": "recommended",
           "why": "Skills copied unread are the risk; this is how to write your own from tasks you repeat, short and predictable.",
           "loads": "every-session",
-          "everySessionTokens": 74,
+          "everySessionTokens": 73,
           "onDemandTokens": 2045,
           "heavy": false,
           "card": "cards/writing-great-skills.md"
@@ -457,7 +457,7 @@
           "why": "When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any.",
           "loads": "by-name",
           "everySessionTokens": 0,
-          "onDemandTokens": 2581,
+          "onDemandTokens": 2575,
           "heavy": false,
           "card": "cards/git-cleanup.md"
         },
@@ -593,7 +593,7 @@
           "why": "Sets up a separate worktree for a branch, so parallel work never switches branches under another session.",
           "loads": "every-session",
           "everySessionTokens": 57,
-          "onDemandTokens": 1674,
+          "onDemandTokens": 1670,
           "heavy": false,
           "card": "cards/using-git-worktrees.md"
         },

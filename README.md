@@ -41,7 +41,7 @@ It fits software, data and machine-learning work, and leaves out what does not f
 
 | Phase | What happens |
 |---|---|
-| **Audit** | On your yes, Claude looks at your setup, read-only. It never opens secrets or data files. |
+| **Audit** | On your yes, a script from the kit looks at your setup, read-only, and prints names only, never values. It never opens secrets or data files. |
 | **Decide** | A few questions, then a menu: each item with its value for your work and its cost in context. |
 | **Spec and plan** | What you chose, written down, with a first wave of at most about 8 items. |
 | **Install** | The first wave, item by item: scanned, applied, checked. |
@@ -60,6 +60,8 @@ claude --add-dir "$HOME/claude-setup"
 ```
 
 These lines work in bash, zsh and PowerShell, not in Windows' `cmd.exe`.
+
+Optional, after the clone: check that your copy is the signed release, as step 1 of [Your first session](START-HERE.md#your-first-session) shows.
 
 Then say **"Start the adoption."** Installing Claude Code and git, and where your setup can live: [START-HERE.md](START-HERE.md).
 

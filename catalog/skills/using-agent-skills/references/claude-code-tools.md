@@ -10,7 +10,7 @@ In a `subagent-driven-development` run the main session is the costly seat. It r
 
 ## How
 
-Do it only when the owner asks, or when he has said the session model is too pricey for coordination.
+Do it only when the owner asks, or has said the session model is too pricey for coordination.
 
 1. Start exactly one orchestrator subagent. Give it the path to the plan and tell it to run `subagent-driven-development` from the first task to the last.
 2. Put it on a mid-tier model only if the owner named that model. Otherwise it inherits the session's model, like every other subagent.

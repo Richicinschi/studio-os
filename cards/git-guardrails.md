@@ -62,7 +62,7 @@ The menu marks the item **have** when a git guard runs for every shell tool Clau
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on `catalog/skills/git-guardrails/` (version 2.0.0). The kit's recorded scan is of version 2.0.0, on 2026-11-19 ([the kit's scan triage](../tools/export/scan-triage.md#git-guardrails-do_not_install-100100-19-findings)): 19 findings, each a false positive or by design, all from the guard's job: the refused and allowed forms its text lists, the commands in its test table (`cases.json`) and the rules that match them, the test force-push its own check sends, and the settings file it writes to. Claude shows each finding with its reading and goes on only after you have read them.
+1. **Claude:** runs `vet-and-adopt` on `catalog/skills/git-guardrails/` (version 2.0.0). The kit's recorded scan is of version 2.0.0 with SkillSpector v2.13.6, on 2026-11-22 ([the kit's scan triage](../tools/export/scan-triage.md#git-guardrails-do_not_install-100100-18-findings)): DO_NOT_INSTALL, 100/100, from 18 findings, each a false positive or by design, all from the guard's job: the refused forms its text lists, the commands in its test table (`cases.json`), the test force-push its own check sends, the settings file it writes to, and the guard's own scripts and table, which the scanner read only in part (they are full of quoted commands) and the kit read in full. Claude shows each finding with its reading and goes on only after you have read them.
 2. **Claude:** copies everything in the skill's `scripts/` folder to the place you chose, `.claude/hooks/git-guardrails/` or `~/.claude/hooks/git-guardrails/`:
 
    Bash (or any POSIX shell):

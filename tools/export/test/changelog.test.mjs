@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { itemHashes, diffItems, changelogSection, prependChangelog, staleness, pageSources, CHANGELOG_HEAD } from '../changelog.mjs';
+import { itemHashes, diffItems, releaseDiff, changelogSection, prependChangelog, staleness, pageSources, CHANGELOG_HEAD } from '../changelog.mjs';
 
 function tree(files) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-cl-'));
@@ -35,6 +35,41 @@ test('a re-scan alone does not change an item: the scan date and version are lef
     assert.equal(itemHashes(root, files)['skill:a'], h1);
     writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src('REVIEW', '1.1', '2026-12-01'));
     assert.notEqual(itemHashes(root, files)['skill:a'], h1);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('a release compares finding counts too: a new count under the same verdict is a change, a re-scan with the same count is not', () => {
+  const src = (count, date) => `# a: source\n\n- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.13.6 with --no-llm, ${date}${count}\n`;
+  const counted = (n) => `; ${n} findings, all read: ${n} false positives ([triage](../../../tools/export/scan-triage.md#a))`;
+  const root = tree({ 'catalog/skills/a/SOURCE.md': src(counted(6), '2026-11-21') });
+  const files = { 'skill:a': ['catalog/skills/a/SOURCE.md'] };
+  try {
+    const first = releaseDiff(root, files, null);
+    assert.equal(first.state.hashes, 'verdict+findings');
+    assert.deepEqual(first.diff.added, ['skill:a']);
+    writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src(counted(6), '2026-12-01'));
+    assert.deepEqual(releaseDiff(root, files, first.state).diff.changed, []);
+    writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src(counted(9), '2026-12-01'));
+    assert.deepEqual(releaseDiff(root, files, first.state).diff.changed, ['skill:a']);
+    // "no findings" and no count at all are both 0.
+    writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src('; no findings ([triage](x))', '2026-12-01'));
+    const none = releaseDiff(root, files, first.state).state;
+    writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src('', '2026-12-02'));
+    assert.deepEqual(releaseDiff(root, files, none).diff.changed, []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('a previous state written before finding counts were hashed is compared in its own form, and the new state is written in the new form', () => {
+  const src = (n) => `# a: source\n\n- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.13.6 with --no-llm, 2026-11-22; ${n} findings, all read: ${n} false positives ([triage](x))\n`;
+  const root = tree({ 'catalog/skills/a/SOURCE.md': src(6) });
+  const files = { 'skill:a': ['catalog/skills/a/SOURCE.md'] };
+  try {
+    const old = { version: '3.3.0', items: itemHashes(root, files) };
+    writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src(9));
+    const r = releaseDiff(root, files, old);
+    assert.deepEqual(r.diff.changed, [], 'the old form cannot see a count, so every item would look changed if compared in the new one');
+    assert.equal(r.state.hashes, 'verdict+findings');
+    assert.notEqual(r.state.items['skill:a'], itemHashes(root, files)['skill:a']);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

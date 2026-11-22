@@ -143,34 +143,73 @@ They hold in every phase and every message: approvals, phase 4 and `vet-and-adop
 ## Phase 1: Audit (opt-in, read-only)
 
 Your first question, multiple choice: "May I look around your setup folder before I ask anything?
-Read-only: I list file types, manifests, existing Claude files and git remotes, and never open secrets
-or data files." Options: yes (recommended), no, or only one subfolder they name.
+Read-only: a script from the kit reads your setup and prints names only (file types, dependencies,
+your Claude files, git remote hosts), never a value, and never opens secrets or data files." Options:
+yes (recommended), no, or only one subfolder they name.
 
-On yes, read only:
+On yes, check Node.js first: `node --version`. With version 22 or later, run from the kit folder, on
+the folder they agreed to, then `claude plugin list` as before (without it, see "Without Node.js 22"
+below):
+
+```
+node tools/audit.mjs "<folder>"
+```
+
+What the script reads, printing names only (`tools/audit.mjs`, its header comment). Names only means
+no value from a settings or config file; skill and agent descriptions and instruction-file headings
+are free text, and it prints them as they are:
 
 - manifests: `package.json`, `pyproject.toml`, `requirements*.txt`, `environment.yml`, `Pipfile`,
-  `go.mod`, `pom.xml`, `*.csproj`, `dbt_project.yml`, `docker-compose*.yml`, CI workflow files;
-- file-type counts (the top 15 extensions, notebooks and SQL included), and BI project files by
-  extension only;
-- the existing Claude setup: `CLAUDE.md`, `AGENTS.md`, `.claude/settings*.json`, `.claude/skills/`,
-  `.claude/agents/`, `.mcp.json`;
-- other agents' instruction files: `.cursorrules`, `.github/copilot-instructions.md`;
-- git state per repository: the remote's host only (never the full URL), the branch, clean or dirty;
-- existing hooks: `.husky/`, `.pre-commit-config.yaml`, and files in `.git/hooks/` that are not
-  `.sample` files.
+  `go.mod`, `pom.xml`, `*.csproj`, `dbt_project.yml`, compose files (`docker-compose*.yml`,
+  `compose.yaml`, `compose.override.yaml`) and GitHub Actions workflows: dependency, service and job
+  names, never versions, environment values or commands;
+- file-type counts: the top 15 extensions, notebooks and SQL included;
+- the existing Claude setup: `.claude/settings*.json` (hook events and script file names, permission
+  counts, enabled plugins), `.mcp.json` (server names, transport, host only), `.claude/skills/` and
+  `.claude/agents/` (name and description from the front matter, never the body);
+- instruction files, `CLAUDE.md`, `AGENTS.md`, `.cursorrules` and `.github/copilot-instructions.md`:
+  line count and headings, never the body;
+- git state per repository: the remote's host only (never the full URL), the branch, clean or how
+  many changes;
+- existing hooks: file names in `.husky/` and in `.git/hooks/` (not `.sample` files), and the hook
+  ids in `.pre-commit-config.yaml`.
 
-Never:
+The script's rules, which hold whatever you intend:
 
-- open `.env*`, `*.pem`, `*.key`, `*credential*`, `*secret*`, `id_*`, or the data files themselves
-  (`*.csv`, `*.parquet`, `*.xlsx`, `*.db`, `*.sqlite`, data folders); note only that they exist and
-  how many;
-- go more than four levels deep, or into `node_modules/`, `.venv/`, `venv/` or build folders;
-- read more than the first 200 lines of any manifest.
+- it never opens `.env*`, `*.pem`, `*.key`, `*credential*`, `*secret*`, `id_*`, or the data files
+  themselves (`*.csv`, `*.parquet`, `*.xlsx`, `*.db`, `*.sqlite`, data folders); it lists them under
+  "Present but not opened": their kind, how many, and up to 10 paths. A skill folder or an agent file
+  named so (`secret-scanner`) is still read, for its front matter only;
+- it goes no more than four levels deep, and never into `.git/` (beyond the hook file names above),
+  `node_modules/`, `.venv/`, `venv/` or build folders;
+- it reads no more than the first 200 lines of any manifest.
 
-Then these passes, under the same rules:
+You open none of these files in this phase, in the setup folder: not to check the script, not for a
+pass below. A file it shows as "present, not parsed" stays that way in the inventory. If the script
+itself fails (Node.js 22 is there and it exits with an error), say so in one line and offer the choice
+again: another folder or subfolder, or no. Never read the files yourself instead.
 
-- **Infer their profiles**, from manifests and file-type counts only, never from a notebook's
-  contents (its output cells can hold data). More than one can apply:
+**Without Node.js 22** (`node` not found, or a version below 22): say in one line that the audit's
+script needs Node.js 22, because it reads the settings and config files so that you never open them.
+Hand over the install as a step only they can do, from `docs/install-reference.md`, "Tools some items
+need": on Windows `winget install --id OpenJS.NodeJS.22 -e`, on macOS and Linux the nvm lines there;
+then `! node --version` to check it. A Node.js installed while Claude Code runs may not be found
+until Claude Code starts again: if it is still not found, start Claude Code again in a new terminal,
+and the run resumes from `adoption/`. Until it is installed, make a names-only listing under the
+script's rules above: file and folder names and counts by extension, from a directory listing that
+opens no file, no more than four levels deep, never into the skipped folders or data folders. Never
+fall back to opening the files the script reads, and run no command that prints a value from them.
+Write the inventory sections that names can fill: File types; Present but not opened; which manifests,
+Claude files, instruction files, skills, agents and hooks are present, by name; the folders that hold a
+`.git`. Write "not checked (Node not installed)" in every cell that names alone cannot settle, and as
+the mark of every menu item whose Detect needs more than names. Once Node.js 22 is installed, run the
+script and write the inventory again from it.
+
+Then these passes, which need you, under the same rules:
+
+- **Infer their profiles** from the script's Stack and File types tables, and from file names (such
+  as `pubspec.yaml`, `Cargo.toml` or a `Dockerfile`), never from a file's contents or a notebook's
+  (its output cells can hold data). More than one can apply:
   - `ml`: torch, tensorflow, jax, scikit-learn, xgboost, lightgbm, transformers, mlflow, wandb or dvc
     in a manifest;
   - `data`: `dbt_project.yml`, more than a handful of `.sql` files, BI project files by extension,
@@ -180,8 +219,9 @@ Then these passes, under the same rules:
   - `general` when nothing matches.
 
   Write them as `profiles:` in `adoption/inventory.md`, with the file that suggested each.
-- **List what they already have**, at project level (`.claude/`) and at user level (`~/.claude`, or
-  `$CLAUDE_CONFIG_DIR` when it is set):
+- **List what they already have.** At project level (`.claude/`), the script's "Already installed"
+  rows. At user level (`~/.claude`, or `$CLAUDE_CONFIG_DIR` when it is set), which the script does
+  not read, and slash commands at both levels:
   - skills and agents: name and description from the front matter only, never the body;
   - plugins: name and version (`claude plugin list`);
   - slash commands and MCP servers: names and scope only, never credentials or environment values;
@@ -192,22 +232,37 @@ Then these passes, under the same rules:
   `nothing like it in the kit, keep it`. Mark each scanned yes, no or unknown (a row in an earlier
   `adoption/decisions.md` counts as yes).
 - **Estimate what loads into every session today** (whether `/context` output reaches you is not
-  documented: `docs/facts.md`, "Claude Code: measuring context and asking multiple choice"): the bytes
-  of the instruction files and every file they import with `@`, plus the `description` of every skill
-  and agent at both levels, divided by 4. Tell them `/context` shows the live breakdown; a total they
-  read you is recorded as measured. Never open a data or secret file for this.
+  documented: `docs/facts.md`, "Claude Code: measuring context and asking multiple choice"): the size
+  of each instruction file, at both levels, from a file listing (`ls -l`, or `dir` on Windows), which
+  opens no file, plus the `description` of every skill and agent at both levels, divided by 4. Files
+  they import with `@` are not counted, since finding them means reading the file: say so. Tell them
+  `/context` shows the live breakdown; a total they read you is recorded as measured. Never open a
+  data or secret file for this.
 - **Run the Detect part of every card** in `cards/`, so each menu item can be marked **have**,
   **partly** or **not yet**. Where a plugin enabled in their project brings a skill or agent of the
   same name, the mark is **a plugin provides one** in place of **not yet**, or
   **partly (a plugin provides one)** in place of **partly**, so what is missing stays in view; either
   way the kit's copy is not offered as a second. Where the card's plugin check could not run, say so
   and give no plugin mark. Detect commands print settings as set or not set, versions and counts;
-  never print a key, a credential or a file's contents.
+  never print a key, a credential or a file's contents. In this phase, a Detect step that reads a file
+  the script reads in the setup folder, or runs a command that prints values from those files (such as
+  `git remote -v`, `git config --get remote.origin.url`, or `claude mcp list` in the setup folder or
+  a repository), takes its answer from the script's output, and the file stays closed. A command that
+  prints only set or not set, a count or a version may run, such as
+  `git -C <repo> config --get core.hooksPath >/dev/null && echo set`. MCP servers: project servers
+  come from the script's rows; where a card runs `claude mcp list`, run it only in an empty temporary
+  folder (a new one in the system temp folder: `mktemp -d`, or a new folder under `$env:TEMP` on
+  Windows; never inside the setup or kit folder), so it lists user-scope servers only (and those from a plugin or a claude.ai connector), under
+  the rules for the user level: names and states, never a command, an argument or a URL. Where the
+  output cannot settle the mark (a hook's matcher, a deny rule's text, an `@` import, a local-scope
+  MCP server), say what is missing under "Kit items you already have" and give the item no mark.
 
-Write `adoption/inventory.md` in their setup from `templates/adoption/inventory.md`, every section
-filled, the starting point (empty, existing work, or an existing Claude setup) included. **Show it to
-them before any Decide question.** On no, skip the audit and ask round 1 open; the menu then shows no
-have/partly marks.
+Write `adoption/inventory.md` in their setup from `templates/adoption/inventory.md`: the script's
+sections under the same headings, with each repository's folder written relative to the setup folder;
+the user-level rows and plugins added to "Already installed", and its last three columns filled; then
+every other section, the starting point (empty, existing work, or an existing Claude setup) included.
+**Show it to them before any Decide question.** On no, skip the audit and ask round 1 open; the menu
+then shows no have/partly marks.
 
 ## Phase 2: Decide
 
@@ -475,6 +530,31 @@ Say in one line what is still needed and which phase the next run starts from.
 
 ## Update mode
 
+**The kit's signature, first.** Before step 1, run
+`git -C "<kit>" verify-commit --raw HEAD 2>&1; echo "exit $?"`. In PowerShell, run
+`$ErrorActionPreference = 'Continue'; git -C "<kit>" verify-commit --raw HEAD 2>&1 | ForEach-Object { "$_" }; "exit $LASTEXITCODE"`
+instead: in Windows PowerShell 5.1, `2>&1` turns gpg's lines into error records, which stop the
+command when `$ErrorActionPreference` is `Stop`. Report one of these five, with its line on what it
+means. `exit 0` alone is not a pass: a good signature by any imported key gives it. None of them
+stops the run; verifying stays optional, so go on with step 1 whatever it says.
+
+- **signed by the release key:** a `VALIDSIG` line whose last field is
+  `991E180986B77CE992993AEB2E926BA88C6D6423`, and no `REVKEYSIG` line. The kit's newest commit is
+  one the release key signed. With an `EXPKEYSIG` line too (after 2027-05-20), this is still the
+  outcome: the commit was signed while the key was valid; say that the key has expired.
+- **signed by another key:** a `VALIDSIG` line ending in another fingerprint, `NO_PUBKEY` with
+  another key id, or a `REVKEYSIG` line (a revoked key; not the release). The commit is not one the
+  release key signed as published: a commit made in the kit folder, or a copy from elsewhere.
+  Compare it with the public repository. For a `REVKEYSIG` line, also look for the new key's
+  announcement (`SECURITY.md`, "Checking that your copy is the release").
+- **altered:** a `BADSIG` line. The commit does not match its signature: it was changed after it
+  was signed, so it is not the release. Clone the kit again.
+- **not signed:** no output, and `exit 1`. The newest commit carries no signature: a commit made in
+  the kit folder, or a copy that is not the release.
+- **no key imported:** `NO_PUBKEY 2E926BA88C6D6423`, or git cannot start `gpg` (`cannot run` or
+  `cannot spawn`). The check could not be made; `START-HERE.md`, "Your first session", step 1, shows
+  how to import the key.
+
 1. Read their `adoption/decisions.md` (it records the kit version they adopted), their
    `adoption/features.md`, and the kit's `CHANGELOG.md`.
 2. Run the audit again (with their yes) and compare it with their last `adoption/inventory.md`: new
@@ -483,6 +563,14 @@ Say in one line what is still needed and which phase the next run starts from.
    under the same rules. Never re-ask a decided item unless the changelog says it changed.
 4. Append an "Update to vX.Y.Z" section to their spec, add rows to their plan, and continue with
    phases 4 and 5 for the new rows.
+
+**Reading the Scan column.** A row written from v3.4.0 on holds two verdicts and the script
+comparison: `kit: <verdict> <score>/100 · installed: <verdict> <score>/100 · scripts identical`, or
+`· changed: <names>`, or `· no scripts`, or an `installed:` part that is `pending` or `n/a: <why>`
+(the forms are listed in `templates/adoption/decisions.md`). An `installed: pending` row is an item
+applied but not yet checked on disk: offer to run `vet-and-adopt`'s scans after Apply. A row from
+before v3.4.0 holds one verdict, the kit copy's scan, and is still valid as it stands: read the
+verdict as the kit copy's, and never re-ask an item only because its row has one verdict.
 
 ## Scenarios this skill must handle
 

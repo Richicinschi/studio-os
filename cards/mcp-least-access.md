@@ -15,11 +15,11 @@ checked: 2026-11-02
 
 ## Detect
 
-Read-only. Server names and scopes only: never a credential, a header, an environment value or a token in a URL.
+Read-only. Server names and scopes only: never a credential, a header, an environment value or a token in a URL. In the adoption's audit (phase 1), project servers come from the audit script's output, `.mcp.json` stays closed, and `claude mcp list` runs only in an empty temporary folder (a new one in the system temp folder: `mktemp -d`, or a new folder under `$env:TEMP` on Windows; never inside your setup or the kit's folder), so it lists user-scope servers only (and those from a plugin or a claude.ai connector); a local-scope server is then not found until this item is taken.
 
 - Project scope: the names of the servers in `.mcp.json` at the root of each repository in `adoption/inventory.md`, not their settings.
 - Every scope: `claude mcp list` prints each server with its state (connected, needs authentication, failed). Claude reports names and states only; if a line shows a token in a URL or an argument, Claude says a secret is exposed there without repeating it. To print a state it has to reach each server, so Claude asks before running it; without your yes, Detect stops at `.mcp.json` and asks you which other servers you use.
-- Which scope each server is in: one named in `.mcp.json` is project scope. Local and project servers load only in their own project, and user servers in all of them ([docs/facts.md](../docs/facts.md), "Claude Code: MCP servers"), so Claude runs `claude mcp list` once more in an empty temporary folder: a server listed there too is user scope (or comes from a plugin or a claude.ai connector), and one listed only in the project and not in `.mcp.json` is local.
+- Which scope each server is in: one named in `.mcp.json` is project scope. Local and project servers load only in their own project, and user servers in all of them ([docs/facts.md](../docs/facts.md), "Claude Code: MCP servers"), so Claude runs `claude mcp list` once more in an empty temporary folder (a new one in the system temp folder: `mktemp -d`, or a new folder under `$env:TEMP` on Windows; never inside your setup or the kit's folder): a server listed there too is user scope (or comes from a plugin or a claude.ai connector), and one listed only in the project and not in `.mcp.json` is local.
 - Records: whether each server has a row in `adoption/decisions.md`, or in your own notes, naming its source, its scope and its access.
 
 The menu marks the item **have** when every server Detect finds has a recorded source, scope and access, **partly** when some do, and **not yet** when none do or there are no servers yet. With no servers, the item stays optional until you want one.
@@ -53,8 +53,9 @@ The menu marks the item **have** when every server Detect finds has a recorded s
 - Claude Code. Every `claude mcp` command here is in [docs/facts.md](../docs/facts.md), "Claude Code: MCP servers".
 - SkillSpector, for the scan of the server's source ([SkillSpector](skillspector.md)).
 - For a local server started with `npx`, Node.js; with `uvx`, uv:
-  - Windows: `! winget install --id OpenJS.NodeJS.22 -e` and `! powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`;
-  - macOS and Linux: Node.js through nvm, the lines in docs/facts.md, "Installing the tools on Windows, macOS and Linux", and `! curl -LsSf https://astral.sh/uv/install.sh | sh`.
+  - Windows: `! winget install --id OpenJS.NodeJS.22 -e` and `! winget install --id=astral-sh.uv -e`;
+  - macOS and Linux: Node.js through nvm, the lines in docs/facts.md, "Installing the tools on Windows, macOS and Linux"; uv with `! brew install uv` on macOS, or `! pipx install uv` on any system with pipx;
+  - uv without winget, Homebrew or pipx: its own piped script, on Windows `! powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`, on macOS and Linux `! curl -LsSf https://astral.sh/uv/install.sh | sh`. This runs a script from the network before you have read it.
 - An account on the system with the right to create a narrow credential, or someone who can create one for you.
 - On Team and Enterprise plans, an admin: only admins add servers there ([docs/facts.md](../docs/facts.md)).
 
@@ -74,7 +75,7 @@ The menu marks the item **have** when every server Detect finds has a recorded s
 
 ## Check
 
-1. **Claude:** `claude mcp list`. Expected: the server's name with the state connected, not "needs authentication" or "failed". For the scope: a project server's name is in `.mcp.json`; a local one is not listed when `claude mcp list` runs in an empty temporary folder; a user one is ([docs/facts.md](../docs/facts.md), "Claude Code: MCP servers").
+1. **Claude:** `claude mcp list`. Expected: the server's name with the state connected, not "needs authentication" or "failed". For the scope: a project server's name is in `.mcp.json`; a local one is not listed when `claude mcp list` runs in an empty temporary folder (a new one in the system temp folder: `mktemp -d`, or a new folder under `$env:TEMP` on Windows; never inside your setup or the kit's folder); a user one is ([docs/facts.md](../docs/facts.md), "Claude Code: MCP servers").
 2. **Claude:** `claude mcp get <name>`. Expected: the variable shown by name, `${<NAME>}`, never a value; that command shows a reference by name rather than its value ([docs/facts.md](../docs/facts.md)). A token or key in the output means a value was stored: Claude says so without repeating it, and the item is not done until the credential is replaced and the server is removed and added again with the reference.
 3. **you:** in a session, ask Claude for one read through the server, such as listing a few tables or items: it returns them. Then ask for one write you would not mind, such as creating an item named `mcp-write-check` in a test space. Expected for a read-only choice: the server or the system refuses it with a permission error. For a read-and-write choice, the same write outside the allowed project is refused.
 

@@ -142,3 +142,12 @@ export function readSkillMeta(skillDir) {
     licenceFile, licenceLine, thirdParty, upstream: upstreams[0] || null, upstreams,
   };
 }
+
+// The export writes the release version into export.manifest.json; package.json is set by hand
+// (docs/MAINTAINING.md, the release step), and npm test holds the two together.
+export function versionMismatch(root) {
+  const version = (f) => JSON.parse(readFileSync(path.join(root, f), 'utf8')).version;
+  const pkg = version('package.json');
+  const manifest = version('export.manifest.json');
+  return pkg === manifest ? null : `package.json says ${pkg} and export.manifest.json says ${manifest}: set package.json's version to the release`;
+}

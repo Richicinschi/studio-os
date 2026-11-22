@@ -3,7 +3,7 @@
 // nested maps. Enough for SKILL.md files and kit pages, with no dependency.
 
 export function splitFrontmatter(text) {
-  const m = text.match(/^﻿?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+  const m = text.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   return m ? { raw: m[1].replace(/\r\n/g, '\n'), body: text.slice(m[0].length) } : { raw: null, body: text };
 }
 

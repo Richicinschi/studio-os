@@ -2,7 +2,8 @@
 // Content lint: module pages carry their front matter and the five headings in order; adoption cards
 // their front matter and the eight headings in order; every skill folder's SKILL.md is named after its
 // folder; every catalog skill has a SOURCE.md; every front matter in a shipped Markdown file is YAML
-// that a real parser reads the way the kit's reader does.
+// that a real parser reads the way the kit's reader does; no file under tools/, templates/ or .claude/ holds
+// a literal byte-order mark.
 //   node tools/export/lint-content.mjs        # exit 1 on any error
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -108,6 +109,33 @@ export function lintKit(root) {
     ...(existsSync(cards) ? readdirSync(cards).filter((n) => n.endsWith('.md')).sort().map((n) => `cards/${n}`) : [])];
   for (const rel of voice) if (existsSync(path.join(root, rel))) errors.push(...lintBanned(rel, readFileSync(path.join(root, rel), 'utf8')));
   errors.push(...lintFrontmatterYaml(root));
+  errors.push(...lintByteOrderMarks(root));
+  return errors;
+}
+
+// A byte-order mark written into source as the raw bytes EF BB BF is invisible in an editor and lost or
+// doubled by tools that strip or add one; source writes the escape \uFEFF. Checked in every file under
+// tools/, templates/ and .claude/, one finding per line; .git, node_modules and the local-only *.local.txt
+// and *.local.json files (never committed) are skipped. catalog/ is not checked: it keeps upstream text
+// as written.
+export const BOM_DIRS = ['.claude', 'templates', 'tools'];
+const BOM = Buffer.from([0xef, 0xbb, 0xbf]);
+
+export function lintByteOrderMarks(root) {
+  const errors = [];
+  const walk = (rel) => {
+    for (const e of readdirSync(path.join(root, rel), { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
+      if (e.name === '.git' || e.name === 'node_modules') continue;
+      const r = `${rel}/${e.name}`;
+      if (e.isDirectory()) { walk(r); continue; }
+      if (/\.local\.(?:txt|json)$/.test(e.name)) continue;
+      const buf = readFileSync(path.join(root, r));
+      const lines = new Set();
+      for (let at = buf.indexOf(BOM); at >= 0; at = buf.indexOf(BOM, at + 3)) lines.add(buf.subarray(0, at).filter((b) => b === 0x0a).length + 1);
+      for (const l of lines) errors.push(`${r}:${l} a literal byte-order mark (bytes EF BB BF); remove it, or in code write the escape \\uFEFF`);
+    }
+  };
+  for (const d of BOM_DIRS) if (existsSync(path.join(root, d))) walk(d);
   return errors;
 }
 

@@ -41,7 +41,7 @@ Use wrangler whenever it can do the job; do not hand-build Cloudflare API calls.
 New project:
 
 ```bash
-npx wrangler init edge-api
+npx wrangler@4.165.0 init edge-api
 
 # or scaffold with a framework
 npx create-cloudflare@2.74.15 demo-app

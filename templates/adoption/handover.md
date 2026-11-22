@@ -39,4 +39,4 @@ Fresh-session proof, run on <YYYY-MM-DD> in a second terminal: asked "<the quest
 
 ## When the kit changes
 
-Pull the kit (`git pull` in its folder), read the top of its `CHANGELOG.md`, open Claude Code in the kit and say "Update my adoption." Only new or changed items are asked about; your answers in `adoption/features.md` and `adoption/decisions.md` stand. To take the next items from your plan's Later waves, say "next wave".
+Pull the kit (`git pull` in its folder), check it with `git verify-commit HEAD` in the same folder (the kit's `START-HERE.md`, "Your first session", step 1, says what a pass shows), read the top of its `CHANGELOG.md`, open Claude Code in the kit and say "Update my adoption." Only new or changed items are asked about; your answers in `adoption/features.md` and `adoption/decisions.md` stand. To take the next items from your plan's Later waves, say "next wave".

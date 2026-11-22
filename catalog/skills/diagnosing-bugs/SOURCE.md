@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone debugging a failure or a slowdown.
 - **Pack / module:** data-work / 09-data-work
-- **Last scan:** SAFE (risk 0/100), SkillSpector v2.2.3 with --no-llm, 2026-11-19
+- **Last scan:** CAUTION (risk 25/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 1 finding, read: 1 false positive ([triage](../../../tools/export/scan-triage.md#diagnosing-bugs-caution-25100-1-finding))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

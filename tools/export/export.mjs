@@ -18,9 +18,10 @@ import { loadManifest, hubInventory } from './manifest.mjs';
 import { loadDenyList, loadOwnerName, loadLocalRewrites, STUDIO_REWRITES } from './rules.mjs';
 import { buildKit } from './build.mjs';
 import { resolvePacks } from './packs.mjs';
-import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateRisky, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, gateStudioBlocks, gateMarkers, gateNames, gateJson, shebangFiles, isLocalOnly } from './gates.mjs';
-import { parseTriage } from './scan.mjs';
-import { itemHashes, diffItems, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
+import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateRisky, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateCards, gateTriage, gateScanner, gateStudioBlocks, gateMarkers, gateNames, gateJson, shebangFiles, isLocalOnly } from './gates.mjs';
+import { parseTriage, scanItemHashes } from './scan.mjs';
+import { isSkipped } from './item-hash.mjs';
+import { releaseDiff, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
 import { lintKit } from './lint-content.mjs';
 
 // What the build produces; only these move from the staging copy into the kit.
@@ -73,6 +74,14 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
     if (dirty) { log(`export: the hub has uncommitted changes in what the export reads; commit them, or pass --hub a clean checkout:\n${dirty}`); return 2; }
   }
 
+  // The one scanner the kit pins (version and full commit); the scanner gate holds every install line and
+  // every recorded scan to it. Without it that gate could not run, so the export refuses to start.
+  let scanner;
+  try {
+    scanner = JSON.parse(readFileSync(local('scanner.json'), 'utf8'));
+    if (typeof scanner.version !== 'string' || !/^[0-9a-f]{40}$/.test(scanner.commit)) throw new Error('needs a version and a 40-character commit');
+  } catch (e) { log(`export: tools/export/scanner.json: ${e.code === 'ENOENT' ? 'missing' : e.message}`); return 2; }
+
   const scansPath = local('scans.json');
   const scans = existsSync(scansPath) ? JSON.parse(readFileSync(scansPath, 'utf8')) : {};
   const triagePath = local('scan-triage.md');
@@ -81,7 +90,9 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
   try {
     cpSync(root, stage, { recursive: true, filter: (src) => {
       const rel = path.relative(root, src).split(path.sep).join('/');
-      return !(rel === '.git' || rel.startsWith('.git/') || rel.split('/').includes('node_modules') || isLocalOnly(rel));
+      // The same names the build and scan.mjs leave out (item-hash.mjs), so a stray .DS_Store or
+      // __pycache__ in a kit skill neither ships nor changes its hash.
+      return !(isSkipped(rel) || isLocalOnly(rel));
     } });
     // Which packs ship is computed from the hub, never flipped by hand; each withheld pack prints its skill-level reasons.
     // A release stamps its own version into the manifest, so the feature menu and the adoption the drill
@@ -107,7 +118,9 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       accounting: [...gateAccounting(stage, { written: built.written, notices: built.notices, manifest }), ...gateDiagramUrls(stage)],
       links: gateLinks(stage),
       cards: gateCards(stage, manifest),
-      triage: gateTriage({ keys: built.scanKeys, scans, triage, release: Boolean(release) }),
+      // Each item hashed as built in the stage, the content that ships, the way scan.mjs hashes the kit's copy.
+      triage: gateTriage({ keys: built.scanKeys, scans, triage, release: Boolean(release), hashes: scanItemHashes(stage) }),
+      scanner: gateScanner(stage, scanner, scans),
       ...(release ? { lint: lintKit(stage) } : {}),
     };
     let failed = 0;
@@ -149,10 +162,9 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       // The committed file, not the in-memory manifest: that one also holds the private items from the local list.
       const committed = loadManifest(path.join(root, 'export.manifest.json'));
       writeFileSync(path.join(root, 'export.manifest.json'), `${JSON.stringify({ ...committed, version: release }, null, 2)}\n`);
-      const items = itemHashes(root, built.itemFiles);
-      const diff = diffItems(prev?.items, items);
+      const { diff, state } = releaseDiff(root, built.itemFiles, prev);
       prependChangelog(path.join(root, 'CHANGELOG.md'), changelogSection(release, today, diff, notes, { removed: manifest.removed || [], shippedPacks: manifest.items.filter((it) => it.kind === 'pack' && it.status === 'shipped').map((it) => it.id) }));
-      writeFileSync(local('state.json'), `${JSON.stringify({ version: release, date: today, hubCommit: hubGit(hub, ['rev-parse', 'HEAD']), items }, null, 2)}\n`);
+      writeFileSync(local('state.json'), `${JSON.stringify({ version: release, date: today, hubCommit: hubGit(hub, ['rev-parse', 'HEAD']), ...state }, null, 2)}\n`);
       log(`released v${release}: ${diff.added.length} added, ${diff.changed.length} changed, ${diff.removed.length} removed`);
     }
     return 0;

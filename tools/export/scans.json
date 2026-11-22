@@ -1,317 +1,2027 @@
 {
   "claim-auditor": {
-    "score": 0,
-    "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 21,
+    "recommendation": "CAUTION",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "fac6ed0139be004f",
+    "findings": [
+      {
+        "rule": "AR2",
+        "file": "SKILL.md",
+        "line": 37,
+        "severity": "HIGH"
+      }
+    ]
   },
   "diagnosing-bugs": {
-    "score": 0,
-    "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 25,
+    "recommendation": "CAUTION",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "619fda6f4ef377d5",
+    "findings": [
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 177,
+        "severity": "HIGH"
+      }
+    ]
   },
   "drawio-diagrams": {
-    "score": 100,
+    "score": 57,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 8,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "3064bf97263aebe3",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 71,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE2",
+        "file": "references/autolayout.md",
+        "line": 17,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "references/style-extraction.md",
+        "line": 113,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "references/style-presets.md",
+        "line": 88,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AST4",
+        "file": "scripts/autolayout.py",
+        "line": 203,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "drill-to-plan": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "70443b803876bbf9",
+    "findings": []
   },
   "git-cleanup": {
     "score": 0,
-    "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "recommendation": "CAUTION",
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "e4c3aee741f1e557",
+    "findings": []
   },
   "git-guardrails": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 19,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "ec5a2fca47e4e50c",
+    "findings": [
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 86,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 86,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "SKILL.md",
+        "line": 115,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AS1",
+        "file": "SKILL.md",
+        "line": 123,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 142,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 142,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 143,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AS1",
+        "file": "SKILL.md",
+        "line": 168,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 184,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 185,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "SKILL.md",
+        "line": 194,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "SKILL.md",
+        "line": 200,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/cases.json",
+        "line": 3,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/cases.json",
+        "line": 12,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/cases.json",
+        "line": 26,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/cases.json",
+        "line": 28,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/cases.json",
+        "line": 94,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/cases.json",
+        "line": 161,
+        "severity": "HIGH"
+      }
+    ]
   },
   "handoff": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "7e150ceadf865906",
+    "findings": []
   },
   "improve": {
-    "score": 60,
-    "recommendation": "DO_NOT_INSTALL",
-    "findings": 3,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 32,
+    "recommendation": "CAUTION",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "0f40128cfcbe4f9c",
+    "findings": [
+      {
+        "rule": "PE3",
+        "file": "SKILL.md",
+        "line": 41,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE3",
+        "file": "references/audit-playbook.md",
+        "line": 45,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM3",
+        "file": "references/closing-the-loop.md",
+        "line": 123,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "tdd": {
-    "score": 25,
+    "score": 37,
     "recommendation": "CAUTION",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "01fec104b652850c",
+    "findings": [
+      {
+        "rule": "AR2",
+        "file": "SKILL.md",
+        "line": 136,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RA1",
+        "file": "writing-good-tests.md",
+        "line": 94,
+        "severity": "HIGH"
+      }
+    ]
   },
   "using-agent-skills": {
-    "score": 35,
+    "score": 29,
     "recommendation": "CAUTION",
-    "findings": 2,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "95b5c912f49c94f6",
+    "findings": [
+      {
+        "rule": "AS1",
+        "file": "SKILL.md",
+        "line": 13,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AS3",
+        "file": "SKILL.md",
+        "line": 13,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "writing-great-skills": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "26d738df61a27ff8",
+    "findings": []
   },
   "drill-to-adopt": {
-    "score": 10,
+    "score": 0,
     "recommendation": "SAFE",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "9e62cfa661d711e9",
+    "findings": []
   },
   "setup-workspace": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "13ec744ccc00c726",
+    "findings": []
   },
   "vet-and-adopt": {
-    "score": 20,
+    "score": 0,
     "recommendation": "SAFE",
-    "findings": 2,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "2f52c5e438f74a8e",
+    "findings": []
   },
   "brainstorming": {
-    "score": 100,
+    "score": 75,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 11,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "c1eabdb40b8d9dfc",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "scripts/start-server.sh",
+        "line": 130,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "scripts/start-server.sh",
+        "line": 130,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "scripts/start-server.sh",
+        "line": 132,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "scripts/start-server.sh",
+        "line": 134,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/stop-server.sh",
+        "line": 30,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/stop-server.sh",
+        "line": 65,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "scripts/stop-server.sh",
+        "line": 87,
+        "severity": "HIGH"
+      }
+    ]
   },
   "dispatching-parallel-agents": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "ddee93c84a1b2d52",
+    "findings": []
   },
   "executing-plans": {
-    "score": 25,
-    "recommendation": "CAUTION",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 17,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "d9dc98b9c358338e",
+    "findings": [
+      {
+        "rule": "TM1",
+        "file": "SKILL.md",
+        "line": 163,
+        "severity": "HIGH"
+      }
+    ]
   },
   "finishing-a-development-branch": {
-    "score": 25,
+    "score": 0,
     "recommendation": "CAUTION",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "33d76284f95a9235",
+    "findings": []
   },
   "receiving-code-review": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "a5e8e0889168d8c5",
+    "findings": []
   },
   "requesting-code-review": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "4bf19f990795607e",
+    "findings": []
   },
   "subagent-driven-development": {
-    "score": 25,
-    "recommendation": "CAUTION",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 17,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "790471c81369c53d",
+    "findings": [
+      {
+        "rule": "TM1",
+        "file": "SKILL.md",
+        "line": 118,
+        "severity": "HIGH"
+      }
+    ]
   },
   "using-git-worktrees": {
-    "score": 10,
+    "score": 7,
     "recommendation": "SAFE",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "6f5107c4fe6772fc",
+    "findings": [
+      {
+        "rule": "EA2",
+        "file": "SKILL.md",
+        "line": 55,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "verification-before-completion": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "29e5814c5e5a8156",
+    "findings": []
   },
   "writing-plans": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "725dcc8f31a6829a",
+    "findings": []
   },
   "pack:advisor-council-for-big-decisions": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "43412c21a6c4e4c1",
+    "findings": []
   },
   "pack:android-swiftui-react-native-app-building": {
-    "score": 10,
-    "recommendation": "SAFE",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 44,
+    "recommendation": "CAUTION",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "eb6ea633769b6682",
+    "findings": [
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 15,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 23,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 25,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 25,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 29,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 33,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 52,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 52,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 60,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/react-native-and-expo-basics.md",
+        "line": 66,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/swiftui-and-ios-review.md",
+        "line": 24,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:app-legal-privacy-terms-store-review": {
-    "score": 100,
+    "score": 83,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 27,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "7f670daf316204c5",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-analytics-consent.md",
+        "line": 48,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-analytics-consent.md",
+        "line": 57,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-apple-gate/assets/app-privacy-label-template.md",
+        "line": 75,
+        "severity": "LOW"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan.md",
+        "line": 71,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/legal-data-surface-scan.md",
+        "line": 82,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/legal-data-surface-scan/scripts/run_exodus.mjs",
+        "line": 36,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/legal-data-surface-scan/scripts/run_exodus.mjs",
+        "line": 44,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/legal-data-surface-scan/scripts/run_mobsf.mjs",
+        "line": 11,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/legal-data-surface-scan/scripts/run_mobsf.mjs",
+        "line": 45,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 11,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 51,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 67,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 83,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 86,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 86,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-data-surface-scan/scripts/scan_ios_privacy.mjs",
+        "line": 161,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/ap-guidance.md",
+        "line": 68,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/ap-guidance.md",
+        "line": 68,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/ap-guidance.md",
+        "line": 84,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-guardrails/references/nl-eu-law/eprivacy-cookiewet.md",
+        "line": 39,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/eprivacy-cookiewet.md",
+        "line": 66,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/eprivacy-cookiewet.md",
+        "line": 93,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/eprivacy-cookiewet.md",
+        "line": 109,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/nl-eu-law/gdpr-articles.md",
+        "line": 57,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-guardrails/references/nl-eu-law/transfers-dpf-scc.md",
+        "line": 34,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-guardrails/references/platform/apple-app-privacy.md",
+        "line": 65,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-guardrails/references/platform/apple-app-privacy.md",
+        "line": 65,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-guardrails/references/platform/apple-app-privacy.md",
+        "line": 211,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/platform/apple-review-guidelines.md",
+        "line": 97,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/platform/apple-review-guidelines.md",
+        "line": 155,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-guardrails/references/platform/play-policies.md",
+        "line": 52,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/platform/play-policies.md",
+        "line": 215,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/legal-guardrails/references/taxonomy/sdk-data-map.md",
+        "line": 127,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-guardrails/references/taxonomy/sdk-data-map.md",
+        "line": 129,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/legal-guardrails/references/taxonomy/sdk-data-map.md",
+        "line": 233,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/legal-signoff-orchestrator.md",
+        "line": 42,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA3",
+        "file": "skills/legal-terms-review-nl/assets/eu-safe-clauses.md",
+        "line": 95,
+        "severity": "LOW"
+      }
+    ]
   },
   "pack:audio-video-media": {
-    "score": 20,
-    "recommendation": "SAFE",
-    "findings": 2,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 72,
+    "recommendation": "DO_NOT_INSTALL",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "047ac75d456af5ed",
+    "findings": [
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 14,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/ai-video-generation.md",
+        "line": 48,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/judge-media-by-measurement.md",
+        "line": 13,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA1",
+        "file": "skills/publish-ready-media.md",
+        "line": 31,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/transcribe-recording.md",
+        "line": 19,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:dependency-supply-chain-risk-checks": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "7f0a397a70428979",
+    "findings": []
   },
   "pack:design-ui-logos-slides-posters": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 6,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "32d68b21e5350ffc",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/accessibility-review.md",
+        "line": 41,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/design-tool-bridge.md",
+        "line": 22,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA1",
+        "file": "skills/design-tool-bridge.md",
+        "line": 45,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "MP3",
+        "file": "skills/motion-design/director/motion-personality.md",
+        "line": 35,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AST4",
+        "file": "skills/motion-dev-animations/scripts/selfcheck_validator.py",
+        "line": 19,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/motion-dev-animations/scripts/validate_motion_config.py",
+        "line": 122,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "MP3",
+        "file": "skills/slide-deck.md",
+        "line": 28,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "OH3",
+        "file": "skills/template-charts-reports.md",
+        "line": 62,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:django-flask-laravel-shops-and-chat": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "ec538e885336d953",
+    "findings": []
   },
   "pack:engineering-testing-performance-code-design": {
-    "score": 25,
-    "recommendation": "CAUTION",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 12,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "520023b87f1f1180",
+    "findings": [
+      {
+        "rule": "RP1",
+        "file": "skills/browser-testing-with-devtools.md",
+        "line": 51,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/performance-optimization.md",
+        "line": 319,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/performance-optimization.md",
+        "line": 322,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:games-design-prototype-playtest-assets": {
-    "score": 13,
-    "recommendation": "SAFE",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 70,
+    "recommendation": "DO_NOT_INSTALL",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "fb9af570d0dddd7d",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 15,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 19,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/game-art-pipeline/check_art.py",
+        "line": 16,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:godot-camera-shaders-particles-export": {
-    "score": 40,
+    "score": 46,
     "recommendation": "CAUTION",
-    "findings": 4,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "3cdbfeeefa078baa",
+    "findings": [
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 23,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA1",
+        "file": "skills/godot-editor-bridge.md",
+        "line": 17,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/godot-export-builds.md",
+        "line": 106,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/godot-test-and-verify.md",
+        "line": 40,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/godot-test-and-verify.md",
+        "line": 77,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:learning-lessons-explanations-practice": {
     "score": 0,
     "recommendation": "SAFE",
-    "findings": 0,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "bf5b71bcd4878762",
+    "findings": []
   },
   "pack:marketing-copy-emails-seo-signups": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 6,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "338c9b432bb1ec60",
+    "findings": [
+      {
+        "rule": "E4",
+        "file": "skills/ai-seo.md",
+        "line": 22,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/churn-prevention/references/cancel-flow-patterns.md",
+        "line": 115,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/cold-email.md",
+        "line": 33,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E4",
+        "file": "skills/content-strategy.md",
+        "line": 26,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/content-strategy/references/cms-workflow-and-platforms.md",
+        "line": 15,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "MP3",
+        "file": "skills/cro/references/form-fields-and-flow.md",
+        "line": 80,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/onboarding.md",
+        "line": 53,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "P6",
+        "file": "skills/paywalls/references/experiments.md",
+        "line": 93,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:marketing-plans-offers-pricing-launches": {
-    "score": 60,
+    "score": 97,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 5,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "4b3446d48c7d0ff7",
+    "findings": [
+      {
+        "rule": "EA2",
+        "file": "skills/ad-creative.md",
+        "line": 57,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/ad-creative/references/visual-production.md",
+        "line": 55,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/ad-creative/references/visual-production.md",
+        "line": 58,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/community-marketing/platforms-and-health.md",
+        "line": 18,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/competitor-profiling.md",
+        "line": 26,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR1",
+        "file": "skills/marketing-plan/references/funding-tiers.md",
+        "line": 45,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/pricing.md",
+        "line": 24,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/pricing.md",
+        "line": 57,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE1",
+        "file": "skills/pricing/references/free-plans-and-enterprise.md",
+        "line": 27,
+        "severity": "LOW"
+      },
+      {
+        "rule": "AS1",
+        "file": "skills/product-marketing.md",
+        "line": 20,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/public-relations/newsjack-loop.md",
+        "line": 96,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:mobile-apps-flutter-firebase": {
-    "score": 100,
+    "score": 94,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 31,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "46f2608d88c76bde",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics.md",
+        "line": 7,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics.md",
+        "line": 14,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics.md",
+        "line": 22,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics.md",
+        "line": 30,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics.md",
+        "line": 31,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics.md",
+        "line": 32,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics.md",
+        "line": 36,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics.md",
+        "line": 40,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 11,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 12,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 30,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 34,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 45,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E3",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 51,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 51,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-basics/agent-environments.md",
+        "line": 52,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics/native-and-web-setup.md",
+        "line": 29,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics/native-and-web-setup.md",
+        "line": 31,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics/native-and-web-setup.md",
+        "line": 31,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-basics/native-and-web-setup.md",
+        "line": 32,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics.md",
+        "line": 37,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics/ios-setup.md",
+        "line": 7,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics/ios-setup.md",
+        "line": 10,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics/ios-setup.md",
+        "line": 10,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics/ios-setup.md",
+        "line": 36,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics/ios-setup.md",
+        "line": 37,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-crashlytics/ios-setup.md",
+        "line": 41,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/firebase-firestore/indexes.md",
+        "line": 74,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 7,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 10,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 10,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 20,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 24,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 24,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 25,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 32,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/firebase-remote-config-basics/ios-setup.md",
+        "line": 57,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RA2",
+        "file": "skills/flutter-setup-declarative-routing.md",
+        "line": 46,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/using-firebase/assets/gitignore.template",
+        "line": 17,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/using-firebase/assets/gitignore.template",
+        "line": 21,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/using-firebase/scripts/fbtool.sh",
+        "line": 13,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/using-firebase/scripts/test_fbtool.sh",
+        "line": 2,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/using-firebase/scripts/test_fbtool.sh",
+        "line": 15,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/using-firebase/scripts/test_fbtool.sh",
+        "line": 98,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/using-firebase/scripts/test_fbtool.sh",
+        "line": 119,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/using-firebase/scripts/test_fbtool.sh",
+        "line": 131,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:phone-app-testing-release-and-agents": {
-    "score": 30,
-    "recommendation": "CAUTION",
-    "findings": 3,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 18,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "e4b8ae30cad85f0a",
+    "findings": [
+      {
+        "rule": "RA2",
+        "file": "skills/app-store-and-play-release-gate.md",
+        "line": 37,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/inspect-your-own-app-build.md",
+        "line": 59,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/mobile-ui-build-bar.md",
+        "line": 18,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:python-backend-fastapi-docker-agents": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 21,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "d7d4ed1e20c4e0e4",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 15,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "SC2",
+        "file": "skills/modern-python/references/uv-commands.md",
+        "line": 5,
+        "severity": "LOW"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/modern-python/references/uv-commands.md",
+        "line": 41,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/modern-python/references/uv-commands.md",
+        "line": 41,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 56,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 56,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM2",
+        "file": "skills/production-docker.md",
+        "line": 56,
+        "severity": "LOW"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/production-docker.md",
+        "line": 68,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/production-docker.md",
+        "line": 167,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 185,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 185,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM2",
+        "file": "skills/production-docker.md",
+        "line": 185,
+        "severity": "LOW"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/production-docker.md",
+        "line": 215,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "SSRF2",
+        "file": "skills/production-docker.md",
+        "line": 258,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "SSRF2",
+        "file": "skills/production-docker.md",
+        "line": 265,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/production-docker.md",
+        "line": 411,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/production-docker.md",
+        "line": 433,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 440,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 440,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker.md",
+        "line": 440,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM2",
+        "file": "skills/production-docker.md",
+        "line": 440,
+        "severity": "LOW"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/production-docker.md",
+        "line": 468,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker/templates/Dockerfile.node.template",
+        "line": 34,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker/templates/Dockerfile.node.template",
+        "line": 34,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM2",
+        "file": "skills/production-docker/templates/Dockerfile.node.template",
+        "line": 34,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SSRF2",
+        "file": "skills/production-docker/templates/Dockerfile.node.template",
+        "line": 58,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker/templates/Dockerfile.python.template",
+        "line": 21,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM1",
+        "file": "skills/production-docker/templates/Dockerfile.python.template",
+        "line": 21,
+        "severity": "LOW"
+      },
+      {
+        "rule": "TM2",
+        "file": "skills/production-docker/templates/Dockerfile.python.template",
+        "line": 21,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SSRF2",
+        "file": "skills/production-docker/templates/Dockerfile.python.template",
+        "line": 66,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/production-fastapi.md",
+        "line": 392,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/production-fastapi/templates/main.py.template",
+        "line": 32,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:stock-research-backtests-trading-safety": {
-    "score": 32,
-    "recommendation": "CAUTION",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 57,
+    "recommendation": "DO_NOT_INSTALL",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "efe0d835d8bbfd6e",
+    "findings": [
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 15,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 20,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "YR4",
+        "file": "skills/personal-budget-and-bookkeeping.md",
+        "line": 20,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:unity-editor-scripts-prefabs-builds": {
-    "score": 10,
+    "score": 0,
     "recommendation": "SAFE",
-    "findings": 1,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "4a0a44551fd644df",
+    "findings": []
   },
   "pack:web-api-security-login-and-graphql": {
-    "score": 60,
-    "recommendation": "DO_NOT_INSTALL",
-    "findings": 3,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "score": 44,
+    "recommendation": "CAUTION",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "94b91069cabac4bd",
+    "findings": [
+      {
+        "rule": "RP1",
+        "file": "skills/api-design-and-lint.md",
+        "line": 43,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/api-design-and-lint.md",
+        "line": 47,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/auth-and-sessions.md",
+        "line": 26,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/auth-and-sessions.md",
+        "line": 31,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/graphql-and-federation.md",
+        "line": 14,
+        "severity": "MEDIUM"
+      }
+    ]
   },
   "pack:web-astro-cloudflare-gsap-performance": {
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
-    "findings": 37,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-22",
+    "itemHash": "5cb08da628ae3290",
+    "findings": [
+      {
+        "rule": "E1",
+        "file": "skills/astro-dev.md",
+        "line": 152,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/astro-dev/references/astro-core-patterns.md",
+        "line": 100,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/astro-dev/references/astro-core-patterns.md",
+        "line": 333,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/astro-dev/references/content-collections.md",
+        "line": 73,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 14,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC4",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 14,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 15,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 16,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 17,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 18,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC4",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 18,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 19,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 20,
+        "severity": "LOW"
+      },
+      {
+        "rule": "SC1",
+        "file": "skills/build-local-site/templates/package.json",
+        "line": 23,
+        "severity": "LOW"
+      },
+      {
+        "rule": "EA2",
+        "file": "skills/build-local-site/templates/src/layouts/BaseLayout.astro",
+        "line": 23,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "P2",
+        "file": "skills/build-local-site/templates/src/layouts/BaseLayout.astro",
+        "line": 39,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "P2",
+        "file": "skills/build-local-site/templates/src/pages/blog/[slug].astro",
+        "line": 96,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "AR2",
+        "file": "skills/schema.md",
+        "line": 94,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "OH1",
+        "file": "skills/schema/references/schema-examples.md",
+        "line": 304,
+        "severity": "HIGH"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/workers-best-practices.md",
+        "line": 110,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/workers-best-practices/references/review.md",
+        "line": 28,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/workers-best-practices/references/review.md",
+        "line": 83,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 20,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 28,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 28,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 51,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 202,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "RP1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 205,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 210,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 210,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 213,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 213,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 219,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 219,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 395,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/workers-best-practices/references/rules.md",
+        "line": 406,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "E1",
+        "file": "skills/wrangler.md",
+        "line": 204,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "PE3",
+        "file": "skills/wrangler.md",
+        "line": 303,
+        "severity": "HIGH"
+      }
+    ]
   },
   "pack:web-search-and-scraping-into-files": {
-    "score": 45,
+    "score": 32,
     "recommendation": "CAUTION",
-    "findings": 2,
-    "version": "v2.2.3",
-    "date": "2026-11-19"
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "962ba275b4c2c8ae",
+    "findings": [
+      {
+        "rule": "LP3",
+        "file": "SKILL.md",
+        "line": 1,
+        "severity": "MEDIUM"
+      },
+      {
+        "rule": "AE1",
+        "file": "SKILL.md",
+        "line": 14,
+        "severity": "HIGH"
+      }
+    ]
+  },
+  "agent:bob-builder": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "136eb95322a28868",
+    "findings": []
+  },
+  "agent:linus-reviewer": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "b412750a2b388d4c",
+    "findings": []
+  },
+  "agent:sherlock-researcher": {
+    "score": 0,
+    "recommendation": "SAFE",
+    "version": "v2.13.6",
+    "date": "2026-11-21",
+    "itemHash": "c425139e7e6b0a0e",
+    "findings": []
   }
 }

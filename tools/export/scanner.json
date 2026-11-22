@@ -1,0 +1,7 @@
+{
+  "version": "v2.13.6",
+  "tag": "v2.13.6",
+  "commit": "e2674da339b0bddc6e565d059c0577c6d9cd25da",
+  "python": "3.13",
+  "install": "uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da"
+}

@@ -101,8 +101,10 @@ test('a shippable pack lands in catalog/packs, with its agents and stubs, and a 
 test('a shipped pack carries a SOURCE.md with the same fields as a skill, its scan and its triage', () => withHub((hub) => {
   const out = stage();
   try {
-    const scans = { 'pack:pack-one-two-three': { score: 25, recommendation: 'CAUTION', version: 'v2.2.3', date: '2026-11-09' } };
-    const triage = { 'pack:pack-one-two-three': { recommendation: 'CAUTION', score: 25, findings: 2, fp: 1, byDesign: 1, other: 0, anchor: 'packpack-one-two-three-caution-25100-2-findings' } };
+    const findings = [{ rule: 'LP3', file: 'skills/one-job.md', line: 1, severity: 'MEDIUM' }, { rule: 'TM1', file: 'skills/one-job.md', line: 3, severity: 'HIGH' }];
+    const scans = { 'pack:pack-one-two-three': { score: 25, recommendation: 'CAUTION', findings, version: 'v2.2.3', date: '2026-11-09' } };
+    const rows = [{ rule: 'LP3', file: 'skills/one-job.md', line: 1, verdict: 'BY DESIGN' }, { rule: 'TM1', file: 'skills/one-job.md', line: 3, verdict: 'FP' }];
+    const triage = { 'pack:pack-one-two-three': { recommendation: 'CAUTION', score: 25, rows, anchor: 'packpack-one-two-three-caution-25100-2-findings' } };
     const r = buildKit({ hub, out, manifest: { items: shipOne }, owner: FIXTURE_OWNER, scans, triage });
     const rel = 'catalog/packs/pack-one-two-three/SOURCE.md';
     const src = readFileSync(path.join(out, rel), 'utf8');

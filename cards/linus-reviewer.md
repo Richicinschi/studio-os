@@ -50,12 +50,12 @@ The menu marks the item **have** when an agent file named `linus-reviewer`, or t
 
 - Claude Code, for the seat as a subagent. Whether claude.ai's chat app has subagents is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so this card has no claude.ai route.
 - Git, from START-HERE's "Prepare": the seat reads diffs and history with it.
-- SkillSpector for the scan, row 1 of your plan ([SkillSpector](skillspector.md)). The install is the same on every system, once uv is installed: `! uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git`. On Windows, run `$env:PYTHONUTF8=1` in PowerShell before a scan.
+- SkillSpector v2.13.6 for the scan, row 1 of your plan ([SkillSpector](skillspector.md)). The install, pinned by its full commit, is the same on every system, once uv is installed: `! uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da`. On Windows, run `$env:PYTHONUTF8=1` in PowerShell before a scan.
 - Optional: the kit's [diagnosing-bugs](diagnosing-bugs.md), for proving a suspected bug before it is reported.
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on `catalog/agents/linus-reviewer.md`: scans it with SkillSpector (`skillspector scan catalog/agents/linus-reviewer.md --no-llm`), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit's maintainers scanned its skills, not its agents, so yours is the first scan of this file. Expect ADAPT: the file carries the studio's naming and stacks.
+1. **Claude:** runs `vet-and-adopt` on `catalog/agents/linus-reviewer.md`: scans it with SkillSpector and hands the report to the kit's comparer (`skillspector scan catalog/agents/linus-reviewer.md --no-llm --format json | node tools/scan-compare.mjs agent:linus-reviewer -`, with `PYTHONUTF8=1` first on Windows), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit scans its agents too: with SkillSpector v2.13.6, on 2026-11-21, this file scanned `SAFE` at 0/100 with no findings (`tools/export/scans.json`, key `agent:linus-reviewer`). With the pinned version the comparer prints `known: 0, moved: 0, reworded: 0, new: 0` when your scan finds the same. Expect ADAPT: the file carries the studio's naming and stacks.
 2. **Claude:** writes the seat in your words, and shows it to you before saving:
    - **the name:** if any of the four skills above will start it or name it, keep `linus-reviewer`, or rename it and change the name in those skills too, writing-plans included (their cards say where). Otherwise a plain role name such as `reviewer`. The file name and the `name:` line match;
    - **the description:** what it reviews and when, without the studio's name for its crew;

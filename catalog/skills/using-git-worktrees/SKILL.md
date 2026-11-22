@@ -112,7 +112,7 @@ No manifest means no install.
 
 ## 6. Clean baseline
 
-Run the project's test command (`npm test`, `cargo test`, `pytest`, `go test ./...`, or whatever it uses) before you change anything.
+Run the project's test command (`npm test`, `cargo test`, `pytest`, or whatever it uses) before you change anything.
 
 - Failures: report them and ask whether to go on or look into them first.
 - Green: report ready.

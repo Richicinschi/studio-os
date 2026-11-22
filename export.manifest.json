@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "items": [
     {
       "id": "advisor-council-for-big-decisions",
@@ -859,7 +859,7 @@
       "module": "05-skills",
       "upstream": "https://github.com/NVIDIA/SkillSpector",
       "licence": "Apache-2.0",
-      "install": "uv tool install --python 3.13 git+https://github.com/NVIDIA/SkillSpector.git",
+      "install": "uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da",
       "importance": "core",
       "why": "A copied skill can carry a prompt injection or send data out; every later item is scanned with it before it is installed.",
       "title": "SkillSpector with the scan-first rule",

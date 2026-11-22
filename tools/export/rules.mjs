@@ -120,7 +120,7 @@ export const findStudioMarkers = (text) => text.split(/\r?\n/)
 // hit goes on MARKERS_ALLOW, never out of this list.
 const MARKERS = [
   ...['the hub', 'this machine', 'his yes'].map((m) => ({ m, re: new RegExp(`\\b${m.replace(' ', '\\s+')}\\b`, 'i') })),
-  ...['hard rule', 'studio rule'].map((m) => ({ m, re: new RegExp(`\\b${m.replace(' ', '\\s+')}s?\\b`, 'i') })),
+  ...['hard rule', 'studio rule', 'studio hub'].map((m) => ({ m, re: new RegExp(`\\b${m.replace(' ', '\\s+')}s?\\b`, 'i') })),
   ...[1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({ m: `G${n}`, re: new RegExp(`\\bG${n}\\b`) })),
 ];
 
@@ -154,7 +154,7 @@ function readTerms(file, what, hint) {
   if (!existsSync(file)) throw new Error(`${what} missing: ${file} (${hint}; never commit it)`);
   const buf = readFileSync(file);
   if (buf.includes(0) || !isUtf8(buf)) throw new Error(`${what} must be UTF-8: ${file}`);
-  const terms = buf.toString('utf8').replace(/^﻿/, '').split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+  const terms = buf.toString('utf8').replace(/^\uFEFF/, '').split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
   if (!terms.length) throw new Error(`${what} is empty: ${file}`);
   return terms;
 }
@@ -214,6 +214,7 @@ export const STUDIO_REWRITES = [
   {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "A name followed by \"pack X\" lives inside that pack\\. Read `library/X/SKILL\\.md`, find the skill in its table, open the file it names and follow it\\.",replacement: "A name followed by \"pack X\" lives inside the domain X you installed. Read `.claude/skills/X/SKILL.md`, find the skill in its table, open the file it names and follow it.",why: "the studio's library folder"},
   {file: "catalog/skills/using-agent-skills/SKILL.md",pattern: "- When no row fits, read[^\\n]*\\n- Keep this page true\\.[^\\n]*\\n",replacement: "- When no row fits, list `.claude/skills/` and read the descriptions.\n",why: "the studio's skill index, library index and sync script"},
   {file: "catalog/skills/using-agent-skills/SKILL.md",phrase: "For an outside skill: `vet-external-skill`, then `writing-great-skills`",replacement: "For an outside skill: vet it with the kit's `vet-and-adopt` (run from the kit folder), then `writing-great-skills`",why: "the studio's vetting skill; the kit's is vet-and-adopt"},
+  { file: 'catalog/skills/writing-great-skills/SKILL.md', phrase: 'Pairs with vet-external-skill', replacement: 'Pairs with vet-and-adopt', why: 'the studio\'s vetting skill, named as plain text in the description; the kit\'s is vet-and-adopt' },
   {file: "catalog/packs/web-astro-cloudflare-gsap-performance/skills/site-architecture.md",phrase: "\"see how [reminders](/features/reminders) work\"",replacement: "\"see how reminders work\", linked to the reminders page",why: "an example link to a page of an imagined site; the kit cannot resolve a site path"},
   { file: '*', phrase: '.studio/rules/hard-rules.md', replacement: 'your rules file', why: 'a studio path' },
   { file: '*', phrase: '.studio/registry/projects.md', replacement: 'your project registry', why: 'a studio path' },
@@ -232,7 +233,7 @@ export const STUDIO_REWRITES = [
 export function loadLocalRewrites(file) {
   if (!existsSync(file)) throw new Error(`local rewrites missing: ${file} (copy rewrites.local.example.json and fill it, or write []; never commit it)`);
   let list;
-  try { list = JSON.parse(readFileSync(file, 'utf8').replace(/^﻿/, '')); } catch { throw new Error(`local rewrites are not valid JSON: ${file}`); }
+  try { list = JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')); } catch { throw new Error(`local rewrites are not valid JSON: ${file}`); }
   if (!Array.isArray(list)) throw new Error(`local rewrites must be a JSON array: ${file}`);
   const str = (v) => typeof v === 'string' && v.length > 0;
   const bad = list.map((r, i) => (r && str(r.file) && str(r.phrase) !== str(r.pattern) && typeof r.replacement === 'string' && str(r.why) && str(r.gone) ? null : i + 1)).filter(Boolean);
@@ -324,6 +325,7 @@ export function findRisky(text, file = '') {
 // that is real; fix it at its source in the hub.
 export const RISKY_ALLOW = [
   { file: 'catalog/packs/python-backend-fastapi-docker-agents/skills/production-docker.md', phrase: '| `FROM python:latest` | Builds change without warning | Pin version and digest |', why: 'a row of the anti-patterns table, warning against the floating tag' },
+  { file: 'tools/export/scan-triage.md', phrase: '"`FROM python:latest` \\| Builds change without warning \\| Pin version and digest"', why: 'the triage row quoting that anti-patterns row, read as an FP' },
 ];
 
 // Kit text that names the block marker on purpose (a maintainer note on how blocks work). Matched like

@@ -1,9 +1,9 @@
 /**
  * How the before-tool guards read a command line: as the simple commands it
- * RUNS. A quoted argument stays an argument, so `git commit -m "gh pr merge"` merges nothing (the
- * rule `deQuoted` kept, 2026-07-28); the body of `bash -c`, `pwsh -Command` or -EncodedCommand,
- * `cmd /c`, `eval` and `iex` is read as commands too, in its own shell's rules (audit C-02), and so
- * is `$( )`, a backtick pair (sh), `( )` and `{ }`. Every line is a command (M-40); a heredoc body,
+ * RUNS. A quoted argument stays an argument, so `git commit -m "gh pr merge"` merges nothing;
+ * the body of `bash -c`, `pwsh -Command` or -EncodedCommand,
+ * `cmd /c`, `eval` and `iex` is read as commands too, in its own shell's rules, and so
+ * is `$( )`, a backtick pair (sh), `( )` and `{ }`. Every line is a command; a heredoc body,
  * a here-string and a comment are not. Env assignments and wrapper words (time, nohup, sudo, env,
  * timeout N, xargs, nice, exec, command) come off the front. `prog` is the program's file name in
  * lower case without .exe/.cmd/.bat, so `"C:\Program Files\GitHub CLI\gh.exe"` is gh.

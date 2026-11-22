@@ -8,6 +8,7 @@ import path from 'node:path';
 import { makeFixtureHub, makePackHub, FIXTURE_OWNER, cardText } from './fixture-hub.mjs';
 import { CHANGELOG_HEAD } from '../changelog.mjs';
 import { runExport } from '../export.mjs';
+import { scanItemHashes } from '../scan.mjs';
 
 const flags = { importance: 'optional', why: 'Fixes a problem some adopters have.' };
 const manifest = { kit: 'studio-os', version: '2.0.0', items: [
@@ -35,13 +36,24 @@ function setup({ git = true } = {}) {
   w('tools/export/owner.local.txt', `${FIXTURE_OWNER}\n`);
   w('tools/export/private.local.txt', '# nothing private in the fixture\n');
   w('tools/export/rewrites.local.json', '[]\n');
-  // A release ships only scanned items.
-  const safe = { score: 0, recommendation: 'SAFE', findings: 0, version: 'v2.2.3', date: '2026-11-02' };
-  w('tools/export/scans.json', JSON.stringify({ alpha: safe, beta: safe }));
+  // A release ships only scanned items, each scanned with the version scanner.json pins (an invented commit).
+  w('tools/export/scanner.json', JSON.stringify({ version: 'v2.2.3', tag: 'v2.2.3', commit: 'c3'.repeat(20), python: '3.13', install: 'uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@' + 'c3'.repeat(20) }));
+  const safe = { score: 0, recommendation: 'SAFE', findings: [], version: 'v2.2.3', date: '2026-11-02' };
+  w('tools/export/scans.json', JSON.stringify({ alpha: safe, beta: safe, 'agent:gamma': safe }));
   for (const it of manifest.items) w(`cards/${it.id}.md`, cardText(it.id, it.module));
   const lines = [];
   const run = (o = {}) => runExport({ root, hub, noGitleaks: true, today: '2026-11-02', log: (l) => lines.push(String(l)), rewrites: [], ...o });
-  return { hub, root, w, lines, run, done: () => { rmSync(hub, { recursive: true, force: true }); rmSync(root, { recursive: true, force: true }); } };
+  // As a maintainer does before a release: a dry run writes the catalog, then each item is scanned, which
+  // records the hash of the content the scan read.
+  const scanned = () => {
+    run();
+    const hashes = scanItemHashes(root);
+    const scans = JSON.parse(readFileSync(path.join(root, 'tools/export/scans.json'), 'utf8'));
+    for (const [key, rec] of Object.entries(scans)) if (hashes[key]) rec.itemHash = hashes[key];
+    w('tools/export/scans.json', JSON.stringify(scans));
+    lines.length = 0;
+  };
+  return { hub, root, w, lines, run, scanned, done: () => { rmSync(hub, { recursive: true, force: true }); rmSync(root, { recursive: true, force: true }); } };
 }
 const clean = (h, args) => (args[0] === 'status' ? '' : 'abc123');
 
@@ -164,6 +176,7 @@ test('in a kit that is not a git work tree, the export says the scripts were not
 test('in a kit that is not a git work tree, a release says so, exits non-zero and writes no release files', () => {
   const s = setup({ git: false });
   try {
+    s.scanned();
     const before = readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8');
     assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1, s.lines.join('\n'));
     assert.match(s.lines.join('\n'), /is not a git work tree: 0 script\(s\) were not marked executable, and the release files were not written/);
@@ -257,7 +270,7 @@ test('the export writes the feature menu into the catalog', () => {
 test('a shipped item whose last scan is not SAFE fails the export until scan-triage.md has its section', () => {
   const s = setup();
   try {
-    s.w('tools/export/scans.json', JSON.stringify({ alpha: { score: 25, recommendation: 'CAUTION', findings: 1, version: 'v2.2.3', date: '2026-11-09' } }));
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: { score: 25, recommendation: 'CAUTION', findings: [{ rule: 'TM1', file: 'SKILL.md', line: 3, severity: 'HIGH' }], version: 'v2.2.3', date: '2026-11-09' } }));
     assert.equal(s.run(), 1);
     const out = s.lines.join('\n');
     assert.match(out, /triage: FAIL \(1\)/);
@@ -282,7 +295,7 @@ test('a shipped domain gets its SOURCE.md, which accounting accepts, and a scan 
       { id: 'private-pack-for-me', kind: 'pack', status: 'private' }];
     s.w('export.manifest.json', JSON.stringify({ ...manifest, items }));
     s.w('cards/pack-pack-one-two-three.md', cardText('pack-pack-one-two-three', 'domains'));
-    s.w('tools/export/scans.json', JSON.stringify({ 'pack:pack-one-two-three': { score: 25, recommendation: 'CAUTION', findings: 1, version: 'v2.2.3', date: '2026-11-09' } }));
+    s.w('tools/export/scans.json', JSON.stringify({ 'pack:pack-one-two-three': { score: 25, recommendation: 'CAUTION', findings: [{ rule: 'TM1', file: 'skills/one-job.md', line: 3, severity: 'HIGH' }], version: 'v2.2.3', date: '2026-11-09' } }));
     const run = () => runExport({ root: s.root, hub: packHub, noGitleaks: true, today: '2026-11-02', log: (l) => s.lines.push(String(l)), rewrites: [] });
     try {
       assert.equal(run(), 1);
@@ -339,14 +352,75 @@ test('a failing gate leaves the kit exactly as it was', () => {
   } finally { s.done(); }
 });
 
+test('a scan made with a version scanner.json does not pin, or an unpinned install line, fails the scanner gate and leaves the kit unchanged', () => {
+  const s = setup();
+  try {
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: { score: 0, recommendation: 'SAFE', findings: [], version: 'v2.13.6', date: '2026-11-21' } }));
+    s.w('docs/install.md', '# Install\n\nuv tool install git+https://example.invalid/skillspector.git\n');
+    assert.equal(s.run(), 1);
+    const out = s.lines.join('\n');
+    assert.match(out, /scanner: FAIL \(2\)/);
+    assert.match(out, /docs\/install\.md:3 a SkillSpector install not pinned/);
+    assert.match(out, /tools\/export\/scans\.json: alpha was scanned with v2\.13\.6, but tools\/export\/scanner\.json pins v2\.2\.3/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
+test('the export refuses to start without tools/export/scanner.json, and builds nothing', () => {
+  const s = setup();
+  try {
+    rmSync(path.join(s.root, 'tools/export/scanner.json'));
+    assert.equal(s.run(), 2);
+    assert.match(s.lines.join('\n'), /export: .*scanner\.json/);
+    assert.equal(existsSync(path.join(s.root, 'catalog')), false);
+  } finally { s.done(); }
+});
+
 test('a release fails the triage gate for a shipped item with no scan; a dry run lets it through', () => {
   const s = setup();
   try {
-    s.w('tools/export/scans.json', JSON.stringify({ alpha: { score: 0, recommendation: 'SAFE', findings: 0, version: 'v2.2.3', date: '2026-11-02' } }));
+    const safe = { score: 0, recommendation: 'SAFE', findings: [], version: 'v2.2.3', date: '2026-11-02' };
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: safe }));
     assert.equal(s.run(), 0, s.lines.join('\n'));
-    s.lines.length = 0;
+    s.scanned();
     assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1);
-    assert.match(s.lines.join('\n'), /triage: FAIL \(1\)\n {2}beta: no scan in scans\.json; a release ships only scanned items/);
+    assert.match(s.lines.join('\n'), /triage: FAIL \(2\)\n {2}beta: no scan in scans\.json; a release ships only scanned items.*\n {2}agent:gamma: no scan in scans\.json/);
+    // A kit skill in the kit folder is gated the same way: unscanned, it fails a release.
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: safe, beta: safe, 'agent:gamma': safe }));
+    s.w('.claude/skills/kit-one/SKILL.md', '---\nname: kit-one\ndescription: A kit skill.\n---\n# kit-one\n');
+    s.scanned();
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1);
+    assert.match(s.lines.join('\n'), /triage: FAIL \(1\)\n {2}kit-one: no scan in scans\.json; a release ships only scanned items/);
+  } finally { s.done(); }
+});
+
+test('a release fails the triage gate for an item that changed since its scan; a dry run writes the change so it can be scanned', () => {
+  const s = setup();
+  try {
+    s.scanned();
+    // The hub changes alpha after the scan: its triage was read against other content.
+    const skill = path.join(s.hub, '.claude/skills/alpha/SKILL.md');
+    writeFileSync(skill, `${readFileSync(skill, 'utf8')}\nOne more line after the scan.\n`);
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1);
+    assert.match(s.lines.join('\n'), /triage: FAIL \(1\)\n {2}alpha: the item changed since its scan; rescan and re-read its triage/);
+    assert.equal(existsSync(path.join(s.root, 'tools/export/state.json')), false);
+    s.lines.length = 0;
+    assert.equal(s.run(), 0, s.lines.join('\n'));
+    assert.match(readFileSync(path.join(s.root, 'catalog/skills/alpha/SKILL.md'), 'utf8'), /One more line after the scan\./);
+  } finally { s.done(); }
+});
+
+test('a stray .DS_Store or __pycache__ in a kit skill neither ships nor changes its hash: the release passes', () => {
+  const s = setup();
+  try {
+    const safe = { score: 0, recommendation: 'SAFE', findings: [], version: 'v2.2.3', date: '2026-11-02' };
+    s.w('.claude/skills/kit-one/SKILL.md', '---\nname: kit-one\ndescription: A kit skill.\n---\n# kit-one\n');
+    s.w('tools/export/scans.json', JSON.stringify({ alpha: safe, beta: safe, 'agent:gamma': safe, 'kit-one': safe }));
+    s.scanned();
+    s.w('.claude/skills/kit-one/.DS_Store', 'finder notes');
+    s.w('.claude/skills/kit-one/__pycache__/x.cpython-313.pyc', 'bytes');
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
+    assert.match(s.lines.join('\n'), /triage: pass/);
   } finally { s.done(); }
 });
 
@@ -363,6 +437,7 @@ test('a release never skips gitleaks, and refuses a hub with uncommitted changes
 test('the first release passes the lint, then writes one changelog section and the state snapshot', () => {
   const s = setup();
   try {
+    s.scanned();
     assert.equal(s.run({ release: '2.0.0', notes: ['First release.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
     const log = readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8');
     assert.equal(log.match(/# Changelog/g).length, 1);
@@ -370,6 +445,8 @@ test('the first release passes the lint, then writes one changelog section and t
     const state = JSON.parse(readFileSync(path.join(s.root, 'tools/export/state.json'), 'utf8'));
     assert.equal(state.version, '2.0.0');
     assert.equal(state.hubCommit, 'abc123');
+    assert.equal(state.hashes, 'verdict+findings');
+    assert.deepEqual(Object.keys(state.items).sort(), ['agent:gamma', 'skill:alpha', 'skill:beta']);
   } finally { s.done(); }
 });
 
@@ -403,6 +480,7 @@ test('every removal in the manifest records its version and a replacement or a r
 test('a release stamps its version into the manifest and the feature menu, and no private item reaches the file', () => {
   const s = setup();
   try {
+    s.scanned();
     assert.equal(s.run({ release: '3.1.0', notes: ['Stamp.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
     const onDisk = JSON.parse(readFileSync(path.join(s.root, 'export.manifest.json'), 'utf8'));
     assert.equal(onDisk.version, '3.1.0');

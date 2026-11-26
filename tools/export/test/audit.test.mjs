@@ -455,3 +455,22 @@ test('the audit writes nothing, and audit() returns every section', () => {
     for (const h of HEADINGS) assert.ok(Array.isArray(sections[h]), `${h} is a list of lines`);
   } finally { plain.done(); }
 });
+
+// Public issue #4: the other agent tools' instruction files their own pages name (docs/facts.md, "Other agent
+// tools: instruction files, skills and hooks"), by name and headings only; a file no tool reads as rules,
+// and skills, are not listed.
+test('the audit lists the instruction files of Cursor, GitHub Copilot, Gemini CLI, Codex, Windsurf, Devin and Kiro, and leaves out what none of them reads', () => {
+  const s = sandbox();
+  try {
+    const listed = ['.cursorrules', '.cursor/rules/style.mdc', '.cursor/rules/team/review.mdc', '.cursor/rules/plain.md', '.github/copilot-instructions.md',
+      '.github/instructions/frontend/react.instructions.md', 'GEMINI.md', 'AGENTS.override.md', 'AGENT.md', 'AGENTS.local.md', '.windsurfrules',
+      '.windsurf/rules/a.md', '.windsurf/global_rules.md', '.devin/rules/b.md', '.devin/global_rules.md', '.kiro/steering/product.md'];
+    const ignored = ['.github/instructions/notes.md', '.agents/skills/x/SKILL.md', 'docs/GEMINI-notes.md', '.devin/notes.md'];
+    for (const f of [...listed, ...ignored]) s.put(f, `# Heading of ${f}\n\nbody ${t(40)}\n`);
+    const row = audit(s.root, { depth: 4 }).sections['Existing Claude setup'].find((l) => l.startsWith("| Other agent tools' instructions"));
+    assert.ok(row, 'the row is there');
+    for (const f of listed) assert.ok(row.includes(`${f}: 3 lines; headings: Heading of ${f}`), `${f} is listed by name and heading`);
+    for (const f of ignored) assert.ok(!row.includes(`${f}:`), `${f} is not listed`);
+    assert.ok(!row.includes(t(40)), 'no body text');
+  } finally { s.done(); }
+});

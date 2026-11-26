@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-games-design-prototype-playtest-assets.md](../../../cards/pack-games-design-prototype-playtest-assets.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 70/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 4 findings, all read: 3 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#packgames-design-prototype-playtest-assets-do_not_install-70100-4-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 70/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; 4 findings, all read: 3 false positives, 1 by design ([triage](../../../tools/export/scan-triage.md#packgames-design-prototype-playtest-assets-do_not_install-70100-4-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

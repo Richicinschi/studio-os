@@ -75,7 +75,7 @@ If no version prints, the comparer prints anything other than those two lines, o
 ## Undo
 
 - **Claude:** deletes the scan-first line from the front door it went into, and marks the row in `adoption/decisions.md` as undone.
-- **you:** remove SkillSpector, and uv if nothing else uses it, with uv's own uninstall command; those commands are not documented in docs/facts.md as of 2026-11-02.
+- **you:** remove SkillSpector with `uv tool uninstall skillspector`, and uv, if nothing else uses it, the way you installed it ([docs/facts.md](../docs/facts.md), "Installing SkillSpector" and "Installing the tools on Windows, macOS and Linux").
 - Removing the scanner does not undo anything it checked; those decisions stay in `adoption/decisions.md`.
 
 ## Watch out
@@ -85,5 +85,5 @@ If no version prints, the comparer prints anything other than those two lines, o
 - **Versions move, so the kit pins one.** A newer SkillSpector can score the same files differently and find other things. The kit pins v2.13.6 by its full commit, in `tools/export/scanner.json`, and makes every record of its scans with it. A newer version comes through the kit, not through your own upgrade: its maintainer moves the pin, rescans and re-reads every shipped item, and releases the result ([docs/MAINTAINING.md](../docs/MAINTAINING.md)); you then install the new line. A scanner of another version still works, but the comparer says so in a line before its counts, and its findings can differ from the kit's record ([docs/facts.md](../docs/facts.md), "Installing SkillSpector").
 - **Keep `--no-llm`.** The static scan needs no API key and costs nothing; the LLM pass is paid, and Claude leaves it off unless you choose it.
 - **Name updates and all four kinds in the line.** The studio's own gap was a rule that covered the skills it took in, not a plugin it already ran.
-- **A work machine** may need your IT department's approval for a tool installed from GitHub; ask before step 2. An install that asks for an administrator password goes in a separate terminal, not through `!`: whether a `!` command can take typed input is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: the ! prefix, /init and local files").
+- **A work machine** may need your IT department's approval for a tool installed from GitHub; ask before step 2. An install that asks for an administrator password goes in a separate terminal, not through `!`: whether a `!` command can take typed input is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: the ! prefix, /init and local files").
 - **Token cost:** SkillSpector loads nothing into a session. The rule line costs about 60 tokens every session (estimate, bytes divided by 4).

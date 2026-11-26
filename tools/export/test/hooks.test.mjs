@@ -719,6 +719,19 @@ test('session-start-status: a git guard that lets the test force-push through, o
   } finally { s.done(); }
 });
 
+test('session-start-status: guard lines are never cut by the ten-line cap, however many there are', () => {
+  const s = sandbox();
+  try {
+    const setup = guardedSetup(s);
+    // Eleven guards that are missing: each one is a line, and none of them may be hidden.
+    const paths = Array.from({ length: 11 }, (_, i) => path.join(setup, `.claude/hooks/g${String(i).padStart(2, '0')}/block-dangerous-git.mjs`));
+    writeJson(path.join(setup, '.claude/settings.json'), preToolUse(...paths.map((p) => execHook(posix(p)))));
+    const r = s.run(START, setup, '', { CLAUDE_PROJECT_DIR: setup });
+    assert.equal(r.status, 0, r.err);
+    assert.deepEqual(r.out.trim().split('\n').sort(), paths.map((p) => guardLine(path.resolve(p))).sort());
+  } finally { s.done(); }
+});
+
 test('session-start-status: guards are found in settings.local.json in shell form, and in the user settings under CLAUDE_CONFIG_DIR or else ~/.claude', () => {
   const s = sandbox();
   try {

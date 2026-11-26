@@ -61,7 +61,7 @@ By design, the convener does not vote and does not average. It surfaces the conf
 
 ## Apply it in claude.ai
 
-Whether the claude.ai chat app has subagents is not documented ([docs/facts.md](../../docs/facts.md)), so on this route you play the convener.
+Whether the claude.ai chat app has subagents is an open question ([docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so on this route you play the convener.
 
 1. **Add two seat files** to a Project's knowledge: the lens and output sections of the skeptic and the architect.
 2. **Ask each seat in its own chat** in that Project, so one view does not colour the next: "Answer as the skeptic file describes: the three likeliest ways this breaks, and the assumption that sinks it."

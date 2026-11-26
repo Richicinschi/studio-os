@@ -41,7 +41,7 @@ The menu marks the item **have** when conditional includes exist and every repos
   - Windows: `! winget install --id Git.Git -e --source winget`;
   - macOS: `! xcode-select --install`;
   - Debian or Ubuntu: `! sudo apt install git`.
-- The minimum git version for conditional includes: not documented in docs/facts.md as of 2026-11-02. The Windows run recorded there used git 2.54.0.
+- The minimum git version for conditional includes: git 2.13, which added `includeIf` with `gitdir` and `gitdir/i` ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder"). The Windows run recorded there used git 2.54.0.
 - Nothing else beyond Claude Code.
 
 ## Steps

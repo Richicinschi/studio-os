@@ -1,6 +1,6 @@
 ---
 name: design-ui-logos-slides-posters
-description: "Use when the user asks for a logo, poster, presentation or slides, a chart or report, a style guide, a page from a Figma file, a look and feel, a polish of a bland screen, an app illustration, a newsletter for email, or an accessibility check. Open this before replying, even to ask questions."
+description: "Use when the user asks for a logo, poster, business card, presentation or slides, a chart or report or which chart type and colours to use, a style guide, a page from a Figma file, a look and feel, a polish of a bland screen, an app illustration, an animation, motion or scroll effect, a newsletter for email, or an accessibility check. Open this before replying, even to ask questions."
 ---
 
 # Design, UX and accessibility
@@ -20,6 +20,7 @@ Script paths in this domain start at this domain's folder, the base directory Cl
 | Format a document for email or a CMS | Format a document for places that strip styling (email, CMS paste, similar editors) and check that it survives. | Use when the user wants a document to look right once pasted into an email tool, a CMS or an editor that drops styles. | skills/platform-formatted-document.md |
 | Design a logo | Brief, research, three concepts, a hard stop for approval, then an export kit and an audit of the SVG. (needs: an SVG renderer) | Use when the user needs a logo or brand mark for a project or business. | skills/logo-design.md |
 | Make a poster or social card | Make a one- or two-ink poster or a social card from a fixed recipe, check it small and large, retry once. | Use when the user wants a poster, flyer, cover image or social media card. | skills/poster-and-social-cards.md |
+| Make a business card | Design a two-sided card, a QR code that saves your contact and a print-ready PDF, with the size, bleed and small type checked by script. (needs: a browser) | Use when the user wants business cards or a contact card, or a QR code that saves their details. | skills/business-card.md |
 | Illustrate an app screen | Draw a product or UI component as a clean illustration, and animate it if wanted. (needs: a browser) | Use when the user wants a picture of an app screen or component for a launch page, documentation or a post. | skills/product-ui-illustration.md |
 | Check visuals before handover | Render visual work, measure it with a script, name the faults you can see, and hand over only when the checks pass. (needs: a browser) | Use when finishing any visual deliverable, or when the user asks whether a page or image looks right. | skills/visual-qa-gate.md |
 | Check accessibility | Check contrast, focus, labels, touch targets and motion against the public WCAG criteria and report measured results. | Use when the user asks whether a page, app or design is accessible, or wants it to work for everyone. | skills/accessibility-review.md |
@@ -27,5 +28,5 @@ Script paths in this domain start at this domain's folder, the base directory Cl
 | Pick styles, palettes and fonts | Choose a visual style, a colour palette with contrast checked, a font pair, chart types and a usability pass, each with a stated reason. | Use when the user needs concrete choices of style, colours, fonts or chart type for an interface, or a usability check of a form or screen. | skills/ui-styles-palettes-fonts.md |
 | Brand | Brand voice, visual identity, messaging frameworks and brand consistency. | Use for branded content, tone of voice, marketing assets, brand compliance or style guides. | skills/brand.md |
 | Motion design | Motion design principles for animations and transitions: timing, easing, choreography. | Use for animations, transitions, micro-interactions, loading states or scroll effects. | skills/motion-design.md |
-| Motion dev animations | Creates GPU-accelerated animations with Motion.dev for React, Next.js, Svelte and Astro. | Use for animation, scroll effects, parallax, hero animations, gestures, drag or springs in those projects. | skills/motion-dev-animations.md |
-| Review animations | Reviews animation and motion code against a strict craft bar: easing, duration, origin, interruptibility, performance and reduced motion. | Use when animation or motion code should be reviewed against a high craft bar. | skills/review-animations.md |
+| Motion dev animations | GPU-accelerated Motion.dev animation for React, Next.js, Svelte and Astro. | Use for scroll, parallax, hero, gesture, drag or spring motion. | skills/motion-dev-animations.md |
+| Review animations | Review animation: easing, duration, origin, interruption, performance, reduced motion. | Use for a strict review of motion code. | skills/review-animations.md |

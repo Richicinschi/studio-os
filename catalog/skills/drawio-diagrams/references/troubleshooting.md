@@ -36,7 +36,7 @@ entries end in a one-line cure.
   `-e`. The real cause is a truncated IEND chunk in `-e` PNGs (upstream issue 8); leaving `-e`
   off for previews is the simplest cure.
 - **A final `-e` PNG will not open in viewers or APIs.** Run
-  `python3 <skill-dir>/scripts/repair_png.py <path>`. The CLI drops the last 8 bytes. SVG and
+  `uv run python <skill-dir>/scripts/repair_png.py <path>`. The CLI drops the last 8 bytes. SVG and
   PDF are fine.
 - **Wrong background in an export.** A known CLI bug. Use `--transparent`, or set the background
   in the style.
@@ -75,7 +75,7 @@ separator and discards everything after `#`, and the fragment is the entire diag
 the link to `start`. Write a `.url` shortcut and open that.
 
 ```bash
-URL=$(python3 <skill-dir>/scripts/encode_drawio_url.py --edit diagram.drawio)
+URL=$(uv run python <skill-dir>/scripts/encode_drawio_url.py --edit diagram.drawio)
 TMP=$(mktemp --suffix=.url)
 printf '[InternetShortcut]\r\nURL=%s\r\n' "$URL" > "$TMP"
 cmd.exe /c start "" "$(wslpath -w "$TMP")"

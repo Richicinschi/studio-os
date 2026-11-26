@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-audio-video-media.md](../../../cards/pack-audio-video-media.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 72/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 5 findings, all read: 5 false positives ([triage](../../../tools/export/scan-triage.md#packaudio-video-media-do_not_install-72100-5-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 72/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; 5 findings, all read: 5 false positives ([triage](../../../tools/export/scan-triage.md#packaudio-video-media-do_not_install-72100-5-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

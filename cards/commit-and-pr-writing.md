@@ -66,6 +66,13 @@ The menu marks the item **have** when an instruction file covers both commit mes
 
 A failing line Claude did not mark, or a judgement you disagree with, means the item is not done: the plan row stays unticked, and the wording of the rule is the next thing to look at.
 
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: test "$(grep -ciE 'commit message|PR bod' "$(frontdoor)")" -ge 1 && echo yes || echo no
+expect: yes
+```
+
 ## Undo
 
 - **Claude:** removes the rule, and the prefix line, from your front door.

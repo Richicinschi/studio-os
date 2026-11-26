@@ -56,7 +56,7 @@ The menu marks the item **have** when an `improve` skill exists at either level,
 
 - Claude Code. With subagents the audit runs in parallel; without them it audits directly.
 - A git repository: each plan records the commit it was written against, and `execute` needs a separate worktree.
-- `gh`, signed in, only for `--issues`. How to install it is not documented in docs/facts.md as of 2026-11-02.
+- `gh`, signed in, only for `--issues`. How to install it and sign in is in [docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux".
 
 ## Steps
 

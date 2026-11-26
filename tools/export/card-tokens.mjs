@@ -294,6 +294,7 @@ export function checkStudioLines(root, cardId) {
 // not a kit file's size. Commands in a Detect section (`wc -c`) carry no figure, so they pass.
 export const BYTES_ALLOW = [
   { file: 'cards/memory-index.md', phrase: 'loads the first 200 lines or 25 KB of its own `MEMORY.md`', why: 'Claude Code\'s documented limit for its auto memory (docs/facts.md), not the size of a kit file' },
+  { file: 'cards/claude-ai-project.md', phrase: 'A Project file can be up to 30 MB', why: 'claude.ai\'s documented limit for a Project file (docs/facts.md, "claude.ai: Projects"), not the size of a kit file' },
 ];
 const BYTE_FIGURE = /(?<![\w.,])\d[\d,.]*\s*(?:bytes?\b(?!\s+divided\s+by\s+4)|[KMG]i?B\b|kB\b)/g;
 

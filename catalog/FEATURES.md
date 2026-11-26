@@ -74,11 +74,11 @@ Every session for this module: about 129 tokens (estimate).
 
 | Item | What it is | Importance | Why | Loads | Tokens every session |
 |---|---|---|---|---|---|
-| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 2,799) | 64 |
+| git-guardrails | skill | recommended | An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run. | description every session, body on demand (about 2,896) | 64 |
 | git-hooks | practice: The git hook templates | recommended | Once committed, a leak stays in history; these refuse a secret, a conflict marker or a private address before the commit lands. | none | 0 |
 | sensitive-file-deny-rules | practice: Deny rules for secret files | recommended | A secret read into a session cannot be taken back; Claude Code itself refuses reads of .env, key and secret-named files. | none | 0 |
 | commit-and-pr-writing | practice: Commit messages and PR bodies that say why | optional; recommended for software, ml, data | A message that repeats the diff tells nobody why; a PR body that names what was verified and what was left undone does. | every session | 69 |
-| finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 2,230) | 33 |
+| finishing-a-development-branch | skill | optional; recommended for software, ml, data | When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own. | description every session, body on demand (about 2,316) | 33 |
 | git-cleanup | skill | optional; recommended for software, ml, data | When stale branches pile up: it sorts them into merged, superseded and active, and asks before it deletes any. | you start it by name, body on demand (about 2,575) | 0 |
 | git-identity-per-folder | practice: One git identity per folder | optional; recommended for software, ml, data | Company work committed under a personal address, or the reverse, is hard to undo; each folder picks its own address. | none | 0 |
 | grant-ledger | practice: The grant ledger for risky acts | optional; recommended for software, ml, data | One recorded yes per force-push, merge, tag or hook skip, so a vague "clean up" never covers an act you did not name. | every session | 101 |
@@ -109,7 +109,7 @@ Every session for this module: about 303 tokens (estimate).
 | bob-builder | agent | optional | Builds a planned feature test-first in its own worktree, so the main thread keeps planning. | description every session, body on demand (about 317) | 55 |
 | linus-reviewer | agent | optional; recommended for software, ml, data | Reviews a change before it merges: correctness, conventions, security and simpler code, citing file and line. | description every session, body on demand (about 354) | 51 |
 | receiving-code-review | skill | optional; recommended for software, ml, data | Review feedback taken on trust, or argued away, both go wrong; this checks each point before acting on it. | description every session, body on demand (about 1,533) | 64 |
-| requesting-code-review | skill | optional; recommended for software, ml, data | A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges. | description every session, body on demand (about 705) | 49 |
+| requesting-code-review | skill | optional; recommended for software, ml, data | A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges. | description every session, body on demand (about 913) | 49 |
 | sherlock-researcher | agent | optional | Deep research across many sources, with every claim cited, for questions one search will not settle. | description every session, body on demand (about 320) | 45 |
 
 Every session for this module: about 264 tokens (estimate).
@@ -120,7 +120,7 @@ Every session for this module: about 264 tokens (estimate).
 |---|---|---|---|---|---|
 | claim-auditor | skill | optional; recommended for data, ml | A number nobody can trace back to its query is expensive to retract; this traces every claim before it ships. | description every session, body on demand (about 1,035) | 74 |
 | diagnosing-bugs | skill | optional; recommended for software, ml, data | For a hard bug or a slowdown: it builds a feedback loop that can fail before it guesses at a cause. | description every session, body on demand (about 2,563) | 60 |
-| drawio-diagrams | skill | optional | Turns a system or data flow into an editable diagram file, kept on your machine. | description every session, body on demand (about 2,175) | 74 |
+| drawio-diagrams | skill | optional | Turns a system or data flow into an editable diagram file, kept on your machine. | description every session, body on demand (about 2,208) | 74 |
 | tdd | skill | optional; recommended for software, ml, data | Agent tool calls that were never tested fail in front of users; this builds features test-first, red then green. | description every session, body on demand (about 1,969) | 65 |
 
 Every session for this module: about 273 tokens (estimate).
@@ -165,7 +165,7 @@ A domain is a set of skills for one kind of job, installed together as a pack. E
 | app-legal-privacy-terms-store-review | App legal: privacy policy, terms and store review: Privacy policy and terms drafted or reviewed, plus the legal checks before an app store submission. Not legal advice. | 15 | 0 | 53 | about 1,171 |
 | audio-video-media | Audio, video and media: Understand, clip, clean up, transcribe, subtitle or shrink a recording; make narrated, launch or story videos. | 13 | 1 | 69 | about 1,119 |
 | dependency-supply-chain-risk-checks | Dependency supply-chain risk checks: The packages a project depends on checked for supply-chain risk: single maintainers, abandoned libraries, past vulnerabilities. | 1 | 0 | 43 | about 170 |
-| design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 18 | 1 | 74 | about 1,344 |
+| design-ui-logos-slides-posters | Design, UX and accessibility: A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check. | 19 | 1 | 97 | about 1,384 |
 | django-flask-laravel-shops-and-chat | Web back ends: Django, Flask, Laravel, shops, chat and jobs: Django, Flask and Laravel projects: shops, content back ends, live chat and updates, retrying background jobs. | 3 | 0 | 45 | about 274 |
 | engineering-testing-performance-code-design | Engineering: browser testing, performance and code design: Test a web page in a real browser, speed up slow code or pages, and shape the structure of a codebase. | 3 | 0 | 34 | about 305 |
 | games-design-prototype-playtest-assets | Games: design, prototype, playtest, art and ports: Make a game in any engine: the idea, a first playable, playtesting, art, screens and balancing numbers. | 8 | 0 | 56 | about 658 |

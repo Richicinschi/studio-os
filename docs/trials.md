@@ -4,11 +4,29 @@ This page records how the kit's adoption flow was tried before release, what bro
 
 **Invented personas played the adopters, not real people.** A headless Claude Code ran the kit's skills as "the drill". In runs 1 to 6 a second agent answered its questions as an invented persona, from a written script; in runs 7 to 9 the person running the trial wrote each answer from a short persona. No real adopter has run the kit yet, as of this record (2026-11-09).
 
+## What the kit was tried on
+
+Each row is a run someone made, with what it ran on and when. "Not recorded" means the record of that run does not say; it is not a guess left blank.
+
+| What ran | Operating system | Claude Code | Node.js | Date | Where it is recorded |
+|---|---|---|---|---|---|
+| The tests and the lint, on GitHub's runners, for each release; for v3.0.0 they failed on Ubuntu, and v3.0.1 fixed the tests | Ubuntu, Windows and macOS (`ubuntu-latest`, `windows-latest`, `macos-latest`) | not used | 22 | each release from v2.0.3 (2026-11-03) to v3.4.0 (2026-11-22) | `CHANGELOG.md`, v2.0.3 and v3.0.1; `.github/workflows/test.yml` |
+| The tests, the hook canary and START-HERE's Linux install lines (runs 1 to 3) | Windows; macOS on arm64; Linux on arm64, in a fresh container. x64 Linux was not run | not used | not recorded | 2026-11-02: after the v2.0.0 build and before v2.0.1, both of that date in `CHANGELOG.md` | runs 1 to 3, below |
+| Adoption runs 1 to 6 | not recorded | not recorded | not recorded | 2026-11-02, the same way | runs 1 to 6, below |
+| Adoption runs 7 to 9, the domains | not recorded | 2.1.319 | not recorded | 2026-11-09 | runs 7 to 9, below |
+| The deny rules for secret files, headless | Windows | 2.1.319 | not used | 2026-11-09 and 2026-11-10 | [docs/facts.md](facts.md), "Claude Code: permission rules for secret files" |
+| The same deny rules, headless | macOS 26.5.1 | 2.1.321 | not used | 2026-11-10 | the same section |
+| `claude plugin list --json` in a throwaway config folder | not recorded | 2.1.329 | not used | 2026-11-20 | [docs/facts.md](facts.md), "Claude Code: installed plugins and their skills" |
+| A deep review that cloned the kit, ran the tests, the git guard, the hooks and the card commands: 151 tests passed, 2 skipped | Windows 10, in Git Bash and Windows PowerShell 5.1, with git 2.54.0 and gitleaks 8.30.1 | a session of it; version not recorded | 22.23 | 2026-11-10 | public issue #36 |
+| The tests and the lint on the newer Node.js line, on a clone in a container (`node:24-trixie`): 438 tests, 432 passed, 0 failed, 6 skipped (two run on Windows only, one needs a user other than root, one needs gitleaks, two need the maintainer's local lists); lint clean | Linux x64 | not used | 24.22.3 | 2026-11-25 | this table; from the next release on, the CI job `test-node-24` |
+| A domain on claude.ai | not tried: the zip was built and listed, not uploaded | | | 2026-11-09 | runs 7 to 9, below |
+
 ## Setup
 
 - Two invented personas, named here by profile only: the data persona and the ml persona. The kit has four profiles (`data`, `ml`, `software`, `general`); the trials covered two.
 - Each trial ran in a separate Claude Code configuration, with a separate git configuration, key folder and GPG folder. Before the first turn and after the last, a script hashed the real machine's global git config and its key folders. Every pair matched, in all six runs.
 - The drill's replies were logged turn by turn. A separate judge agent then marked each pass condition PASS or FAIL against the log and the files the drill wrote.
+- From run 10 on, each run records its tokens: each turn runs as `claude -p --output-format json` (the first with the opening message, each later one with `--resume <session id>`), and the `usage` field of each turn's JSON output is added up: tokens written to the prompt cache, read from it, sent uncached, and written by the model. The run's section states the four sums and the context at the first reply.
 - The drill ran headless: writes under `.claude/` were refused, and the persona deferred every `!` command (a command the adopter types themselves). Both limited how far the first runs got. The judge did not count them against the kit by themselves.
 
 ## Pass conditions
@@ -94,7 +112,7 @@ The judge also recorded that row 1 could never be ticked before the front-door r
 
 ## Runs 7 to 9: domains (2026-11-09)
 
-The kit gained domains (packs of skills installed together) and a domain question in the drill. These runs tried that path only, on the kit as built that day, with Claude Code 2.1.319. Each ran in a throwaway folder outside every repository: a fresh clone of the kit, and an empty folder for the adopter's setup. The session loaded project settings only, so none of the author's own skills, agents or memory could reach it. The reply to each question was written by the person running the trial, from a short persona, so this is a script read by a person, not a second agent. Nothing was judged by a separate agent.
+The kit gained domains (packs of skills installed together) and a domain question in the drill. These runs tried that path only, on the kit as built that day, with Claude Code 2.1.319. Each ran in a throwaway folder outside every repository: a fresh clone of the kit, and an empty folder for the adopter's setup. The session loaded project settings only, so none of the author's own skills, agents or memory could reach it. The reply to each question was written by the agent running the trials, a separate Claude Code session, from a short persona; no person typed during the runs. Nothing was judged by a separate agent.
 
 | Run | Persona | Answers fitted | How far it ran |
 |---|---|---|---|
@@ -102,12 +120,12 @@ The kit gained domains (packs of skills installed together) and a domain questio
 | 8 | a short-story writer | no domain | 17 turns, to the approved plan and the first install row |
 | 9 | the same writer, same answers, on the kit after the fixes below | no domain | 18 turns, to the approved plan |
 
-**Run 7 result.**
+**Run 7 result.** The whole run, turn by turn, with the files it wrote: [examples/adoption-run-7.md](../examples/adoption-run-7.md).
 
 - The domain question offered only the domain that fits the work, with its every-session cost (about 69 tokens, an estimate) and "None of these fit" as a choice.
 - The pack was scanned by SkillSpector before anything was copied: 20 out of 100, LOW, SAFE. The drill read the two medium findings, found both to be false alarms, and said what it had not read.
 - It landed as 18 files, byte-identical to the kit copy, plus the reviewer agent. This pack has no stubs; the stub copy was not tried.
-- A fresh session listed the pack and the agent. Asked to clean up a recording, it opened the pack, read the matching skill, and applied the adopter's style rules from the style page. It stopped at a plan, as asked.
+- A fresh session named the pack; none listed the agent (turn 34 says so). Asked to clean up a recording, it opened the pack, read the matching skill, and applied the adopter's style rules from the style page. It stopped at a plan, as asked.
 - Three further fresh questions were answered from the adopter's own files, each with its source file named.
 - `node tools/upload-bundle.mjs audio-video-media --out <folder>` wrote a zip of 18 files; `tar -tf` listed them, with no agents or stubs in it.
 - Nothing was written into the kit's folder. The only studio-looking text in the adopter's files was a first name, taken from the machine and put in the spec's header unasked. The drill now never writes a person's name unless it is given and asked for; run 9 shows it.
@@ -124,7 +142,7 @@ The kit gained domains (packs of skills installed together) and a domain questio
 
 **What still broke:**
 
-- **Writes under `.claude/` were refused**, as in runs 1 to 6. A permission-bypassing run was refused by the machine's classifier, and was not worked around. The drill handed over a copy line for each file, and the person running the trial typed it. So the install was the adopter's copy, checked by the drill with a byte comparison, not the drill's own write.
+- **Writes under `.claude/` were refused**, as in runs 1 to 6. A permission-bypassing run was refused by the machine's classifier, and was not worked around. The drill handed over a copy line for each file, and the agent running the trial ran it. So the install was the adopter's copy, checked by the drill with a byte comparison, not the drill's own write.
 - **Run 8 named the domains it had just said do not fit.** Fixed; run 9 shows it.
 - **The kit version in the spec was wrong.** Run 7's spec said v2.0.0, taken from a manifest that a release never updated; run 8 caught it from the changelog, and run 9's spec still said v2.0.0. A release now writes its version into the manifest. Tested, not re-run, because no release has been made since.
 - **A file count was off by one.** The drill reported 17 files copied; there were 18. The skill now says counts come from a listing run in the same sitting and are quoted with the command; run 9 reached no install, so this is only partly shown.
@@ -132,9 +150,62 @@ The kit gained domains (packs of skills installed together) and a domain questio
 
 **Not tried:** the advisor council domain and its `council` stub; installing a domain on claude.ai (the zip was built and listed, not uploaded); a second operating system; any run past the first handover.
 
+## Run 10: the short path (2026-11-25)
+
+The drill gained a short path, "Start with continuity": the scanner, a front door and a handoff note, then a fresh session that must answer "where did we stop?" from the files. This run tried it once, on the kit as built that day, on Windows 10, with the Claude Code that printed 2.1.332 for `claude --version` on that machine the same evening (the run itself was refused the command). Like runs 7 to 9, it ran in a throwaway folder outside every repository, from a fresh clone of the kit, with an empty folder for the setup, and loaded project settings only. Each turn was a headless `claude -p` call that resumed the conversation, and file writes were allowed in the working folders, nothing more.
+
+**An agent played the adopter.** The agent running the trial wrote each answer after reading the reply, from a short persona: a freelance data analyst with one folder per client, whose problem was that each morning starts from zero. It answered at once, picked the recommended option, and added one rule of its own. When the drill handed over a `!` line, the agent ran the command in a terminal of its own and pasted the output. Nothing was judged by a separate agent.
+
+**Result: passed.**
+- **Time:** 7 minutes 1 second from the first message to the fresh session's answer, and 7 minutes 28 seconds to the drill's closing message, measured. That took 17 messages: 15 in the drill's conversation, the last of them the report back, and 2 in the fresh session. The durations Claude Code reported for the 17 turns, its tool runs included, add up to 240 seconds.
+- **Tokens,** as Claude Code reported them for the 17 turns (the `usage` of its JSON output), added up: 86,593 written to the prompt cache, 2,785,418 read from it, 120 sent uncached, and 23,745 written by the model. Most of the reading is the same context sent again each turn and read from the cache. The first reply went out with about 60,200 tokens in context, Claude Code's own instructions and tools included. From this run on, each trial records these figures. This run used the drill as one file; it now reads its phases one at a time, as START-HERE's "What the adoption reads" shows.
+- **The scanner** at the pinned version was already on the trial's PATH, as a small script that runs it through `uvx`, so it was checked and kept, not installed. Its check (a scan of one kit skill compared with the kit's record) matched.
+- **The front door** was written in the persona's words with the rules it chose, and loaded by a one-line `CLAUDE.md`. The handoff template followed, with the two front-door lines and a first note.
+- **Every kit template was scanned before use, and again once installed.** Each scan was SAFE, 0 out of 100.
+- **The fresh session was started in the setup folder.** It listed the rules when asked what it must never do. Asked "where did we stop?", it named the note, `handoffs/2026-11-25-adoption-short-path.md`, and its next step, "Start the adoption" in the kit folder.
+- **Nothing was written into the kit's folder.** No person's name and no path of the author's machine is in the setup files.
+
+**What it did not show:**
+- **A person's time.** Reading each reply and running the six handed-over commands takes longer than an agent answering at once.
+- **The scanner's install.**
+- **The permission prompts of an interactive session.** In this headless run the permission check refused the cards' multi-command Detect lines, the version check and the drill's own clock. The drill handed the version check and the scans over as `!` lines. It left the check for a `CLAUDE.md` in a folder above the setup and the count of user-level skills as "not checked", said so, and wrote it to `adoption/kit-notes.md`. In an interactive session those are permission prompts the person answers. The drill could not measure its own time; the trial's driver did.
+
 ## Other reviews
 
 Agents also read the kit cold, as a newcomer, and checked it for private detail, unsourced claims, and the user's point of view. Their findings were fixed before release. Those reviews are in the private development history; they are agent reads, not adopter trials.
+
+## Run 11: a domain as a Claude Code plugin, in a local marketplace (2026-11-26)
+
+Claude Code's plugin system installs, versions, updates and removes skills and agents. This run tried whether a domain fits it, with the advisor council domain, on Windows 10 with Claude Code 2.1.332. Nothing was published: the marketplace was a folder in a throwaway directory. Every command but the first ran with `CLAUDE_CONFIG_DIR` set to a throwaway configuration folder. The first, `claude plugin marketplace list` without it, listed the maintainer's own marketplaces, to compare: the throwaway configuration showed only the built-in directory. The maintainer's own `~/.claude` settings and plugins were the same, file by file, before and after. The run was made twice, the second time keeping every command's output.
+
+**The plugin:** the domain as `vet-and-adopt` places it. The entry and its `skills/` folder became one skill, and its eight agents went beside it. Two manifest files were added: `.claude-plugin/plugin.json` in the plugin, and `.claude-plugin/marketplace.json` in the marketplace folder. The domain's files are the kit's, scanned SAFE, 0 out of 100 (SkillSpector v2.13.6, 2026-11-21).
+
+| Step | Command | Result |
+|---|---|---|
+| Validate | `claude plugin validate` on the plugin, then the marketplace | Passed; the marketplace with one warning, no marketplace description |
+| Install | `claude plugin marketplace add <folder>`, then `claude plugin install <domain>@<marketplace>` | Installed at user scope, version 1.0.0. `claude plugin validate` listed the skill and the eight agents under the plugin's name, such as `advisor-council-for-big-decisions:karen-skeptic`. The plugin was copied into the plugin cache, `cache/<marketplace>/<plugin>/1.0.0/`, 16 files, though [docs/facts.md](facts.md#claude-code-installed-plugins-and-their-skills) says a plugin from a marketplace added from a local folder is not; `claude plugin list --json` named both that folder (`installPath`) and the marketplace folder (`readFromFolder`). Which one a session reads was not tested. |
+| Update | version 1.0.1 with one changed line, `claude plugin marketplace update`, then `claude plugin update` | "updated from 1.0.0 to 1.0.1", with "Restart to apply changes"; the new copy held the changed line |
+| Remove | `claude plugin uninstall`, then `claude plugin marketplace remove` | Gone from `claude plugin list`; both versions stayed in the plugin cache, each marked `.orphaned_at` |
+
+**What it shows:**
+- **Install, update and remove work**, by command and by version. That is what #12 and #5 asked of the kit's own copy route.
+- **Every name changes.** A domain's skill and agents load under the plugin's name ([docs/facts.md](facts.md#claude-code-installed-plugins-and-their-skills)). The cards, the drill's menu and the domains' stubs, which exist to give a skill a short name, all use the short names today.
+- **Not removed at once.** An update or an uninstall leaves the old copy, marked, until Claude Code removes it 14 days later (the same section). So an undo does not leave the configuration as it was on the day.
+
+**Open:** whether the other domains follow. That is the maintainer's call. The cost is a change to every name the kit uses for a domain's parts.
+
+## Domains on claude.ai (not run yet)
+
+No domain has been uploaded to claude.ai yet: the zip was built and listed, never uploaded. The trial is ready. `node tools/export/claude-ai-trial.mjs build <folder>` writes two zips and a checklist: `advisor-council-for-big-decisions`, one of the nine domains whose front matter a strict YAML reader refused until that was fixed, and whose skill asks for a panel that claude.ai has no agents for; and `marketing-copy-emails-seo-signups`, which has many skills behind one entry. Each gets one task that needs a skill file inside the domain. After each upload, `node tools/export/claude-ai-trial.mjs record` prints the row that goes in this table.
+
+| Date | Domain | Upload | Skill Claude read | Note |
+|---|---|---|---|---|
+
+## Reports from adopters
+
+The runs above are the maintainer's. Reports from other people come through the adoption report form (`CONTRIBUTING.md`), each with the receipt the drill writes at the end of phase 5: [every adoption report](https://github.com/Richicinschi/studio-os/issues?q=label%3Aadoption-report). None has been sent yet.
+
+The studio's own use, counted, with how each count was made: [docs/studio-use.md](studio-use.md). It is not adoption evidence: the studio wrote the kit.
 
 ## What this does not prove
 

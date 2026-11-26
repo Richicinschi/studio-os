@@ -49,7 +49,7 @@ The menu marks the item **have** when a `brainstorming` skill exists at either l
 
 - Nothing beyond Claude Code for the conversation and the design document.
 - The optional browser companion, which shows mockups in a browser tab, runs a small server on your machine and needs:
-  - Node.js. The kit installs version 22; the companion's minimum version is not documented in docs/facts.md as of 2026-11-02. Windows: `! winget install --id OpenJS.NodeJS.22 -e`; macOS and Linux: `! curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash`, then `! \. "$HOME/.nvm/nvm.sh" && nvm install 22`.
+  - Node.js. The kit installs version 22; the companion cannot run on a version older than 14.18 ([docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux"). Windows: `! winget install --id OpenJS.NodeJS.22 -e`; macOS and Linux: `! curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash`, then `! \. "$HOME/.nvm/nvm.sh" && nvm install 22`.
   - bash, for its start and stop scripts. Windows: Git for Windows, `! winget install --id Git.Git -e --source winget`; macOS and Linux: check with `bash --version`.
 - [writing-plans](writing-plans.md), for the step after an approved design. Optional: step 2 below says what replaces it.
 - A git repository, if you want design documents committed.
@@ -92,4 +92,4 @@ If a check fails, or Claude starts building in check 3, the item is not done: th
 - **On Windows the owner check is off.** From a Windows shell the server runs without the check that stops it when its session ends, so only the four-hour idle stop ends a forgotten one; close it yourself when you finish brainstorming.
 - **Cost:** its name and description load into every session, about 67 tokens (an estimate, bytes divided by 4); the body, about 3,520 tokens (estimate), loads only when it is used.
 - **Company repositories:** a design document committed to `docs/` stays in the repository's history. Ask whether your company wants design notes there before the first commit.
-- **claude.ai:** the conversation and the design document work there as an uploaded custom skill (docs/facts.md, "claude.ai: custom skills and the built-in document skills"). The browser companion runs a server on your machine and the builder check starts a subagent, so both need Claude Code; whether claude.ai's chat app has subagents is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from").
+- **claude.ai:** the conversation and the design document work there as an uploaded custom skill (docs/facts.md, "claude.ai: custom skills and the built-in document skills"). The browser companion runs a server on your machine and the builder check starts a subagent, so both need Claude Code; whether claude.ai's chat app has subagents is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from").

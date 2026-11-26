@@ -56,7 +56,9 @@ tree in one step.
 3. Then, after the tree exists, ask about `git init` as a question of its own, never as part of the
    tree's question or another option: "Make this folder a git repository? It keeps a history of every
    change to your setup." Run it only on that yes, with a `.gitignore` that excludes `.env*`, data
-   folders, `.claude/settings.local.json` and `CLAUDE.local.md`. Add no remote unless their data rules
+   folders, `.claude/settings.local.json` and `CLAUDE.local.md`, and `adoption/` when their spec keeps
+   it out of git. Where a `.gitignore` is there already, add only the lines it lacks, shown first;
+   never replace it. Add no remote unless their data rules
    allow one and they ask for it.
 
 ## 3. Restructure mode: existing work

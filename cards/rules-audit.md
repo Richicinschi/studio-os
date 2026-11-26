@@ -73,6 +73,13 @@ The menu marks the item **have** when the brief is in your setup and an audit re
 
 If a finding lacks either quote, or the report has no list of what was found consistent, the brief was not followed: the plan row stays unticked, and the audit runs again. If you chose to run it later, check 1 alone ticks the row, and the decision row says the first run is still open.
 
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: grep -c '<your setup>' "$(installed rules-audit-brief.md)"
+expect: 0
+```
+
 ## Undo
 
 - **Claude:** deletes the brief from your setup.

@@ -12,7 +12,7 @@ tokens:
 ## Why
 
 - **The problem:** at the end of a branch, an agent left to itself picks how the work lands. It merges into the base branch on its own, guesses the wrong base, offers to throw the work away, force-pushes after a rejected push, or removes a worktree that holds files nobody committed. Each of these is hard to take back.
-- **The reason:** the skill ends every branch the same way. It runs the full test suite first and confirms the base branch, then offers a menu of two options: push and open a pull request (PR) that you merge, or keep the branch as it is. A local merge or a discard happens only when you ask for it in so many words, a discard only after you type `discard`, and it removes only a worktree it made in this session, never with `--force` on its own.
+- **The reason:** the skill ends every branch the same way. It runs the full test suite first and confirms the base branch, then offers a menu of two options: push and open a pull request (PR) that you merge, or keep the branch as it is. Before the first push it has the whole branch and the draft PR body reviewed with [requesting-code-review](requesting-code-review.md), and fixes what the review finds. A local merge or a discard happens only when you ask for it in so many words, a discard only after you type `discard`, and it removes only a worktree it made in this session, never with `--force` on its own.
 - **The cost of skipping it:** a merge made the wrong way loses history, and nothing brings it back. In the studio, 21 pull requests were merged with a squash during one migration, before the rule existed: each branch's commits were folded into one, and they were left as they are ([a recorded yes before a merge](../examples/grant-before-merge.md)).
 - **The principle:** [one task, one branch, one PR, full history](../PRINCIPLES.md#one-task-one-branch-one-pr-full-history). The skill ends a task as a PR that you merge, in the way you chose, instead of a merge the agent made.
 
@@ -60,7 +60,7 @@ The menu marks the item **have** when a skill of this name is present, in a proj
   - Debian or Ubuntu: `! sudo apt install git`.
 - A Bash shell for the skill's commands. On Windows, Git for Windows gives Claude Code one; without it, Claude Code uses PowerShell ([docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux"), and the commands need rewriting in step 2.
 - A test command for each project; the skill will not offer the menu until the suite passes.
-- Optional: the `gh` command line, to open a PR on GitHub from the terminal. How to install it is not documented in docs/facts.md as of 2026-11-02, and `gh` serves GitHub only ([docs/facts.md](../docs/facts.md), "GitHub: merge methods"); without it, or on another host, you open the PR on your server's website after the push.
+- Optional: the `gh` command line, to open a PR on GitHub from the terminal. How to install it is in [docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux", and `gh` serves GitHub only ([docs/facts.md](../docs/facts.md), "GitHub: merge methods"); without it, or on another host, you open the PR on your server's website after the push.
 
 ## Steps
 
@@ -72,6 +72,7 @@ The menu marks the item **have** when a skill of this name is present, in a proj
    - **The commit** made when files are saved before a cleanup: a plain `git commit` in the kit's copy; it signs if you took [signed commits](signed-commits.md), which signs every commit.
    - **The force-push row**, which asks for a recorded grant row: points at your yes-list or ledger.
    - **Tests and PRs**: your test command; your server's command line, or the link it prints on a push.
+   - **The review before the first push** (option 1 hands the whole branch and the draft PR body to [requesting-code-review](requesting-code-review.md)): kept if you take that skill; otherwise your own review step, or cut.
    - **The front matter's author**: your own.
 3. **Claude:** records the decision, who merges and how, the scope and the undo in `adoption/decisions.md`, with the scan result.
 

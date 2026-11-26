@@ -1,0 +1,70 @@
+name: Adoption report
+description: How an adoption went for you, with the receipt the drill wrote
+title: "[Adoption report]: "
+labels: ["adoption-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. A report is the only evidence the kit has from people other than its maintainer.
+        Never paste secrets, keys, company or client names, paths, data or personal details. Describe them in words instead.
+  - type: input
+    id: kit-version
+    attributes:
+      label: Kit version
+      description: The receipt's "Kit:" line names it, as in v3.5.0; or the top section of CHANGELOG.md in your copy of the kit.
+    validations:
+      required: true
+  - type: textarea
+    id: receipt
+    attributes:
+      label: Your receipt
+      description: Paste `adoption/receipt.md` as it is. It names kit items, counts and a duration only; read it once more before you send it. Without one (claude.ai only, or no Node.js), leave this empty and fill in the next two.
+      render: markdown
+    validations:
+      required: false
+  - type: textarea
+    id: what-you-adopted
+    attributes:
+      label: What you adopted
+      description: The items by their names in the kit's menu, if there is no receipt.
+    validations:
+      required: false
+  - type: input
+    id: how-long
+    attributes:
+      label: How long it took
+      description: Roughly, in minutes or sittings, if there is no receipt.
+    validations:
+      required: false
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where you use Claude
+      options:
+        - Claude Code
+        - claude.ai
+        - Both
+    validations:
+      required: false
+  - type: textarea
+    id: what-broke
+    attributes:
+      label: Where it broke or confused you
+      description: A step, a check or a question, by phase and item, in your own words.
+    validations:
+      required: false
+  - type: textarea
+    id: what-you-kept
+    attributes:
+      label: What you kept, and what you took out again
+      description: After a few days of use, if you can.
+    validations:
+      required: false
+  - type: checkboxes
+    id: nothing-private
+    attributes:
+      label: Nothing private
+      options:
+        - label: This report holds no names, paths, company or client details, data or secrets.
+          required: true

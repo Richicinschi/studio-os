@@ -73,6 +73,13 @@ Light takes steps 1, 2, 4 and 6; standard takes steps 1 to 4 and 6; full takes a
 
 If step 1 prints `0`, or an entry has an empty Why, or in step 2 Claude answers without opening the log, the item is not done: the plan row stays unticked. The usual cause in step 2 is a front-door line that is missing or names another path.
 
+`tools/check-setup.mjs` runs the count of step 1 from this block, without Claude; showing the newest entry stays with Claude:
+
+```check
+run: test "$(grep -cE '^## [0-9]{4}-[0-9]{2}-[0-9]{2}: ' "$(installed DECISIONS.md)")" -ge 1 && echo yes || echo no
+expect: yes
+```
+
 ## Undo
 
 - **Claude:** removes the front-door line, with the diff shown.
@@ -87,4 +94,4 @@ If step 1 prints `0`, or an entry has an empty Why, or in step 2 Claude answers 
 - **A log that nothing prompts falls behind.** At the light size nothing reminds Claude to offer an entry, so a decision made in a chat stays in that chat unless you say "log this". The standard size adds the reminder.
 - **A long log:** Claude can list the dated headings (`grep -n '^## [0-9]' DECISIONS.md`) and open the one entry it needs, instead of reading the whole file.
 - **Company rules.** Decisions about company work can be confidential. Where the log lives follows the data rules you gave in round 1 of the adoption.
-- **claude.ai:** keep the log as a file in the Project's knowledge and add each new entry to it. Whether a Project reads its knowledge files only when needed is not documented in docs/facts.md as of 2026-11-02.
+- **claude.ai:** keep the log as a file in the Project's knowledge and add each new entry to it. A Project uses its knowledge as context in each chat; only on a paid plan, once the knowledge nears the context window, does Claude search it for the parts it needs ([docs/facts.md](../docs/facts.md), "claude.ai: Projects"). So in a smaller Project the whole log is in every chat's context.

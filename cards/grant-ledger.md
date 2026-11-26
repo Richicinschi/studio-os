@@ -95,6 +95,13 @@ Which steps each size takes: **light** 1 and 5; **standard** 1 to 3 and 5; **ful
 
 If Claude tags before the row exists, or treats the first yes as cover for the second tag, the item is not done: the plan row stays unticked, and the wording of the rule in your front door is the next thing to look at. At light, check 1 does not apply, and check 2 runs without the rows: Claude asks before each tag.
 
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: grep -c '^| Date | Act | Target | Your words | Reference |' "$(installed grants.md)"
+expect: 1
+```
+
 ## Undo
 
 - **Claude:** removes the rule it added to your front door.

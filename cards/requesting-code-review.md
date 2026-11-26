@@ -4,7 +4,7 @@ module: 08-agents-and-council
 checked: 2026-11-09
 tokens:
   description: 49
-  body: 705
+  body: 913
 ---
 
 # Requesting a code review
@@ -12,7 +12,7 @@ tokens:
 ## Why
 
 - **The problem:** a change checked only by the session that wrote it gets one view, and a big change deserves someone whose whole job is to find what is wrong with it. Reviewing inline also fills the main thread with the whole diff.
-- **The reason:** this skill hands the change to a reviewer subagent with a brief it fills in: what was built, what it should do, and the first and last commit of the range. The reviewer gets that brief, never your session's history, reads the diff in its own context, and returns strengths, issues by severity with file and line, and a verdict on whether it is ready to merge. Then you fix, defer or push back, point by point.
+- **The reason:** this skill hands the change to a reviewer subagent with a brief it fills in: what was built, what it should do, the first and last commit of the range, and the draft PR body when a pull request follows. The reviewer gets that brief, never your session's history, reads the diff in its own context, and returns strengths, issues by severity with file and line, and a verdict on whether it is ready to merge. Then you fix, defer or push back, point by point.
 - **The cost of skipping it:** in the studio, a run passed every check and would have deleted about 190 pages; reading the change, not the checks, is what caught it ([the green run](../examples/green-run-that-would-have-deleted.md)).
 - **The principle:** [evidence before claims](../PRINCIPLES.md#evidence-before-claims). A change is not called ready to merge until a reviewer that did not write it has read the diff and given a verdict.
 
@@ -46,18 +46,18 @@ The menu marks the item **have** when a skill of this name exists at either leve
 
 ## Needs
 
-- Claude Code: the skill starts a subagent. Whether claude.ai's chat app has subagents is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so this card has no claude.ai route.
+- Claude Code: the skill starts a subagent. Whether claude.ai's chat app has subagents is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so this card has no claude.ai route.
 - Git, from START-HERE's "Prepare".
-- A reviewer: the [linus-reviewer](linus-reviewer.md) agent, your own reviewer agent, or a general-purpose subagent. A built-in subagent of that kind is not documented in docs/facts.md as of 2026-11-02; ask Claude in a session whether it has one before you choose it.
+- A reviewer: the [linus-reviewer](linus-reviewer.md) agent, your own reviewer agent, or a general-purpose subagent. Claude Code has a built-in one, `general-purpose`, in interactive sessions, unless a deny rule or a setting removes it ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"); ask Claude in a session whether it has one before you choose it.
 - SkillSpector v2.13.6 for the scan, row 1 of your plan ([SkillSpector](skillspector.md)). The install, pinned by its full commit, is the same on every system, once uv is installed: `! uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da`. On Windows, run `$env:PYTHONUTF8=1` in PowerShell before a scan.
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on `catalog/skills/requesting-code-review/` (`SKILL.md` and the brief template `code-reviewer.md`): scans it with SkillSpector and hands the report to the kit's comparer (`skillspector scan catalog/skills/requesting-code-review --no-llm --format json | node tools/scan-compare.mjs requesting-code-review - --root catalog/skills/requesting-code-review`, with `PYTHONUTF8=1` first on Windows), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit's record of its scan, with SkillSpector v2.13.6 on 2026-11-21, is `SAFE` at 0/100 with no findings (`tools/export/scans.json`); with the pinned version the comparer prints `known: 0, moved: 0, reworded: 0, new: 0`. Your own scan is the one that decides.
+1. **Claude:** runs `vet-and-adopt` on `catalog/skills/requesting-code-review/` (`SKILL.md` and the brief template `code-reviewer.md`): scans it with SkillSpector and hands the report to the kit's comparer (`skillspector scan catalog/skills/requesting-code-review --no-llm --format json | node tools/scan-compare.mjs requesting-code-review - --root catalog/skills/requesting-code-review`, with `PYTHONUTF8=1` first on Windows), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit's record of its scan, with SkillSpector v2.13.6 on 2026-11-26, is `SAFE` at 0/100 with no findings (`tools/export/scans.json`); with the pinned version the comparer prints `known: 0, moved: 0, reworded: 0, new: 0`. Your own scan is the one that decides.
 2. **Claude:** writes it for your setup, and shows it to you before saving:
-   - **the reviewer it starts:** ADOPT keeps `linus-reviewer`. ADAPT changes it in two places, step 2 of "How to ask" in `SKILL.md` and the `Subagent (...)` line at the top of `code-reviewer.md`: to your reviewer agent's name, or to a general-purpose subagent given the filled-in brief;
-   - **the model note:** step 2 of "How to ask" cites the studio's agent rules file (`.claude/agents/AGENTS.md`), which the kit does not ship: your own model rule in a few words, or cut;
-   - **the "Mandatory" list:** the studio's copy asks for a review after a task only when that task's review is switched on in [subagent-driven-development](subagent-driven-development.md), and at the end of every plan. If you do not take that skill, that first line keeps only "at the end of every plan"; "after a major feature" and "before a merge to your main branch" stay as they are;
+   - **the reviewer it starts:** ADOPT keeps `linus-reviewer`. ADAPT changes it in two places, step 3 of "How to ask" in `SKILL.md` and the `Subagent (...)` line at the top of `code-reviewer.md`: to your reviewer agent's name, or to a general-purpose subagent given the filled-in brief;
+   - **the model note:** step 3 of "How to ask" cites the studio's agent rules file (`.claude/agents/AGENTS.md`), which the kit does not ship: your own model rule in a few words, or cut;
+   - **the "Mandatory" list:** the studio's copy asks for a review after a task only when that task's review is switched on in [subagent-driven-development](subagent-driven-development.md), and at the end of every plan. If you do not take that skill, the line about tasks keeps only "at the end of every plan"; "before the first push", "after a major feature" and "before a merge to your main branch" stay as they are;
    - **the temporary folder:** the brief's example for looking at another revision is a Unix path under `/tmp`; on Windows, name a temporary folder of yours;
    - **the metadata block:** its author line names the studio; Claude writes yours, and keeps the name and description;
    - **keep:** the brief template with its "Set-aside list", its read-only rule, its rule that the reviewer starts no subagents of its own, and the severity scale (Critical, Important, Minor).
@@ -70,7 +70,7 @@ The menu marks the item **have** when a skill of this name exists at either leve
 2. **you:** in a new session, inside a repository with one small finished commit, say "request a code review of my last commit". Expected: Claude works out the first and last commit of the range, starts the reviewer subagent with the filled-in brief, and returns strengths, issues by Critical, Important and Minor with file and line, and "Ready to merge?" answered Yes, No or With fixes.
 3. **you:** afterwards, the repository is as it was: same branch, nothing changed in the working tree.
 
-If Claude reviews the diff in the main thread, or reports that the reviewer it names does not exist, the item is not done: the plan row stays unticked, and the reviewer name in step 2 of "How to ask" is the first thing to look at.
+If Claude reviews the diff in the main thread, or reports that the reviewer it names does not exist, the item is not done: the plan row stays unticked, and the reviewer name in step 3 of "How to ask" is the first thing to look at.
 
 ## Undo
 
@@ -80,9 +80,9 @@ If Claude reviews the diff in the main thread, or reports that the reviewer it n
 
 ## Watch out
 
-- **Its description loads every session:** about 49 tokens (an estimate). Its body (its instructions), about 705 tokens, and the brief template `code-reviewer.md`, about 1,680 tokens (estimates), load only when it runs.
+- **Its description loads every session:** about 49 tokens (an estimate). Its body (its instructions), about 913 tokens, and the brief template `code-reviewer.md`, about 1,850 tokens (estimates), load only when it runs.
 - **Two copies answer the same request.** If you also have another skill that does the same job, both descriptions load and two skills fit "request a review". Keep one.
-- **One review at the end, for routine work.** The studio stopped a run of near-identical implement-then-review rounds as too repetitive: the early, risky tasks had gained from their reviews, the later routine ones had not ([module 04, The mechanism](../modules/04-delegation/README.md#the-mechanism)). That is why its "Mandatory" list no longer says "after each task".
-- **Two output formats can meet.** The brief asks for "Ready to merge?", while the `linus-reviewer` seat's own instructions ask for APPROVE or CHANGES REQUESTED. Which wins is not documented; pick one when you adapt, so every review reads the same.
+- **One review at the end, for routine work.** The studio stopped a run of near-identical implement-then-review rounds as too repetitive: the early, risky tasks had gained from their reviews, the later routine ones had not ([module 04, The mechanism](../modules/04-delegation/README.md#the-mechanism)). That is why its "Mandatory" list no longer says "after each task". It does ask for one review of the whole branch, with the draft PR body, before the first push, and for repeated rounds only on sign-in, payment, store submission or security code, stopping after four.
+- **Two output formats can meet.** The brief asks for "Ready to merge?", while the `linus-reviewer` seat's own instructions ask for APPROVE or CHANGES REQUESTED. Which wins is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"); pick one when you adapt, so every review reads the same.
 - **The reviewer must leave your checkout alone.** Another session may be working in it. The brief says so; keep that rule when you adapt it.
-- **Company rules:** the reviewer reads the whole diff, which is session content that Claude Code sends over the network ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"); where a reviewer's WebSearch and WebFetch requests go beyond that is not in docs/facts.md as of 2026-11-02. Check your data rules for that code, and your reviewer's tool list against them.
+- **Company rules:** the reviewer reads the whole diff, which is session content that Claude Code sends over the network. A reviewer's WebSearch queries also go to Anthropic's search backend, and its WebFetch sends each hostname to Anthropic for a safety check before it fetches a page ([docs/facts.md](../docs/facts.md), "Claude Code: plans, account, attribution and where session content goes"). Check your data rules for that code, and your reviewer's tool list against them.

@@ -20,7 +20,7 @@ other_figures:
 Read-only, in your setup folder and in the kit folder.
 
 - Whether you have a plan, and how many rows are ticked: `ls adoption/plan.md` and `grep -c '\[x\]' adoption/plan.md`.
-- Whether your copy of the kit has the mode: `grep -c 'Setup-check mode' <kit>/.claude/skills/drill-to-adopt/SKILL.md` prints `1`.
+- Whether your copy of the kit has the mode: `grep -rqs 'Setup-check mode' "<kit>/.claude/skills/drill-to-adopt" && echo yes || echo no` prints `yes`. It looks in the whole skill folder, since newer versions keep each mode in a file of its own.
 - The kit version you have, the first `## ` heading of `<kit>/CHANGELOG.md`, and the version your adoption was made with, the Kit version column of the newest row in `adoption/decisions.md`.
 
 The menu marks the item **have** when a plan with ticked rows exists and your kit copy has the mode; **partly** when there is a plan but the kit copy is older than the mode, or no row is ticked yet; and **not yet** when there is no plan.

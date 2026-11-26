@@ -60,6 +60,6 @@ Your Claude takes you through these steps during the adoption ([START-HERE](../.
 3. At the end of each day, say "handoff". Save the note as `handoff-YYYY-MM-DD.md` and add it to the Project's knowledge. The instructions tell the next chat to read the newest one first.
 4. Start each day in a new chat in the same Project, not in yesterday's chat.
 5. Keep old handoff notes in the knowledge: that is your vault. Never replace one with a shorter summary.
-6. Check the memory feature. It is on by default on Free, Pro, Max and Ultra, and off on Team and Enterprise until each member turns it on (`docs/facts.md`, "claude.ai: memory and past chats"). The files in the Project stay the record you control.
+6. Check the memory feature. It is on by default on Free, Pro, Max and Ultra. On Team and Enterprise it starts on for each member in most organizations made from 31 October 2026 and off in older ones, where each member turns it on (`docs/facts.md`, "claude.ai: memory and past chats"). The files in the Project stay the record you control.
 
 Catalog items used: [handoff](../../catalog/skills/handoff/SOURCE.md). `save-session` is named in the catalog, but its files are not in the kit, so it cannot be adopted from here.

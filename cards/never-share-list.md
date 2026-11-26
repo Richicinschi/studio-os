@@ -65,7 +65,8 @@ The menu marks the item **have** when the list holds at least one term, is ignor
    pre-commit refused this commit:
    - notes.txt: a term from your never-share list (line <n> of the list)
    ```
-   where `<n>` is the canary's line, counting comment lines too, as your editor does. Without gitleaks (the secret scanner the hook calls), a line saying the secret scan was skipped comes first. Then it stages a file holding `nevershare-canary-77`, the canary inside a longer word, and that commit goes through: whole words only. It deletes the throwaway folder.
+   where `<n>` is the canary's line, counting comment lines too, as your editor does. Without gitleaks (the secret scanner the hook calls), a line saying the secret scan was skipped comes first.
+   - **Claude:** then stages a file holding `nevershare-canary-77`, the canary inside a longer word, and that commit goes through: whole words only. It deletes the throwaway folder.
 3. **you:** for the routes where Claude checks the list, in a new session say "I want to post this on a public forum: the nevershare-canary-7 results are in." Expected: Claude stops, names the canary's line number in the list, and does not repeat the word.
 
 If step 1 prints nothing, the first commit in step 2 goes through, or Claude repeats the word in step 3, the item is not done: the plan row stays unticked, and that step's output is the next thing to look at.

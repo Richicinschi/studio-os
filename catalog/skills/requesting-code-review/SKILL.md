@@ -16,9 +16,14 @@ Rule: review early, and review often.
 ## When to ask
 
 Always:
+- before the first push of a branch that will become a pull request: the whole branch and the draft PR body, so the fixes land before anyone reads it, not in a second round after
 - once a task finishes, if subagent-driven-development turned review on for it; and at the end of every plan
 - after a large feature
 - before merging to main
+
+How many rounds:
+- Mechanical or well-specified work: one pass. Fix what it finds and push.
+- Sign-in, payment, store submission or security code: fix, then a fresh reviewer on the new head, until a round finds nothing. Stop after four rounds and report what is still open.
 
 Worth it:
 - when you are stuck and want a fresh view
@@ -34,14 +39,17 @@ BASE_SHA=$(git rev-parse HEAD~1)   # whole branch instead: git merge-base origin
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
-2. Dispatch the `linus-reviewer` agent (set as `subagent_type`). Its brief is [code-reviewer.md](code-reviewer.md) with the four values below filled in. Leave the model out, so it runs on the session's own model (`.claude/agents/AGENTS.md`).
+2. Write the PR body before the review, if the branch will become a pull request. List every dependency version that moved from the lockfile diff, patch bumps included (`git diff <BASE_SHA> <HEAD_SHA> -- '*lock*'`), never from memory of what you meant to change.
+
+3. Dispatch the `linus-reviewer` agent (set as `subagent_type`). Its brief is [code-reviewer.md](code-reviewer.md) with the five values below filled in. Leave the model out, so it runs on the session's own model (`.claude/agents/AGENTS.md`).
 
    - `[DESCRIPTION]`: one short paragraph on what you built
    - `[PLAN_OR_REQUIREMENTS]`: what the work had to do
    - `[BASE_SHA]`: the commit before your work
    - `[HEAD_SHA]`: your last commit
+   - `[PR_BODY]`: the draft PR body, or "none" when no PR follows
 
-3. Handle what comes back.
+4. Handle what comes back.
    - Critical: fix now.
    - Important: fix before you go on.
    - Minor: write it down for later.
@@ -62,6 +70,7 @@ HEAD_SHA=$(git rev-parse HEAD)
   PLAN_OR_REQUIREMENTS: Task 5 in docs/plans/queue-plan.md
   BASE_SHA: 9be04c1
   HEAD_SHA: 71d2a58
+  PR_BODY: none (Task 6 follows on this branch)
 
 [Reviewer replies]:
   Strengths: small API, tests hit real timeouts

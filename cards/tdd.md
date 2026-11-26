@@ -52,7 +52,7 @@ The menu marks the item **have** when a `tdd` skill at `1.1.0` is in place, or a
 
 ## Needs
 
-- Nothing beyond Claude Code, plus the test runner your project already uses. Test runners and their installs are not documented in docs/facts.md as of 2026-11-02; your project's own setup is the source.
+- Nothing beyond Claude Code, plus the test runner your project already uses. The kit does not cover a particular test runner or its install; your project's own setup is the source.
 - SkillSpector, for the scan in step 1: row 1 of your plan ([docs/facts.md](../docs/facts.md), "Installing SkillSpector").
 
 ## Steps

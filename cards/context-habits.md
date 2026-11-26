@@ -61,14 +61,14 @@ The menu marks the item **have** when you start fresh and there is a handoff not
 3. **you:** next time, start a new session: type `/clear` in the open one, or close it and start Claude Code again in your setup folder. Ask "where did we stop?", or paste the note's resume prompt.
 4. **you:** at a natural break inside one task, run `/compact` with a line on what to keep, for example `/compact keep the schema decisions and the failing query`. When the next part is a different task, use `/clear` instead.
 5. **you:** when Claude is about to read many files to find one thing, say: "Give this search to a subagent, and bring back only the conclusion."
-6. **you:** now and then, type `/context` to see the load by category, including which `CLAUDE.md` and auto memory files loaded. Read it yourself: its units are not documented, and whether its output reaches Claude is not documented either.
+6. **you:** now and then, type `/context` to see the load by category, including which `CLAUDE.md` and auto memory files loaded. Read it yourself: its units, and whether its output reaches Claude, are open questions ([docs/facts.md](../docs/facts.md), "Claude Code: measuring context and asking multiple choice").
 7. **Claude:** if you said yes to question 2, adds the "Context" section to the front door in your words; if you chose the split in question 3, changes the identity lines. Both as a merge, with the diff shown.
 8. **Claude:** records the decision, the scope (your habits only, or the front door too), any change to the front door, and the undo in `adoption/decisions.md`.
 
 ## Check
 
 1. **you:** the next working day, in a fresh session (a new terminal, or after `/clear`), ask "where did we stop?" as the first message. Expected: Claude reads the newest note in `handoffs/`, names it, and answers with its open items and its first step, without you explaining anything.
-2. **you:** type `/context` after that answer and look at what loaded; compare the categories with what Detect measured (not the numbers, whose units are not documented).
+2. **you:** type `/context` after that answer and look at what loaded; compare the categories with what Detect measured, not the numbers: their units are an open question ([docs/facts.md](../docs/facts.md), "Claude Code: measuring context and asking multiple choice").
 
 If Claude cannot answer from the note, the item is not done: the plan row stays unticked. The usual cause is a front door that does not name `handoffs/`, or no note written the evening before.
 
@@ -85,4 +85,4 @@ If Claude cannot answer from the note, the item is not done: the plan row stays 
 - **What survives a compaction.** The project-root `CLAUDE.md`, unscoped rules and auto memory are read again from disk; skill bodies are capped. Instructions given only in the conversation can be lost, so anything you want kept goes into the front door. `/autocompact` sets an earlier trigger, for example `/autocompact 500k`.
 - **Subagents have a cost of their own.** In the studio, nine research agents sent out in parallel used about 1.1 million subagent tokens together and hit the session limit; the last two failed mid-run and had to be run again. The figure is the studio's own record of those runs, not re-measured for the kit ([module 02, Evidence](../modules/02-context-and-models/README.md#evidence)). If you hit usage limits, run research agents one at a time.
 - **Token cost.** The "Context" section written for this card was about 74 tokens every session (estimate, bytes divided by 4). The habits themselves load nothing.
-- **claude.ai:** one chat per task inside the Project; when a chat runs long or drifts, ask for a handoff note, add it to the Project's knowledge, and go on in a new chat. How claude.ai caches chats is not documented in docs/facts.md as of 2026-11-02; a fresh chat per task does not depend on it.
+- **claude.ai:** one chat per task inside the Project; when a chat runs long or drifts, ask for a handoff note, add it to the Project's knowledge, and go on in a new chat. claude.ai caches a Project's content, so reusing it counts less against your limits until the cache expires ([docs/facts.md](../docs/facts.md), "Prompt cache and why a new day starts cold"); a fresh chat per task does not depend on it.

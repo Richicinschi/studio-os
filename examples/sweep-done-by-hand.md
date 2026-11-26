@@ -32,4 +32,4 @@ Later the studio made it stronger: if work can run in parallel, it should. A pha
 - Before a sweep starts, ask two questions: is it mechanical, and is each file independent? Two yeses make it a subagent's job. In Claude Code, `dispatching-parallel-agents` covers running independent tasks side by side.
 - Give each subagent the five things above. If writing the brief would take longer than the work, do the work.
 - The catalog's [improve](../catalog/skills/improve/SOURCE.md) skill turns an audit into small plans that a cheaper executor can run. Take it through `vet-and-adopt` first.
-- In claude.ai, whether the chat app has subagents is not documented ([docs/facts.md](../docs/facts.md)). Split the sweep into separate chats in one Project, one part each.
+- In claude.ai, whether the chat app has subagents is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"). Split the sweep into separate chats in one Project, one part each.

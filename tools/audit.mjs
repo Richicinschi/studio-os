@@ -402,7 +402,17 @@ function frontMatter(file) {
 }
 
 const INSTRUCTIONS = (r) => /^(?:claude|agents)\.md$/i.test(path.posix.basename(r));
-const OTHER_AGENTS = (r) => /^\.cursorrules$/i.test(path.posix.basename(r)) || /(?:^|\/)\.github\/copilot-instructions\.md$/i.test(r);
+// Other agent tools' own instruction files, as their pages name them (docs/facts.md, "Other agent tools:
+// instruction files, skills and hooks"): Cursor's rules (`.mdc`, and the `.md` files Devin reads there) and
+// its older .cursorrules, GitHub Copilot's repository and path-specific instructions, Gemini CLI's GEMINI.md,
+// Codex's AGENTS.override.md, Devin's AGENT.md and AGENTS.local.md, Windsurf's and Devin's rules and global
+// rules, Kiro's steering files. AGENTS.md and CLAUDE.md are the kit's own.
+const OTHER_AGENTS = (r) => /^(?:\.cursorrules|\.windsurfrules|gemini\.md|agents\.override\.md|agent\.md|agents\.local\.md)$/i.test(path.posix.basename(r))
+  || /(?:^|\/)\.github\/copilot-instructions\.md$/i.test(r)
+  || /(?:^|\/)\.github\/instructions\/(?:[^/]+\/)*[^/]+\.instructions\.md$/i.test(r)
+  || /(?:^|\/)\.cursor\/rules\/(?:[^/]+\/)*[^/]+\.mdc?$/i.test(r)
+  || /(?:^|\/)\.(?:windsurf|devin)\/(?:rules\/[^/]+|global_rules)\.md$/i.test(r)
+  || /(?:^|\/)\.kiro\/steering\/[^/]+\.md$/i.test(r);
 
 // Present, line count and headings, never the body.
 function instructionFile(root, r) {
@@ -467,7 +477,7 @@ function claudeSetup(root, files) {
       row('`.claude/settings*.json`', notes.settings),
       row('`.claude/skills/`, `.claude/agents/`', notes.items),
       row('`.mcp.json`', notes.mcp),
-      row("Other agents' instructions (`.cursorrules`, `.github/copilot-instructions.md`)", notes.others),
+      row("Other agent tools' instructions (Cursor, GitHub Copilot, Gemini CLI, Codex, Windsurf, Devin, Kiro)", notes.others),
     ],
     installed,
   };

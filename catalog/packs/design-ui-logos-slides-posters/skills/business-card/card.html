@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Business card</title>
+<!-- Prints front.svg and back.svg, from this page's folder, one side per page at the trim plus 3 mm bleed on
+     every side: an 85 x 55 mm card prints at 91 x 61 mm. For a US card (88.9 x 50.8 mm) change all four sizes
+     below to 94.9mm and 56.8mm. For any other card, use its trim plus 6 mm each way. For a one-sided card,
+     delete the back's img line. display: block keeps each side on its own page; without it the PDF gets extra
+     pages. -->
+<style>
+  @page { size: 91mm 61mm; margin: 0; }
+  html, body { margin: 0; }
+  img { display: block; width: 91mm; height: 61mm; break-after: page; }
+  img:last-child { break-after: auto; }
+</style>
+</head>
+<body>
+<img src="front.svg" alt="Front of the card">
+<img src="back.svg" alt="Back of the card">
+</body>
+</html>

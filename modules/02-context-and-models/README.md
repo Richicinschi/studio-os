@@ -52,7 +52,7 @@ The general lesson: pick the model by the kind of work, and remember that parall
 |---|---|---|
 | Not sure which: most workloads | Opus 5.5 | `opus` |
 | Long autonomous coding, large refactors, computer use | Opus 5.5 | `opus` |
-| Multi-hour agent sessions, deep research, demanding reasoning: the hardest and longest-running tasks | Fable 5.1 | `fable` |
+| Multi-hour agent sessions, deep research, demanding reasoning: the hardest and longest-running tasks | Fable 5.2 | `fable` |
 | Everyday coding, data analysis, content | Sonnet 5.5 | `sonnet` |
 | Simple tasks; real-time, high-volume, cost-sensitive work; subagent tasks | Haiku 5.5 | `haiku` |
 
@@ -62,7 +62,7 @@ Effort is a second dial; its levels are under the same heading in `docs/facts.md
 
 1. **One chat per task,** inside the Project for that stream of work. The Project's instructions and knowledge carry the context, so a new chat starts informed instead of cold.
 2. **When a chat runs long or drifts,** ask for a handoff note, add it to the Project's knowledge, and go on in a new chat.
-3. **Pick the model per chat** from the same table. The claude.ai model menu lists Haiku 5.5, Sonnet 5.5, Opus 5.5 and Fable 5.1, with older models. Which plan gets which model, and which one is the default, is not documented (`docs/facts.md`, "Models: which for what").
-4. **Caching:** how claude.ai caches chats is not documented either; a fresh chat per task does not depend on it.
+3. **Pick the model per chat** from the same table, by its name in the model menu next to the send button; "More models" shows the older ones. Which plan gets which model, and which one is the default, is an open question ([docs/facts.md](../../docs/facts.md), "Models: which for what").
+4. **Caching:** claude.ai caches a Project's content, so reusing it counts less against your limits until the cache expires ([docs/facts.md](../../docs/facts.md), "Prompt cache and why a new day starts cold"); a fresh chat per task does not depend on it.
 
 Catalog items used: [sherlock-researcher](../../catalog/agents/sherlock-researcher.md), the research agent in the story (module 08 covers the agents). The habits on this page are one menu item with its card: [context habits](../../cards/context-habits.md).

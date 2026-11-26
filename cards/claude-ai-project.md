@@ -32,7 +32,7 @@ The menu marks the item **have** when all three answers are yes; **partly** when
 
 ## Ask
 
-1. **"Size?"** Each estimate is the instruction block before you fill it, bytes divided by 4; it grows with your lists. How claude.ai brings a Project's instructions and knowledge into each chat is not documented in docs/facts.md as of 2026-11-02, so the knowledge files are not counted.
+1. **"Size?"** Each estimate is the instruction block before you fill it, bytes divided by 4; it grows with your lists. The knowledge files are not counted, because their cost depends on what you add. A Project's chats use its knowledge as context, and on a paid plan a knowledge base that nears the context window is searched instead ([docs/facts.md](../docs/facts.md), "claude.ai: Projects").
    - Light: the block as the template has it (the work, two lines on who you are, the "ask me first" and "never" lists, the line to read the newest handoff note first, and the handoff shape), with only the handoff notes in the knowledge. Light costs about 116 tokens (estimate). Recommended for a first adoption, and when your data rules keep everything else out of claude.ai.
    - Standard: light, plus the two or three `STYLE.md` lines you would miss most in the block, and the reference documents this stream needs in the knowledge. Standard costs about 130 tokens (estimate). Recommended when a new chat in this stream keeps asking for the same documents.
    - Full: standard, plus the full `USER.md` and `RELATIONSHIP.md` ([identity files](identity-user.md)) in the knowledge, and one line in the block that points to them. Full costs about 151 tokens (estimate). Recommended when you wrote them at the standard or full level.
@@ -48,14 +48,14 @@ The menu marks the item **have** when all three answers are yes; **partly** when
    - Default when skipped: no change.
 3. **"claude.ai's own memory?"**
    - Leave it as your plan sets it; the Project's files stay the record you control. Recommended.
-   - Turn it on: on Team and Enterprise it is off for each member until they turn it on.
+   - Turn it on: on Team and Enterprise it can be off for you, in an older organization or where you turned it off yourself ([docs/facts.md](../docs/facts.md), "claude.ai: memory and past chats").
    - Pause it: claude.ai keeps what it remembered, but stops using it and adding to it.
    - Not sure: leave it as it is, the option recommended above.
    - Default when skipped: no change.
 
 ## Needs
 
-- A claude.ai account. The free plan allows at most five Projects; file size, file count and knowledge limits per plan are not documented in docs/facts.md as of 2026-11-02.
+- A claude.ai account. The free plan allows at most five Projects. A Project file can be up to 30 MB, and the knowledge must fit in the context window, or up to ten times that on a paid plan ([docs/facts.md](../docs/facts.md), "claude.ai: Projects").
 - Nothing to install.
 - For the notes: the [handoff note](handoff.md) habit.
 
@@ -63,11 +63,11 @@ The menu marks the item **have** when all three answers are yes; **partly** when
 
 All three sizes take every step; they differ in what step 2 writes into the block and what step 4 adds to the knowledge.
 
-1. **you:** in claude.ai, make a new Project named after the stream of work. (docs/facts.md does not document the button names for making a Project, editing its instructions or adding to its knowledge as of 2026-11-02, so steps 1, 3 and 4 say what to do, not where to click.)
+1. **you:** in claude.ai, make a new Project named after the stream of work: "Projects" on the left, then "+ New Project". Its instructions are under "Set project instructions", and its knowledge takes files through the "+" button on the right of the Project's page ([docs/facts.md](../docs/facts.md), "claude.ai: Projects").
 2. **Claude:** fills the instruction block from `templates/claude-ai/PROJECT-INSTRUCTIONS.md` in your words: the name of the work; two lines from your `USER.md`; the "ask me first" and "never" lists from your `RELATIONSHIP.md`; at standard and full, the two or three `STYLE.md` lines you would miss most; at full, one line pointing to the full `USER.md` and `RELATIONSHIP.md` in the knowledge; the line telling a new chat to read the newest `handoff-YYYY-MM-DD.md` first; and the shape of a note for when you say "handoff". Short enough to read in a minute. Shown for you to copy.
 3. **you:** paste the block into the Project's instructions.
 4. **you:** add to the Project's knowledge what your size holds: the handoff notes (light), plus the reference documents this stream needs (standard), plus the full `USER.md` and `RELATIONSHIP.md` (full). If there is no note yet, the first one comes at the end of today. Company material goes in only where your data rules allow it.
-5. **you:** only if you chose to change memory in question 3: Settings > Your Claude > "Memory from chats" (older layout: Settings > Memory). To pause, choose "Pause memory", never "Reset memory", which deletes everything remembered, Project memories included.
+5. **you:** only if you chose to change memory in question 3: Settings > Your Claude > "Generate memory from chats" (older layout: Settings > Memory). To pause, choose "Pause memory", never "Reset memory", which deletes everything remembered, Project memories included.
 6. **you:** at the end of each day, say "handoff" in the chat, save the answer as `handoff-YYYY-MM-DD.md`, and add it to the Project's knowledge. Keep the old notes.
 7. **you:** start each day in a new chat in the same Project, not in yesterday's chat.
 8. **Claude:** records the decision, the size, the Project's name, what went into its knowledge and the undo in `adoption/decisions.md`. With claude.ai only, Claude writes that line in the chat, and you add it to a decisions note in the Project's knowledge.
@@ -82,13 +82,13 @@ If it asks you, answers in general terms, or uses an older note, the item is not
 
 - **you:** remove the block from the Project's instructions, or only the lines this card added.
 - **you:** take the handoff notes out of the knowledge only after saving a copy elsewhere: they are your record.
-- **you:** if you changed memory, set it back in Settings > Your Claude > "Memory from chats".
+- **you:** if you changed memory, set it back in Settings > Your Claude > "Generate memory from chats".
 - **Claude:** adds the undo to `adoption/decisions.md`.
 
 ## Watch out
 
-- **What it costs per chat.** The template's block, the light size before you fill it, is about 116 tokens (estimate, bytes divided by 4); the standard size's `STYLE.md` line and the full size's pointer line bring it to about 130 and 151 tokens (estimates). It grows with your lists. How claude.ai brings a Project's instructions and knowledge into each chat, and how it caches chats, is not documented in docs/facts.md as of 2026-11-02.
-- **Memory differs by plan.** It is on by default on Free, Pro, Max and Ultra. On Team and Enterprise it is off for each member until they turn it on, and owners cannot turn it on for them. It builds itself from your chats, so keep your contract in the instructions, which you wrote and review.
+- **What it costs per chat.** The template's block, the light size before you fill it, is about 116 tokens (estimate, bytes divided by 4); the standard size's `STYLE.md` line and the full size's pointer line bring it to about 130 and 151 tokens (estimates). It grows with your lists. Each chat in the Project uses its instructions and knowledge as context, and a Project's content is cached, so reusing it counts less against your limits ([docs/facts.md](../docs/facts.md), "claude.ai: Projects" and "Prompt cache and why a new day starts cold").
+- **Memory differs by plan.** It is on by default on Free, Pro, Max and Ultra. On Team and Enterprise the owners decide whether it is available; in most organizations made from 31 October 2026 it starts on for each member, in older ones it starts off, and owners cannot turn it on for one member ([docs/facts.md](../docs/facts.md), "claude.ai: memory and past chats"). It builds itself from your chats, so keep your contract in the instructions, which you wrote and review.
 - **Past chats.** On Pro, Max, Ultra, Team and Enterprise, claude.ai can search and reference your past chats, on by default (Settings > Your Claude > "Search and reference chats"). The note is still the record you control.
 - **Company data.** A personal account holding company material can break your company's rules. Put into a Project only what your data rules allow, and nothing that crosses between streams of work.
 - **One block, many Projects.** Use the same contract block in every Project, and update all of them when it changes.

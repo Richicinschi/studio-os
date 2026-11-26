@@ -4,6 +4,7 @@ Stories from the studio, with the names taken out. Each one keeps what happened,
 
 | Story | Module | The lesson |
 |---|---|---|
+| [One adoption, turn by turn](adoption-run-7.md) | All | What the drill asks, what the person answers, and what lands in the setup: trial run 7, whole, with a scripted persona, one model and one date. |
 | [The green run that would have deleted 190 pages](green-run-that-would-have-deleted.md) | 03 Planning | A run can pass every check and still be wrong; compare the size of the change with what you expected. |
 | [Vault before you shorten](vault-before-shortening.md) | 01 Continuity | Free memory by moving text, word for word, to a tagged vault, never by cutting it. |
 | [The sweep done by hand](sweep-done-by-hand.md) | 04 Delegation | Long mechanical work goes to a subagent with a self-contained brief, so the main thread keeps moving. |

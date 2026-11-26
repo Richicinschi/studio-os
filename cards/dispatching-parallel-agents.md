@@ -46,7 +46,7 @@ The menu marks the item **have** when a `dispatching-parallel-agents` skill exis
 
 ## Needs
 
-- Claude Code. Subagents are a Claude Code feature; whether claude.ai's chat app has them is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so there you split the work by hand ([module 04](../modules/04-delegation/README.md)).
+- Claude Code. Subagents are a Claude Code feature; whether claude.ai's chat app has them is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so there you split the work by hand ([module 04](../modules/04-delegation/README.md)).
 - Nothing else.
 
 ## Steps

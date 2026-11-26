@@ -5,9 +5,11 @@ description: >-
   setup. Runs the adoption in five phases: a read-only audit on their yes; one question at a time
   about their work, data rules and tools; the feature menu, each item flagged with importance and
   context cost, and the domains that fit their work; an approved spec and a plan in small waves; wave 1 carried out item by item through
-  vet-and-adopt; and a verify phase with proof in the same sitting. Trigger on "start the adoption",
-  "adopt the kit", "drill me to adopt", "set me up like the studio", "update my adoption", "what is
-  new in the kit", "check my setup". Never installs anything itself.
+  vet-and-adopt; and a verify phase with proof in the same sitting. Also a short path: two items, a
+  front door and a handoff note, proved in a fresh session. Trigger on "start the adoption", "start
+  with continuity", "the short path", "adopt the kit", "drill me to adopt", "set me up like the
+  studio", "update my adoption", "what is new in the kit", "check my setup". Never installs anything
+  itself.
 metadata:
   category: adoption
   author: Studio OS kit (forked from the studio's drill-to-plan)
@@ -28,14 +30,34 @@ stopped:
 | Phase | Who | Writes |
 |---|---|---|
 | 1. Audit | you, read-only, on their yes | `adoption/inventory.md` |
-| 2. Decide | they answer | `adoption/features.md` |
+| 2. Decide | they answer | `adoption/features.md`; on their explicit "keep it out", one exclude line for `adoption/` |
 | 3. Spec and plan | you write, they approve | `adoption/spec.md`, `adoption/plan.md` |
-| 4. Install | `vet-and-adopt`, row by row, on their yes | `adoption/decisions.md` |
-| 5. Verify | you check, they see the proof | `adoption/handover.md` |
+| 4. Install | `vet-and-adopt`, row by row, on their yes | `adoption/decisions.md`, `adoption/installed.json` |
+| 5. Verify | you check, they see the proof | `adoption/handover.md`, `adoption/receipt.md` |
 
 Prepare comes before phase 1 and is theirs: Claude Code, git, the kit, and the first sentence. Update
-runs come later, once per kit version (update mode, below). Nothing is installed before phase 4, the
-scanner included. The first sitting ends with wave 1 installed and seen working, not the whole plan.
+runs come later, once per kit version (update mode). Nothing is installed before phase 4, the
+scanner included, except on the short path (continuity mode), which takes its three items
+through `vet-and-adopt` in one sitting. The first sitting ends with wave 1 installed and seen
+working, not the whole plan.
+
+**This file holds what every question needs.** Each phase and mode has a file of its own in this
+skill's folder: read it when that phase or mode starts, and not before, so a session carries only what
+it is doing. A session that resumes, or is sent to a phase by a command, reads that phase's file before
+its first question there.
+
+| When | Read |
+|---|---|
+| Phase 1 starts | `.claude/skills/drill-to-adopt/phases/1-audit.md` |
+| Phase 2 starts | `.claude/skills/drill-to-adopt/phases/2-decide.md` |
+| Phase 3 starts, or they type `draft` | `.claude/skills/drill-to-adopt/phases/3-spec-and-plan.md` |
+| Phase 4 starts | `.claude/skills/drill-to-adopt/phases/4-install.md` |
+| Phase 5 starts | `.claude/skills/drill-to-adopt/phases/5-verify.md` |
+| "Next wave" | `.claude/skills/drill-to-adopt/phases/2-decide.md` (its Round 2), then phases 4 and 5 |
+| Continuity mode | `.claude/skills/drill-to-adopt/modes/continuity.md` |
+| Setup-check mode | `.claude/skills/drill-to-adopt/modes/setup-check.md` |
+| Update mode | `.claude/skills/drill-to-adopt/modes/update.md` |
+| You change this skill | `.claude/skills/drill-to-adopt/scenarios.md` |
 
 ## Voice and honesty
 
@@ -45,6 +67,11 @@ Kind:
 
 - Plain words. Gloss a technical word in one plain line the first time you use it, and say what a
   command does in plain words before you show it; ask them to approve the effect, not git internals.
+- Explain tokens once, the first time you mention them (usually when you show the inventory, before
+  any token figure), in their terms: "Claude reads your instruction files and the list of your skills
+  before your first message, every session. That costs tokens, roughly pieces of words, out of the room
+  Claude has for your work." (`docs/facts.md`, "Claude Code: measuring context and asking multiple
+  choice".)
 - Name their situation once, without flattery or gushing.
 - Stopping is always fine; the next run resumes from `adoption/`. Recommend stopping at most once,
   with the reason, and again only for a new reason.
@@ -68,12 +95,12 @@ True:
   question and cite what it finds. Never from memory, never as a passing remark.
 - **Plans and prices come from `docs/facts.md` too.** Whenever a plan comes up (their answer to the
   plan question, a limit, a feature that depends on a plan, the cost of anything), look it up there
-  first and name the section: "Installing the tools on Windows, macOS and Linux" says which plans
-  include Claude Code, and "Claude Code: plans, account, attribution and where session content goes"
-  covers accounts and data. If the plan they name does not fit what they plan to do (the free
+  first and name the section: "Claude Code: plans, account, attribution and where session content
+  goes" says which plans include Claude Code and covers accounts and data. If the plan they name does not fit what they plan to do (the free
   claude.ai plan and Claude Code, for one), say so at once, with the section, before the next question.
-  "Not documented" is an answer only after you have read those sections.
-- Flag a fact whose `checked:` date is older than 90 days: "this may have changed since <date>".
+  "`docs/facts.md` does not say" is an answer only after you have read those sections.
+- Flag a fact whose own date is past its window, 30 days in a section `docs/facts.md` lists under
+  `fast:` and 90 days in any other: "this may have changed since <date>".
 - Keep verified, inferred and assumed apart in what you say.
 - State the cost in time, tokens or money before a step that has one: per item, never as a running
   total. A whole-setup total appears twice only: at the menu and in the handover.
@@ -88,16 +115,22 @@ True:
 
 ## Before the first question
 
-1. Read `ADOPT.md`, `catalog/features.json` (the menu: every item, its module, importance, why,
-   loads and token estimate, and its card; and `domains`, the packs this kit ships, each with its
-   skills, agents and token costs), `catalog/INDEX.md`, and the `questions:` in the front
-   matter of every `modules/*/README.md`. Read an item's card, `cards/<id>.md`, before you ask about it.
+1. Read `ADOPT.md`. The menu and the cards wait for the phase that needs them: phase 1 reads
+   `catalog/features.json` and `catalog/DETECT.md` after their yes to the audit, phase 2 adds `catalog/INDEX.md` and the modules'
+   `questions:`, and an item's card, `cards/<id>.md`, is read right before you ask about the item.
 2. Find the mode and the phase by testing one path: does `adoption/` exist in their setup? Test that
    name only; never list, glob or search their setup folder before their yes to the audit. No
    `adoption/` means a **first run** from phase 1. If it exists, read the newest handoff note in it
-   first, then resume at the first phase whose file is missing or unfinished, and say so in one line.
-   An `adoption/decisions.md` with rows means **update mode**. "Check my setup" means **setup-check
-   mode**. If you do not know where their setup lives, that is your first question: a work repo, a
+   first, then resume at the first phase whose file is missing or unfinished, and say so in one line;
+   an `adoption/inventory.md` that holds only the "Continuity path" section is unfinished, so phase 1
+   runs. That run never asks about the short path's items again: the menu shows each as
+   **taken (short path, light)**, the plan lists each row already ticked, and round 1 confirms in one
+   line what the front door already says about their work instead of asking it again. Offer growing
+   the front door or the handoff note to its next size once, on the menu. When every phase is done and every wave row is ticked, say so, and name "Update my
+   adoption" for a new kit version and "Check my setup". "Update my adoption" or "what is new in the
+   kit" means **update mode**. "Check my setup"
+   means **setup-check mode**. "Start with continuity" or "the short path" means **continuity mode**.
+   If you do not know where their setup lives, that is your first question: a work repo, a
    folder for their Claude files, or claude.ai only.
 
 ## Rules for every question
@@ -140,362 +173,6 @@ They hold in every phase and every message: approvals, phase 4 and `vet-and-adop
   `claude mcp add ...`) are shown first and run only on their yes. On claude.ai, give a numbered list
   of settings to click instead.
 
-## Phase 1: Audit (opt-in, read-only)
-
-Your first question, multiple choice: "May I look around your setup folder before I ask anything?
-Read-only: a script from the kit reads your setup and prints names only (file types, dependencies,
-your Claude files, git remote hosts), never a value, and never opens secrets or data files." Options:
-yes (recommended), no, or only one subfolder they name.
-
-On yes, check Node.js first: `node --version`. With version 22 or later, run from the kit folder, on
-the folder they agreed to, then `claude plugin list` as before (without it, see "Without Node.js 22"
-below):
-
-```
-node tools/audit.mjs "<folder>"
-```
-
-What the script reads, printing names only (`tools/audit.mjs`, its header comment). Names only means
-no value from a settings or config file; skill and agent descriptions and instruction-file headings
-are free text, and it prints them as they are:
-
-- manifests: `package.json`, `pyproject.toml`, `requirements*.txt`, `environment.yml`, `Pipfile`,
-  `go.mod`, `pom.xml`, `*.csproj`, `dbt_project.yml`, compose files (`docker-compose*.yml`,
-  `compose.yaml`, `compose.override.yaml`) and GitHub Actions workflows: dependency, service and job
-  names, never versions, environment values or commands;
-- file-type counts: the top 15 extensions, notebooks and SQL included;
-- the existing Claude setup: `.claude/settings*.json` (hook events and script file names, permission
-  counts, enabled plugins), `.mcp.json` (server names, transport, host only), `.claude/skills/` and
-  `.claude/agents/` (name and description from the front matter, never the body);
-- instruction files, `CLAUDE.md`, `AGENTS.md`, `.cursorrules` and `.github/copilot-instructions.md`:
-  line count and headings, never the body;
-- git state per repository: the remote's host only (never the full URL), the branch, clean or how
-  many changes;
-- existing hooks: file names in `.husky/` and in `.git/hooks/` (not `.sample` files), and the hook
-  ids in `.pre-commit-config.yaml`.
-
-The script's rules, which hold whatever you intend:
-
-- it never opens `.env*`, `*.pem`, `*.key`, `*credential*`, `*secret*`, `id_*`, or the data files
-  themselves (`*.csv`, `*.parquet`, `*.xlsx`, `*.db`, `*.sqlite`, data folders); it lists them under
-  "Present but not opened": their kind, how many, and up to 10 paths. A skill folder or an agent file
-  named so (`secret-scanner`) is still read, for its front matter only;
-- it goes no more than four levels deep, and never into `.git/` (beyond the hook file names above),
-  `node_modules/`, `.venv/`, `venv/` or build folders;
-- it reads no more than the first 200 lines of any manifest.
-
-You open none of these files in this phase, in the setup folder: not to check the script, not for a
-pass below. A file it shows as "present, not parsed" stays that way in the inventory. If the script
-itself fails (Node.js 22 is there and it exits with an error), say so in one line and offer the choice
-again: another folder or subfolder, or no. Never read the files yourself instead.
-
-**Without Node.js 22** (`node` not found, or a version below 22): say in one line that the audit's
-script needs Node.js 22, because it reads the settings and config files so that you never open them.
-Hand over the install as a step only they can do, from `docs/install-reference.md`, "Tools some items
-need": on Windows `winget install --id OpenJS.NodeJS.22 -e`, on macOS and Linux the nvm lines there;
-then `! node --version` to check it. A Node.js installed while Claude Code runs may not be found
-until Claude Code starts again: if it is still not found, start Claude Code again in a new terminal,
-and the run resumes from `adoption/`. Until it is installed, make a names-only listing under the
-script's rules above: file and folder names and counts by extension, from a directory listing that
-opens no file, no more than four levels deep, never into the skipped folders or data folders. Never
-fall back to opening the files the script reads, and run no command that prints a value from them.
-Write the inventory sections that names can fill: File types; Present but not opened; which manifests,
-Claude files, instruction files, skills, agents and hooks are present, by name; the folders that hold a
-`.git`. Write "not checked (Node not installed)" in every cell that names alone cannot settle, and as
-the mark of every menu item whose Detect needs more than names. Once Node.js 22 is installed, run the
-script and write the inventory again from it.
-
-Then these passes, which need you, under the same rules:
-
-- **Infer their profiles** from the script's Stack and File types tables, and from file names (such
-  as `pubspec.yaml`, `Cargo.toml` or a `Dockerfile`), never from a file's contents or a notebook's
-  (its output cells can hold data). More than one can apply:
-  - `ml`: torch, tensorflow, jax, scikit-learn, xgboost, lightgbm, transformers, mlflow, wandb or dvc
-    in a manifest;
-  - `data`: `dbt_project.yml`, more than a handful of `.sql` files, BI project files by extension,
-    sqlfluff or great_expectations;
-  - `software`: an app or service manifest (a web framework in `package.json`, `pubspec.yaml`, a
-    service `Dockerfile`, `go.mod`, `Cargo.toml`);
-  - `general` when nothing matches.
-
-  Write them as `profiles:` in `adoption/inventory.md`, with the file that suggested each.
-- **List what they already have.** At project level (`.claude/`), the script's "Already installed"
-  rows. At user level (`~/.claude`, or `$CLAUDE_CONFIG_DIR` when it is set), which the script does
-  not read, and slash commands at both levels:
-  - skills and agents: name and description from the front matter only, never the body;
-  - plugins: name and version (`claude plugin list`);
-  - slash commands and MCP servers: names and scope only, never credentials or environment values;
-  - hooks: the event and the script's file name, never its contents.
-
-  Classify each against the kit, comparing its description with each item's in
-  `catalog/features.json` and its card's Why: `same job as <id>`, `overlaps <id> in part`, or
-  `nothing like it in the kit, keep it`. Mark each scanned yes, no or unknown (a row in an earlier
-  `adoption/decisions.md` counts as yes).
-- **Estimate what loads into every session today** (whether `/context` output reaches you is not
-  documented: `docs/facts.md`, "Claude Code: measuring context and asking multiple choice"): the size
-  of each instruction file, at both levels, from a file listing (`ls -l`, or `dir` on Windows), which
-  opens no file, plus the `description` of every skill and agent at both levels, divided by 4. Files
-  they import with `@` are not counted, since finding them means reading the file: say so. Tell them
-  `/context` shows the live breakdown; a total they read you is recorded as measured. Never open a
-  data or secret file for this.
-- **Run the Detect part of every card** in `cards/`, so each menu item can be marked **have**,
-  **partly** or **not yet**. Where a plugin enabled in their project brings a skill or agent of the
-  same name, the mark is **a plugin provides one** in place of **not yet**, or
-  **partly (a plugin provides one)** in place of **partly**, so what is missing stays in view; either
-  way the kit's copy is not offered as a second. Where the card's plugin check could not run, say so
-  and give no plugin mark. Detect commands print settings as set or not set, versions and counts;
-  never print a key, a credential or a file's contents. In this phase, a Detect step that reads a file
-  the script reads in the setup folder, or runs a command that prints values from those files (such as
-  `git remote -v`, `git config --get remote.origin.url`, or `claude mcp list` in the setup folder or
-  a repository), takes its answer from the script's output, and the file stays closed. A command that
-  prints only set or not set, a count or a version may run, such as
-  `git -C <repo> config --get core.hooksPath >/dev/null && echo set`. MCP servers: project servers
-  come from the script's rows; where a card runs `claude mcp list`, run it only in an empty temporary
-  folder (a new one in the system temp folder: `mktemp -d`, or a new folder under `$env:TEMP` on
-  Windows; never inside the setup or kit folder), so it lists user-scope servers only (and those from a plugin or a claude.ai connector), under
-  the rules for the user level: names and states, never a command, an argument or a URL. Where the
-  output cannot settle the mark (a hook's matcher, a deny rule's text, an `@` import, a local-scope
-  MCP server), say what is missing under "Kit items you already have" and give the item no mark.
-
-Write `adoption/inventory.md` in their setup from `templates/adoption/inventory.md`: the script's
-sections under the same headings, with each repository's folder written relative to the setup folder;
-the user-level rows and plugins added to "Already installed", and its last three columns filled; then
-every other section, the starting point (empty, existing work, or an existing Claude setup) included.
-**Show it to them before any Decide question.** On no, skip the audit and ask round 1 open; the menu
-then shows no have/partly marks.
-
-## Phase 2: Decide
-
-### Round 1: who they are (always, in this order)
-
-With an inventory, confirm what it shows in one question instead of asking each point open: list what
-you inferred (profiles, operating system, tools), then "Right? Yes (Recommended) / Some is wrong: tell
-me which". Their work is the exception, always asked open first.
-
-1. **Their work, in their words:** "What is your work, and what should Claude help you with?", with
-   what the audit suggested as a starting point. Then the one confirmation above; they may add a
-   profile. The confirmed profiles and their own terms go into the spec.
-2. **Their data rules**, before any question or option says where anything could be stored, one
-   question each: what may leave the company; whether the account they use Claude with may see work
-   data; whether a repository on a work machine may have a remote, and where. On each, the strictest
-   reading is the recommended option, so Not sure takes it, and the spec says so.
-3. **Where they use Claude:** claude.ai, Claude Code, or both. Then their plan, as its own question.
-   The operating system comes from the audit; ask only when it is missing.
-4. **What goes wrong today:** what they lose between sessions or chats. The proposed set and wave 1
-   answer this problem.
-5. **What else they have** beyond what the audit saw: claude.ai Projects, saved prompts, notes or work
-   in other folders. Read the files they point you to (never data files) and list what you found.
-6. **Their layout**, when the inventory says existing work or step 5 named a folder: module 11's
-   `questions:` (one place or spread; reorganize or leave), then for each folder they named outside
-   the setup, a notes folder for example: move it, point to it from the front door, or leave it. A
-   yes to reorganizing or to a move puts restructure mode in the plan; nothing moves before that row.
-
-### What they already have
-
-When the audit found anything installed, show its table before the menu, in kind words: "You already
-have these. Here is how each relates to the kit." An item that does the same job as a kit item, or
-overlaps one, shows on the menu as `you have: <name>`, and its route question offers:
-
-- keep yours (recommended when yours works and you like it);
-- fold the kit's ideas into yours;
-- replace yours;
-- keep both, with a warning: both load every session, and Claude sees two skills for one job. The
-  studio lived through this while a plugin and its own adapted copy of that plugin's skills were both
-  installed.
-
-### The feature menu (one question)
-
-Resolve each item's importance against their confirmed profiles: an item's `importance` and `why`
-may be one value or one per profile (`default`, `data`, `ml`, `software`); take the highest among the
-profiles that apply, and the matching why. A pack none of their profiles needs (app development for
-an `ml` adopter, for example) is not offered.
-
-**Propose the smallest sensible set, not every recommended item.** Ticked: `skillspector`, `handoff`,
-the front door and memory, and the two or three items that answer the problem they named in round 1.
-Every other item starts unticked with its importance shown: "recommended" is a label, not a tick. If
-they untick `handoff`, say once what they lose (the next session starts from zero), and respect it.
-
-From `catalog/features.json`, show the menu in two levels. Never list every item at once.
-
-1. **The modules,** one numbered line each (about 12): the problem it fixes, in one line; its
-   importance for their profiles; what it adds to every session (about N tokens, an estimate); and
-   "proposed: <the proposed items in plain words>" where your proposed set takes something from it.
-2. **The answers:** "As proposed (Recommended)"; "Open a module: give its number, to see its items and
-   change them"; "Also one item: name it in plain words" (for example "also the skeptic reviewer");
-   "Not sure: as proposed".
-3. **An opened module** shows its items, one numbered line each: what it does for them in plain words
-   (from its why), its importance, its context cost in words (none, on demand, every session), have /
-   partly / partly (a plugin provides one) / not yet / a plugin provides one, and whether it is proposed. Never a bare id, never two items on one line: each
-   council seat is an item of its own. Their
-   answer (numbers to add or drop, or "keep") closes that module; then the menu comes back once, with
-   the change shown.
-
-Accept an item by name wherever they give one, in any module. Ask with the multiple-choice tool when
-you have one (up to four choices a question), otherwise as a numbered list answered with numbers. A pick needs their word: an item their
-answer leaves unclear stays unticked and is listed back to them, never kept as "assumed". Where a
-ticked item has sizes (its card's Size question), ask its size now, as its own question, recommending
-the smallest that solves their problem; offer growing it in update mode.
-
-Write every answer to `adoption/features.md` (from `templates/adoption/features.md`) as it comes.
-They may also edit that file by hand; a re-run reads it and never asks again.
-
-### Domains (one question)
-
-A domain is a pack: a set of skills for one kind of job, installed together, from `domains` in
-`catalog/features.json`. Each costs one short description every session (its `alwaysOnTokens`); its
-index and the skills inside load only when a task reaches them. Ask this after the menu, once, and
-only about the domains that fit what they told you in round 1:
-
-- Offer a domain only when their work, profiles or tools make it plausible, and name the one line
-  from the domain's `why`. Do not offer a domain merely because it exists: a domain they
-  never named a job for stays out of the question.
-- A domain whose pack is not in `catalog/packs/` is not in this version of the kit, so it is not
-  offered, whatever the studio uses.
-- When no domain fits, the options are only **"None of these fit"** and "Not sure". Never list a domain you
-  have said does not fit, and never name the kit's other domains in the question.
-- Options: the fitting domains, each with its every-session cost (about N tokens, an estimate), then
-  **"None of these fit"**, which is a valid answer and installs nothing, then "Not sure: none for
-  now; update mode offers them again".
-- Record the answer in `adoption/features.md` like any menu item: one row per chosen domain, with
-  its id, the every-session cost and the scope (this project or every project). A "none" answer is
-  written as a row too, so a re-run does not ask again.
-- Read the domain's card, `cards/pack-<id>.md`, before you ask its questions, and ask them under the
-  same rules as any other card. Installing a domain is a row in the plan like any other and goes
-  through `vet-and-adopt`, which scans the pack, then copies its entry and skills into
-  `.claude/skills/<id>/`, its agents into `.claude/agents/` and its standalone stubs beside it.
-- Someone who only uses claude.ai takes the pack as a zip: `node tools/upload-bundle.mjs <id> --out
-  <folder>` builds it, and START-HERE ("If you only use claude.ai") says how to upload it.
-
-### The total
-
-Explain tokens once, the first time you mention them (usually when you show the inventory, before
-any token figure), in their terms: "Claude reads your instruction files and the list of your skills
-before your first message, every session. That costs tokens, roughly pieces of words, out of the room
-Claude has for your work." (`docs/facts.md`, "Claude Code: measuring context and asking multiple
-choice".) Right after the menu and its size questions: "Your choice loads about N tokens into every
-session (an estimate); the heaviest three are A (about n), B (about n) and C (about n)." Give a share of that
-room only when `docs/facts.md` states its size. Offer to drop a heavy item, once. Write the total
-and the heaviest three into the header of `adoption/features.md`. Show a total here and in the
-handover only.
-
-### Round 2: tailor the first wave only
-
-First say which ticked items make the first sitting: wave 1, at most about 8, in the plan's order
-(phase 3). The rest wait for a later wave and get their questions when that wave starts ("next wave"
-or update mode); say so in one line. Then, for wave-1 items only:
-
-1. **State the defaults in one message.** For each wave-1 item whose card recommendation follows from
-   the audit or from what they said, one numbered line: "<item>: <the recommended answer>, because
-   <the reason from their setup>." Then one question: "Keep these (Recommended)", "Change some: give
-   the numbers", "Not sure: keep them". One reply accepts them all; for a number they change, ask
-   that card question in full.
-2. **Ask only what needs them**, at most two questions per item: a card question whose answer only
-   they know (which key, which folders, which email). Ask it in full, every option, with the card's
-   own recommendation rule applied to their Detect result. A menu tick is not an answer to it, and a
-   later question is never folded into an earlier one.
-3. **Module questions** only for a module with a wave-1 item, and only those an earlier answer did
-   not settle; say which answer settled the others.
-
-`skip` leaves a question open; the card's "Default when skipped" goes into the spec as the expected
-answer, and nothing is set from it. Note your expected decision (SKIP, FOLD, ADAPT or ADOPT) and the
-tailoring. Later-wave items go into the spec as "decided at their wave"; an unticked item gets no
-questions. The aim: on the light path (the proposed set, nothing unusual), the spec is approved within
-about 25 turns of "Start the adoption".
-
-### Gap report
-
-Give each part of their stack and work its own row, from the inventory and round 1: every database,
-BI tool, API and system they named. Mark it:
-
-- **covered:** name the item that handles it;
-- **partly covered:** say what is missing;
-- **not covered.**
-
-A practice (a rule or a habit, no tool) never makes a tool covered: a database with the least-access
-rule and no vetted connector is partly covered at most.
-
-For every row not covered, propose exactly one route:
-
-- **an outside candidate**, an official vendor skill or MCP server first. It always goes through
-  `vet-and-adopt`: nothing that runs in a session is installed before it is scanned;
-- **a skill they write themselves** with `writing-great-skills`, from a task they repeat. Ask: "What
-  do you do every week that a checklist could carry?";
-- **or skip**, with why.
-
-Searching the web for candidates is its own yes/no question; with a yes, cite every source. Record
-the report in the spec's `## 8. Gaps`.
-
-## Phase 3: Spec and plan
-
-**Restate, then write the spec.** Restate in plain words: their work in their words; what they will
-adopt and how; what they will skip and why; the gaps and their routes; the data rules you will
-respect; the every-session total. Phrase nothing in the restatement as a question; end it with the
-one question "May I write this as your spec?", with options. On their yes, write
-`adoption/spec.md` in **their** setup from `templates/adoption/spec.md`, fill every section, the Gaps
-included, and tell them the full path. Nothing goes into the kit repo.
-
-**Then the plan,** from `templates/adoption/plan.md`: **one row per item**, never two in one row; an
-item folded into another keeps its own row and says where it went. In waves; nothing needs a plugin.
-
-**Wave 1 is the first sitting: at most about 8 rows.** Every other item they chose goes under "Later
-waves" with a one-line why; nothing is dropped. Say it plainly: "Your plan has N items. Today we do
-these 8 and see them work; 'next wave' picks up the rest." They may move an item up. Wave 1, in order:
-
-- Row 1 is always `skillspector`, the scanner with the scan-first rule, so it arrives right before the
-  first thing it checks.
-- In an **empty** folder, or a new setup folder the spec chose, row 2 is `setup-workspace` in create
-  mode: the whole template tree, every file from `templates/`. No earlier row writes a front door, a
-  `CLAUDE.md` or `handoffs/`; the scanner's rule line goes into the front door this row creates.
-  `git init` is its own question, after the tree exists.
-- When anything installed is scanned no or unknown: "scan what you already have", read-only, each
-  result recorded; a real finding becomes a question to them, never an automatic removal.
-- Then `handoff`, in the size they chose.
-- With **existing work**, when they said yes to reorganizing or to a move in round 1:
-  `setup-workspace` in restructure mode.
-- Then the front door and memory, and the items that answer their named problem, the heaviest last.
-- Each row's steps only they can do come from the card's **you:** lines, its check from the card's
-  Check.
-
-Show them the plan and ask for an explicit yes. After wave 1 has passed Verify, "next wave" (or update
-mode) takes the next few items from Later waves the same way: their Round 2 first, then their rows.
-
-## Phase 4: Install
-
-Give the progress line, then hand off: "Now we take wave 1 row by row with `vet-and-adopt`." This
-sitting does wave 1 only; each item is its own yes, and a row is ticked only after its check passed.
-The question rules still hold for every approval: one question per message, options with the
-recommended first, Not sure, and Skip for now where it differs. A later session resumes from the
-plan's ticks.
-
-- **At row 1, say once how loud the scanner is** (`vet-and-adopt`, Triage).
-- **Gather the steps only they can do.** When they put off a line, keep it. When the rows are done,
-  give one block of every pending line, in order, each with what it does in plain words, to paste one
-  at a time.
-- **Prove it works in this sitting.** As soon as the front door, memory and handoff rows pass, ask
-  them to open a second terminal in the folder they will start from each day, start Claude Code
-  there, and ask the question that names the problem they came with (for example "what did we
-  decide yesterday?"). They leave having seen it work, not with a to-do list.
-
-## Phase 5: Verify
-
-At the end of wave 1, or when the sitting ends with rows still waiting, and again after each later
-wave:
-
-1. **Run each ticked row's check again** and record the result, with the line that showed it. Name
-   each row still waiting, and what it waits on.
-2. **The fresh-session proof**, if phase 4 has not run it: a fresh session in a second terminal is
-   asked the question that names their problem, then "where did we stop?". The answers must come
-   from their files (the front door, memory, the newest handoff note), not from this conversation.
-   Record which file each came from.
-3. **Measure again** what loads into every session, the same way as in phase 1, and compare it with
-   the phase 2 total.
-4. **Write `adoption/handover.md`** from `templates/adoption/handover.md`: what they have now and
-   where it lives, what still waits on them, how to resume tomorrow, the before / chosen / now
-   totals, what they skipped and why, and what to do when the kit changes.
-
-Call nothing working before its check has run. A failed check is reported as failed, with what to
-look at next.
-
 ## Coverage checklist
 
 Audit · Profiles · Already installed · Work · Data rules · Tools and plan · Losses today · Current
@@ -507,18 +184,6 @@ out) · Gap report · Spec · Plan · Verify. On `coverage`, print it with ✅ c
 Phase 2 ends when every wave-1 item is decided (a stated default kept, or an answer) or ruled out,
 or when they say `stop`. Later-wave items wait for their wave. Do not pad.
 
-## Setup-check mode
-
-When they say "check my setup": re-run the check of every ticked row in `adoption/plan.md`, from each
-item's card, and report pass or fail per item, with the line that showed it. Change nothing. For a
-failure, say what to look at next, and offer to fix it as a new plan row on their yes.
-
-Whatever the plan holds, also send each git guard one fake force-push: every `block-dangerous-git.mjs`
-that a `hooks.PreToolUse` entry names in `.claude/settings.json`, `.claude/settings.local.json` or the
-user settings, with the line of `cards/git-guardrails.md`, Check step 1. Report one line per guard:
-`exit 2` is pass; any other exit, a missing file among them, is fail. A path that is not a
-file, such as a folder, is fail and is never run. Run no other hook from the settings.
-
 ## When a session ends partway
 
 The adoption uses its own handoff. When a session stops before the adoption is finished (they say
@@ -527,63 +192,3 @@ The adoption uses its own handoff. When a session stops before the adoption is f
 warning, and the first thing the next run does. The next run reads it first. Write what the current
 phase has so far: the spec with every undecided item under "Open", or the plan with its unticked rows.
 Say in one line what is still needed and which phase the next run starts from.
-
-## Update mode
-
-**The kit's signature, first.** Before step 1, run
-`git -C "<kit>" verify-commit --raw HEAD 2>&1; echo "exit $?"`. In PowerShell, run
-`$ErrorActionPreference = 'Continue'; git -C "<kit>" verify-commit --raw HEAD 2>&1 | ForEach-Object { "$_" }; "exit $LASTEXITCODE"`
-instead: in Windows PowerShell 5.1, `2>&1` turns gpg's lines into error records, which stop the
-command when `$ErrorActionPreference` is `Stop`. Report one of these five, with its line on what it
-means. `exit 0` alone is not a pass: a good signature by any imported key gives it. None of them
-stops the run; verifying stays optional, so go on with step 1 whatever it says.
-
-- **signed by the release key:** a `VALIDSIG` line whose last field is
-  `991E180986B77CE992993AEB2E926BA88C6D6423`, and no `REVKEYSIG` line. The kit's newest commit is
-  one the release key signed. With an `EXPKEYSIG` line too (after 2027-05-20), this is still the
-  outcome: the commit was signed while the key was valid; say that the key has expired.
-- **signed by another key:** a `VALIDSIG` line ending in another fingerprint, `NO_PUBKEY` with
-  another key id, or a `REVKEYSIG` line (a revoked key; not the release). The commit is not one the
-  release key signed as published: a commit made in the kit folder, or a copy from elsewhere.
-  Compare it with the public repository. For a `REVKEYSIG` line, also look for the new key's
-  announcement (`SECURITY.md`, "Checking that your copy is the release").
-- **altered:** a `BADSIG` line. The commit does not match its signature: it was changed after it
-  was signed, so it is not the release. Clone the kit again.
-- **not signed:** no output, and `exit 1`. The newest commit carries no signature: a commit made in
-  the kit folder, or a copy that is not the release.
-- **no key imported:** `NO_PUBKEY 2E926BA88C6D6423`, or git cannot start `gpg` (`cannot run` or
-  `cannot spawn`). The check could not be made; `START-HERE.md`, "Your first session", step 1, shows
-  how to import the key.
-
-1. Read their `adoption/decisions.md` (it records the kit version they adopted), their
-   `adoption/features.md`, and the kit's `CHANGELOG.md`.
-2. Run the audit again (with their yes) and compare it with their last `adoption/inventory.md`: new
-   repositories, tools or hooks become new items in the gap report.
-3. Re-enter at phase 2 with the items added or changed since that version only. Ask about those,
-   under the same rules. Never re-ask a decided item unless the changelog says it changed.
-4. Append an "Update to vX.Y.Z" section to their spec, add rows to their plan, and continue with
-   phases 4 and 5 for the new rows.
-
-**Reading the Scan column.** A row written from v3.4.0 on holds two verdicts and the script
-comparison: `kit: <verdict> <score>/100 · installed: <verdict> <score>/100 · scripts identical`, or
-`· changed: <names>`, or `· no scripts`, or an `installed:` part that is `pending` or `n/a: <why>`
-(the forms are listed in `templates/adoption/decisions.md`). An `installed: pending` row is an item
-applied but not yet checked on disk: offer to run `vet-and-adopt`'s scans after Apply. A row from
-before v3.4.0 holds one verdict, the kit copy's scan, and is still valid as it stands: read the
-verdict as the kit copy's, and never re-ask an item only because its row has one verdict.
-
-## Scenarios this skill must handle
-
-Read these when you change the skill; each is a way the run can go wrong.
-
-- **No domain fits.** The adopter's work is writing and note-taking, and nothing in `domains` matches.
-  Ask the domain question with only "None of these fit" and "Not sure". The right result is a
-  recorded "no domain" row in `adoption/features.md`, no pack in the plan, and no pack installed. It
-  is a finding, not a failure ([Voice and honesty](#voice-and-honesty)).
-- **A domain they have in part.** They already keep a skill that runs a panel. The card's Detect marks
-  the domain **partly**; the route question offers keep, fold, replace or both with the warning.
-- **A pack the kit does not ship.** They ask for a domain the studio uses that is not in `domains`.
-  Say it is not in this kit, and offer the gap report's routes: an outside candidate through
-  `vet-and-adopt`, or a skill they write themselves.
-- **claude.ai only.** No agents install; the zip carries the entry and the skills, and a skill that
-  needs a local tool says so in its "Without local tools" section.

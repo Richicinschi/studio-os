@@ -22,6 +22,7 @@ Needs Node 22 or later on the PATH. It needs no bash and no jq, and Claude Code 
 form (`node` with the script path as its one argument, no shell), so it runs the same on Windows,
 macOS and Linux, with or without Git Bash, for Bash and PowerShell commands.
 
+
 ## Policy on plain push
 
 A plain `git push` passes. Only forced and destructive pushes are stopped.
@@ -107,7 +108,11 @@ It reads the command line, not what git will do. These pass:
 - Wildcard pathspecs with a literal or a class in them that still match nearly every path, such
   as `[a-z]*`, and a backslash as a folder separator, which git for Windows reads (`'.\'`,
   `'src\..'` name the whole tree there).
-- It runs only inside Claude Code, and only for the tools its matcher names.
+- It is tested only in Claude Code. Cursor, the GitHub Copilot CLI, Copilot in VS Code and the
+  Devin CLI read a project's `.claude/settings.json` too, but may not run the entry from step 3 as
+  Claude Code does (`args`, `${CLAUDE_PROJECT_DIR}`, `onFailure`). Where the hook fails to start,
+  the command runs: see a forced push refused there before you rely on it.
+- It runs only for the tools its matcher names, and another tool may give its shell another name.
 - It has no way through for an approved act: the user runs that.
 
 It also refuses some harmless commands, on purpose:

@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deflateRawSync } from 'node:zlib';
+import { detectTable } from '../detect.mjs';
 import { walkFiles, gateSecrets, gatePrivacy, gatePaths, gateAccounting, gateLinks, gateNotes, gateDiagramUrls, gateTriage, gateRisky, gateStudioBlocks, gateMarkers, MARKERS_ALLOW, gateNames, NAMES_ALLOW, gateJson, shebangFiles, gateScanner, SCANNER_ALLOW } from '../gates.mjs';
 
 function kit(files) {
@@ -155,6 +156,31 @@ test('studio markers: found in catalog/ text, code comments included; files outs
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('studio markers: catalog/DETECT.md is read as the cards it is made from, only while it is exactly that; every other gate reads it', () => {
+  // A card speaks to the reader and may say "this machine"; catalog/DETECT.md carries its Detect section.
+  const card = '# Draw\n\n## Detect\n\n- What the skill can use on this machine: `command -v dot` prints a path.\n\n## Ask\n\nx\n';
+  const root = kit({ 'cards/draw.md': card, 'catalog/skills/b/SKILL.md': 'Run it on this machine.\n' });
+  const w = (rel, t) => writeFileSync(path.join(root, rel), t);
+  try {
+    w('catalog/DETECT.md', detectTable(root));
+    // The generated file passes; the same marker in any other catalog file still fails.
+    assert.deepEqual(gateMarkers(root), ['catalog/skills/b/SKILL.md:1 studio marker "this machine"']);
+    // A hand edit makes it a file like any other: every marker in it is reported, the card's included.
+    w('catalog/DETECT.md', `${detectTable(root)}\nAsk the hub.\n`);
+    assert.deepEqual(gateMarkers(root).filter((f) => f.startsWith('catalog/DETECT.md')).map((f) => f.split(' studio marker ')[1]), ['"this machine"', '"the hub"']);
+    // The other gates read it even while it is exactly the generated file: a card's Detect line that holds a
+    // denied term, a home path and a token is flagged in catalog/DETECT.md by each of them.
+    // The home path is put together at run time, so this file ships none for the paths gate to find.
+    const home = ['', 'home', 'quenlin', 'notes'].join('/');
+    w('cards/draw.md', card.replace('prints a path.', `prints a path. Quenlin keeps ${home} and ghp_${'a'.repeat(36)}.`));
+    w('catalog/DETECT.md', detectTable(root));
+    assert.ok(!gateMarkers(root).some((f) => f.startsWith('catalog/DETECT.md')), 'the markers gate skips the generated file');
+    assert.ok(gatePrivacy(root, ['Quenlin']).some((f) => f.startsWith('catalog/DETECT.md:')), 'privacy');
+    assert.ok(gatePaths(root).some((f) => f.startsWith('catalog/DETECT.md:')), 'paths');
+    assert.ok(gateSecrets(root).some((f) => f.startsWith('catalog/DETECT.md')), 'secrets');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('studio markers: an allowed phrase passes only in its own file, and only on its line', () => {
   const allow = [{ file: 'catalog/packs/p/skills/law.md', phrase: 'guideline G6', why: 'a regulator guideline number' }];
   const root = kit({
@@ -180,6 +206,15 @@ test('risky: an allowed phrase passes only in its own file, and only on its line
 
 test('risky: the kit itself passes its risky gate, hand-written files included', () => {
   assert.deepEqual(gateRisky(fileURLToPath(new URL('../../../', import.meta.url))), []);
+});
+
+test('the kit itself passes its paths, secrets and markers gates, its tests included, so npm test finds what a release would', () => {
+  // The v3.5.0 dry run found a test's literal home path and a card's words in catalog/DETECT.md only at
+  // release time; these hold the kit's own files to the same gates in every test run.
+  const kitRoot = fileURLToPath(new URL('../../../', import.meta.url));
+  assert.deepEqual(gatePaths(kitRoot), [], 'paths');
+  assert.deepEqual(gateSecrets(kitRoot), [], 'secrets');
+  assert.deepEqual(gateMarkers(kitRoot), [], 'markers');
 });
 
 test('risky: an image with neither a tag nor a digest, in a Dockerfile, a YAML file or a fenced block', () => {

@@ -441,12 +441,24 @@ test('the first release passes the lint, then writes one changelog section and t
     assert.equal(s.run({ release: '2.0.0', notes: ['First release.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
     const log = readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8');
     assert.equal(log.match(/# Changelog/g).length, 1);
-    assert.ok(log.includes('## v2.0.0 (2026-11-02)\n\n- First release.\n\n**Added:** `agent:gamma`, `skill:alpha`, `skill:beta`\n'));
+    assert.ok(log.includes('## v2.0.0 (2026-11-02)\n\n- First release.\n\n**Added:** `agent:gamma`, `external:tool`, `skill:alpha`, `skill:beta`\n'));
     const state = JSON.parse(readFileSync(path.join(s.root, 'tools/export/state.json'), 'utf8'));
     assert.equal(state.version, '2.0.0');
     assert.equal(state.hubCommit, 'abc123');
-    assert.equal(state.hashes, 'verdict+findings');
-    assert.deepEqual(Object.keys(state.items).sort(), ['agent:gamma', 'skill:alpha', 'skill:beta']);
+    assert.equal(state.hashes, 'verdict+findings+cards');
+    assert.deepEqual(Object.keys(state.items).sort(), ['agent:gamma', 'external:tool', 'skill:alpha', 'skill:beta']);
+    // An agent's recorded scan is part of its hash, so a new verdict lists it as changed at the next release.
+    const scans = JSON.parse(readFileSync(path.join(s.root, 'tools/export/scans.json'), 'utf8'));
+    scans['agent:gamma'] = { ...scans['agent:gamma'], score: 40, recommendation: 'CAUTION', findings: [{ rule: 'X1', file: 'gamma.md', line: 2, severity: 'LOW' }] };
+    writeFileSync(path.join(s.root, 'tools/export/scans.json'), JSON.stringify(scans));
+    writeFileSync(path.join(s.root, 'tools/export/scan-triage.md'), '### agent:gamma: CAUTION, 40/100, 1 findings\n\n| Finding | File:line | Verdict | Why |\n|---|---|---|---|\n| X1 test | gamma.md:2 | FP | a test |\n');
+    // The next release compares its files with the last one's tag (#66), so v2.0.0 is committed and tagged first.
+    const git = (...a) => execFileSync('git', ['-C', s.root, ...a], { encoding: 'utf8' });
+    for (const [k, v] of [['user.name', 'test'], ['user.email', 'test@example.invalid'], ['commit.gpgsign', 'false'], ['tag.gpgsign', 'false']]) git('config', k, v);
+    s.w('.gitignore', 'tools/export/*.local.txt\ntools/export/*.local.json\n');
+    git('add', '.'); git('commit', '-q', '-m', 'v2.0.0'); git('tag', 'v2.0.0');
+    assert.equal(s.run({ release: '2.1.0', noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
+    assert.ok(readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8').includes('## v2.1.0 (2026-11-02)\n\n- Every file this release changed, under its item: [docs/releases/v2.1.0.md](docs/releases/v2.1.0.md).\n\n**Changed:** `agent:gamma`\n'));
   } finally { s.done(); }
 });
 
@@ -575,4 +587,77 @@ test('a shipped file that cites an item the private list keeps out of the kit fa
     assert.match(out, /catalog\/skills\/alpha\/SKILL\.md:\d+ denied term #\d+/);
     assert.equal(out.includes(id), false, 'the name is never printed');
   } finally { s.done(); }
+});
+
+// ---- #66: every changed file, under its item, at each release
+test('a release after the first writes docs/releases/vX.Y.Z.md from the last release\'s tag, and the changelog links it', () => {
+  const s = setup();
+  const git = (...a) => execFileSync('git', ['-C', s.root, ...a], { encoding: 'utf8' });
+  try {
+    s.scanned();
+    assert.equal(s.run({ release: '2.0.0', notes: ['First release.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
+    assert.match(s.lines.join('\n'), /release files: the first release has no earlier one to compare with; no page written/);
+    for (const [k, v] of [['user.name', 'test'], ['user.email', 'test@example.invalid'], ['commit.gpgsign', 'false'], ['tag.gpgsign', 'false']]) git('config', k, v);
+    s.w('.gitignore', 'tools/export/*.local.txt\ntools/export/*.local.json\n');
+    git('add', '.'); git('commit', '-q', '-m', 'v2.0.0'); git('tag', 'v2.0.0');
+    s.w('cards/alpha.md', `${readFileSync(path.join(s.root, 'cards/alpha.md'), 'utf8')}\nOne more line.\n`);
+    // A dry run names the groups the release's page will have, so the --why lines can be written first.
+    s.lines.length = 0;
+    assert.equal(s.run({ whys: ['skill:alpha=Its card says more.'] }), 0, s.lines.join('\n'));
+    assert.match(s.lines.join('\n'), /^release files \(dry run\): since v2\.0\.0, \d+ group\(s\): .*skill:alpha.*; no why for: /m);
+    s.lines.length = 0;
+    assert.equal(s.run({ release: '2.1.0', notes: ['Second.'], whys: ['skill:alpha=Its card says more.', 'skill:nothing=Unused.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
+    const page = readFileSync(path.join(s.root, 'docs/releases/v2.1.0.md'), 'utf8');
+    assert.match(page, /^# Studio OS v2\.1\.0: every changed file$/m);
+    assert.match(page, /^## skill:alpha\n\nWhy: Its card says more\.\n\n- changed `cards\/alpha\.md`$/m);
+    assert.match(page, /^- changed `CHANGELOG\.md`$/m, 'what the release itself writes is listed too');
+    assert.ok(!/local\.txt/.test(page), 'ignored local files are never listed');
+    assert.match(readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8'), /^## v2\.1\.0 \(2026-11-02\)\n\n- Second\.\n- Every file this release changed, under its item: \[docs\/releases\/v2\.1\.0\.md\]\(docs\/releases\/v2\.1\.0\.md\)\.$/m);
+    assert.match(s.lines.join('\n'), /release files: docs\/releases\/v2\.1\.0\.md, \d+ file\(s\) in \d+ group\(s\); no why for/);
+    assert.match(s.lines.join('\n'), /a --why names a group with no changed file, left out: skill:nothing/);
+    // The same release again is refused: its changelog section and state are written; its page can be redone alone.
+    s.lines.length = 0;
+    assert.equal(s.run({ release: '2.1.0', notes: ['Again.'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 2);
+    assert.match(s.lines.join('\n'), /v2\.1\.0 is already released in this checkout .*release-files\.mjs page --previous <the release before> --release 2\.1\.0/);
+    assert.equal(readFileSync(path.join(s.root, 'CHANGELOG.md'), 'utf8').match(/^## v2\.1\.0 /gm).length, 1);
+  } finally { s.done(); }
+});
+
+test('a release stops before building when the last release\'s tag is missing, or a --why is malformed or fails the gates', () => {
+  const s = setup();
+  try {
+    s.scanned();
+    s.w('tools/export/state.json', JSON.stringify({ version: '1.9.0', hashes: 'verdict+findings', items: {} }));
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 2);
+    assert.match(s.lines.join('\n'), /the tag v1\.9\.0 of the last release is not in this checkout; fetch it first: git fetch origin --tags/);
+    s.lines.length = 0;
+    assert.equal(s.run({ whys: ['no equals sign'] }), 2);
+    assert.match(s.lines.join('\n'), /a --why is "<group>=<text>"/);
+    s.lines.length = 0;
+    assert.equal(s.run({ whys: ['skill:alpha=Thanks to Quenlin.'] }), 2);
+    assert.match(s.lines.join('\n'), /a --note or --why fails the gates; nothing was built/);
+    assert.match(s.lines.join('\n'), /--why skill:alpha: denied term #\d+/, 'a finding names its --why');
+  } finally { s.done(); }
+});
+
+// ---- the markers gate and catalog/DETECT.md
+test('a release passes with a marker in a card\'s Detect line, which catalog/DETECT.md carries, and fails with it in a shipped skill', () => {
+  const s = setup();
+  try {
+    // The card speaks to the reader: "this machine" is theirs.
+    s.w('cards/alpha.md', readFileSync(path.join(s.root, 'cards/alpha.md'), 'utf8').replace(/## Detect\n\nx\n/, '## Detect\n\n- What the skill can use on this machine: `command -v dot` prints a path.\n'));
+    s.scanned();
+    assert.equal(s.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 0, s.lines.join('\n'));
+    assert.match(readFileSync(path.join(s.root, 'catalog/DETECT.md'), 'utf8'), /What the skill can use on this machine/);
+    assert.match(s.lines.join('\n'), /^markers: pass$/m);
+  } finally { s.done(); }
+  const t = setup();
+  try {
+    // The same words in a shipped skill are a studio marker, and the release stops.
+    const skill = path.join(t.hub, '.claude/skills/beta/SKILL.md');
+    writeFileSync(skill, `${readFileSync(skill, 'utf8')}\nRun it on this machine.\n`);
+    t.scanned();
+    assert.equal(t.run({ release: '2.0.0', notes: ['x'], noGitleaks: false, gitleaks: () => [], hubGit: clean }), 1);
+    assert.match(t.lines.join('\n'), /catalog\/skills\/beta\/SKILL\.md:\d+ studio marker "this machine"/);
+  } finally { t.done(); }
 });

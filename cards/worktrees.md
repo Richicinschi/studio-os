@@ -48,7 +48,7 @@ The menu marks the item **have** when an instruction file carries a worktree rul
   - Windows: `! winget install --id Git.Git -e --source winget`;
   - macOS: `! xcode-select --install`;
   - Debian or Ubuntu: `! sudo apt install git`.
-- The minimum git version for worktrees: not documented in docs/facts.md as of 2026-11-02.
+- The minimum git version: 2.28. The steps need 2.17, the first with `git worktree remove`; the check also runs `git branch --show-current`, which came with 2.22, and makes its throwaway repository with `git init -b`, which came with 2.28 ([docs/facts.md](../docs/facts.md), "Git: hooks and worktrees").
 - Nothing else beyond Claude Code.
 
 ## Steps
@@ -69,10 +69,18 @@ The menu marks the item **have** when an instruction file carries a worktree rul
 ## Check
 
 1. **Claude:** `grep -ci worktree <your front door>`. Expected: `1` or more.
-2. **you:** make a throwaway repository with a remote, in a temporary folder: `git init --bare -b main origin.git`, then `git clone origin.git repo`, then `git -C repo config user.name throwaway`, `git -C repo config user.email canary@example.invalid` and `git -C repo config commit.gpgsign false`, so your own name, address and signing take no part, then in `repo` one commit holding a `.gitignore` with the line `.env`, then `git -C repo push origin main`. In a new session in `repo`, say "Start a branch for a small change; another session is working in this checkout." Expected: Claude proposes a worktree in the folder you chose, not a branch switch here, and its command carries `--no-track`. After your yes, `git -C repo worktree list | wc -l` prints one more than before, `git -C repo branch --show-current` prints the branch it had before, and `git -C <path> status -sb`, with `<path>` the new worktree's folder, prints `## <branch>` with no `...origin/main` after it: the new branch has no upstream.
-3. **you:** create an ignored file in the check worktree, `echo KEY=x > <path>/.env`, then say "Remove the worktree." Expected: before removing, Claude runs `git -C <path> status --porcelain --ignored`, names `.env` (the line `!! .env`) and asks you what happens to it. Answer "delete it"; Claude removes the check worktree, and you delete the throwaway folder.
+2. **you:** make a throwaway repository with a remote, in a temporary folder: `git init --bare -b main origin.git`, then `git clone origin.git repo`, then `git -C repo config user.name throwaway`, `git -C repo config user.email canary@example.invalid` and `git -C repo config commit.gpgsign false`, so your own name, address and signing take no part, then in `repo` one commit holding a `.gitignore` with the line `.env`, then `git -C repo push origin main`.
+3. **you:** in a new session in `repo`, say "Start a branch for a small change; another session is working in this checkout." Expected: Claude proposes a worktree in the folder you chose, not a branch switch here, and its command carries `--no-track`. After your yes, `git -C repo worktree list | wc -l` prints one more than before, `git -C repo branch --show-current` prints the branch it had before, and `git -C <path> status -sb`, with `<path>` the new worktree's folder, prints `## <branch>` with no `...origin/main` after it: the new branch has no upstream.
+4. **you:** create an ignored file in the check worktree, `echo KEY=x > <path>/.env`, then say "Remove the worktree." Expected: before removing, Claude runs `git -C <path> status --porcelain --ignored`, names `.env` (the line `!! .env`) and asks you what happens to it. Answer "delete it"; Claude removes the check worktree, and you delete the throwaway folder.
 
 If Claude runs `git checkout` or `git switch` in the shared checkout instead, the item is not done: the plan row stays unticked, and the wording of the rule is the next thing to look at.
+
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: test "$(grep -ci 'worktree' "$(frontdoor)")" -ge 1 && echo yes || echo no
+expect: yes
+```
 
 ## Undo
 

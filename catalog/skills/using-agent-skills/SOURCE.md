@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone with more than a handful of skills who needs routing between them.
 - **Pack / module:** way-of-working / 05-skills
-- **Last scan:** CAUTION (risk 29/100), SkillSpector v2.13.6 with --no-llm, 2026-11-22; 2 findings, all read: 1 false positive, 1 by design ([triage](../../../tools/export/scan-triage.md#using-agent-skills-caution-29100-2-findings))
+- **Last scan:** CAUTION (risk 29/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; 2 findings, all read: 1 false positive, 1 by design ([triage](../../../tools/export/scan-triage.md#using-agent-skills-caution-29100-2-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

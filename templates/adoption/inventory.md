@@ -33,7 +33,7 @@ profiles: <data / ml / software / general, inferred from manifests and file type
 | `.claude/settings*.json` | | |
 | `.claude/skills/`, `.claude/agents/` | | |
 | `.mcp.json` | | |
-| Other agents' instructions (`.cursorrules`, `.github/copilot-instructions.md`) | | |
+| Other agent tools' instructions (Cursor, GitHub Copilot, Gemini CLI, Codex, Windsurf, Devin, Kiro) | | |
 
 ## Hooks
 | Repository | Hook setup (`.husky/`, `.pre-commit-config.yaml`, `.git/hooks/`) |

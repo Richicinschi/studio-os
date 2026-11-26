@@ -8,6 +8,7 @@ import { makeFixtureHub, makePackHub, FIXTURE_OWNER as owner } from './fixture-h
 import { buildKit } from '../build.mjs';
 import { STUDIO_REWRITES } from '../rules.mjs';
 import { gateNames } from '../gates.mjs';
+import { hashItem } from '../item-hash.mjs';
 
 const flags = (importance = 'recommended') => ({ importance, why: `Why ${importance}.` });
 const manifest = { kit: 'studio-os', version: '2.0.0', items: [
@@ -174,9 +175,11 @@ test('features.json carries importance, why, loads and the token estimates per m
     assert.equal(mod('01-continuity').title, 'Continuity');
     assert.deepEqual(mod('02-context-and-models').items, []);
     const item = (id) => f.modules.flatMap((x) => x.items).find((x) => x.id === id);
+    const { hash, ...delta } = item('delta');
     assert.deepEqual(
-      { ...item('delta') },
+      delta,
       { id: 'delta', kind: 'skill', importance: 'optional', why: 'Why optional.', loads: 'every-session', everySessionTokens: 100, onDemandTokens: 200, heavy: false, card: 'cards/delta.md' });
+    assert.match(hash, /^[0-9a-f]{16}$/);
     assert.equal(item('front-door').everySessionTokens, 1100);
     assert.equal(item('front-door').heavy, true);
     assert.equal(item('hooks').everySessionTokens, 0);
@@ -491,6 +494,44 @@ test('buildKit returns the studio names, the names the kit ships (its own skills
       shipped: ['alpha', 'drill-to-adopt', 'gamma', 'lone-stub', 'one-job', 'pack-one-two-three', 'seat-one', 'stubby', 'vet-and-adopt'],
       private: ['hidden-job', 'hidden-pack', 'hidden-seat', 'hidden-stub', 'private-pack-for-me', 'secret-job'],
     });
+  } finally { rmSync(hub, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
+});
+
+test('each item and domain in features.json carries its content hash: its files, the files the manifest names and its card', () => {
+  const hub = makePackHub();
+  const out = mkdtempSync(path.join(os.tmpdir(), 'kit-out-'));
+  const w = (rel, text) => { mkdirSync(path.dirname(path.join(out, rel)), { recursive: true }); writeFileSync(path.join(out, rel), text); };
+  try {
+    w('cards/alpha.md', '# Alpha\n');
+    w('cards/front-door.md', '# Front door\n');
+    w('cards/pack-pack-one-two-three.md', '# Domain\n');
+    w('templates/big/FRONT.md', 'front');
+    w('templates/big/sub/MORE.md', 'more');
+    w('templates/big/node_modules/x.js', 'never hashed');
+    const items = [manifest.items[0], { id: 'beta', kind: 'skill', status: 'catalog-only', pack: 'catalog' }, manifest.items[2], manifest.items[3],
+      { id: 'front-door', kind: 'practice', status: 'shipped', pack: 'way-of-working', module: '01-continuity', title: 'The front door', loads: 'none', files: ['templates/big'], ...flags() },
+      { id: 'private-pack-for-me', kind: 'pack', status: 'private' },
+      { id: 'pack-one-two-three', kind: 'pack', status: 'shipped', why: 'A domain.' }, { id: 'pack-with-licence-inside', kind: 'pack', status: 'withheld' }];
+    const scan = (recommendation, score) => ({ score, recommendation, version: '1.0', date: '2026-11-02' });
+    const build = (scans = {}) => {
+      const r = buildKit({ hub, out, manifest: { ...manifest, items }, owner, scans });
+      const f = JSON.parse(readFileSync(path.join(out, 'catalog/features.json'), 'utf8'));
+      return { r, item: (id) => f.modules.flatMap((x) => x.items).find((x) => x.id === id), domain: (id) => f.domains.find((x) => x.id === id) };
+    };
+    const { r, item, domain } = build({ alpha: scan('SAFE', 0) });
+    const neutral = (files) => hashItem(out, files, { scanNeutral: true });
+    assert.equal(item('alpha').hash, neutral([...r.itemFiles['skill:alpha'], 'cards/alpha.md']));
+    assert.equal(item('gamma').hash, neutral(r.itemFiles['agent:gamma']), 'an agent with no card: its file');
+    assert.equal(item('front-door').hash, neutral(['templates/big/FRONT.md', 'templates/big/sub/MORE.md', 'cards/front-door.md']));
+    assert.equal(domain('pack-one-two-three').hash, neutral([...r.itemFiles['pack:pack-one-two-three'], 'cards/pack-pack-one-two-three.md']));
+    assert.equal(item('tool').hash, null, 'a link-only item with no card has nothing to hash');
+    // The same kit builds the same hashes; a new scan of the same files does too; a changed card does not.
+    const again = build({ alpha: scan('CAUTION', 40) });
+    assert.match(readFileSync(path.join(out, 'catalog/skills/alpha/SOURCE.md'), 'utf8'), /CAUTION/);
+    for (const id of ['alpha', 'gamma', 'front-door']) assert.equal(again.item(id).hash, item(id).hash, id);
+    assert.equal(again.domain('pack-one-two-three').hash, domain('pack-one-two-three').hash);
+    w('cards/alpha.md', '# Alpha, reworded\n');
+    assert.notEqual(build().item('alpha').hash, item('alpha').hash);
   } finally { rmSync(hub, { recursive: true, force: true }); rmSync(out, { recursive: true, force: true }); }
 });
 

@@ -23,10 +23,10 @@ the nodes yourself.
 ## Running it
 
 ```bash
-python3 <skill-dir>/scripts/autolayout.py graph.json -o diagram.drawio
+uv run python <skill-dir>/scripts/autolayout.py graph.json -o diagram.drawio
 ```
 
-(On Windows use `py -3` in place of `python3`.) With `-o`, the file is written and stderr reports
+(Without uv, run it with your own Python 3; `py -3` on Windows.) With `-o`, the file is written and stderr reports
 `wrote diagram.drawio (N nodes, M edges)`. Without `-o`, the XML is printed to stdout. The
 `--mono` flag turns the group colours off.
 
@@ -96,7 +96,7 @@ level. The result is boxes of related modules, not a tangle.
 ## Lint the result
 
 ```bash
-python3 <skill-dir>/scripts/validate.py diagram.drawio
+uv run python <skill-dir>/scripts/validate.py diagram.drawio
 ```
 
 Output from this script should lint clean. A failure means the input graph was faulty, for

@@ -57,6 +57,7 @@ import path from 'node:path';
 import { FIXTURE_OWNER } from './fixture-hub.mjs';
 import { packShippable } from '../packs.mjs';
 import { buildKit } from '../build.mjs';
+import { catalogItemFiles } from '../changelog.mjs';
 import { gateLinks } from '../gates.mjs';
 import { STUDIO_REWRITES } from '../rules.mjs';
 
@@ -95,6 +96,9 @@ test('a shippable pack lands in catalog/packs, with its agents and stubs, and a 
     assert.ok(!existsSync(path.join(out, 'catalog/packs/pack-with-licence-inside')));
     assert.ok(r.written.includes('catalog/packs/pack-one-two-three/SKILL.md'));
     assert.ok(r.itemFiles['pack:pack-one-two-three'].includes('catalog/packs/pack-one-two-three/agents/seat-one.md'));
+    // What the release diff reads from a committed catalog, without the hub, is what the build listed.
+    const sorted = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, [...v].sort()]).sort());
+    assert.deepEqual(sorted(catalogItemFiles(out, { items: shipOne })), sorted(r.itemFiles));
   } finally { rmSync(out, { recursive: true, force: true }); }
 }));
 

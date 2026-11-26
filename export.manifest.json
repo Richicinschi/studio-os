@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "items": [
     {
       "id": "advisor-council-for-big-decisions",
@@ -162,8 +162,8 @@
       "module": "09-data-work",
       "upstream": "not published",
       "licence": "none published",
-      "install": "Not documented by Anthropic, so the kit cannot say how to get it; see docs/facts.md, 'claude.ai: custom skills and the built-in document skills'.",
-      "note": "Checked 2026-11-02: not documented as an Anthropic built-in in claude.ai or Claude Code, and in neither anthropics/skills nor anthropics/claude-plugins-official. Some Claude Code builds offer it with no file on disk; an adopter cannot be told how to get it, so it is catalog-only."
+      "install": "Comes with Claude Code as the bundled skill /dataviz; nothing to install. See docs/facts.md, 'Claude Code: bundled commands'.",
+      "note": "Checked 2026-11-25: Claude Code's commands page lists /dataviz as a bundled skill, so it ships with Claude Code and there is nothing for the kit to adopt; claude.ai's help page names no built-in skill for charts. Catalog-only."
     },
     {
       "id": "decision-log",

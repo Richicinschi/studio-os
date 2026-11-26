@@ -21,7 +21,7 @@ Read-only. These commands print settings as set or not set, versions and counts.
   - `git config --global --get commit.gpgsign` and `git config --global --get gpg.format`;
   - `git config --global --get user.signingkey >/dev/null && echo set || echo "not set"`;
   - the same three inside each repository with `git -C <repo> config --local ...`.
-- Whether a company repository overrides any of them locally: `git -C <repo> config --local --name-only --get-regexp '^(commit\.gpgsign|gpg\.format|user\.signingkey)$'`. `--name-only` is not in docs/facts.md as of 2026-11-02, so Claude first checks in `git help config` that it prints names without values.
+- Whether a company repository overrides any of them locally: `git -C <repo> config --local --name-only --get-regexp '^(commit\.gpgsign|gpg\.format|user\.signingkey)$'`. `--name-only` prints the names without the values ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder"); Claude still checks in `git help config` that the installed git has it.
 - Versions: `git --version`, `ssh -V`, and `gpg --version | head -1` (it may not be installed).
 - How many keys exist, counts only:
   - GPG secret keys, counted only when the folder that holds them exists (`gpgconf` names the keyring folder the `gpg` you run uses, without creating it), otherwise `no keyring`:
@@ -62,7 +62,7 @@ The menu marks the item **have** when `commit.gpgsign` is `true` and a signing k
 
 ## Steps
 
-1. **you:** create a key, if Detect found none of the kind you chose, in a separate terminal, not with `!`: these commands wait for a passphrase that only you can type, and whether a `!` command can take typed input is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: the ! prefix, /init and local files"). The commands are GitHub's ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder"):
+1. **you:** create a key, if Detect found none of the kind you chose, in a separate terminal, not with `!`: these commands wait for a passphrase that only you can type, and whether a `!` command can take typed input is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: the ! prefix, /init and local files"). The commands are GitHub's ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder"):
    - SSH: `ssh-keygen -t ed25519 -C "<your email>"`;
    - GPG: `gpg --full-generate-key` (GnuPG 2.1.17 or later).
 2. **you:** tell Claude which key to use. For SSH, type the path of the public key file (the one ending in `.pub`); for GPG, the key ID. Claude never lists your key folders to find it.
@@ -107,4 +107,4 @@ If step 1 prints `No signature` or an error, the item is not done: the plan row 
 - **An unattended job cannot sign.** No one is there to type the passphrase. The studio exempts its one scheduled runner from signing and limits what it commits: in the studio's own repository, only a narrow set of folders, pushed straight to the main branch; in other repositories, only its own night branches, which land through a reviewed PR.
 - **A personal key in a company repository** can break your company's policy. Ask before you sign there, and use the identity your company expects ([one git identity per folder](git-identity-per-folder.md)).
 - **Never commit a key.** The private key stays on your machine; only the public half goes to the server.
-- **SSH keys and email:** GitHub matches a GPG key to your verified email; whether an SSH signing key must match the commit email is not documented as of 2026-11-02.
+- **SSH keys and email:** GitHub matches a GPG key to your verified email; whether an SSH signing key must match the commit email is an open question ([docs/facts.md](../docs/facts.md), "Git: signed commits and identity per folder").

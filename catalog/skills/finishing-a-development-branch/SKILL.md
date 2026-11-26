@@ -79,6 +79,8 @@ Add nothing to either list. Then wait. Never offer deletion. It follows only fro
 
 ### Option 1: push and open the PR
 
+Before the first push, review the whole branch with `requesting-code-review` (base: `git merge-base origin/<base-branch> HEAD`), handing the reviewer the draft PR body too, and fix what it finds. A PR body states only what the diff shows, every lockfile version move included. Skip this only if such a review already ran on the head you push.
+
 ```bash
 git push -u origin <feature-branch>
 # detached HEAD: git push origin HEAD:refs/heads/<new-branch>

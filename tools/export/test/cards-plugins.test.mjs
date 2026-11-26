@@ -60,7 +60,10 @@ test('each of those cards looks in enabled plugins for a copy of the same name, 
 });
 
 test('the drill and the features template know the plugin marks, and keep partly visible', () => {
-  const drill = readFileSync(path.join(KIT, '.claude/skills/drill-to-adopt/SKILL.md'), 'utf8').replace(/\s+/g, ' ');
+  // The drill keeps each phase in a file of its own, so all its files are read.
+  const dir = path.join(KIT, '.claude/skills/drill-to-adopt');
+  const drill = readdirSync(dir, { recursive: true }).filter((f) => String(f).endsWith('.md')).sort()
+    .map((f) => readFileSync(path.join(dir, String(f)), 'utf8')).join('\n').replace(/\s+/g, ' ');
   assert.match(drill, /\*\*a plugin provides one\*\* in place of \*\*not yet\*\*/);
   assert.match(drill, /\*\*partly \(a plugin provides one\)\*\* in place of \*\*partly\*\*/);
   assert.match(drill, /partly \/ partly \(a plugin provides one\) \/ not yet \/ a plugin provides one/);

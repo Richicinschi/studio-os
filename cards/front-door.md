@@ -76,9 +76,16 @@ Which steps each size takes: **light** and **standard** every step but 3, **full
 
 1. **Claude:** `grep -cE '^@AGENTS\.md[[:space:]]*$' CLAUDE.md` prints `1`.
 2. **you:** start a new session in your setup folder and ask, as the first message, "What must you never do here?" Expected: Claude answers with the rules from your `AGENTS.md` without opening a file first (no file read appears before the answer).
-3. **you:** type `/context` to see the load yourself: it lists which `CLAUDE.md` files loaded. Whether it lists the imported `AGENTS.md` on its own line is not documented in docs/facts.md as of 2026-11-02, so step 2 is the check that counts.
+3. **you:** type `/context` to see the load yourself: it lists which `CLAUDE.md` files loaded. Whether it lists the imported `AGENTS.md` on its own line is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: measuring context and asking multiple choice"), so step 2 is the check that counts.
 
 If step 1 prints `0`, or step 2 gets an answer that is not yours, the item is not done: the plan row stays unticked. The usual cause is a `CLAUDE.md` without the import line, here or in a folder above.
+
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: grep -cE '^@AGENTS\.md[[:space:]]*$' "$(installed CLAUDE.md)"
+expect: 1
+```
 
 ## Undo
 

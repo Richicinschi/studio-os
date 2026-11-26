@@ -3,7 +3,7 @@
     "score": 21,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "fac6ed0139be004f",
     "findings": [
       {
@@ -18,7 +18,7 @@
     "score": 25,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "619fda6f4ef377d5",
     "findings": [
       {
@@ -33,8 +33,8 @@
     "score": 57,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
-    "itemHash": "3064bf97263aebe3",
+    "date": "2026-11-26",
+    "itemHash": "1ae38fd7fd40d804",
     "findings": [
       {
         "rule": "LP3",
@@ -45,7 +45,7 @@
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 71,
+        "line": 72,
         "severity": "HIGH"
       },
       {
@@ -78,7 +78,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "70443b803876bbf9",
     "findings": []
   },
@@ -86,7 +86,7 @@
     "score": 0,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "itemHash": "e4c3aee741f1e557",
     "findings": []
   },
@@ -94,79 +94,79 @@
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-22",
-    "itemHash": "ec5a2fca47e4e50c",
+    "date": "2026-11-26",
+    "itemHash": "b33cf6a0ef43f134",
     "findings": [
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 86,
+        "line": 87,
         "severity": "HIGH"
       },
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 86,
+        "line": 87,
         "severity": "HIGH"
       },
       {
         "rule": "TM1",
         "file": "SKILL.md",
-        "line": 115,
+        "line": 120,
         "severity": "HIGH"
       },
       {
         "rule": "AS1",
         "file": "SKILL.md",
-        "line": 123,
+        "line": 128,
         "severity": "HIGH"
       },
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 142,
+        "line": 147,
         "severity": "HIGH"
       },
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 142,
+        "line": 147,
         "severity": "HIGH"
       },
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 143,
+        "line": 148,
         "severity": "HIGH"
       },
       {
         "rule": "AS1",
         "file": "SKILL.md",
-        "line": 168,
+        "line": 173,
         "severity": "HIGH"
       },
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 184,
+        "line": 189,
         "severity": "HIGH"
       },
       {
         "rule": "AE1",
         "file": "SKILL.md",
-        "line": 185,
+        "line": 190,
         "severity": "HIGH"
       },
       {
         "rule": "TM1",
         "file": "SKILL.md",
-        "line": 194,
+        "line": 199,
         "severity": "HIGH"
       },
       {
         "rule": "TM1",
         "file": "SKILL.md",
-        "line": 200,
+        "line": 205,
         "severity": "HIGH"
       },
       {
@@ -211,7 +211,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "7e150ceadf865906",
     "findings": []
   },
@@ -219,7 +219,7 @@
     "score": 32,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "0f40128cfcbe4f9c",
     "findings": [
       {
@@ -246,7 +246,7 @@
     "score": 37,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "01fec104b652850c",
     "findings": [
       {
@@ -267,7 +267,7 @@
     "score": 29,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "itemHash": "95b5c912f49c94f6",
     "findings": [
       {
@@ -288,7 +288,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "itemHash": "26d738df61a27ff8",
     "findings": []
   },
@@ -296,31 +296,31 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-22",
-    "itemHash": "9e62cfa661d711e9",
+    "date": "2026-11-26",
+    "itemHash": "91969f5ffb77a475",
     "findings": []
   },
   "setup-workspace": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
-    "itemHash": "13ec744ccc00c726",
+    "date": "2026-11-26",
+    "itemHash": "b5e8916cf912b1e6",
     "findings": []
   },
   "vet-and-adopt": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-22",
-    "itemHash": "2f52c5e438f74a8e",
+    "date": "2026-11-26",
+    "itemHash": "d440ba1f1aa2ef7c",
     "findings": []
   },
   "brainstorming": {
     "score": 75,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "c1eabdb40b8d9dfc",
     "findings": [
       {
@@ -377,7 +377,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "ddee93c84a1b2d52",
     "findings": []
   },
@@ -385,7 +385,7 @@
     "score": 17,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "d9dc98b9c358338e",
     "findings": [
       {
@@ -400,15 +400,15 @@
     "score": 0,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
-    "itemHash": "33d76284f95a9235",
+    "date": "2026-11-26",
+    "itemHash": "6c2996de24ead352",
     "findings": []
   },
   "receiving-code-review": {
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "a5e8e0889168d8c5",
     "findings": []
   },
@@ -416,15 +416,15 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
-    "itemHash": "4bf19f990795607e",
+    "date": "2026-11-26",
+    "itemHash": "86c9f7210facc2f4",
     "findings": []
   },
   "subagent-driven-development": {
     "score": 17,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "790471c81369c53d",
     "findings": [
       {
@@ -439,7 +439,7 @@
     "score": 7,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "itemHash": "6f5107c4fe6772fc",
     "findings": [
       {
@@ -454,7 +454,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "29e5814c5e5a8156",
     "findings": []
   },
@@ -462,7 +462,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "725dcc8f31a6829a",
     "findings": []
   },
@@ -470,7 +470,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "43412c21a6c4e4c1",
     "findings": []
   },
@@ -478,7 +478,7 @@
     "score": 44,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "eb6ea633769b6682",
     "findings": [
       {
@@ -553,7 +553,7 @@
     "score": 83,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "7f670daf316204c5",
     "findings": [
       {
@@ -790,7 +790,7 @@
     "score": 72,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "047ac75d456af5ed",
     "findings": [
       {
@@ -829,7 +829,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "7f0a397a70428979",
     "findings": []
   },
@@ -837,8 +837,8 @@
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
-    "itemHash": "32d68b21e5350ffc",
+    "date": "2026-11-26",
+    "itemHash": "09930a79f4887457",
     "findings": [
       {
         "rule": "LP3",
@@ -900,7 +900,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "ec538e885336d953",
     "findings": []
   },
@@ -908,7 +908,7 @@
     "score": 12,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "520023b87f1f1180",
     "findings": [
       {
@@ -935,7 +935,7 @@
     "score": 70,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "fb9af570d0dddd7d",
     "findings": [
       {
@@ -968,7 +968,7 @@
     "score": 46,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "3cdbfeeefa078baa",
     "findings": [
       {
@@ -1007,7 +1007,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "bf5b71bcd4878762",
     "findings": []
   },
@@ -1015,7 +1015,7 @@
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "338c9b432bb1ec60",
     "findings": [
       {
@@ -1072,7 +1072,7 @@
     "score": 97,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "4b3446d48c7d0ff7",
     "findings": [
       {
@@ -1147,7 +1147,7 @@
     "score": 94,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "46f2608d88c76bde",
     "findings": [
       {
@@ -1438,7 +1438,7 @@
     "score": 18,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "e4b8ae30cad85f0a",
     "findings": [
       {
@@ -1465,7 +1465,7 @@
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "itemHash": "d7d4ed1e20c4e0e4",
     "findings": [
       {
@@ -1672,7 +1672,7 @@
     "score": 57,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "efe0d835d8bbfd6e",
     "findings": [
       {
@@ -1699,7 +1699,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "4a0a44551fd644df",
     "findings": []
   },
@@ -1707,7 +1707,7 @@
     "score": 44,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "94b91069cabac4bd",
     "findings": [
       {
@@ -1746,7 +1746,7 @@
     "score": 100,
     "recommendation": "DO_NOT_INSTALL",
     "version": "v2.13.6",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "itemHash": "5cb08da628ae3290",
     "findings": [
       {
@@ -1983,7 +1983,7 @@
     "score": 32,
     "recommendation": "CAUTION",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "962ba275b4c2c8ae",
     "findings": [
       {
@@ -2004,7 +2004,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "136eb95322a28868",
     "findings": []
   },
@@ -2012,7 +2012,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "b412750a2b388d4c",
     "findings": []
   },
@@ -2020,7 +2020,7 @@
     "score": 0,
     "recommendation": "SAFE",
     "version": "v2.13.6",
-    "date": "2026-11-21",
+    "date": "2026-11-26",
     "itemHash": "c425139e7e6b0a0e",
     "findings": []
   }

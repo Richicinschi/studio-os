@@ -219,8 +219,10 @@ const guard = testGuards(guardsIn([path.join(root, '.claude/settings.json'), pat
 
 const lines = [...guard, ...unsaved, ...missing, ...stale];
 if (lines.length > MAX_LINES) {
-  const shown = lines.slice(0, MAX_LINES - 1);
-  console.log([...shown, `... and ${lines.length - shown.length} more`].join('\n'));
+  // A git guard that does not refuse is never cut, however many there are; the cap applies to the rest.
+  const shown = lines.slice(0, Math.max(MAX_LINES - 1, guard.length));
+  const rest = lines.length - shown.length;
+  console.log([...shown, ...(rest ? [`... and ${rest} more`] : [])].join('\n'));
 } else if (lines.length) {
   console.log(lines.join('\n'));
 }

@@ -9,7 +9,7 @@ description: >-
 metadata:
   category: adoption
   author: Studio OS kit (generalized from the studio's vet-external-skill and its skill-adoption rule)
-  version: 2.1.0
+  version: 2.2.0
   tooling: SkillSpector (NVIDIA, Apache-2.0), installed as row 1 of the adoption plan
 ---
 
@@ -48,7 +48,8 @@ sitting:
    "pending" and `installed: pending` in the Scan cell, before the scans after Apply; fill the Scan
    cell in when they have run. A SKIP gets its row too, with Check "n/a".
 6. Run its Check. **Tick the row only after the check has passed**, and fill in the row's Check
-   cell. A failed check leaves the row unticked; say what failed and what to look at next.
+   cell and the install record (section 5). A failed check leaves the row unticked; say what failed
+   and what to look at next.
 
 Without a plan (an item someone names directly), the steps below still apply in the same order.
 
@@ -241,8 +242,8 @@ for an agent.
    and an upload leaves none on disk to read. Their row says so (section 5).
 
 **A stop after the install** ends one of two ways, and the adopter chooses: keep the item, with the
-reason written in the row's Why cell, or take it out with the card's Undo, and the row's Decision
-says it was undone. The item is on disk until then, so ask before anything else.
+reason written in the row's Why cell, or take it out ("Undo, from the record", section 5), and the
+row's Decision says it was undone. The item is on disk until then, so ask before anything else.
 
 The scanner does not see every change: a script edited after the scan can scan the same, which is
 why the comparison runs too.
@@ -271,6 +272,58 @@ Assessment" table. The other forms:
 - **FOLD:** `kit: <verdict> <score>/100 · installed: n/a: folded into <file>`.
 - **An MCP server or a claude.ai upload:** `kit: <verdict> <score>/100 · installed: n/a: nothing installed on disk`.
 - **A practice or any item with no files:** `n/a: no files`.
+
+### The install record
+
+Once the scans after Apply have run, and any script copied again on their yes is back, record what
+the install wrote, from the kit's folder, so drift and undo rest on a list, not on a reading of the
+row. A SKIP is recorded at once:
+
+```bash
+node tools/installed.mjs record <setup> <id> <decision> --created <path> --edited <path> --setting <file>#<key>
+```
+
+- `<setup>` is their setup folder, never the kit's. `<id>` is the item's card name, `cards/<id>.md`
+  (`pack-<id>` for a domain), the same in every record. `<decision>` is ADOPT, ADAPT, FOLD or SKIP.
+- Repeat `--created` for each file or folder the install made (a folder counts as every file in it,
+  and a file added to it later shows in a check), `--edited` for each file it changed that was there
+  before (their instruction file, a `.gitignore`), and `--setting` for each settings key it added, as
+  a dot path into the JSON file at the level the card names: `.claude/settings.json#hooks.PreToolUse`.
+  Add `--made` for each folder the install made only to hold its files, such as `.claude/agents/` in
+  a setup that had none: an undo removes it once empty, and removes no folder the record does not name.
+  A SKIP takes none of them. A path is relative to `<setup>`, or absolute, or starts with `~/`.
+- It writes `adoption/installed.json`, and nothing else: the kit version, the item's content hash
+  from `catalog/features.json`, the decision, and a SHA-256 of each file and of each key's value. Show
+  the line it prints. Recording an item again replaces its entry; record again whenever the installed
+  copy changes later in this item.
+- When the check has run: `node tools/installed.mjs checked <setup> <id> pass` (or `fail`).
+- An MCP server added at project scope writes `.mcp.json` in their setup: record
+  `--setting .mcp.json#mcpServers.<name>`. At local or user scope, and for a claude.ai upload, nothing
+  is written in their setup: record the decision with no paths. Without Node.js 22 there is no
+  record: say so once, and the row stays the record.
+
+### Undo, from the record
+
+`node tools/installed.mjs check <setup> <id>` lists every file and settings key the install wrote,
+each `unchanged`, `changed`, `missing`, `added` (a file in a folder it created that it did not
+write), or `rewritten by <item>` (a later item wrote it since), and names any other item that
+recorded the same file or key. Every removal and every edit waits for their yes.
+
+1. A **created** file that is `unchanged`, and that no other item recorded, is removed on their yes,
+   the whole list in one question: `node tools/installed.mjs undo <setup> <id>` prints that list and
+   what it leaves, and removes nothing; after their yes, the same with `--yes` removes those files and
+   the folders the install made, once empty, and records the item UNDONE when nothing is left.
+2. A `changed` or `added` file holds work done after the install. Show how it differs from the kit's
+   copy with `node tools/compare-install.mjs` (an adapted file differs anyway), and ask before
+   removing it.
+3. A file or key `rewritten by` a later item, or recorded by another item too, belongs to that item
+   as well: it stays, and only this item's part comes out, as the card's Undo says.
+4. An **edited** file and a settings key are undone as the card's Undo says: take out what the item
+   added and keep the rest, each change shown first.
+5. An item with no record (installed before the record existed, or without Node.js) is undone from
+   its row's Undo cell, the card's Undo written for their setup.
+6. Then `node tools/installed.mjs record <setup> <id> UNDONE`, and the row's Decision says it was
+   undone.
 
 ## 6. Outside items
 

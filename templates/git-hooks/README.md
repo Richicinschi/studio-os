@@ -17,11 +17,11 @@ The commands use `$HOME`, which PowerShell, bash and zsh all expand; Windows Pow
    - in its `commit-msg`, when you keep the trailer check: `node "$HOME/claude-setup/git-hooks/check-message.mjs" "$1" || exit 1`. If it has none, create the file with `#!/bin/sh` as its first line and that line below it, and on macOS and Linux `chmod +x` it. Without the `#!/bin/sh` line, git on Windows cannot start the hook and every commit fails.
 
    Without `|| exit 1`, a refusal is printed and the commit still goes through whenever the hook runs another command after it.
-5. Otherwise turn them on in one repository: `git -C "<repo>" config core.hooksPath "<full path to the folder>"` (on Windows, write the path with forward slashes). Keep the quotes: without them, a path with a space is cut at the space, git stores the first part, and no hook runs.
+5. Otherwise turn them on in one repository. **You** run this line in a terminal of your own; Claude can give you the line with both paths filled in: `git -C "<repo>" config core.hooksPath "<full path to the folder>"` (on Windows, write the path with forward slashes). Keep the quotes: without them, a path with a space is cut at the space, git stores the first part, and no hook runs. It is your command because the setting that turns the hooks on can as well point git at an empty folder and turn every hook off: the kit's git-guardrails refuses it from Claude for that reason (version 2.0.0), and the kit leaves it with you whether that guard is installed or not.
 6. Either way, try it in that repository, with nothing else staged: stage a new file holding the line `<<<<<<< check` and run `git commit -m "hooks check"`. It must be refused with `pre-commit refused this commit:`; then unstage and delete the file. When you keep the trailer check, also run `git commit --allow-empty -m x -m "Co-authored-by: Check <check@example.invalid>"`; it must be refused with `commit-msg refused`.
 7. After a week without surprises, do the same in your other repositories.
 
-To turn them off in a repository: `git -C "<repo>" config --unset core.hooksPath`, or remove the lines you added to its own hooks.
+To turn them off in a repository: `git -C "<repo>" config --unset core.hooksPath`, which you also run in your own terminal (git-guardrails refuses removing the setting from Claude, as it refuses setting it), or remove the lines you added to its own hooks.
 
 ## What they do not do
 They are a floor, not a wall: `git commit --no-verify` skips them. If that is a risk for you, add "never use --no-verify without asking me" to your `RELATIONSHIP.md` (module 07).

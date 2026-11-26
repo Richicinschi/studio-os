@@ -63,6 +63,17 @@ The menu marks the item **have** when the vault file exists and the front door o
 
 If step 1 prints `0` for either file, or Claude proposes to shorten or summarize anything, the rule is not where sessions read it: the item is not done, and the plan row stays unticked.
 
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: test -f "$(installed MEMORY-VAULT.md)" && echo present || echo missing
+expect: present
+run: grep -cF 'Vault rule: never shorten or delete a memory line; copy it word for word into memory/vault/MEMORY-VAULT.md first, check it landed, then leave a pointer.' "$(frontdoor)"
+expect: 1
+run: grep -cF 'Vault rule: never shorten or delete a memory line; copy it word for word into memory/vault/MEMORY-VAULT.md first, check it landed, then leave a pointer.' "$(installed MEMORY.md)"
+expect: 1
+```
+
 ## Undo
 
 - **Claude:** before the vault goes, puts every entry back word for word into the index or the memory file it came from; then deletes the vault file, on your yes.

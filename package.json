@@ -1,6 +1,6 @@
 {
   "name": "studio-os",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -10,5 +10,5 @@
     "lint": "node tools/export/lint-content.mjs",
     "export": "node tools/export/export.mjs"
   },
-  "engines": { "node": ">=22" }
+  "engines": { "node": ">=22.2" }
 }

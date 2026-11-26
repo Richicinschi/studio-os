@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { lintModulePage, lintKit, lintStartHere, lintCard, lintBanned, lintFrontmatterYaml, frontmatterFiles } from '../lint-content.mjs';
+import { lintModulePage, lintKit, lintStartHere, lintCard, lintBanned, lintFrontmatterYaml, frontmatterFiles, lintNotDocumented, lintCardSize, CARD_MAX_TOKENS, BULLET_MAX_WORDS } from '../lint-content.mjs';
 import { cardText } from './fixture-hub.mjs';
 
 const KIT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -144,5 +144,63 @@ test('lintKit fails on a literal byte-order mark (EF BB BF) under tools/, templa
       'templates/rules/a.md:1 a literal byte-order mark (bytes EF BB BF); remove it, or in code write the escape \\uFEFF',
       'tools/export/x.mjs:2 a literal byte-order mark (bytes EF BB BF); remove it, or in code write the escape \\uFEFF',
     ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// ---- public issue #59: a card, and each of its list items, has a size limit
+test(`a card over ${CARD_MAX_TOKENS} tokens and a list item over ${BULLET_MAX_WORDS} words are refused, a wrapped item counted whole`, () => {
+  const words = (n) => Array.from({ length: n }, (_, i) => `w${i}`).join(' ');
+  const card = ['---', 'id: x', '---', '', '## Watch out', '', `- ${words(BULLET_MAX_WORDS)}`, `- ${words(100)}`, `  ${words(60)}`, `1. ${words(10)}`, ''].join('\n');
+  assert.deepEqual(lintCardSize('cards/x.md', card), [`cards/x.md:8 a list item of 160 words, over ${BULLET_MAX_WORDS}`]);
+  const big = `${card}\n${'x'.repeat(CARD_MAX_TOKENS * 4)}\n`;
+  assert.match(lintCardSize('cards/x.md', big)[0], new RegExp(`^cards/x.md: about \\d+ tokens, over the ${CARD_MAX_TOKENS}`));
+});
+
+test('a list item runs on over a blank line while its text stays indented; fenced code counts as no words; a nested item is its own', () => {
+  const words = (n) => Array.from({ length: n }, (_, i) => `w${i}`).join(' ');
+  const card = ['## Steps', '',
+    `2. ${words(100)}`, '', `   ${words(60)}`, '',                     // one item, two paragraphs: 160 words
+    `3. ${words(100)}`, '', '   ```bash', `   ${words(80)}`, '   ```', '', // code under it does not count: 100
+    `4. ${words(100)}`, `   - ${words(120)}`, '',                      // a nested item ends its parent: 100 and 120
+    '```', `- ${words(200)}`, '```', '',                               // a "- " line inside a fence is not an item
+    `5. ${words(140)}`, '', `${words(40)}`, ''].join('\n');             // a paragraph back at the margin ends it: 140
+  assert.deepEqual(lintCardSize('cards/x.md', card), [`cards/x.md:3 a list item of 160 words, over ${BULLET_MAX_WORDS}`]);
+});
+
+// ---- public issue #65: "not documented" lives in docs/facts.md only
+test('"not documented" is refused in every Markdown page outside catalog/, docs/facts.md, CHANGELOG.md and docs/MAINTAINING.md', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'kit-notdoc-'));
+  const w = (rel, t) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), t); };
+  try {
+    w('cards/a.md', 'Fine.\nWhether X is not documented ([docs/facts.md](../docs/facts.md)).\n');
+    w('modules/01/README.md', 'It is **not** documented, said differently.\n');
+    w('cards/b.md', 'Line one.\n\nWhether Y is not\ndocumented, across a line break.\n\nAlso *not* documented, and not yet documented.\n\nAn undocumented flag.\n');
+    w('.claude/worktrees/x/cards/c.md', 'not documented, in a nested worktree\n');
+    w('docs/facts.md', '- X: not documented as of 2026-11-25; searched [a page](https://a.example.invalid).\n');
+    w('CHANGELOG.md', 'v1: the facts said "not documented".\n');
+    w('docs/MAINTAINING.md', 'The lint refuses "not documented".\n');
+    w('catalog/skills/x/SKILL.md', 'Upstream text: not documented.\n');
+    w('tools/notes.txt', 'not documented, but not Markdown\n');
+    // A fenced block quotes another file as it was: not read. The text after it is.
+    w('examples/run.md', 'A file the run wrote:\n\n```markdown\nSkills: not documented.\n```\n\n~~~~\n```\nnot documented\n```\n~~~~\n\nAfter the block: undocumented.\n');
+    assert.deepEqual(lintNotDocumented(root).map((e) => e.split(' says')[0]).sort(), ['cards/a.md:1', 'cards/b.md:3', 'cards/b.md:6', 'cards/b.md:8', 'examples/run.md:13', 'modules/01/README.md:1']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('lintKit refuses a card whose check block writes, reaches the network or is not well formed', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'kit-lint-'));
+  const w = (rel, t) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), t); };
+  try {
+    w('START-HERE.md', '# Start here\n\n### Windows\nx\n\n### macOS\nx\n\n### Linux\nx\n'); w('ADOPT.md', 'x'); w('CHANGELOG.md', 'x'); w('export.manifest.json', '{}');
+    const check = (block) => cardText('demo', 'skills').replace(/## Check\n/, `## Check\n\n\`\`\`check\n${block}\n\`\`\`\n`);
+    w('cards/good.md', check('run: grep -c x "$(installed SKILL.md)"\nexpect: 1'));
+    w('cards/writes.md', check('run: grep -c x a > b\nexpect: 1'));
+    w('cards/fetches.md', check('run: curl -s x\nexpect: 1'));
+    w('cards/broken.md', check('run: grep -c x a'));
+    const found = lintKit(root).filter((e) => /check block/.test(e));
+    assert.equal(found.length, 3, found.join('\n'));
+    assert.match(found.join('\n'), /^cards\/broken\.md: check block, line \d+: a run: line with no expect: after it$/m);
+    assert.match(found.join('\n'), /^cards\/fetches\.md:\d+ check block: a run: line the allowlist refuses \(a command that is not on the list of readers .*\): curl -s x$/m);
+    assert.match(found.join('\n'), /^cards\/writes\.md:\d+ check block: a run: line the allowlist refuses \(a redirect other than [^)]*\): grep -c x a > b$/m);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

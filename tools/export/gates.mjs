@@ -10,6 +10,7 @@ import { inflateRawSync } from 'node:zlib';
 import { findSecrets, findDenied, findPaths, findRisky, fileKind, PATHS_ALLOW, RISKY_ALLOW, findStudioMarkers, STUDIO_ALLOW, findMarkers, MARKERS_ALLOW } from './rules.mjs';
 import { isMenuItem } from './manifest.mjs';
 import { parseFrontmatter, splitFrontmatter } from './frontmatter.mjs';
+import { DETECT_FILE, detectTable } from './detect.mjs';
 
 export { MARKERS_ALLOW };
 
@@ -87,7 +88,14 @@ export const gateRisky = (root, allow = RISKY_ALLOW) => gateLines(root, findRisk
 export const gateStudioBlocks = (root, allow = STUDIO_ALLOW) => gateLines(root, findStudioMarkers, allow);
 
 // Studio words (the hub, hard rule, G1 to G8 …) in any text file under catalog/; findMarkers skips the rest.
-export const gateMarkers = (root, allow = MARKERS_ALLOW) => gateLines(root, findMarkers, allow);
+// catalog/DETECT.md is the cards' Detect sections, and this gate does not read cards/; it is skipped only
+// while it is exactly what detect.mjs makes from this tree's cards, so a hand edit is read like any other
+// catalog file. Only this gate skips it: privacy, paths and secrets read it as they read every file.
+export function gateMarkers(root, allow = MARKERS_ALLOW) {
+  const generated = detectTable(root);
+  const find = (text, file) => (file === DETECT_FILE && text.replace(/\r\n/g, '\n') === generated ? [] : findMarkers(text, file));
+  return gateLines(root, find, allow);
+}
 
 // Names from outside the studio that a shipped file may use although the studio has an item of that name:
 // { file, name, why }. An entry passes only that name, only in that file.

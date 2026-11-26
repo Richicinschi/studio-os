@@ -51,7 +51,7 @@ The menu marks the domain **have** when the pack's folder and the `council` skil
 
 ## Needs
 
-- Claude Code. The council starts its seats as subagents. Whether claude.ai's chat app has subagents is not documented ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so claude.ai gets the council skill only, and you run the seats by hand.
+- Claude Code. The council starts its seats as subagents. Whether claude.ai's chat app has subagents is an open question ([docs/facts.md](../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so claude.ai gets the council skill only, and you run the seats by hand.
 - SkillSpector for the scan, row 1 of your plan ([SkillSpector](skillspector.md)).
 
 ## Steps

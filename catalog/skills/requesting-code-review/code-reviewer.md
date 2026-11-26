@@ -30,6 +30,10 @@ Subagent (linus-reviewer):
     git diff [BASE_SHA]..[HEAD_SHA]
     ```
 
+    ## The PR body
+
+    [PR_BODY]
+
     ## Read-only
 
     Touch nothing on this checkout: not the files, not the index, not HEAD,
@@ -88,6 +92,16 @@ Subagent (linus-reviewer):
     - Do existing callers and stored data keep working?
     - Are docs updated?
     - Can you spot a bug by reading?
+
+    The PR body, when there is one:
+    - Check it sentence by sentence against the diff. A sentence the diff
+      does not show (a file, a count, a test result, "no behaviour change")
+      is an Important finding, quoted with what the diff shows instead.
+    - Read every lockfile in the diff and list each package whose version
+      moved, patch bumps included. Any that the body leaves out, or
+      describes wrongly, is an Important finding.
+    - A test count or result that only the implementer's run can prove:
+      say which, so the implementer quotes the run.
 
     ## Grading
 
@@ -162,6 +176,7 @@ Fill-in values:
 - `[PLAN_OR_REQUIREMENTS]`: the goal it serves (a plan file path, the task text, or the requirements).
 - `[BASE_SHA]`: the commit before the work.
 - `[HEAD_SHA]`: the last commit of the work.
+- `[PR_BODY]`: the draft PR body, or "none" when no PR follows.
 
 The report has five parts, in this order: strengths, issues sorted by severity (Critical, then Important, then Minor), recommendations, the set-aside list, and a verdict.
 

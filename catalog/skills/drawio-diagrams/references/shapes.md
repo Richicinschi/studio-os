@@ -16,8 +16,8 @@ There are two sources.
 ## Searching
 
 ```bash
-python3 <skill-dir>/scripts/shapesearch.py "azure function app" --limit 5
-python3 <skill-dir>/scripts/shapesearch.py "bpmn gateway" --json
+uv run python <skill-dir>/scripts/shapesearch.py "azure function app" --limit 5
+uv run python <skill-dir>/scripts/shapesearch.py "bpmn gateway" --json
 ```
 
 - Give keywords. Matching runs on shape tags, forgives similar-sounding spellings, and splits

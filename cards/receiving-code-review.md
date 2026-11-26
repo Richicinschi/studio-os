@@ -49,11 +49,11 @@ The menu marks the item **have** when a skill of this name exists at either leve
 
 - Claude Code, or claude.ai with code execution turned on, which custom skills need ([docs/facts.md](../docs/facts.md), "claude.ai: custom skills and the built-in document skills").
 - SkillSpector v2.13.6 for the scan, row 1 of your plan ([SkillSpector](skillspector.md)). The install, pinned by its full commit, is the same on every system, once uv is installed: `! uv tool install --python 3.13 git+https://github.com/NVIDIA/skillspector.git@e2674da339b0bddc6e565d059c0577c6d9cd25da`. On Windows, run `$env:PYTHONUTF8=1` in PowerShell before a scan.
-- The `gh` command line, only for the skill's last section, which replies inside GitHub review threads. That command and how to install `gh` are not documented in docs/facts.md as of 2026-11-02.
+- The `gh` command line, signed in, only for the skill's last section, which replies inside GitHub review threads through GitHub's replies endpoint. How to install `gh` and sign in is in [docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux", and the endpoint in "GitHub: replying to a review comment".
 
 ## Steps
 
-1. **Claude:** runs `vet-and-adopt` on `catalog/skills/receiving-code-review/` (`SKILL.md`): scans it with SkillSpector and hands the report to the kit's comparer (`skillspector scan catalog/skills/receiving-code-review --no-llm --format json | node tools/scan-compare.mjs receiving-code-review - --root catalog/skills/receiving-code-review`, with `PYTHONUTF8=1` first on Windows), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit's record of its scan, with SkillSpector v2.13.6 on 2026-11-21, is `SAFE` at 0/100 with no findings (`tools/export/scans.json`); with the pinned version the comparer prints `known: 0, moved: 0, reworded: 0, new: 0`. Your own scan is the one that decides.
+1. **Claude:** runs `vet-and-adopt` on `catalog/skills/receiving-code-review/` (`SKILL.md`): scans it with SkillSpector and hands the report to the kit's comparer (`skillspector scan catalog/skills/receiving-code-review --no-llm --format json | node tools/scan-compare.mjs receiving-code-review - --root catalog/skills/receiving-code-review`, with `PYTHONUTF8=1` first on Windows), triages the findings, and recommends SKIP, FOLD, ADAPT or ADOPT against what Detect found. The kit's record of its scan, with SkillSpector v2.13.6 on 2026-11-26, is `SAFE` at 0/100 with no findings (`tools/export/scans.json`); with the pinned version the comparer prints `known: 0, moved: 0, reworded: 0, new: 0`. Your own scan is the one that decides.
 2. **Claude:** prepares the copy, and shows you every change before saving:
    - **the metadata block:** its author line names the studio; Claude writes yours, and keeps the name, description and body;
    - **the instruction-file rule it leans on:** the skill says the studio's instruction files forbid "You're absolutely right!". If Detect found no such line in yours, Claude offers to add one, or to drop those words from the skill, so it does not cite a rule you do not have;
@@ -74,7 +74,7 @@ If Claude agrees and starts changing code before checking, or removes the functi
 ## Undo
 
 - **Claude:** deletes the `receiving-code-review` folder from the level it went to, or the lines it added to your instruction file for FOLD.
-- **you:** in claude.ai, remove the skill in Customize > Skills, where you uploaded it; the exact removal steps are not documented in docs/facts.md as of 2026-11-02.
+- **you:** in claude.ai, open the skill in Customize > Skills, where you uploaded it, and turn it off with its toggle, or delete it with the "..." button next to the toggle ([docs/facts.md](../docs/facts.md), "claude.ai: custom skills and the built-in document skills").
 - **Claude:** adds a row to `adoption/decisions.md` saying it was removed.
 
 ## Watch out

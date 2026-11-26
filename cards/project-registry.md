@@ -92,6 +92,13 @@ The menu marks the item **have** when the registry has a row for every repositor
 
 A `MISSING` line, a missing pointer, or a hook run that does not name the repository means the item is not done: the plan row stays unticked, and that row's path is the next thing to look at.
 
+`tools/check-setup.mjs` runs step 2 from this block, without Claude:
+
+```check
+run: test "$(grep -c 'PROJECTS.md' "$(frontdoor)")" -ge 1 && echo yes || echo no
+expect: yes
+```
+
 ## Undo
 
 - **Claude:** deletes `<your setup>/registry/PROJECTS.md`, and the `registry/` folder once it is empty.

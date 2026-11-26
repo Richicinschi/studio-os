@@ -2,6 +2,24 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.5.0 (2026-11-26)
+
+- The README and START-HERE lead with the adoption protocol and name the short path: "Start with continuity" gives a first result in one sitting, proved in a fresh session (#3, #28, #29).
+- The drill now reads its phases one at a time: about 7,700 tokens before its first question instead of about 28,000, and START-HERE says what each phase reads (#58).
+- The drill warns before an adoption adds more skills than Claude can tell apart, and asks once whether your adoption/ folder stays out of git (#26, #62).
+- Every install is recorded in adoption/installed.json, with a hash of each file and settings key it wrote; tools/check-setup.mjs checks your setup without Claude, and tools/installed.mjs undo takes an item out from that record (#60, #11, #12).
+- Eleven cards carry a check block that runs without Claude, held to a short list of reading commands; CI installs, checks and undoes every skill, agent and domain the kit ships (#32).
+- At the end of an adoption the drill writes a receipt with nothing private in it, and there is a form to send it as an adoption report (#30, #9).
+- examples/adoption-run-7.md is one whole adoption, turn by turn, from a trial run with a scripted persona (#63).
+- docs/facts.md: every fact is dated, fast-moving facts are checked every 30 days, and the stale ones were refreshed; new pages say which other agent tools read the kit's files and how the kit compares with Claude Code's own features (#65, #4, #14).
+- Cards are held to a size, the export reports skills whose descriptions overlap, and the git hooks template says who sets the hooks folder (#59, #61, #35).
+- docs/studio-use.md counts the studio's own use, with each method; docs/trials.md records the trial of a domain as a Claude Code plugin, and a claude.ai trial is ready to run (#31, #27, #64).
+- New in the design domain: a business-card skill that makes a two-sided, print-ready PDF and a QR code that saves your contact, made and checked by script without your details leaving the machine.
+- Maintainers: the changelog now lists practices, cards and the link-only item, and every item and domain in catalog/features.json carries a content hash; each release after this one writes docs/releases/vX.Y.Z.md, every changed file under its item, with a check before publishing; a weekly links job and a Node 24 job join CI, which runs on Linux only on the private repository; the content lint checks facts' dates, card sizes, check blocks and fenced text; new tests cover the install cycle, the card checks, the phase loads and the release files (#68, #34, #5, #66).
+- Every file this release changed, under its item: [docs/releases/v3.5.0.md](docs/releases/v3.5.0.md).
+
+**Changed:** `agent:bob-builder`, `agent:linus-reviewer`, `agent:sherlock-researcher`, `external:skillspector`, `pack:advisor-council-for-big-decisions`, `pack:design-ui-logos-slides-posters`, `practice:claude-ai-project`, `practice:commit-and-pr-writing`, `practice:context-habits`, `practice:decision-log`, `practice:front-door`, `practice:git-hooks`, `practice:git-identity-per-folder`, `practice:grant-ledger`, `practice:long-jobs-in-containers`, `practice:mcp-least-access`, `practice:memory-index`, `practice:merge-commit-only`, `practice:never-share-list`, `practice:project-registry`, `practice:real-data-seed`, `practice:rules-audit`, `practice:rules-on-demand`, `practice:sealed-holdout`, `practice:sensitive-file-deny-rules`, `practice:session-end-check`, `practice:session-start-status`, `practice:setup-check`, `practice:signed-commits`, `practice:vault`, `practice:verify-before-push`, `practice:worktrees`, `skill:brainstorming`, `skill:claim-auditor`, `skill:dispatching-parallel-agents`, `skill:drawio-diagrams`, `skill:finishing-a-development-branch`, `skill:git-guardrails`, `skill:handoff`, `skill:improve`, `skill:receiving-code-review`, `skill:requesting-code-review`, `skill:subagent-driven-development`, `skill:tdd`, `skill:using-agent-skills`, `skill:using-git-worktrees`
+
 ## v3.4.0 (2026-11-22)
 
 - The kit now pins its scanner, SkillSpector v2.13.6, by its exact commit, and every scan it records is bound to the exact content the scan read, so a changed item shows as needing a new scan (#53).

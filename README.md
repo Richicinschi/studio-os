@@ -17,7 +17,23 @@
 
 **Studio OS** is an adoption kit for Claude Code: how one solo studio works with Claude, written down so you can take the parts that fit your own work.
 
-It is not an installer. Your own Claude interviews you, proposes the smallest set that answers the problem you name, and changes your setup only on your yes.
+It is a protocol, not a collection to copy and not an installer. Your own Claude looks at your setup read-only, fits a menu to your work, installs each item only on your yes, and then proves it worked: a fresh session answers "where did we stop?" from your files. To see that proof first, take the short path, "Start with continuity": the scanner, a front door and a handoff note, in one sitting.
+
+| Phase | What happens |
+|---|---|
+| **Audit** | On your yes, a script from the kit looks at your setup, read-only, and prints names only, never values. It never opens secrets or data files. |
+| **Decide** | A few questions, one at a time, then a menu: each item with its value for your work and its cost in context. |
+| **Spec and plan** | What you chose, written down, with a first wave of at most about 8 items. |
+| **Install** | The first wave, item by item: scanned, applied on your yes, checked. |
+| **Verify** | Proof: a fresh session answers "where did we stop?" from your files. |
+
+Every phase writes to an `adoption/` folder in your setup, so you can stop and pick up any time. Later updates ask only about what changed. The full picture: [docs/adoption-sequence.svg](docs/adoption-sequence.svg).
+
+## Three ways in
+
+- **The short path:** say "Start with continuity". The scanner, then two items, a front-door file every session reads first and a handoff note written at the end of one, then the fresh-session proof. One trial took 7 minutes to the proof, measured, with an agent answering at once; to read each reply and approve or run the short checks it asks for (six in the trial), plan about 20 minutes (an estimate), and more if the scanner is not installed yet ([docs/trials.md](docs/trials.md), run 10). The full adoption stays open for later and keeps what you decided.
+- **The full adoption:** say "Start the adoption". Deciding takes about an hour (an estimate), then the first wave is installed and proved in the same sitting or the next.
+- **One item:** name it, and the kit's `vet-and-adopt` scans it and walks you through its card.
 
 ## Why
 
@@ -35,19 +51,11 @@ People who use Claude for real work and keep losing time to the same things:
 - a skill from the internet might not be safe;
 - Claude runs git with nothing to stop a mistake.
 
-It fits software, data and machine-learning work, and leaves out what does not fit yours. The full kit needs Claude Code; part of it carries over to claude.ai.
+It fits software, data and machine-learning work, and leaves out what does not fit yours. The full kit needs Claude Code; part of it carries over to claude.ai, and to other agent tools that read the same files ([docs/other-tools.md](docs/other-tools.md)). What Claude Code already does on its own, and what the kit adds: [docs/compared.md](docs/compared.md).
 
-## How it works
+## What the protocol can install
 
-| Phase | What happens |
-|---|---|
-| **Audit** | On your yes, a script from the kit looks at your setup, read-only, and prints names only, never values. It never opens secrets or data files. |
-| **Decide** | A few questions, then a menu: each item with its value for your work and its cost in context. |
-| **Spec and plan** | What you chose, written down, with a first wave of at most about 8 items. |
-| **Install** | The first wave, item by item: scanned, applied, checked. |
-| **Verify** | Proof: a fresh session answers "where did we stop?" from your files. |
-
-Every phase writes to an `adoption/` folder in your setup, so you can stop and pick up any time. Later updates ask only about what changed. The full picture: [docs/adoption-sequence.svg](docs/adoption-sequence.svg).
+Practices (written habits, and the small files and hooks that keep them), core skills, agents, and domains (packs of skills for one kind of job). The [feature menu](catalog/FEATURES.md) lists them with their cost in context.
 
 ## Quick start
 
@@ -63,7 +71,7 @@ These lines work in bash, zsh and PowerShell, not in Windows' `cmd.exe`.
 
 Optional, after the clone: check that your copy is the signed release, as step 1 of [Your first session](START-HERE.md#your-first-session) shows.
 
-Then say **"Start the adoption."** Installing Claude Code and git, and where your setup can live: [START-HERE.md](START-HERE.md).
+Then say **"Start with continuity"** for the short path, or **"Start the adoption"** for the full one. To see one first: [a whole adoption, turn by turn](examples/adoption-run-7.md), from a trial run with a scripted persona. Installing Claude Code and git, and where your setup can live: [START-HERE.md](START-HERE.md).
 
 ## What is inside
 
@@ -78,6 +86,8 @@ Then say **"Start the adoption."** Installing Claude Code and git, and where you
 | [templates/](templates/) | Blank files to start from |
 | [ADOPT.md](ADOPT.md) | The protocol your Claude follows during the adoption |
 | [docs/trials.md](docs/trials.md) | How the adoption was tested, by invented personas rather than real adopters, and what that does not prove |
+| [docs/compared.md](docs/compared.md) | What Claude Code does on its own, and what the kit adds |
+| [docs/other-tools.md](docs/other-tools.md) | Which parts of your setup other agent tools read too, and what that means for the kit's hooks |
 | [CHANGELOG.md](CHANGELOG.md) | What each release added, changed and removed |
 
 ## Problems and changes

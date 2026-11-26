@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone whose repos collect stale branches and worktrees.
 - **Pack / module:** way-of-working / 06-git-and-guardrails
-- **Last scan:** CAUTION (risk 0/100), SkillSpector v2.13.6 with --no-llm, 2026-11-22; no findings ([triage](../../../tools/export/scan-triage.md#git-cleanup-caution-0100-0-findings))
+- **Last scan:** CAUTION (risk 0/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; no findings ([triage](../../../tools/export/scan-triage.md#git-cleanup-caution-0100-0-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

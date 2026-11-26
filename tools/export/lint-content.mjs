@@ -3,11 +3,13 @@
 // their front matter and the eight headings in order; every skill folder's SKILL.md is named after its
 // folder; every catalog skill has a SOURCE.md; every front matter in a shipped Markdown file is YAML
 // that a real parser reads the way the kit's reader does; no file under tools/, templates/ or .claude/ holds
-// a literal byte-order mark.
+// a literal byte-order mark; every fact in docs/facts.md has a date; "not documented" is written only there.
 //   node tools/export/lint-content.mjs        # exit 1 on any error
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { lintFacts } from './facts.mjs';
+import { lintChecks } from '../check-setup.mjs';
 import { parseFrontmatter, plainValueProblems, splitFrontmatter } from './frontmatter.mjs';
 
 export const MODULE_HEADINGS = ['## The problem', '## The mechanism', '## Evidence', '## Apply it in Claude Code', '## Apply it in claude.ai'];
@@ -63,6 +65,45 @@ export function lintCard(rel, text) {
     const end = at + 1 < found.length ? found[at + 1].i : lines.length;
     if (!lines.slice(found[at].i + 1, end).some((l) => l.trim())) errors.push(`${rel}: heading "${h}" is empty`);
   }
+  errors.push(...lintCardSize(rel, text));
+  return errors;
+}
+
+// A card is read before Claude asks about its item and again when it installs it, so its length is paid in
+// every adoption (public issue #59). A card stays under CARD_MAX_TOKENS (bytes divided by 4, the kit's
+// estimator) and each list item under BULLET_MAX_WORDS; a test record or a list of spellings belongs in a
+// test file or SECURITY.md, linked from the card.
+export const CARD_MAX_TOKENS = 4000;
+export const BULLET_MAX_WORDS = 150;
+export function lintCardSize(rel, text) {
+  const errors = [];
+  const tokens = Math.ceil(Buffer.byteLength(text, 'utf8') / 4);
+  if (tokens > CARD_MAX_TOKENS) errors.push(`${rel}: about ${tokens} tokens, over the ${CARD_MAX_TOKENS} a card may hold`);
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  // Fenced code is neither a list item nor words: it is a command to copy, not text to read.
+  const fenced = [];
+  let open = false;
+  for (const l of lines) {
+    const fence = /^\s*(?:```|~~~)/.test(l);
+    fenced.push(open || fence);
+    if (fence) open = !open;
+  }
+  const marker = (l) => l.match(/^(\s*)(?:[-*] |\d+\. )/);
+  const indent = (l) => l.length - l.trimStart().length;
+  for (let i = 0; i < lines.length; i++) {
+    const m = !fenced[i] && marker(lines[i]);
+    if (!m) continue;
+    // An item runs on over blank lines while its text stays indented past its marker; a nested item, or a
+    // line back at the marker's indent, ends it.
+    let words = lines[i].trim().split(/\s+/).length - 1;
+    for (let j = i + 1; j < lines.length; j++) {
+      if (fenced[j]) continue;
+      if (!lines[j].trim()) continue;
+      if (indent(lines[j]) <= m[1].length || marker(lines[j])) break;
+      words += lines[j].trim().split(/\s+/).length;
+    }
+    if (words > BULLET_MAX_WORDS) errors.push(`${rel}:${i + 1} a list item of ${words} words, over ${BULLET_MAX_WORDS}`);
+  }
   return errors;
 }
 
@@ -100,17 +141,61 @@ export function lintKit(root) {
   }
   const cards = path.join(root, 'cards');
   if (existsSync(cards)) {
-    for (const f of readdirSync(cards).filter((n) => n.endsWith('.md')).sort()) errors.push(...lintCard(`cards/${f}`, readFileSync(path.join(cards, f), 'utf8')));
+    for (const f of readdirSync(cards).filter((n) => n.endsWith('.md')).sort()) {
+      const text = readFileSync(path.join(cards, f), 'utf8');
+      // A check block runs in an adopter's setup (tools/check-setup.mjs): read-only, offline, no code fetched.
+      errors.push(...lintCard(`cards/${f}`, text), ...lintChecks(`cards/${f}`, text));
+    }
   }
   for (const f of ['START-HERE.md', 'ADOPT.md', 'CHANGELOG.md', 'export.manifest.json']) if (!existsSync(path.join(root, f))) errors.push(`${f}: missing`);
   if (existsSync(path.join(root, 'START-HERE.md'))) errors.push(...lintStartHere(readFileSync(path.join(root, 'START-HERE.md'), 'utf8')));
+  // A kit skill may keep parts of itself in files beside SKILL.md (the drill's phases and modes): all are read.
+  const skillFiles = (d) => readdirSync(path.join(root, '.claude/skills', d), { recursive: true })
+    .map((f) => String(f).split(path.sep).join('/')).filter((f) => f.endsWith('.md')).sort().map((f) => `.claude/skills/${d}/${f}`);
   const voice = ['START-HERE.md', 'ADOPT.md',
-    ...dirsIn(path.join(root, '.claude/skills')).map((d) => `.claude/skills/${d}/SKILL.md`),
+    ...dirsIn(path.join(root, '.claude/skills')).flatMap(skillFiles),
     ...(existsSync(cards) ? readdirSync(cards).filter((n) => n.endsWith('.md')).sort().map((n) => `cards/${n}`) : [])];
   for (const rel of voice) if (existsSync(path.join(root, rel))) errors.push(...lintBanned(rel, readFileSync(path.join(root, rel), 'utf8')));
   errors.push(...lintFrontmatterYaml(root));
   errors.push(...lintByteOrderMarks(root));
+  if (existsSync(path.join(root, 'docs/facts.md'))) errors.push(...lintFacts('docs/facts.md', readFileSync(path.join(root, 'docs/facts.md'), 'utf8')));
+  errors.push(...lintNotDocumented(root));
   return errors;
+}
+
+// What the vendor's pages do not say is written once, in docs/facts.md, with its date and the pages
+// searched, so it is checked again when its date comes due; every other page links there. The phrase is
+// refused in every Markdown file outside catalog/ (upstream text, kept as written) but docs/facts.md, the
+// changelog (history) and docs/MAINTAINING.md (which names the rule). Fenced blocks are not read.
+export const NOT_DOCUMENTED_OK = new Set(['docs/facts.md', 'CHANGELOG.md', 'docs/MAINTAINING.md']);
+// "not documented", "not yet documented", "undocumented", with Markdown emphasis on either word, across a
+// line break: each paragraph is tested whole, and a finding names the paragraph's first line.
+const notDocumented = /\b(?:not[*_]*\s+(?:yet\s+)?[*_]*documented|undocumented)\b/i;
+export function lintNotDocumented(root) {
+  const out = [];
+  const walk = (rel) => {
+    for (const e of readdirSync(path.join(root, rel), { withFileTypes: true })) {
+      if (e.name === '.git' || e.name === 'node_modules' || (rel === '' && e.name === 'catalog') || (rel === '.claude' && e.name === 'worktrees')) continue;
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) { walk(r); continue; }
+      if (!e.name.endsWith('.md') || NOT_DOCUMENTED_OK.has(r)) continue;
+      // Fenced blocks hold quoted text, such as the files a published trial run wrote, so they are not read.
+      let fence = null;
+      const lines = readFileSync(path.join(root, r), 'utf8').split(/\r?\n/).map((l) => {
+        const m = l.match(/^\s*(```|~~~)/);
+        if (m && (!fence || m[1] === fence)) { fence = fence ? null : m[1]; return ''; }
+        return fence ? '' : l;
+      });
+      let start = 0;
+      for (let i = 0; i <= lines.length; i++) {
+        if (i < lines.length && lines[i].trim()) continue;
+        if (notDocumented.test(lines.slice(start, i).join(' '))) out.push(`${r}:${start + 1} says "not documented": write it in docs/facts.md, with its date and the pages searched, and link there`);
+        start = i + 1;
+      }
+    }
+  };
+  walk('');
+  return out;
 }
 
 // A byte-order mark written into source as the raw bytes EF BB BF is invisible in an editor and lost or

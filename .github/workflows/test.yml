@@ -12,19 +12,34 @@ permissions:
   contents: read
 
 jobs:
-  # The weekly schedule is for the scan job alone; the tests run on pushes, pull requests and manual runs.
+  # The weekly schedule is for the scan and links jobs alone; the tests run on pushes, pull requests and manual runs.
+  # Linux, Windows and macOS on the public repository, whose ruleset requires the three job names; Linux only
+  # on a private one, where Windows minutes count twice and macOS minutes ten times against the allowance.
   test:
     if: github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: ${{ fromJSON(github.event.repository.private && '["ubuntu-latest"]' || '["ubuntu-latest", "windows-latest", "macos-latest"]') }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
+      - run: npm test
+      - run: npm run lint
+
+  # The newer Node.js line, on Linux. The ruleset does not require it, but the release steps wait for the whole
+  # run to pass (gh run watch --exit-status), so a failure here stops a release too: package.json promises 22.2 or later.
+  test-node-24:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
       - run: npm test
       - run: npm run lint
 
@@ -52,3 +67,18 @@ jobs:
       - run: node tools/export/scan.mjs --check
         env:
           PYTHONUTF8: '1'
+
+  # Every source link in docs/facts.md still answers. Weekly and by hand only: it needs the network and a
+  # vendor's page can be down for an hour, so it never runs on a push and no ruleset requires it.
+  links:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: node tools/docs/check-links.mjs

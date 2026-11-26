@@ -7,6 +7,6 @@
 - **What the studio changed:** Written in the studio; studio-specific steps are marked in the module page.
 - **Who it suits:** Anyone who documents systems or data flows.
 - **Pack / module:** data-work / 09-data-work
-- **Last scan:** DO_NOT_INSTALL (risk 57/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 6 findings, all read: 1 false positive, 5 by design ([triage](../../../tools/export/scan-triage.md#drawio-diagrams-do_not_install-57100-6-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 57/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; 6 findings, all read: 1 false positive, 5 by design ([triage](../../../tools/export/scan-triage.md#drawio-diagrams-do_not_install-57100-6-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

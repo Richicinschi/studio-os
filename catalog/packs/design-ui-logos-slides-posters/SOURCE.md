@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-design-ui-logos-slides-posters.md](../../../cards/pack-design-ui-logos-slides-posters.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 9 findings, all read: 7 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#packdesign-ui-logos-slides-posters-do_not_install-100100-9-findings))
+- **Last scan:** DO_NOT_INSTALL (risk 100/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; 9 findings, all read: 7 false positives, 2 by design ([triage](../../../tools/export/scan-triage.md#packdesign-ui-logos-slides-posters-do_not_install-100100-9-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

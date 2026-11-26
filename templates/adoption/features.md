@@ -2,6 +2,7 @@
 
 **Kit version:** v<X.Y.Z> · **Date:** <YYYY-MM-DD> · **Every session, your choice:** about <N> tokens (estimate)
 **Heaviest three:** <id> (about <N>), <id> (about <N>), <id> (about <N>)
+**Skills in Claude's list after the plan:** <N> · **their descriptions:** at least about <N> characters (estimate; plugins' and Claude Code's own skills not counted)
 
 Written by `drill-to-adopt` as you answer, one line per item, never two items on one line. You may edit it by hand: tick or untick a box, and the next run reads this file instead of asking again. A box is ticked only when you chose the item; nothing is ticked as "assumed". Tokens are estimates (bytes divided by 4). The kit's `catalog/FEATURES.md` explains the two flags, importance and context cost, and each item's card, `cards/<id>.md` in the kit, says how it is installed, checked and undone. "You have" comes from the audit: **have**, **partly** or **not yet**. Where a plugin enabled in your project brings a skill or agent of the same name, **a plugin provides one** stands in place of **not yet**, and **partly (a plugin provides one)** in place of **partly**, so what is missing stays in view; either way the kit's copy is not offered as a second.
 

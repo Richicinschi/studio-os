@@ -1,6 +1,6 @@
 {
   "kit": "studio-os",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "heavyTokens": 1000,
   "modules": [
     {
@@ -20,7 +20,8 @@
           "card": "cards/front-door.md",
           "files": [
             "templates/AGENTS.md"
-          ]
+          ],
+          "hash": "025ff3f2c3201883"
         },
         {
           "id": "handoff",
@@ -31,7 +32,8 @@
           "everySessionTokens": 76,
           "onDemandTokens": 1595,
           "heavy": false,
-          "card": "cards/handoff.md"
+          "card": "cards/handoff.md",
+          "hash": "cdaf6cba0472ef1a"
         },
         {
           "id": "memory-index",
@@ -46,7 +48,8 @@
           "card": "cards/memory-index.md",
           "files": [
             "templates/memory/MEMORY.md"
-          ]
+          ],
+          "hash": "bb53c582179e1c25"
         },
         {
           "id": "session-end-check",
@@ -61,7 +64,8 @@
           "card": "cards/session-end-check.md",
           "files": [
             "templates/hooks/session-end-check.mjs"
-          ]
+          ],
+          "hash": "6214ae41e2428561"
         },
         {
           "id": "vault",
@@ -76,7 +80,8 @@
           "card": "cards/vault.md",
           "files": [
             "templates/memory/vault/MEMORY-VAULT.md"
-          ]
+          ],
+          "hash": "24604b62acadbc1a"
         },
         {
           "id": "decision-log",
@@ -91,7 +96,8 @@
           "card": "cards/decision-log.md",
           "files": [
             "templates/decisions/DECISIONS.md"
-          ]
+          ],
+          "hash": "9e2137be9d63fc02"
         },
         {
           "id": "session-start-status",
@@ -106,7 +112,8 @@
           "card": "cards/session-start-status.md",
           "files": [
             "templates/hooks/session-start-status.mjs"
-          ]
+          ],
+          "hash": "65b1fa9cd4c51112"
         }
       ]
     },
@@ -127,7 +134,8 @@
           "card": "cards/context-habits.md",
           "files": [
             "cards/context-habits.md"
-          ]
+          ],
+          "hash": "5b4278cf07455776"
         },
         {
           "id": "rules-on-demand",
@@ -142,7 +150,8 @@
           "card": "cards/rules-on-demand.md",
           "files": [
             "cards/rules-on-demand.md"
-          ]
+          ],
+          "hash": "7705e288688d258a"
         }
       ]
     },
@@ -159,7 +168,8 @@
           "everySessionTokens": 67,
           "onDemandTokens": 3517,
           "heavy": false,
-          "card": "cards/brainstorming.md"
+          "card": "cards/brainstorming.md",
+          "hash": "44dda9dd7a3615a3"
         },
         {
           "id": "setup-check",
@@ -174,7 +184,8 @@
           "card": "cards/setup-check.md",
           "files": [
             "cards/setup-check.md"
-          ]
+          ],
+          "hash": "93e03950fe24657e"
         },
         {
           "id": "writing-plans",
@@ -185,7 +196,8 @@
           "everySessionTokens": 49,
           "onDemandTokens": 2528,
           "heavy": false,
-          "card": "cards/writing-plans.md"
+          "card": "cards/writing-plans.md",
+          "hash": "c68e8dcda75989ff"
         },
         {
           "id": "coding-guidelines",
@@ -205,7 +217,8 @@
           "card": "cards/coding-guidelines.md",
           "files": [
             "templates/rules/coding-guidelines.md"
-          ]
+          ],
+          "hash": "7f6238931fe3ae37"
         },
         {
           "id": "drill-to-plan",
@@ -216,7 +229,8 @@
           "everySessionTokens": 72,
           "onDemandTokens": 1749,
           "heavy": false,
-          "card": "cards/drill-to-plan.md"
+          "card": "cards/drill-to-plan.md",
+          "hash": "86b54f55c2f1fc3e"
         },
         {
           "id": "executing-plans",
@@ -227,7 +241,8 @@
           "everySessionTokens": 53,
           "onDemandTokens": 4127,
           "heavy": false,
-          "card": "cards/executing-plans.md"
+          "card": "cards/executing-plans.md",
+          "hash": "9c449650459075ea"
         },
         {
           "id": "verification-before-completion",
@@ -243,7 +258,8 @@
           "everySessionTokens": 58,
           "onDemandTokens": 1087,
           "heavy": false,
-          "card": "cards/verification-before-completion.md"
+          "card": "cards/verification-before-completion.md",
+          "hash": "9d27f6f45540011a"
         },
         {
           "id": "verify-before-push",
@@ -263,7 +279,8 @@
           "card": "cards/verify-before-push.md",
           "files": [
             "cards/verify-before-push.md"
-          ]
+          ],
+          "hash": "69a5d5050bf57247"
         }
       ]
     },
@@ -280,7 +297,8 @@
           "everySessionTokens": 54,
           "onDemandTokens": 1463,
           "heavy": false,
-          "card": "cards/dispatching-parallel-agents.md"
+          "card": "cards/dispatching-parallel-agents.md",
+          "hash": "31e65c32a4765d0b"
         },
         {
           "id": "improve",
@@ -291,7 +309,8 @@
           "everySessionTokens": 74,
           "onDemandTokens": 3173,
           "heavy": false,
-          "card": "cards/improve.md"
+          "card": "cards/improve.md",
+          "hash": "540b61256ed57440"
         },
         {
           "id": "long-jobs-in-containers",
@@ -309,7 +328,8 @@
           "card": "cards/long-jobs-in-containers.md",
           "files": [
             "cards/long-jobs-in-containers.md"
-          ]
+          ],
+          "hash": "2787fc094e7310ed"
         },
         {
           "id": "subagent-driven-development",
@@ -320,7 +340,8 @@
           "everySessionTokens": 63,
           "onDemandTokens": 4155,
           "heavy": false,
-          "card": "cards/subagent-driven-development.md"
+          "card": "cards/subagent-driven-development.md",
+          "hash": "99a75d21789a9320"
         }
       ]
     },
@@ -338,7 +359,8 @@
           "everySessionTokens": 0,
           "onDemandTokens": null,
           "heavy": false,
-          "card": "cards/skillspector.md"
+          "card": "cards/skillspector.md",
+          "hash": "c07313a074b2dbb9"
         },
         {
           "id": "writing-great-skills",
@@ -349,7 +371,8 @@
           "everySessionTokens": 73,
           "onDemandTokens": 2045,
           "heavy": false,
-          "card": "cards/writing-great-skills.md"
+          "card": "cards/writing-great-skills.md",
+          "hash": "8044e7396472fb7f"
         },
         {
           "id": "using-agent-skills",
@@ -360,7 +383,8 @@
           "everySessionTokens": 56,
           "onDemandTokens": 994,
           "heavy": false,
-          "card": "cards/using-agent-skills.md"
+          "card": "cards/using-agent-skills.md",
+          "hash": "bde28e10c3bd586f"
         }
       ]
     },
@@ -375,9 +399,10 @@
           "why": "An agent that runs git can lose work in one command; this blocks force-push, reset --hard and the like before they run.",
           "loads": "every-session",
           "everySessionTokens": 64,
-          "onDemandTokens": 2799,
+          "onDemandTokens": 2896,
           "heavy": false,
-          "card": "cards/git-guardrails.md"
+          "card": "cards/git-guardrails.md",
+          "hash": "1b380680165b179d"
         },
         {
           "id": "git-hooks",
@@ -392,7 +417,8 @@
           "card": "cards/git-hooks.md",
           "files": [
             "templates/git-hooks"
-          ]
+          ],
+          "hash": "a2f7afacff91e6a1"
         },
         {
           "id": "sensitive-file-deny-rules",
@@ -407,7 +433,8 @@
           "card": "cards/sensitive-file-deny-rules.md",
           "files": [
             "cards/sensitive-file-deny-rules.md"
-          ]
+          ],
+          "hash": "4470cc71f2606dd1"
         },
         {
           "id": "commit-and-pr-writing",
@@ -427,7 +454,8 @@
           "card": "cards/commit-and-pr-writing.md",
           "files": [
             "cards/commit-and-pr-writing.md"
-          ]
+          ],
+          "hash": "8dd0cdc560973cf8"
         },
         {
           "id": "finishing-a-development-branch",
@@ -441,9 +469,10 @@
           "why": "When the work is done: tests first, then push and open a PR, or keep the branch; it never merges on its own.",
           "loads": "every-session",
           "everySessionTokens": 33,
-          "onDemandTokens": 2230,
+          "onDemandTokens": 2316,
           "heavy": false,
-          "card": "cards/finishing-a-development-branch.md"
+          "card": "cards/finishing-a-development-branch.md",
+          "hash": "0297f60964bcfeca"
         },
         {
           "id": "git-cleanup",
@@ -459,7 +488,8 @@
           "everySessionTokens": 0,
           "onDemandTokens": 2575,
           "heavy": false,
-          "card": "cards/git-cleanup.md"
+          "card": "cards/git-cleanup.md",
+          "hash": "09b29192d2227729"
         },
         {
           "id": "git-identity-per-folder",
@@ -479,7 +509,8 @@
           "card": "cards/git-identity-per-folder.md",
           "files": [
             "cards/git-identity-per-folder.md"
-          ]
+          ],
+          "hash": "5e7a12941cc156a8"
         },
         {
           "id": "grant-ledger",
@@ -499,7 +530,8 @@
           "card": "cards/grant-ledger.md",
           "files": [
             "cards/grant-ledger.md"
-          ]
+          ],
+          "hash": "fe1966a38b57ed82"
         },
         {
           "id": "merge-commit-only",
@@ -519,7 +551,8 @@
           "card": "cards/merge-commit-only.md",
           "files": [
             "cards/merge-commit-only.md"
-          ]
+          ],
+          "hash": "9c4de3f2bc02166e"
         },
         {
           "id": "never-share-list",
@@ -539,7 +572,8 @@
           "card": "cards/never-share-list.md",
           "files": [
             "templates/git-hooks/check-staged.mjs"
-          ]
+          ],
+          "hash": "ad86ca919f45a1da"
         },
         {
           "id": "rules-audit",
@@ -559,7 +593,8 @@
           "card": "cards/rules-audit.md",
           "files": [
             "templates/audit/rules-audit-brief.md"
-          ]
+          ],
+          "hash": "0dc01fb01790ede7"
         },
         {
           "id": "signed-commits",
@@ -579,7 +614,8 @@
           "card": "cards/signed-commits.md",
           "files": [
             "cards/signed-commits.md"
-          ]
+          ],
+          "hash": "57f30b917fa6addc"
         },
         {
           "id": "using-git-worktrees",
@@ -595,7 +631,8 @@
           "everySessionTokens": 57,
           "onDemandTokens": 1670,
           "heavy": false,
-          "card": "cards/using-git-worktrees.md"
+          "card": "cards/using-git-worktrees.md",
+          "hash": "c4167930ee34f010"
         },
         {
           "id": "worktrees",
@@ -615,7 +652,8 @@
           "card": "cards/worktrees.md",
           "files": [
             "cards/worktrees.md"
-          ]
+          ],
+          "hash": "4eef49520f638de5"
         }
       ]
     },
@@ -636,7 +674,8 @@
           "card": "cards/identity-relationship.md",
           "files": [
             "templates/identity/RELATIONSHIP.md"
-          ]
+          ],
+          "hash": "f46e498be222aa40"
         },
         {
           "id": "identity-user",
@@ -651,7 +690,8 @@
           "card": "cards/identity-user.md",
           "files": [
             "templates/identity/USER.md"
-          ]
+          ],
+          "hash": "86645a8667648139"
         },
         {
           "id": "identity-soul",
@@ -666,7 +706,8 @@
           "card": "cards/identity-soul.md",
           "files": [
             "templates/identity/SOUL.md"
-          ]
+          ],
+          "hash": "265644f52f04dc66"
         },
         {
           "id": "identity-style",
@@ -681,7 +722,8 @@
           "card": "cards/identity-style.md",
           "files": [
             "templates/identity/STYLE.md"
-          ]
+          ],
+          "hash": "804c3993f585e11d"
         }
       ]
     },
@@ -698,7 +740,8 @@
           "everySessionTokens": 55,
           "onDemandTokens": 317,
           "heavy": false,
-          "card": "cards/bob-builder.md"
+          "card": "cards/bob-builder.md",
+          "hash": "ed2a06a9ccaa1610"
         },
         {
           "id": "linus-reviewer",
@@ -714,7 +757,8 @@
           "everySessionTokens": 51,
           "onDemandTokens": 354,
           "heavy": false,
-          "card": "cards/linus-reviewer.md"
+          "card": "cards/linus-reviewer.md",
+          "hash": "c0b732cd7b95ad12"
         },
         {
           "id": "receiving-code-review",
@@ -730,7 +774,8 @@
           "everySessionTokens": 64,
           "onDemandTokens": 1533,
           "heavy": false,
-          "card": "cards/receiving-code-review.md"
+          "card": "cards/receiving-code-review.md",
+          "hash": "6fb66b6af0800d42"
         },
         {
           "id": "requesting-code-review",
@@ -744,9 +789,10 @@
           "why": "A change checked only by the session that wrote it gets one view; this hands it to a reviewer before it merges.",
           "loads": "every-session",
           "everySessionTokens": 49,
-          "onDemandTokens": 705,
+          "onDemandTokens": 913,
           "heavy": false,
-          "card": "cards/requesting-code-review.md"
+          "card": "cards/requesting-code-review.md",
+          "hash": "3f01e82dcdac54f7"
         },
         {
           "id": "sherlock-researcher",
@@ -757,7 +803,8 @@
           "everySessionTokens": 45,
           "onDemandTokens": 320,
           "heavy": false,
-          "card": "cards/sherlock-researcher.md"
+          "card": "cards/sherlock-researcher.md",
+          "hash": "b0469b18df0e6a41"
         }
       ]
     },
@@ -778,7 +825,8 @@
           "everySessionTokens": 74,
           "onDemandTokens": 1035,
           "heavy": false,
-          "card": "cards/claim-auditor.md"
+          "card": "cards/claim-auditor.md",
+          "hash": "803094c2cd1a817e"
         },
         {
           "id": "diagnosing-bugs",
@@ -794,7 +842,8 @@
           "everySessionTokens": 60,
           "onDemandTokens": 2563,
           "heavy": false,
-          "card": "cards/diagnosing-bugs.md"
+          "card": "cards/diagnosing-bugs.md",
+          "hash": "3d596de46a2de4c2"
         },
         {
           "id": "drawio-diagrams",
@@ -803,9 +852,10 @@
           "why": "Turns a system or data flow into an editable diagram file, kept on your machine.",
           "loads": "every-session",
           "everySessionTokens": 74,
-          "onDemandTokens": 2175,
+          "onDemandTokens": 2208,
           "heavy": false,
-          "card": "cards/drawio-diagrams.md"
+          "card": "cards/drawio-diagrams.md",
+          "hash": "2052cb2d0b093832"
         },
         {
           "id": "tdd",
@@ -821,7 +871,8 @@
           "everySessionTokens": 65,
           "onDemandTokens": 1969,
           "heavy": false,
-          "card": "cards/tdd.md"
+          "card": "cards/tdd.md",
+          "hash": "e88cf43b945d74c3"
         }
       ]
     },
@@ -842,7 +893,8 @@
           "card": "cards/mcp-least-access.md",
           "files": [
             "cards/mcp-least-access.md"
-          ]
+          ],
+          "hash": "a4b8bb7f793e2009"
         }
       ]
     },
@@ -863,7 +915,8 @@
           "card": "cards/claude-ai-project.md",
           "files": [
             "templates/claude-ai/PROJECT-INSTRUCTIONS.md"
-          ]
+          ],
+          "hash": "650e39062bed9862"
         },
         {
           "id": "project-registry",
@@ -878,7 +931,8 @@
           "card": "cards/project-registry.md",
           "files": [
             "templates/registry/PROJECTS.md"
-          ]
+          ],
+          "hash": "0a7377b00da26dcd"
         }
       ]
     },
@@ -903,7 +957,8 @@
           "card": "cards/baseline-before-claim.md",
           "files": [
             "cards/baseline-before-claim.md"
-          ]
+          ],
+          "hash": "709edbd5205d96f3"
         },
         {
           "id": "negative-results",
@@ -921,7 +976,8 @@
           "card": "cards/negative-results.md",
           "files": [
             "cards/negative-results.md"
-          ]
+          ],
+          "hash": "9ad5bbf18d421b45"
         },
         {
           "id": "real-data-seed",
@@ -939,7 +995,8 @@
           "card": "cards/real-data-seed.md",
           "files": [
             "cards/real-data-seed.md"
-          ]
+          ],
+          "hash": "5a7b4f89a2c88f08"
         },
         {
           "id": "sealed-holdout",
@@ -957,7 +1014,8 @@
           "card": "cards/sealed-holdout.md",
           "files": [
             "cards/sealed-holdout.md"
-          ]
+          ],
+          "hash": "a6c7180424553a77"
         },
         {
           "id": "success-criteria-first",
@@ -975,7 +1033,8 @@
           "card": "cards/success-criteria-first.md",
           "files": [
             "cards/success-criteria-first.md"
-          ]
+          ],
+          "hash": "7e25975538d2e704"
         }
       ]
     }
@@ -1001,7 +1060,8 @@
       ],
       "alwaysOnTokens": 49,
       "indexTokens": 171,
-      "card": "cards/pack-advisor-council-for-big-decisions.md"
+      "card": "cards/pack-advisor-council-for-big-decisions.md",
+      "hash": "3ce2368fd7791fbb"
     },
     {
       "id": "android-swiftui-react-native-app-building",
@@ -1016,7 +1076,8 @@
       "agents": [],
       "alwaysOnTokens": 57,
       "indexTokens": 330,
-      "card": "cards/pack-android-swiftui-react-native-app-building.md"
+      "card": "cards/pack-android-swiftui-react-native-app-building.md",
+      "hash": "a3026f9f36287bdf"
     },
     {
       "id": "app-legal-privacy-terms-store-review",
@@ -1043,7 +1104,8 @@
       "agents": [],
       "alwaysOnTokens": 53,
       "indexTokens": 1171,
-      "card": "cards/pack-app-legal-privacy-terms-store-review.md"
+      "card": "cards/pack-app-legal-privacy-terms-store-review.md",
+      "hash": "ccf0b55907d36b00"
     },
     {
       "id": "audio-video-media",
@@ -1070,7 +1132,8 @@
       ],
       "alwaysOnTokens": 69,
       "indexTokens": 1119,
-      "card": "cards/pack-audio-video-media.md"
+      "card": "cards/pack-audio-video-media.md",
+      "hash": "07f3bf8e7a35ce60"
     },
     {
       "id": "dependency-supply-chain-risk-checks",
@@ -1083,12 +1146,13 @@
       "agents": [],
       "alwaysOnTokens": 43,
       "indexTokens": 170,
-      "card": "cards/pack-dependency-supply-chain-risk-checks.md"
+      "card": "cards/pack-dependency-supply-chain-risk-checks.md",
+      "hash": "1807ae8111257d90"
     },
     {
       "id": "design-ui-logos-slides-posters",
       "title": "Design, UX and accessibility",
-      "description": "Use when the user asks for a logo, poster, presentation or slides, a chart or report, a style guide, a page from a Figma file, a look and feel, a polish of a bland screen, an app illustration, a newsletter for email, or an accessibility check. Open this before replying, even to ask questions.",
+      "description": "Use when the user asks for a logo, poster, business card, presentation or slides, a chart or report or which chart type and colours to use, a style guide, a page from a Figma file, a look and feel, a polish of a bland screen, an app illustration, an animation, motion or scroll effect, a newsletter for email, or an accessibility check. Open this before replying, even to ask questions.",
       "why": "A logo, poster, slides, chart, style guide or look and feel; a polish of a bland screen; an accessibility check.",
       "skills": [
         "design-direction",
@@ -1100,6 +1164,7 @@
         "platform-formatted-document",
         "logo-design",
         "poster-and-social-cards",
+        "business-card",
         "product-ui-illustration",
         "visual-qa-gate",
         "accessibility-review",
@@ -1113,9 +1178,10 @@
       "agents": [
         "design-critic"
       ],
-      "alwaysOnTokens": 74,
-      "indexTokens": 1344,
-      "card": "cards/pack-design-ui-logos-slides-posters.md"
+      "alwaysOnTokens": 97,
+      "indexTokens": 1384,
+      "card": "cards/pack-design-ui-logos-slides-posters.md",
+      "hash": "166610446e06407e"
     },
     {
       "id": "django-flask-laravel-shops-and-chat",
@@ -1130,7 +1196,8 @@
       "agents": [],
       "alwaysOnTokens": 45,
       "indexTokens": 274,
-      "card": "cards/pack-django-flask-laravel-shops-and-chat.md"
+      "card": "cards/pack-django-flask-laravel-shops-and-chat.md",
+      "hash": "6abc57aeac0756b2"
     },
     {
       "id": "engineering-testing-performance-code-design",
@@ -1145,7 +1212,8 @@
       "agents": [],
       "alwaysOnTokens": 34,
       "indexTokens": 305,
-      "card": "cards/pack-engineering-testing-performance-code-design.md"
+      "card": "cards/pack-engineering-testing-performance-code-design.md",
+      "hash": "b9aa8cc4b9ae1b8a"
     },
     {
       "id": "games-design-prototype-playtest-assets",
@@ -1165,7 +1233,8 @@
       "agents": [],
       "alwaysOnTokens": 56,
       "indexTokens": 658,
-      "card": "cards/pack-games-design-prototype-playtest-assets.md"
+      "card": "cards/pack-games-design-prototype-playtest-assets.md",
+      "hash": "efc62acb33c62da3"
     },
     {
       "id": "godot-camera-shaders-particles-export",
@@ -1187,7 +1256,8 @@
       "agents": [],
       "alwaysOnTokens": 58,
       "indexTokens": 854,
-      "card": "cards/pack-godot-camera-shaders-particles-export.md"
+      "card": "cards/pack-godot-camera-shaders-particles-export.md",
+      "hash": "0f4333c171f3ddf7"
     },
     {
       "id": "learning-lessons-explanations-practice",
@@ -1200,7 +1270,8 @@
       "agents": [],
       "alwaysOnTokens": 30,
       "indexTokens": 132,
-      "card": "cards/pack-learning-lessons-explanations-practice.md"
+      "card": "cards/pack-learning-lessons-explanations-practice.md",
+      "hash": "72d7f06803f6ded8"
     },
     {
       "id": "marketing-copy-emails-seo-signups",
@@ -1228,7 +1299,8 @@
       "agents": [],
       "alwaysOnTokens": 57,
       "indexTokens": 1074,
-      "card": "cards/pack-marketing-copy-emails-seo-signups.md"
+      "card": "cards/pack-marketing-copy-emails-seo-signups.md",
+      "hash": "15440c53b85ab264"
     },
     {
       "id": "marketing-plans-offers-pricing-launches",
@@ -1256,7 +1328,8 @@
       "agents": [],
       "alwaysOnTokens": 50,
       "indexTokens": 1011,
-      "card": "cards/pack-marketing-plans-offers-pricing-launches.md"
+      "card": "cards/pack-marketing-plans-offers-pricing-launches.md",
+      "hash": "f56675f295ac0cd9"
     },
     {
       "id": "mobile-apps-flutter-firebase",
@@ -1286,7 +1359,8 @@
       "agents": [],
       "alwaysOnTokens": 49,
       "indexTokens": 1253,
-      "card": "cards/pack-mobile-apps-flutter-firebase.md"
+      "card": "cards/pack-mobile-apps-flutter-firebase.md",
+      "hash": "c474b071e18821c7"
     },
     {
       "id": "phone-app-testing-release-and-agents",
@@ -1306,7 +1380,8 @@
       "agents": [],
       "alwaysOnTokens": 57,
       "indexTokens": 650,
-      "card": "cards/pack-phone-app-testing-release-and-agents.md"
+      "card": "cards/pack-phone-app-testing-release-and-agents.md",
+      "hash": "e67d5d30da114e3e"
     },
     {
       "id": "python-backend-fastapi-docker-agents",
@@ -1322,7 +1397,8 @@
       "agents": [],
       "alwaysOnTokens": 36,
       "indexTokens": 398,
-      "card": "cards/pack-python-backend-fastapi-docker-agents.md"
+      "card": "cards/pack-python-backend-fastapi-docker-agents.md",
+      "hash": "33ada5fa209d5cbe"
     },
     {
       "id": "stock-research-backtests-trading-safety",
@@ -1344,7 +1420,8 @@
       "agents": [],
       "alwaysOnTokens": 58,
       "indexTokens": 780,
-      "card": "cards/pack-stock-research-backtests-trading-safety.md"
+      "card": "cards/pack-stock-research-backtests-trading-safety.md",
+      "hash": "191b8578b507a5cf"
     },
     {
       "id": "unity-editor-scripts-prefabs-builds",
@@ -1362,7 +1439,8 @@
       "agents": [],
       "alwaysOnTokens": 48,
       "indexTokens": 497,
-      "card": "cards/pack-unity-editor-scripts-prefabs-builds.md"
+      "card": "cards/pack-unity-editor-scripts-prefabs-builds.md",
+      "hash": "697d169e0c60761a"
     },
     {
       "id": "web-api-security-login-and-graphql",
@@ -1378,7 +1456,8 @@
       "agents": [],
       "alwaysOnTokens": 45,
       "indexTokens": 310,
-      "card": "cards/pack-web-api-security-login-and-graphql.md"
+      "card": "cards/pack-web-api-security-login-and-graphql.md",
+      "hash": "058e98d60da8a954"
     },
     {
       "id": "web-astro-cloudflare-gsap-performance",
@@ -1400,7 +1479,8 @@
       "agents": [],
       "alwaysOnTokens": 59,
       "indexTokens": 735,
-      "card": "cards/pack-web-astro-cloudflare-gsap-performance.md"
+      "card": "cards/pack-web-astro-cloudflare-gsap-performance.md",
+      "hash": "394358f38ce28a7a"
     },
     {
       "id": "web-search-and-scraping-into-files",
@@ -1413,7 +1493,8 @@
       "agents": [],
       "alwaysOnTokens": 52,
       "indexTokens": 196,
-      "card": "cards/pack-web-search-and-scraping-into-files.md"
+      "card": "cards/pack-web-search-and-scraping-into-files.md",
+      "hash": "9d47a2633e5a257e"
     }
   ],
   "later": [

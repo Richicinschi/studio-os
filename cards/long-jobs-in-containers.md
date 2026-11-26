@@ -79,16 +79,23 @@ The menu marks the item **have** when an instruction file carries the rule and D
 
 If Claude starts a background shell in step 2, or in step 3 the container is missing, its log is empty or the job's file is not in the data folder, the item is not done: the plan row stays unticked, and the wording of the rule, the job's output buffering, or the `-v` mount (in Git Bash, the `MSYS_NO_PATHCONV=1` prefix) is the next thing to look at.
 
+`tools/check-setup.mjs` runs step 1 from this block, without Claude:
+
+```check
+run: test "$(grep -ci 'container' "$(frontdoor)")" -ge 1 && echo yes || echo no
+expect: yes
+```
+
 ## Undo
 
 - **Claude:** removes the rule, and the second-machine line, from your front door.
 - **Claude:** on your yes, removes each finished container, `docker rm <job-name>`, and each image it built, `docker image rm <image>`. The data stays in its folder on your disk. Without `-v`, `docker rm` leaves the container's anonymous volumes; Claude adds `-v` only when you have checked nothing in them is needed ([docs/facts.md](../docs/facts.md)).
 - **Claude:** marks the row in `adoption/decisions.md` as undone.
-- **you:** Docker stays installed; removing it is your decision, and its uninstall steps are not documented in docs/facts.md as of 2026-11-02.
+- **you:** Docker stays installed; removing it is your decision. Docker's uninstall steps are in [docs/facts.md](../docs/facts.md), "Docker: a long job in a named container"; uninstalling Docker Desktop deletes every container, image and volume on the machine.
 
 ## Watch out
 
-- **A background shell can be stopped under you.** It lives inside the session, and when Claude Code stops one is not documented in docs/facts.md as of 2026-11-02; a named container runs outside the session and keeps its log.
+- **A background shell can be stopped under you.** It lives inside the session, and Claude Code stops it when Claude Code exits, among other times ([docs/facts.md](../docs/facts.md), "Claude Code: worktrees and background commands"); a named container runs outside the session and keeps its log.
 - **A container must not own data you cannot rebuild.** Removing a container together with its volumes (storage that Docker keeps for it, which `docker rm -v` removes) deletes whatever was stored only inside them ([docs/facts.md](../docs/facts.md)). Keep the data in a folder on your disk, mounted in, and only the code in the image.
 - **A log is a stream.** A progress bar that redraws itself turns into thousands of fragments in `docker logs`; print one progress line every so many units instead. Buffered output shows nothing until the buffer fills, so turn buffering off in the job.
 - **The image is not your machine.** A tool installed on your machine is not in the container, so a job that starts it fails inside; find each tool inside the image when the job starts.
@@ -96,5 +103,5 @@ If Claude starts a background shell in step 2, or in step 3 the container is mis
 - **Check after a restart.** A restart policy can bring a container back only once Docker itself is running again; after a reboot, check `docker info` before you assume your containers are up.
 - **Ceilings matter.** Without `--memory` and `--cpus`, a job competes with everything else the machine runs.
 - **Keep network details out of commits.** A second machine's name or address in a committed file stays in history ([a real address in history](../examples/real-address-in-history.md)).
-- **A company machine:** Docker's licence terms for company use are not documented in docs/facts.md; ask before you install it there.
+- **A company machine:** Docker Desktop is free for a small business (fewer than 250 employees and less than $10 million in annual revenue) and needs a paid subscription in larger organizations and government entities ([docs/facts.md](../docs/facts.md), "Docker: a long job in a named container"); ask before you install it there.
 - **Token cost:** the rule costs about 77 tokens in every session, and the second-machine line about 42 more, estimates (bytes divided by 4, measured on the two starting lines in step 3). Nothing else loads.

@@ -10,7 +10,7 @@
 // work tree or git could not mark the scripts executable (the catalog was copied; the release files were
 // not written); 2 refused before building.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -22,6 +22,9 @@ import { gateSecrets, gateGitleaks, gatePrivacy, gatePaths, gateRisky, gateAccou
 import { parseTriage, scanItemHashes } from './scan.mjs';
 import { isSkipped } from './item-hash.mjs';
 import { releaseDiff, changelogSection, prependChangelog, staleness, pageSources } from './changelog.mjs';
+import { descriptionOverlaps, shippedDescriptions, knownOverlaps, pairName } from './overlap.mjs';
+import { phaseLoads } from './phase-loads.mjs';
+import { changedFiles, gateWhy, groupFiles, pagePath, parseWhy, releaseFilesPage } from './release-files.mjs';
 import { lintKit } from './lint-content.mjs';
 
 // What the build produces; only these move from the staging copy into the kit.
@@ -29,7 +32,7 @@ const GENERATED = ['catalog', 'docs/THIRD_PARTY_NOTICES.md'];
 
 const defaultGit = (dir, args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
-export function runExport({ root, hub, release, notes = [], noGitleaks = false, today = new Date().toISOString().slice(0, 10),
+export function runExport({ root, hub, release, notes = [], whys = [], noGitleaks = false, today = new Date().toISOString().slice(0, 10),
   gitleaks = gateGitleaks, hubGit = defaultGit, kitGit = defaultGit, log = console.log, rewrites = STUDIO_REWRITES }) {
   if (release && noGitleaks) { log('export: a release always runs gitleaks'); return 2; }
   const local = (f) => path.join(root, 'tools/export', f);
@@ -63,10 +66,29 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
     manifest = { ...manifest, items: [...manifest.items, ...priv.filter((p) => !manifest.items.some((it) => it.kind === p.kind && it.id === p.id))] };
   }
 
-  const noteFindings = gateNotes(notes, deny);
+  // The why lines of the release's files page are written into the kit like a note, so they pass the same gate.
+  let why;
+  try { why = parseWhy(whys); } catch (e) { log(`export: ${e.message}`); return 2; }
+  const noteFindings = [...gateNotes(notes, deny), ...gateWhy(why, deny)];
   if (noteFindings.length) {
     for (const f of noteFindings) log(`  ${f}`);
-    log('export: a --note fails the gates; nothing was built');
+    log('export: a --note or --why fails the gates; nothing was built');
+    return 2;
+  }
+  // The files page compares the release with the tree the last release published, its tag.
+  const lastState = existsSync(local('state.json')) ? JSON.parse(readFileSync(local('state.json'), 'utf8')) : null;
+  // A release already made in this checkout is not made again: its changelog section and state exist. Its
+  // files page can be written again on its own, with why lines, by release-files.mjs.
+  if (release && lastState?.version === release) {
+    log(`export: v${release} is already released in this checkout (tools/export/state.json); to write its files page again, run node tools/export/release-files.mjs page --previous <the release before> --release ${release} --why "<group>=<text>"`);
+    return 2;
+  }
+  // The groups a release's files page will have, so its --why lines can be written before the release.
+  const lastTag = lastState?.version ? `v${lastState.version}` : null;
+  let hasLastTag = false;
+  if (lastTag) { try { kitGit(root, ['rev-parse', '--verify', '-q', `refs/tags/${lastTag}`]); hasLastTag = true; } catch { hasLastTag = false; } }
+  if (release && lastTag && !hasLastTag) {
+    log(`export: the tag ${lastTag} of the last release is not in this checkout; fetch it first: git fetch origin --tags`);
     return 2;
   }
   if (release) {
@@ -133,7 +155,15 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
     const stale = staleness(root, { hub, sinceCommit: prev?.hubCommit, today, extra: extraSources });
     for (const w of stale.warnings) log(`stale: ${w}`);
     for (const s of stale.changedSources) log(`stale: ${s.page} summarizes ${s.source}, which changed in the hub`);
-    for (const s of stale.staleFacts) log(`stale: ${s.page} facts last checked ${s.checked}`);
+    for (const s of stale.staleFacts) {
+      log(s.section ? `stale: ${s.page}, "${s.section}": ${s.count} fact(s) past ${s.window} days, the oldest checked ${s.checked}` : `stale: ${s.page} facts last checked ${s.checked}`);
+    }
+    // Descriptions that share their rare trigger words compete for the same request (issue #61): a report,
+    // the pairs tools/export/overlaps.json does not know yet marked new.
+    const known = new Set(knownOverlaps(root));
+    for (const o of descriptionOverlaps(shippedDescriptions(stage))) log(`overlap${known.has(pairName(o)) ? '' : ' (new)'}: ${pairName(o)} share ${o.shared.join(', ')}`);
+    // What the adoption session reads, phase by phase (issue #58); START-HERE states it, npm test holds it.
+    for (const p of phaseLoads(stage)) log(`load: ${p.label}, about ${p.tokens} tokens`);
     log(`built ${built.written.length} file(s) from ${hub}`);
     if (failed) { log(`export: ${failed} finding(s); the kit was not changed`); return 1; }
 
@@ -158,14 +188,29 @@ export function runExport({ root, hub, release, notes = [], noGitleaks = false, 
       return 1;
     }
     log(`modes: ${scripts.length} script(s) marked executable in the git index`);
+    if (!release && hasLastTag) {
+      const groups = [...groupFiles(changedFiles((args) => kitGit(root, args), lastTag), loadManifest(path.join(root, 'export.manifest.json'))).keys()];
+      log(`release files (dry run): since ${lastTag}, ${groups.length} group(s): ${groups.join(', ')}${Object.keys(why).length ? `; no why for: ${groups.filter((g) => !why[g]).join(', ') || 'none'}` : ''}`);
+    } else if (!release && Object.keys(why).length) log('release files: --why is read by a release, and by a dry run once the last release\'s tag is in this checkout');
     if (release) {
       // The committed file, not the in-memory manifest: that one also holds the private items from the local list.
       const committed = loadManifest(path.join(root, 'export.manifest.json'));
       writeFileSync(path.join(root, 'export.manifest.json'), `${JSON.stringify({ ...committed, version: release }, null, 2)}\n`);
-      const { diff, state } = releaseDiff(root, built.itemFiles, prev);
-      prependChangelog(path.join(root, 'CHANGELOG.md'), changelogSection(release, today, diff, notes, { removed: manifest.removed || [], shippedPacks: manifest.items.filter((it) => it.kind === 'pack' && it.status === 'shipped').map((it) => it.id) }));
+      const { diff, state } = releaseDiff(root, built.itemFiles, prev, { manifest, scans });
+      const page = pagePath(release);
+      const pageNote = lastState?.version ? [`Every file this release changed, under its item: [${page}](${page}).`] : [];
+      prependChangelog(path.join(root, 'CHANGELOG.md'), changelogSection(release, today, diff, [...notes, ...pageNote], { removed: manifest.removed || [], shippedPacks: manifest.items.filter((it) => it.kind === 'pack' && it.status === 'shipped').map((it) => it.id) }));
       writeFileSync(local('state.json'), `${JSON.stringify({ version: release, date: today, hubCommit: hubGit(hub, ['rev-parse', 'HEAD']), ...state }, null, 2)}\n`);
       log(`released v${release}: ${diff.added.length} added, ${diff.changed.length} changed, ${diff.removed.length} removed`);
+      // Every changed file under its item (public issue #66), from the last release's tag to this tree.
+      if (lastState?.version) {
+        const files = changedFiles((args) => kitGit(root, args), `v${lastState.version}`);
+        const out = releaseFilesPage({ version: release, previous: lastState.version, files, manifest: loadManifest(path.join(root, 'export.manifest.json')), why });
+        mkdirSync(path.join(root, 'docs/releases'), { recursive: true });
+        writeFileSync(path.join(root, page), out.text);
+        log(`release files: ${page}, ${files.length} file(s) in ${out.groups.length} group(s)${out.missing.length ? `; no why for ${out.missing.length}: ${out.missing.join(', ')}` : ''}`);
+        if (out.unused.length) log(`release files: a --why names a group with no changed file, left out: ${out.unused.join(', ')}`);
+      } else log('release files: the first release has no earlier one to compare with; no page written');
     }
     return 0;
   } finally {
@@ -182,6 +227,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     hub: path.resolve(arg('--hub')),
     release: arg('--release'),
     notes: argv.flatMap((a, i) => (a === '--note' ? [argv[i + 1]] : [])),
+    whys: argv.flatMap((a, i) => (a === '--why' ? [argv[i + 1]] : [])),
     noGitleaks: argv.includes('--no-gitleaks'),
   }));
 }

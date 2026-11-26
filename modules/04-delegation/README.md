@@ -50,7 +50,7 @@ The one review at the end earns its place. In a later studio project, a builder 
 
 ## Apply it in claude.ai
 
-Whether the claude.ai chat app has subagents is not documented ([docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so this route does the splitting by hand:
+Whether the claude.ai chat app has subagents is an open question ([docs/facts.md](../../docs/facts.md), "Claude Code: where skills, agents and instruction files load from"), so this route does the splitting by hand:
 
 1. **Split the work** into parts that do not depend on each other, such as one dashboard or one data source each.
 2. **Open one chat per part,** all in the same Project, so each starts with the same instructions and knowledge.

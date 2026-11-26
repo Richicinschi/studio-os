@@ -1,0 +1,22 @@
+[
+  "pack:godot-camera-shaders-particles-export and pack:unity-editor-scripts-prefabs-builds",
+  "skill:executing-plans and skill:subagent-driven-development",
+  "pack:games-design-prototype-playtest-assets and pack:unity-editor-scripts-prefabs-builds",
+  "pack:android-swiftui-react-native-app-building and pack:app-legal-privacy-terms-store-review",
+  "pack:audio-video-media and pack:marketing-plans-offers-pricing-launches",
+  "pack:django-flask-laravel-shops-and-chat and skill:handoff",
+  "pack:engineering-testing-performance-code-design and pack:web-astro-cloudflare-gsap-performance",
+  "pack:games-design-prototype-playtest-assets and pack:godot-camera-shaders-particles-export",
+  "pack:mobile-apps-flutter-firebase and pack:phone-app-testing-release-and-agents",
+  "pack:mobile-apps-flutter-firebase and pack:web-api-security-login-and-graphql",
+  "skill:claim-auditor and skill:improve",
+  "skill:diagnosing-bugs and skill:improve",
+  "skill:dispatching-parallel-agents and skill:executing-plans",
+  "skill:dispatching-parallel-agents and skill:subagent-driven-development",
+  "skill:executing-plans and skill:using-git-worktrees",
+  "skill:improve and skill:tdd",
+  "skill:receiving-code-review and skill:verification-before-completion",
+  "skill:requesting-code-review and skill:subagent-driven-development",
+  "skill:subagent-driven-development and skill:using-git-worktrees",
+  "skill:using-agent-skills and skill:using-git-worktrees"
+]

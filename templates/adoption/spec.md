@@ -11,7 +11,7 @@
 - Layout today: <one place or spread>; reorganize: <yes / no>; folders you named: <each, and move / point to / leave>
 
 ## 2. Data rules to respect
-<What may leave the company; whether the account you use Claude with may see work data; which remotes are allowed. If unknown: "strictest reading assumed".>
+<What may leave the company; whether the account you use Claude with may see work data; which remotes are allowed; whether `adoption/` is kept out of git. If unknown: "strictest reading assumed".>
 
 ## 3. What goes wrong today
 <...>

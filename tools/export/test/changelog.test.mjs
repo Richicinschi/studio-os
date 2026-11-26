@@ -1,10 +1,11 @@
 // tools/export/test/changelog.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { itemHashes, diffItems, releaseDiff, changelogSection, prependChangelog, staleness, pageSources, CHANGELOG_HEAD } from '../changelog.mjs';
+import { fileURLToPath } from 'node:url';
+import { itemHashes, diffItems, releaseDiff, releaseItemFiles, catalogItemFiles, changelogSection, prependChangelog, staleness, pageSources, CHANGELOG_HEAD, HASHES } from '../changelog.mjs';
 
 function tree(files) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'kit-cl-'));
@@ -45,7 +46,7 @@ test('a release compares finding counts too: a new count under the same verdict 
   const files = { 'skill:a': ['catalog/skills/a/SOURCE.md'] };
   try {
     const first = releaseDiff(root, files, null);
-    assert.equal(first.state.hashes, 'verdict+findings');
+    assert.equal(first.state.hashes, HASHES);
     assert.deepEqual(first.diff.added, ['skill:a']);
     writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src(counted(6), '2026-12-01'));
     assert.deepEqual(releaseDiff(root, files, first.state).diff.changed, []);
@@ -68,9 +69,86 @@ test('a previous state written before finding counts were hashed is compared in 
     writeFileSync(path.join(root, 'catalog/skills/a/SOURCE.md'), src(9));
     const r = releaseDiff(root, files, old);
     assert.deepEqual(r.diff.changed, [], 'the old form cannot see a count, so every item would look changed if compared in the new one');
-    assert.equal(r.state.hashes, 'verdict+findings');
+    assert.equal(r.state.hashes, HASHES);
     assert.notEqual(r.state.items['skill:a'], itemHashes(root, files)['skill:a']);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// A small kit: one skill and one agent in the catalog, two practices (one a folder of templates, one its
+// card alone), an outside item on the menu, and a card for each.
+function menuKit() {
+  const root = tree({
+    'catalog/skills/a/SKILL.md': 'a', 'catalog/agents/g.md': 'g',
+    'templates/hooks-x/pre-commit': 'one', 'templates/hooks-x/check.mjs': 'two',
+    'cards/a.md': 'card a', 'cards/g.md': 'card g', 'cards/hooks-x.md': 'card hooks', 'cards/habit.md': 'card habit', 'cards/tool.md': 'card tool',
+  });
+  const manifest = { items: [
+    { kind: 'skill', id: 'a', status: 'shipped' }, { kind: 'agent', id: 'g', status: 'shipped' },
+    { kind: 'practice', id: 'hooks-x', status: 'shipped', files: ['templates/hooks-x'] },
+    { kind: 'practice', id: 'habit', status: 'shipped', files: ['cards/habit.md'] },
+    { kind: 'external', id: 'tool', status: 'link-only' }, { kind: 'external', id: 'other', status: 'catalog-only' },
+  ] };
+  return { root, manifest, itemFiles: catalogItemFiles(root, manifest) };
+}
+
+test('a release compares practices and outside items too, each with its card and the files it installs', () => {
+  const { root, manifest, itemFiles } = menuKit();
+  try {
+    assert.deepEqual(releaseItemFiles(root, manifest, itemFiles), {
+      'skill:a': ['catalog/skills/a/SKILL.md', 'cards/a.md'], 'agent:g': ['catalog/agents/g.md', 'cards/g.md'],
+      'practice:hooks-x': ['templates/hooks-x/check.mjs', 'templates/hooks-x/pre-commit', 'cards/hooks-x.md'],
+      'practice:habit': ['cards/habit.md'], 'external:tool': ['cards/tool.md'],
+    });
+    const first = releaseDiff(root, itemFiles, null, { manifest });
+    assert.deepEqual(first.diff.added, ['agent:g', 'external:tool', 'practice:habit', 'practice:hooks-x', 'skill:a']);
+    // A changed template, card or a new practice is listed; a never-share list kept beside the templates is not.
+    writeFileSync(path.join(root, 'templates/hooks-x/never-share.local.txt'), 'term\n');
+    assert.deepEqual(releaseDiff(root, itemFiles, first.state, { manifest }).diff, { added: [], removed: [], changed: [] });
+    writeFileSync(path.join(root, 'templates/hooks-x/check.mjs'), 'three');
+    writeFileSync(path.join(root, 'cards/a.md'), 'card a, changed');
+    writeFileSync(path.join(root, 'cards/tool.md'), 'card tool, changed');
+    writeFileSync(path.join(root, 'cards/new.md'), 'card new');
+    const next = { items: [...manifest.items.filter((i) => i.id !== 'habit'), { kind: 'practice', id: 'new', status: 'shipped', files: ['cards/new.md'] }] };
+    assert.deepEqual(releaseDiff(root, itemFiles, first.state, { manifest: next }).diff,
+      { added: ['practice:new'], removed: ['practice:habit'], changed: ['external:tool', 'practice:hooks-x', 'skill:a'] });
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('an agent whose recorded verdict, score or number of findings changes is listed as changed; a rescan with the same record is not', () => {
+  const { root, manifest, itemFiles } = menuKit();
+  const rec = (recommendation, score, n, date = '2026-11-22') => ({ recommendation, score, date, version: 'v2.13.6', findings: Array.from({ length: n }, (_, i) => ({ rule: 'X1', file: 'g.md', line: i + 1, severity: 'LOW' })) });
+  try {
+    const first = releaseDiff(root, itemFiles, null, { manifest, scans: { 'agent:g': rec('SAFE', 0, 0) } });
+    const changed = (scans) => releaseDiff(root, itemFiles, first.state, { manifest, scans }).diff.changed;
+    assert.deepEqual(changed({ 'agent:g': rec('SAFE', 0, 0, '2026-12-01') }), []);
+    assert.deepEqual(changed({ 'agent:g': rec('CAUTION', 0, 0) }), ['agent:g']);
+    assert.deepEqual(changed({ 'agent:g': rec('SAFE', 10, 0) }), ['agent:g']);
+    assert.deepEqual(changed({ 'agent:g': rec('SAFE', 0, 2) }), ['agent:g']);
+    assert.deepEqual(changed({}), ['agent:g'], 'a scan record that went away is a change too');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('a v3.4.0 state is compared in its own form, on the catalog items it tracked: no practice is listed as added', () => {
+  const { root, manifest, itemFiles } = menuKit();
+  try {
+    const old = { version: '3.4.0', hashes: 'verdict+findings', items: itemHashes(root, itemFiles, { findings: true }) };
+    const r = releaseDiff(root, itemFiles, old, { manifest, scans: { 'agent:g': { recommendation: 'CAUTION', score: 50, findings: [] } } });
+    assert.deepEqual(r.diff, { added: [], removed: [], changed: [] });
+    assert.equal(r.state.hashes, HASHES);
+    assert.deepEqual(Object.keys(r.state.items).sort(), ['agent:g', 'external:tool', 'practice:habit', 'practice:hooks-x', 'skill:a']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('every card the kit ships belongs to an item the release compares, every file of those items can be read, and the recorded state is in the current form', () => {
+  const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+  const manifest = JSON.parse(readFileSync(path.join(root, 'export.manifest.json'), 'utf8'));
+  const items = releaseItemFiles(root, manifest, catalogItemFiles(root, manifest));
+  const covered = new Set(Object.values(items).flat());
+  assert.deepEqual(readdirSync(path.join(root, 'cards')).filter((f) => f.endsWith('.md')).map((f) => `cards/${f}`).filter((c) => !covered.has(c)), []);
+  // Hashing reads every file, so a practice that names a file the kit does not hold fails here.
+  releaseDiff(root, catalogItemFiles(root, manifest), null, { manifest });
+  // The items themselves change between releases, so only the form is held here, never the list.
+  assert.equal(JSON.parse(readFileSync(path.join(root, 'tools/export/state.json'), 'utf8')).hashes, HASHES);
 });
 
 test('diff and changelog sections', () => {
@@ -138,6 +216,18 @@ test('staleness and the clean-hub check also follow private sources a page may n
     const r = staleness(root, { hub: 'H', sinceCommit: 'old', today: '2026-11-02', gitLog, extra });
     assert.deepEqual(r.changedSources, [{ page: 'modules/12-x/README.md', source: '.studio/memory/private-one.md' }]);
     assert.deepEqual(pageSources(root, extra), ['.studio/memory/a.md', '.studio/memory/private-one.md']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('docs/facts.md is stale by section, fact by fact: a fast section after 30 days, the rest after 90; its page date no longer counts', () => {
+  const root = tree({
+    'docs/facts.md': ['---', 'title: Facts', 'checked: 2026-01-01', 'fast:', '  - "Models: which for what"', '---', '',
+      '## Models: which for what', '', '- A model. (checked 2026-10-01, [source](https://a.example.invalid))', '- Another. (checked 2026-11-20)', '',
+      '## Git: hooks', '', '- A hook fact. (checked 2026-10-01)', ''].join('\n'),
+  });
+  try {
+    const r = staleness(root, { hub: 'H', sinceCommit: undefined, today: '2026-11-25' });
+    assert.deepEqual(r.staleFacts, [{ page: 'docs/facts.md', section: 'Models: which for what', count: 1, window: 30, checked: '2026-10-01' }]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

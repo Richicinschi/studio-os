@@ -7,6 +7,6 @@
 - **What the studio changed:** n/a
 - **Who it suits:** see its adoption card, [cards/pack-engineering-testing-performance-code-design.md](../../../cards/pack-engineering-testing-performance-code-design.md)
 - **Pack / module:** a domain, installed as a pack of its own
-- **Last scan:** SAFE (risk 12/100), SkillSpector v2.13.6 with --no-llm, 2026-11-21; 3 findings, all read: 1 false positive, 2 by design ([triage](../../../tools/export/scan-triage.md#packengineering-testing-performance-code-design-safe-12100-3-findings))
+- **Last scan:** SAFE (risk 12/100), SkillSpector v2.13.6 with --no-llm, 2026-11-26; 3 findings, all read: 1 false positive, 2 by design ([triage](../../../tools/export/scan-triage.md#packengineering-testing-performance-code-design-safe-12100-3-findings))
 
 Before you take it, run it through `vet-and-adopt`: scan it yourself, then decide.

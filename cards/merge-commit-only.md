@@ -48,9 +48,9 @@ The menu marks the item **have** when an instruction file carries the rule and `
 
 ## Needs
 
-- A GitHub account that may change each repository's settings. Which permission that takes is not documented on GitHub's page as of 2026-11-02 ([docs/facts.md](../docs/facts.md), "GitHub: merge methods").
-- The `gh` command line, signed in to that account. How to install it and sign in is not documented in docs/facts.md as of 2026-11-02; without it, the web route in step 4 does the same.
-- Other hosts (GitLab, Azure DevOps and the rest) have their own settings, not documented in docs/facts.md; there, the rule in your front door is the part this card covers.
+- A GitHub account that may change each repository's settings: the owner of a personal repository, or the Maintain or Admin role in an organization's repository; a fine-grained token also needs the "Administration" repository permission (write) ([docs/facts.md](../docs/facts.md), "GitHub: merge methods").
+- The `gh` command line, signed in to that account. Its install line for each system and `gh auth login` are in [docs/facts.md](../docs/facts.md), "Installing the tools on Windows, macOS and Linux". Without it, the web route in step 4 does the same.
+- Other hosts (GitLab, Azure DevOps and the rest) have their own settings; GitLab's and Azure DevOps' are in [docs/facts.md](../docs/facts.md), "Other hosts: merge methods". There, the rule in your front door is the part this card covers.
 
 ## Steps
 
@@ -91,6 +91,13 @@ The menu marks the item **have** when an instruction file carries the rule and `
 
 Any other output means the item is not done: the plan row stays unticked. A refused change in step 3 of Steps prints gh's error; read it first, and the web route in step 4 is the next thing to try.
 
+`tools/check-setup.mjs` runs step 2 from this block, without Claude:
+
+```check
+run: test "$(grep -ciE 'squash|merge commit' "$(frontdoor)")" -ge 1 && echo yes || echo no
+expect: yes
+```
+
 ## Undo
 
 - **Claude:** on your yes, puts each repository's settings back to the values step 2 recorded, for example `gh api -X PATCH repos/<owner>/<repo> -F allow_squash_merge=true -F allow_rebase_merge=true`; or **you:** switch them back on the web.
@@ -104,7 +111,7 @@ Any other output means the item is not done: the plan row stays unticked. A refu
 - **The setting covers the server only.** A squash made on your own machine and pushed is not stopped by it. The studio enforces the rule twice: by the setting, and by a local guard on Claude's commands ([a recorded yes before a merge](../examples/grant-before-merge.md)).
 - **Name the method you allow, not the ones you refuse.** A check that refuses `--squash` and `--rebase` leaves open a `gh pr merge` that names no method, and the short forms `-s` and `-r` unless it lists them; the studio's guard refuses a `gh pr merge` that names no method too ([module 06](../modules/06-git-and-guardrails/README.md#the-mechanism)). So the check in step 6 refuses every `gh pr merge` without `--merge`.
 - **Re-installing or updating git-guardrails replaces these rules.** The install copies its whole `scripts/` folder, `rules.mjs`, `guard.mjs` and `cases.json` among them, so the additions of step 6 are gone after a re-install or an update. Claude applies them again from `adoption/decisions.md` (step 7) and runs Detect's fake squash merge to see `exit 2` again.
-- **What `gh pr merge --squash` does on a repository with squash switched off** is not documented as of 2026-11-02 ([docs/facts.md](../docs/facts.md)). The setting is documented as preventing the method; Check step 1 is what confirms it is set.
+- **What `gh pr merge --squash` does on a repository with squash switched off** is an open question ([docs/facts.md](../docs/facts.md), "GitHub: merge methods"). The setting is documented as preventing the method; Check step 1 is what confirms it is set.
 - **A new repository has its own settings.** The rule's last sentence covers repositories Claude creates; one you create on the web needs step 3 or 4 as well.
 - **The one exception.** When a merge commit is truly impossible for one PR, the studio switches the method on for that repository, for that one merge, after a recorded yes with the reason, and switches it off again right after ([a recorded yes before a merge](../examples/grant-before-merge.md)).
 - **When to merge stays yours.** The setting decides how a PR lands, not when; put merging on your ask-first list ([the grant ledger](grant-ledger.md), [the working contract](identity-relationship.md)).

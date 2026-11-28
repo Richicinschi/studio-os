@@ -54,7 +54,7 @@ test('the kit ships items to install: every skill, agent and domain, and the car
 });
 
 for (const item of items) {
-  test(`${item.card}: install, check and undo in a throwaway setup, which the undo leaves as it was`, (t) => {
+  test(`${item.card}: install, check and undo in a throwaway setup, which the undo leaves as it was`, async (t) => {
     const setup = mkdtempSync(path.join(os.tmpdir(), 'kit-cycle-'));
     t.after(() => rmSync(setup, { recursive: true, force: true }));
     // A setup with something of its own in it, which nothing may touch.
@@ -73,7 +73,7 @@ for (const item of items) {
       cpSync(path.join(KIT, from), path.join(setup, to), { recursive: true });
     }
     recordItem(setup, { id: item.card, decision: 'ADOPT', created: item.pairs.map(([, to]) => to), made }, { kit: KIT });
-    const [result] = checkItems(setup, { kit: KIT, ids: [item.card] });
+    const [result] = await checkItems(setup, { kit: KIT, ids: [item.card] });
     assert.equal(result.status, 'pass', checkItemsText([result]));
     assert.ok(result.files > 0);
     const done = undoItem(setup, item.card, { kit: KIT });

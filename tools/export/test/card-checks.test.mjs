@@ -66,7 +66,7 @@ test('every card with a check block has a right and a wrong setup here', () => {
 for (const [card, { right, wrong }] of Object.entries(CASES)) {
   for (const [want, setups] of [['pass', right], ['fail', wrong]]) {
     setups.forEach((s, n) => {
-      test(`${card}: setup ${want === 'pass' ? 'right' : 'wrong'} ${n + 1} ${want}es its check block`, (t) => {
+      test(`${card}: setup ${want === 'pass' ? 'right' : 'wrong'} ${n + 1} ${want}es its check block`, async (t) => {
         const setup = mkdtempSync(path.join(os.tmpdir(), 'kit-card-check-'));
         t.after(() => rmSync(setup, { recursive: true, force: true }));
         for (const [rel, text] of Object.entries(s.files || {})) {
@@ -76,7 +76,7 @@ for (const [card, { right, wrong }] of Object.entries(CASES)) {
         for (const [from, to] of Object.entries(s.copy || {})) cpSync(path.join(KIT, from), path.join(setup, to), { recursive: true });
         for (const rel of s.drop || []) rmSync(path.join(setup, rel));
         recordItem(setup, { id: card, decision: 'ADOPT', created: s.created || [], edited: s.edited || [] }, { kit: KIT });
-        const [result] = checkItems(setup, { kit: KIT, ids: [card] });
+        const [result] = await checkItems(setup, { kit: KIT, ids: [card] });
         assert.ok(result.steps.length > 0, 'the block ran');
         assert.equal(result.status, want, checkItemsText([result]));
       });

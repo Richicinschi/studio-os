@@ -3,17 +3,48 @@
 // tools/check-setup.mjs, which runs them in a setup without the model and writes nothing.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseChecks, lintChecks, refusal, checkItems, checkItemsText, cardOf, findBash } from '../../check-setup.mjs';
+import { parseChecks, lintChecks, refusal, checkItems, checkItemsText, cardOf, findBash, runStep } from '../../check-setup.mjs';
 import { recordItem } from '../../installed.mjs';
 
 const KIT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const card = (check) => `# Item\n\n## Steps\n\n1. x\n\n## Check\n\n${check}\n\n## Undo\n\ny\n`;
+
+// The ids of running processes whose command line holds `text`: from /proc on Linux, ps on macOS, and on
+// Windows the process table, leaving out the PowerShell that reads it (its own command line holds `text`).
+function processesNaming(text) {
+  if (process.platform === 'linux') {
+    return readdirSync('/proc').filter((d) => /^\d+$/.test(d)).filter((d) => {
+      try { return readFileSync(`/proc/${d}/cmdline`, 'utf8').split('\0').join(' ').includes(text); } catch { return false; }
+    }).map(Number);
+  }
+  if (process.platform === 'win32') {
+    const r = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
+      `Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -and $_.CommandLine.Contains('${text}') } | ForEach-Object { $_.ProcessId }`],
+    { encoding: 'utf8', windowsHide: true });
+    assert.equal(r.status, 0, `the process list could not be read: ${r.stderr}`);
+    return String(r.stdout).split(/\r?\n/).map((s) => s.trim()).filter(Boolean).map(Number);
+  }
+  const r = spawnSync('ps', ['-axwwo', 'pid=,command='], { encoding: 'utf8' });
+  assert.equal(r.status, 0, `the process list could not be read: ${r.stderr}`);
+  return String(r.stdout).split('\n').filter((l) => l.includes(text)).map((l) => Number(l.trim().split(/\s+/)[0]));
+}
+
+// Waits up to `ms` for no process to name `text`, since an ended process can take a moment to leave the table.
+async function noProcessNaming(text, ms = 5000) {
+  const until = Date.now() + ms;
+  let left = processesNaming(text);
+  while (left.length && Date.now() < until) {
+    await new Promise((r) => { setTimeout(r, 250); });
+    left = processesNaming(text);
+  }
+  return left;
+}
 
 test('parseChecks reads run/expect pairs and install lines from the Check section only, and counts the steps for the person', () => {
   const text = card('1. **Claude:** the file is there.\n\n   ```check\n   # the guard refuses a force-push\n   run: node "$(installed guard.mjs)"; echo "exit $?"\n   expect: exit 2\n   run: grep -c x f\n   expect:\n   install: catalog/skills/guard -> .claude/skills/guard\n   ```\n\n2. **you:** ask in a new session.\n3. **you:** and once more.')
@@ -120,10 +151,10 @@ const snapshot = (root) => readdirSync(root, { recursive: true }).map(String).so
   return s.isFile() ? `${r} ${createHash('sha256').update(readFileSync(path.join(root, r))).digest('hex')} ${s.mtimeMs}` : `${r}/`;
 });
 
-test('checkItems: files and keys present, each check run in the setup, a refused block never run; it writes nothing', (t) => {
+test('checkItems: files and keys present, each check run in the setup, a refused block never run; it writes nothing', async (t) => {
   const f = fixture(t);
   const before = snapshot(f.setup);
-  const results = checkItems(f.setup, { kit: f.kit, ids: ['good', 'bad', 'plain', 'rule', 'sly', 'hooked', 'skipped'] });
+  const results = await checkItems(f.setup, { kit: f.kit, ids: ['good', 'bad', 'plain', 'rule', 'sly', 'hooked', 'skipped'] });
   assert.deepEqual(snapshot(f.setup), before, 'the setup is byte for byte and time for time as it was');
   assert.deepEqual(results.map((r) => `${r.id} ${r.status}`), ['good pass', 'bad fail', 'plain fail', 'rule pass', 'sly fail', 'hooked pass'], 'a SKIP is not checked');
   const by = Object.fromEntries(results.map((r) => [r.id, r]));
@@ -143,19 +174,60 @@ test('checkItems: files and keys present, each check run in the setup, a refused
   assert.match(text, /^sly: fail .*\n {2}not run {2}cards\/sly\.md:\d+ check block: a run: line the allowlist refuses/m);
   // A settings key the install added, taken out since: the item fails.
   f.w(f.setup, '.claude/settings.json', JSON.stringify({ hooks: {} }));
-  const [hooked] = checkItems(f.setup, { kit: f.kit, ids: ['hooked'] });
+  const [hooked] = await checkItems(f.setup, { kit: f.kit, ids: ['hooked'] });
   assert.equal(hooked.status, 'fail');
   assert.match(checkItemsText([hooked]), /^hooked: fail \(0 of 1 file or key present; 1 step for you, from cards\/hooked\.md\)\n {2}missing {2}\.claude\/settings\.json#hooks\.Stop$/m);
 });
 
-test('a step that runs past its time fails, and a missing bash is an error, not a failed item', (t) => {
+test('a step that runs past its time fails, and a missing bash is an error, not a failed item', async (t) => {
   const f = fixture(t);
   recordItem(f.setup, { id: 'slow', decision: 'ADOPT', created: ['slow.md'] }, f.opts);
-  const [slow] = checkItems(f.setup, { kit: f.kit, ids: ['slow'], timeoutMs: 1500 });
+  const [slow] = await checkItems(f.setup, { kit: f.kit, ids: ['slow'], timeoutMs: 1500 });
   assert.equal(slow.status, 'fail');
   assert.match(slow.steps[0].error, /timed out/);
-  assert.throws(() => checkItems(f.setup, { kit: f.kit, ids: ['good'], bash: null }), /bash was not found/);
-  assert.throws(() => checkItems(f.setup, { kit: f.kit, ids: ['good'], bash: path.join(f.setup, 'no-such-bash') }), /could not start/);
+  // Nothing the step started outlives it: its tail -f names this test's own folder, and is gone.
+  assert.deepEqual(await noProcessNaming(path.basename(path.dirname(f.setup))), [], 'a process the timed-out step started still runs');
+  await assert.rejects(checkItems(f.setup, { kit: f.kit, ids: ['good'], bash: null }), /bash was not found/);
+  await assert.rejects(checkItems(f.setup, { kit: f.kit, ids: ['good'], bash: path.join(f.setup, 'no-such-bash') }), /could not start/);
+});
+
+test('a step that prints more than 1 MiB fails at once, and leaves nothing running', async (t) => {
+  const f = fixture(t);
+  f.w(f.kit, 'cards/flood.md', card('```check\nrun: cat /dev/zero "$(installed slow.md)"\nexpect: never\n```'));
+  recordItem(f.setup, { id: 'flood', decision: 'ADOPT', created: ['slow.md'] }, f.opts);
+  const started = Date.now();
+  const [flood] = await checkItems(f.setup, { kit: f.kit, ids: ['flood'], timeoutMs: 20000 });
+  assert.equal(flood.status, 'fail');
+  assert.match(flood.steps[0].error, /printed more than 1 MiB/);
+  assert.ok(Date.now() - started < 15000, 'stopped by the size limit, not the time limit');
+  assert.deepEqual(await noProcessNaming(path.basename(path.dirname(f.setup))), [], 'the flooding step still runs');
+});
+
+test('a step whose shell ends but leaves a child holding its output settles at its time limit', async (t) => {
+  const f = fixture(t);
+  // The allowlist refuses &, so no card can do this; runStep is called directly. sleep ends on its own.
+  const started = Date.now();
+  const r = await runStep({ run: 'sleep 6 & echo started' }, { setup: f.setup, kit: f.kit, id: 'x', bash: findBash(), timeoutMs: 1000 });
+  assert.ok(Date.now() - started < 4000, `settled after ${Date.now() - started} ms, not when the child ended`);
+  assert.match(r.error, /timed out/);
+});
+
+test('an interrupted check stops the step it was running', { skip: process.platform === 'win32' && 'Node cannot send Ctrl+C to another process on Windows' }, async (t) => {
+  const f = fixture(t);
+  recordItem(f.setup, { id: 'slow', decision: 'ADOPT', created: ['slow.md'] }, f.opts);
+  const name = path.basename(path.dirname(f.setup));
+  const script = `import { checkItems } from ${JSON.stringify(new URL('../../check-setup.mjs', import.meta.url).href)};
+await checkItems(${JSON.stringify(f.setup)}, { kit: ${JSON.stringify(f.kit)}, ids: ['slow'], timeoutMs: 60000 });`;
+  const child = spawn(process.execPath, ['--input-type=module', '-e', script], { stdio: 'ignore' });
+  // The script's own command line names the folder too: the step has started once another process does.
+  const step = () => processesNaming(name).filter((pid) => pid !== child.pid);
+  const until = Date.now() + 10000;
+  while (!step().length && Date.now() < until) await new Promise((r) => { setTimeout(r, 100); });
+  assert.ok(step().length, 'the step started');
+  const ended = new Promise((r) => { child.on('exit', (code, signal) => r(signal)); });
+  child.kill('SIGINT');
+  assert.equal(await ended, 'SIGINT', 'the check ends as an interrupted program does');
+  assert.deepEqual(await noProcessNaming(name), [], 'the step outlived the interrupted check');
 });
 
 test('the command line: exit 0 when every item passes, 1 when one fails, 2 with no record or bad input', (t) => {

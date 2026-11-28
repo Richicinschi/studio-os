@@ -8,12 +8,15 @@
 //   node tools/export/release-files.mjs page --previous X.Y.Z --release X.Y.Z [--why "<group>=<text>"]...
 //     writes the page again, such as to add why lines after the release run;
 //   node tools/export/release-files.mjs check X.Y.Z <release commit>
-//     compares the page with the files the release commit changes against the previous tag: exit 0 when the
-//     same, 1 when not, with each file that differs.
+//     compares the page with the files the release commit changes against the previous tag, and the
+//     commit's tools/export/state.json with the hashes of its own tree: exit 0 when both match, 1 when not,
+//     with each file and item that differs.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { catalogItemFiles, releaseDiff } from './changelog.mjs';
 import { gateNotes } from './gates.mjs';
 import { loadDenyList } from './rules.mjs';
 import { loadManifest } from './manifest.mjs';
@@ -112,6 +115,30 @@ export function checkPage(git, previous, commit) {
   return { page: pages[0], missing: [...real].filter((x) => !listed.has(x)).sort(), extra: [...listed].filter((x) => !real.has(x)).sort() };
 }
 
+// The release commit's tools/export/state.json against the hashes of its own tree: { differ: [key, ...] },
+// or { error } when the commit has no state. The next release compares against this state, so an item or
+// card fixed after the release run, its state not written again, would list as changed in the next release
+// although this one ships it (v3.5.0's state kept 13 cards' hashes from before its review's fixes).
+export function checkState(root, commit) {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'kit-release-state-'));
+  try {
+    // The commit's files in a folder of their own, through an index of its own: the checkout stays as it is.
+    const tree = path.join(dir, 'tree');
+    const git = (args) => execFileSync('git', ['-C', root, ...args], { env: { ...process.env, GIT_INDEX_FILE: path.join(dir, 'index') }, stdio: ['ignore', 'ignore', 'pipe'] });
+    mkdirSync(tree);
+    git(['read-tree', commit]);
+    git(['checkout-index', '-a', `--prefix=${tree}/`]);
+    const read = (rel) => (existsSync(path.join(tree, rel)) ? JSON.parse(readFileSync(path.join(tree, rel), 'utf8')) : null);
+    const state = read('tools/export/state.json');
+    if (!state?.items) return { error: `${commit} has no tools/export/state.json with items` };
+    const manifest = read('export.manifest.json');
+    const now = releaseDiff(tree, catalogItemFiles(tree, manifest), null, { manifest, scans: read('tools/export/scans.json') || {} }).state.items;
+    return { differ: [...new Set([...Object.keys(state.items), ...Object.keys(now)])].filter((k) => state.items[k] !== now[k]).sort() };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 function main(argv) {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
   const git = (args) => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', maxBuffer: 1 << 28 });
@@ -134,7 +161,11 @@ function main(argv) {
     for (const x of r.missing) console.log(`not on the page: ${x}`);
     for (const x of r.extra) console.log(`on the page, not in the commit: ${x}`);
     console.log(r.missing.length || r.extra.length ? `${r.page} differs from ${commit}` : `${r.page} lists every file ${commit} changes since v${previous}`);
-    return r.missing.length || r.extra.length ? 1 : 0;
+    const s = checkState(root, commit);
+    if (s.error) console.error(s.error);
+    for (const k of s.differ || []) console.log(`state.json differs from the tree: ${k}`);
+    if (s.differ) console.log(s.differ.length ? `tools/export/state.json does not match ${commit}: release again ("Releasing the same version again" in docs/MAINTAINING.md)` : `tools/export/state.json matches ${commit}`);
+    return r.missing.length || r.extra.length || s.error || s.differ.length ? 1 : 0;
   }
   console.error('usage: node tools/export/release-files.mjs page --previous X.Y.Z --release X.Y.Z [--why "<group>=<text>"]... | check <previous X.Y.Z> <release commit>');
   return 2;

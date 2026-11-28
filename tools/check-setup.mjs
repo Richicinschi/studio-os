@@ -15,7 +15,7 @@
 // redirect, quoting trick or substitution beyond that; the content lint applies it to every card, and
 // this script again before it runs a block. It writes nothing itself.
 // Exit 0 when every item passes; 1 when one fails; 2 on bad input or an error, bash not found included.
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -238,25 +238,85 @@ const PRELUDE = [
   'frontdoor() { installed AGENTS.md "$1" 2>/dev/null || installed CLAUDE.md "$1"; }',
 ].join('\n');
 
-// Runs one check step in the setup folder; returns the last line it printed, and the last line of its errors.
-function runStep(step, { setup, kit, id, bash, timeoutMs }) {
-  const r = spawnSync(bash, ['-c', `${PRELUDE}\n${step.run}`], {
-    cwd: setup, encoding: 'utf8', input: '', timeout: timeoutMs,
-    env: { ...process.env, SETUP: setup, KIT: kit, ID: id, NODE: process.execPath, INSTALLED_MJS, GIT_OPTIONAL_LOCKS: '0' },
+// The most a step may print on its output or its errors, as spawnSync's own limit was.
+const MAX_OUTPUT = 1024 * 1024;
+
+// Stops a step and everything it started, then lets go of its output, so the step settles even when a
+// process it left behind still holds that output. On Windows Git's bash.exe is a launcher: stopping it
+// alone left its bash and that bash's commands running, so the whole tree goes, and only while the launcher
+// runs (taskkill /T finds the tree through it; an ended one's id may be another program's by now).
+// Elsewhere the step leads its own process group, which goes whole.
+function stopTree(child) {
+  if (process.platform !== 'win32') {
+    try { process.kill(-child.pid, 'SIGKILL'); } catch { /* already gone */ }
+  } else if (child.exitCode === null && child.signalCode === null) {
+    spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { stdio: 'ignore', windowsHide: true });
+  }
+  child.stdout?.destroy();
+  child.stderr?.destroy();
+}
+
+// Runs one check step in the setup folder; resolves to the last line it printed, and the last line of its
+// errors. A step past its time, or one that prints more than MAX_OUTPUT, is stopped with everything it
+// started before this resolves; so is the step running when this program is interrupted, before it ends.
+export function runStep(step, { setup, kit, id, bash, timeoutMs }) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(bash, ['-c', `${PRELUDE}\n${step.run}`], {
+      cwd: setup, windowsHide: true, detached: process.platform !== 'win32',
+      env: { ...process.env, SETUP: setup, KIT: kit, ID: id, NODE: process.execPath, INSTALLED_MJS, GIT_OPTIONAL_LOCKS: '0' },
+    });
+    let failed = null;
+    let done = false;
+    let timer = null;
+    const signals = process.platform === 'win32' ? ['SIGINT', 'SIGHUP'] : ['SIGINT', 'SIGTERM', 'SIGHUP'];
+    // The step runs in a process group of its own, so an interrupt reaches only this program: it stops the
+    // step, then ends as the interrupt would have ended it.
+    const onSignal = (signal) => { stopTree(child); settle(); process.kill(process.pid, signal); };
+    const settle = () => {
+      clearTimeout(timer);
+      for (const s of signals) process.off(s, onSignal);
+      const first = !done;
+      done = true;
+      return first;
+    };
+    child.on('error', (e) => { if (settle()) reject(new BadInput(`could not start ${bash}: ${e.message}`)); });
+    if (!child.stdout) return;
+    for (const s of signals) process.on(s, onSignal);
+    const collect = (stream) => {
+      const parts = [];
+      let size = 0;
+      stream.on('data', (b) => {
+        if (failed) return;
+        size += b.length;
+        if (size > MAX_OUTPUT) { failed = 'printed more than 1 MiB'; stopTree(child); return; }
+        parts.push(b);
+      });
+      stream.on('error', () => {});
+      return () => Buffer.concat(parts).toString('utf8');
+    };
+    const out = collect(child.stdout);
+    const err = collect(child.stderr);
+    child.stdin.on('error', () => {});
+    child.stdin.end();
+    // close, not exit: it waits for every process holding the step's output, so the whole step has ended.
+    child.on('close', () => {
+      if (!settle()) return;
+      if (failed) { resolve({ got: null, error: failed }); return; }
+      const last = (s) => s.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).at(-1) || '';
+      // Its errors from the first line, where the cause usually is (a helper that found no file), at most 300 characters.
+      const errs = err().split(/\r?\n/).map((l) => l.trim()).filter(Boolean).join(' / ');
+      resolve({ got: last(out()), error: null, stderr: errs.length > 300 ? `${errs.slice(0, 297)}...` : errs });
+    });
+    timer = setTimeout(() => { failed ||= `timed out after ${timeoutMs / 1000} s`; stopTree(child); }, timeoutMs);
   });
-  if (r.error && r.error.code !== 'ETIMEDOUT') throw new BadInput(`could not start ${bash}: ${r.error.message}`);
-  if (r.error) return { got: null, error: `timed out after ${timeoutMs / 1000} s` };
-  const last = (s) => String(s || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean).at(-1) || '';
-  // Its errors from the first line, where the cause usually is (a helper that found no file), at most 300 characters.
-  const errs = String(r.stderr || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean).join(' / ');
-  return { got: last(r.stdout), error: null, stderr: errs.length > 300 ? `${errs.slice(0, 297)}...` : errs };
 }
 
 // Each recorded item (or the ones named), checked: { id, status, files, missing, changed, steps, manual }.
-export function checkItems(setup, { kit = KIT, ids = [], bash, timeoutMs = RUN_TIMEOUT_MS } = {}) {
+export async function checkItems(setup, { kit = KIT, ids = [], bash, timeoutMs = RUN_TIMEOUT_MS } = {}) {
   const { items } = checkSetup(setup, { kit, ids });
   let shell = bash;
-  return items.filter((it) => !['SKIP', 'UNDONE'].includes(it.decision)).map((it) => {
+  const results = [];
+  for (const it of items.filter((x) => !['SKIP', 'UNDONE'].includes(x.decision))) {
     const files = it.parts.filter((p) => p.kind === 'file' && p.state !== 'added');
     const missing = it.parts.filter((p) => p.state === 'missing').map((p) => (p.kind === 'key' ? `${p.file}#${p.key}` : p.path));
     const changed = it.parts.filter((p) => p.state === 'changed' || p.state === 'added').map((p) => (p.kind === 'key' ? `${p.file}#${p.key}` : p.path));
@@ -266,15 +326,17 @@ export function checkItems(setup, { kit = KIT, ids = [], bash, timeoutMs = RUN_T
     const card = text === null ? null : parseChecks(text);
     // A block the allowlist refuses is never run, wherever the card came from.
     const errors = text === null ? [] : lintChecks(name, text);
-    const steps = errors.length || !card ? [] : card.steps.map((s) => {
+    const steps = [];
+    for (const s of errors.length || !card ? [] : card.steps) {
       if (shell === undefined) shell = findBash();
       if (!shell) throw new BadInput('bash was not found: install Git for Windows, or set CLAUDE_CODE_GIT_BASH_PATH to its bash.exe');
-      const r = runStep(s, { setup, kit, id: it.id, bash: shell, timeoutMs });
-      return { run: s.run, expect: s.expect, got: r.got, error: r.error, stderr: r.stderr, pass: !r.error && r.got === s.expect };
-    });
+      const r = await runStep(s, { setup, kit, id: it.id, bash: shell, timeoutMs });
+      steps.push({ run: s.run, expect: s.expect, got: r.got, error: r.error, stderr: r.stderr, pass: !r.error && r.got === s.expect });
+    }
     const fail = missing.length > 0 || errors.length > 0 || steps.some((s) => !s.pass);
-    return { id: it.id, card: card ? name : null, status: fail ? 'fail' : 'pass', files: files.length, keys: it.parts.filter((p) => p.kind === 'key').length, missing, changed, steps, manual: card ? card.manual : 0, errors };
-  });
+    results.push({ id: it.id, card: card ? name : null, status: fail ? 'fail' : 'pass', files: files.length, keys: it.parts.filter((p) => p.kind === 'key').length, missing, changed, steps, manual: card ? card.manual : 0, errors });
+  }
+  return results;
 }
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -300,22 +362,20 @@ export function checkItemsText(results) {
   return out.join('\n');
 }
 
-function main(argv) {
+async function main(argv) {
   const [setupArg, ...ids] = argv;
   if (!setupArg) throw new BadInput('usage: node tools/check-setup.mjs <setup> [<id>...]');
   const setup = path.resolve(setupArg);
   if (!existsSync(setup) || !statSync(setup).isDirectory()) throw new BadInput(`not a folder: ${setupArg}`);
   if (!readRecord(setup).items.length) throw new BadInput('no install record (adoption/installed.json): run each card\'s Check instead, as setup-check mode does');
-  const results = checkItems(setup, { ids });
+  const results = await checkItems(setup, { ids });
   console.log(checkItemsText(results));
   return results.every((r) => r.status === 'pass') ? 0 : 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  try {
-    process.exitCode = main(process.argv.slice(2));
-  } catch (e) {
+  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (e) => {
     console.error(`error: ${e.message}`);
     process.exitCode = 2;
-  }
+  });
 }

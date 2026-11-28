@@ -370,14 +370,27 @@ test('git runs with no GIT_* variable from the environment but the sealed config
 
 // audit() in a child process under the sealed environment, with git's buffer or time limit shrunk, as
 // the shipped limits (64 MiB of status, 20 seconds per git call) are out of a test's reach.
-function repositoriesWithLimits(s, limits) {
+function repositoriesWithLimits(s, limits, env = s.env) {
   const code = [
     `const m = await import(${JSON.stringify(pathToFileURL(AUDIT).href)});`,
     `if (!m.GIT_LIMITS) { process.stdout.write('no GIT_LIMITS'); process.exit(0); }`,
     `Object.assign(m.GIT_LIMITS, ${JSON.stringify(limits)});`,
     `process.stdout.write(m.audit(${JSON.stringify(s.root)}, { depth: 4 }).sections['Repositories'].join('\\n'));`,
   ].join('\n');
-  return spawnSync(process.execPath, ['--input-type=module', '-e', code], { encoding: 'utf8', env: s.env });
+  return spawnSync(process.execPath, ['--input-type=module', '-e', code], { encoding: 'utf8', env });
+}
+
+// The time limit and the environment under which every git call outlives it. A 1 ms limit alone was a race:
+// on a fast Linux machine a small git call can end within it. So, off Windows, the git on the PATH never
+// answers, however fast the machine; on Windows the real git stays, since it cannot start within 1 ms.
+function gitPastItsTime(s) {
+  if (process.platform === 'win32') return { limits: { timeout: 1 }, env: s.env };
+  const bin = path.join(s.dir, 'slow-bin');
+  mkdirSync(bin);
+  // exec, so the time limit's kill reaches sleep itself: a sleep left as the shell's child would hold the
+  // call's output open for its 30 s.
+  writeFileSync(path.join(bin, 'git'), '#!/bin/sh\nexec sleep 30\n', { mode: 0o755 });
+  return { limits: { timeout: 500 }, env: { ...s.env, PATH: `${bin}${path.delimiter}${s.env.PATH}` } };
 }
 
 test('a status too large for the buffer is dirty, and git that runs too long is unknown', () => {
@@ -391,7 +404,10 @@ test('a status too large for the buffer is dirty, and git that runs too long is 
     let r = repositoriesWithLimits(s, { maxBuffer: 16 });
     assert.equal(r.status, 0, 'audit exits 0 with a small buffer');
     expectIn(r.stdout, '| main | no (many changes) |', 'a status past the buffer counted as dirty');
-    r = repositoriesWithLimits(s, { timeout: 1 });
+    const slow = gitPastItsTime(s);
+    const started = Date.now();
+    r = repositoriesWithLimits(s, slow.limits, slow.env);
+    assert.ok(Date.now() - started >= slow.limits.timeout, 'git ran into the time limit, not a failure to start');
     assert.equal(r.status, 0, 'audit exits 0 with a short time limit');
     expectIn(r.stdout, '| unknown |', 'a git call past the time limit shown as unknown');
     expectNotIn(r.stdout, '| yes |', 'a timed-out status shown as clean');

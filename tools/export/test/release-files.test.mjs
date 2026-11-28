@@ -7,7 +7,8 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { changedFiles, checkPage, gateWhy, groupOf, parseWhy, releaseFilesPage } from '../release-files.mjs';
+import { catalogItemFiles, releaseDiff } from '../changelog.mjs';
+import { changedFiles, checkPage, checkState, gateWhy, groupOf, parseWhy, releaseFilesPage } from '../release-files.mjs';
 
 const manifest = { items: [
   { id: 'alpha', kind: 'skill', status: 'shipped' },
@@ -83,4 +84,25 @@ test('checkPage: the release commit against its page, both ways', (t) => {
   git(['add', '-A']); git(['commit', '-q', '-m', 'late']);
   assert.deepEqual(checkPage(git, '1.0.0', 'HEAD'), { page: 'docs/releases/v1.1.0.md', missing: ['added package.json', 'removed docs/old.md'], extra: [] });
   assert.match(checkPage(git, '1.0.0', 'v1.0.0').error, /found 0/);
+});
+
+test('checkState: the release commit\'s state against the hashes of its own tree, read from git', (t) => {
+  const { root, git, w } = repo(t);
+  w('.gitattributes', '* text=auto eol=lf\n'); w('README.md', 'a\n');
+  git(['add', '.']); git(['commit', '-q', '-m', 'before any release']);
+  const kit = { kit: 'k', version: '1.1.0', items: [{ id: 'alpha', kind: 'skill', status: 'shipped' }] };
+  w('export.manifest.json', JSON.stringify(kit)); w('catalog/skills/alpha/SKILL.md', 'skill\n'); w('cards/alpha.md', 'card\n');
+  const { state } = releaseDiff(root, catalogItemFiles(root, kit), null, { manifest: kit });
+  w('tools/export/state.json', JSON.stringify({ version: '1.1.0', ...state }));
+  git(['add', '.']); git(['commit', '-q', '-m', 'v1.1.0']);
+  assert.deepEqual(checkState(root, 'HEAD'), { differ: [] });
+  // A card fixed after the release run, and the state not written again: the next release would list the item
+  // as changed although the fixed card is what this release ships (v3.5.0's 13 cards).
+  w('cards/alpha.md', 'card, fixed\n');
+  assert.deepEqual(checkState(root, 'HEAD'), { differ: [] }, 'the commit, not the folder');
+  git(['commit', '-q', '-am', 'fix the card']);
+  assert.deepEqual(checkState(root, 'HEAD'), { differ: ['skill:alpha'] });
+  assert.match(checkState(root, 'HEAD~2').error, /no tools\/export\/state\.json/);
+  // Last: an older commit read into the checkout's own index would show here as staged changes.
+  assert.equal(git(['status', '--porcelain']), '', 'the checkout and its index stay as they were');
 });

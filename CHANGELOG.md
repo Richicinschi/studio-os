@@ -2,6 +2,14 @@
 
 Each export adds a section at the top. `drill-to-adopt` in update mode reads this file.
 
+## v3.5.1 (2026-11-28)
+
+- tools/check-setup.mjs now stops a check step together with everything it started when the step runs past its time, prints more than 1 MiB, or the check is interrupted. Before, on Windows, a timed-out step left its shell and its commands running in the background. A step that prints more than 1 MiB now fails its item, where the whole run used to stop with an error.
+- Maintainers: on Linux and macOS, the audit test's time-limit case no longer depends on how fast the machine is. release-files.mjs check also fails when a release commit's tools/export/state.json does not match its files: v3.5.0's state kept the old hashes of 13 cards fixed after its release run, and v3.5.1's state starts from the hashes v3.5.0 shipped. The catalog is the one v3.5.0 shipped.
+- Every file this release changed, under its item: [docs/releases/v3.5.1.md](docs/releases/v3.5.1.md).
+
+No catalog changes.
+
 ## v3.5.0 (2026-11-26)
 
 - The README and START-HERE lead with the adoption protocol and name the short path: "Start with continuity" gives a first result in one sitting, proved in a fresh session (#3, #28, #29).
